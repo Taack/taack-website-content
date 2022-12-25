@@ -1,7 +1,8 @@
-= Informations avancées sur les plugins
+= Les plugins
 :doctype: book
 :toc:
-:taack-category: 1|plugin
+:source-highlighter: rouge
+:taack-category: 1|doc
 
 Pour qu'un plugin soit reconnu et puisse être affiché dans votre Intranet, vous devez créer un `GrailsPlugin` qui implémente `TaackPlugin`.
 
