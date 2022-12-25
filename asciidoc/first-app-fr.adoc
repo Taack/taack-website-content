@@ -2,6 +2,7 @@
 :doctype: book
 :taack-category: 2
 :toc:
+:source-highlighter: rouge
 
 == Comment une application fonctionne avec Taack Framework ?
 
