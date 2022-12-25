@@ -1,0 +1,49 @@
+= Informations avancées sur les plugins
+:doctype: book
+
+Pour qu'un plugin soit reconnu et puisse être affiché dans votre Intranet, vous devez créer un `GrailsPlugin` qui implémente `TaackPlugin`.
+
+Voir un exemple ici : https://github.com/Taack/intranet/blob/main/app/crew/src/main/groovy/crew/CrewGrailsPlugin.groovy[CrewGrailsPlugin.groovy]
+
+Dans ce fichier, nous avons configuré les éléments suivants :
+
+== Rôles et accès
+
+[,groovy]
+----
+static final List<TaackPluginConfiguration.PluginRole> crewPluginRoles = [
+    new TaackPluginConfiguration.PluginRole("ROLE_CREW_ADMIN", TaackPluginConfiguration.PluginRole.RoleRanking.DIRECTOR),
+    new TaackPluginConfiguration.PluginRole("ROLE_CREW_MANAGER", TaackPluginConfiguration.PluginRole.RoleRanking.MANAGER),
+    new TaackPluginConfiguration.PluginRole("ROLE_CREW_USER", TaackPluginConfiguration.PluginRole.RoleRanking.USER),
+]
+----
+
+`crewPluginRoles` contient une liste de `PluginRole` qui associe un `Role` géré par springSecurityService à un `RoleRanking`, allant du plus petit accès (USER) au plus grand accès (DIRECTOR).
+
+== Classes liées
+
+[,groovy]
+----
+static final List<TaackPluginConfiguration.TaackLinkClass> linkClasses = [
+    new TaackPluginConfiguration.TaackLinkClass(Attachment.class, 'publicName', AttachmentController.&showAttachment as MethodClosure)
+]
+----
+
+`linkClasses` contient une liste de `TaackLinkClass`, qui définit les classes qui seront liées à partir d'autres objets et leur comportement par défaut (attribut affiché comme nom et action du contrôleur vers laquelle rediriger).
+Dans cet exemple, nous voulons que Attachment puisse être affiché dans d'autres classes sous son publicName et nous voulons qu'il redirige vers showAttachment.
+
+== Configuration du plugin
+
+[,groovy]
+----
+static final TaackPluginConfiguration crewPluginConfiguration = new TaackPluginConfiguration("Crew",
+    "/crew/crew.svg", "crew", Language.values() as List,
+    new TaackPluginConfiguration.IPluginRole() {
+        @Override
+        List<TaackPluginConfiguration.PluginRole> getPluginRoles() {
+            crewPluginRoles
+        }
+    })
+----
+
+C'est ici que nous définissons le nom de l'application, son icône, son package et la langue dans laquelle il est disponible. C'est également ici que nous indiquons que le plugin utilise la liste des PluginRole et des LinkClasses créée précédemment (dans ce cas, nous ne remplissons que la PluginRoleList).
