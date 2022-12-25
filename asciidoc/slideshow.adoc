@@ -47,7 +47,7 @@ DSL (#Domain Specific Language#)
 [%notitle]
 === Forms
 
-image:screenshot-form-user-en.webp[background, size=cover]
+image::screenshot-form-user-en.webp[background, size=cover]
 
 [.columns]
 == Graphical Components
