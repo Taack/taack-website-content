@@ -1,0 +1,11 @@
+= Why should you use DSL
+:taack-category: 0
+
+Using the Taack-UI framework, you will make heavy use of DSL (Domain Specific Languages).
+They are specialized programming languages that are designed to solve a specific problem within a particular domain. DSLs can be a good choice in certain situations because they offer a number of benefits:
+
+* *Improved readability*: DSLs are often designed with a focus on readability, which makes them easier to understand and use for developers who are familiar with the domain. This can improve the efficiency of development and reduce the risk of errors.
+* *Enhanced expressiveness*: DSLs are designed to express domain-specific concepts in a concise and intuitive way, which can make it easier to solve complex problems and express complex ideas.
+* *Improved maintainability*: DSLs can be designed with maintainability in mind, which can make it easier to modify and extend the code over time.
+
+Overall, DSLs can be a good choice when you need to solve a specific problem within a particular domain.

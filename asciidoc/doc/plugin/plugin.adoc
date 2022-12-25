@@ -1,4 +1,7 @@
 = More in-depth information about plugins
+:doctype: book
+:toc:
+:taack-category: 1|plugin
 
 For a plugin to be recognized and to be shown on your intranet, you will need to create a `GrailsPlugin` that implements `TaackPlugin`.
 

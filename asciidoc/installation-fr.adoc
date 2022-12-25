@@ -1,5 +1,6 @@
 = Installation
 :doctype: book
+:taack-category: 1
 
 == Prérequis
 

@@ -1,5 +1,6 @@
 = First app
 :doctype: book
+:taack-category: 2
 
 == How app works with Taack Framework
 
