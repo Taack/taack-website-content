@@ -1,6 +1,7 @@
 = Première application
 :doctype: book
 :taack-category: 2
+:toc:
 
 == Comment une application fonctionne avec Taack Framework ?
 
