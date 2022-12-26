@@ -1,6 +1,8 @@
 = Video
 :doctype: book
 :taack-category: 2
-:toc:
 :source-highlighter: rouge
 
+== Youtube Channel
+
+https://www.youtube.com/channel/UCPB81L10AKGXgqPc-zhsvVA

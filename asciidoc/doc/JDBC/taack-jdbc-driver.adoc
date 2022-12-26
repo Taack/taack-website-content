@@ -3,6 +3,12 @@
 :taack-category: 0|doc
 :toc:
 :source-highlighter: rouge
+// ifdef::webimagesdir[:imagesdir: {webimagesdir}]
+// ifndef::webimagesdir[:imagesdir: images]
+// ifdef::webrootpath[:imagesoutdir: {webrootpath}]
+//:imagesdir: images
+// ifdef::webrootpath[:imagesoutdir: {webrootpath}]
+:xrefdir: .
 
 == What is it ?
 
@@ -15,7 +21,7 @@ Updating data through this mean is a complex subject. We have to deal with user 
 This is underway.
 
 .Sequence Diagram when executing a Query without errors
-[plantuml,format="svg",opts={optsi}]
+[plantuml,format="svg",opts="online"]
 ----
 @startuml
 group Querying Object using TQL

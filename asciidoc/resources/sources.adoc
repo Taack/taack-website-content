@@ -27,3 +27,9 @@ The Infra contains 3 projects (`taack-jdbc-common` is shared):
 * `taack-jdbc-client` source of the JDBC Driver
 * `taack-ui` Grails plugin that contains the main source code
 
+
+=== Intranet Sample App
+
+https://github.com/Taack/intranet
+
+This app can be use as a skeleton for your future developments.

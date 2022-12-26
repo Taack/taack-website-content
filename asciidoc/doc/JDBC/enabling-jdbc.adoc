@@ -1,12 +1,13 @@
 = Enabling JDBC
 :doctype: book
 :taack-category: 1|doc
+:toc:
 :source-highlighter: rouge
 
 == Create a non-lazy service
 
 .Enabling a Jdbc for `User` domain class
-[source,groovy]
+[,groovy]
 ----
 package crew
 
