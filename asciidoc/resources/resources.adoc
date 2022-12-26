@@ -1,0 +1,3 @@
+= Resources
+:doctype: book
+:taack-category: 2|resources

@@ -1,0 +1,236 @@
+= Taack JDBC Driver
+:doctype: book
+:taack-category: 0|doc
+:toc:
+:source-highlighter: rouge
+
+== What is it ?
+
+JDBC stands for *Java Database Connectivity*. It is an old, important and hugely used Java component. It simplifies data querying and editing between different programs.
+
+Our current JDBC implementation allows only to query Data from the Intranet.
+
+Updating data through this mean is a complex subject. We have to deal with user rights and Data validation that is not described at a Database level, but directly inside the code of the Intranet. Some new approach is needed on our side to avoid duplicating the code.
+
+This is underway.
+
+.Sequence Diagram when executing a Query without errors
+[plantuml,format="svg",opts={optsi}]
+----
+@startuml
+group Querying Object using TQL
+        You -> Program : Type the Query
+        activate Program
+        Program -> Driver : Transmit the Query
+        Driver -> Intranet : Tranmit the Query
+        Intranet -> Intranet : Validate TQL Grammar
+        Intranet -> Intranet : Validate Tables and fields
+        Intranet -> Intranet : Translate TQL to HQL
+        Intranet -> Intranet : Translate HQL to SQL
+        note right
+            **SQL** is the Database
+            Native Language
+        end note
+        Intranet -> Database : transmit the SQL
+        activate Database #000055
+        Database -> Intranet : retreive Results
+        deactivate Database
+        Intranet -> Intranet : Pack Results
+        Intranet -> Driver : Transmit the Pack
+        Driver -> Driver : Unpack
+        Driver -> Program : Transmit Results
+        Program -> You : Show Results
+        deactivate Program
+        You -> Program : You scroll on \nthe results
+        note right
+            **Program** will request for
+            more data if needed,
+            using an **offset**
+        end note
+end
+
+box "Your Computer" #LightBlue
+    participant Program
+    participant Driver
+end box
+box "The Intranet Server" #Yellow
+    participant Intranet
+    participant Database
+end box
+
+@enduml
+----
+
+== Where to Query Data with This Driver ?
+
+Only *3 software programs* have been tested with this Driver so far:
+|===
+|Program            |Introspection ?|Querying ? |Updating ? | Inserting ?
+
+|LibreOffice 7.3    |Only Table List|Yes        |No         | No
+|dBeaver            |Yes            |Yes        |Not Yet    | Not Yet
+|Intellij           |Yes            |Yes        |Not Yet    | Not Yet
+|===
+
+#Introspection# helps you when writing Queries with the *autocompletion*. During the typing of the Query, the program will let you know available tables and fields.
+
+There are 2 work patterns in order to analyze data:
+
+* Write and test the query in a software supporting *Introspection*;
+* Then, either:
+** Use the query typed directly in *LibreOffice*
+** Or work with a *CSV extraction* and put it in any software (Including *Office*)
+
+WARNING: I will make videos later on how to set up the driver with those programs.
+
+== TQL Queries
+
+The main difference with a regular JDBC Driver and our is the Query language.
+
+We developed the *TQL* (Taack Query Language), here are some advantages:
+
+* Secured, we check the query typed before sending it to the real database
+* Easy syntax:
+** Less need of joins
+** Referenced field access (see <<easy-syntax>> point (2))
+** Database agnostic
+
+=== Structure of Basic Queries
+
+[source,sql]
+[[easy-syntax]]
+.TQL Basic Sample
+----
+select                              <1>
+    l.client.firstName,             <2>
+    l.rep.username                  <2>
+from Lead l                         <3>
+where l.dateCreated > '2022-01-01'  <4>
+----
+<1> #Select clause#, allowing to select *columns*;
+<2> #Deferenced Fields#, if the column is itself an object, you can recursively access object fields. Here rep is a `User` object that contains fields in itself (like `username`);
+<3> #From clause#, allowing to choose *tables*, here we use an _alias_ `l`
+<4> #Where clause# allowing to filter data.
+
+=== Basic Queries With Formulas
+
+It is possible to add arithmetic formulas in select clause.
+
+[source,sql]
+[[basic-query-with-formulas]]
+.TQL Basic Sample With Formulas
+----
+select
+    ll.lead.name,
+    ll.qty * ll.salePrice as totalWoTaxes   <1>
+from LeadLine ll
+where ll.qty * ll.salePrice > 100           <2>
+----
+<1> #Select clause#, support both `column alias` and arithmetic operations
+<2> #Where clause# also support arithmetic
+
+WARNING: Columns Alias name must start with a lower case letter and only be part of the ASCII7 character set.
+
+.Results Basic Sample With Formulas
+|===
+|lead.name |totalWoTaxes
+
+|Balisage pylône SFR site 240087 (Hivory)
+|250.00000000
+
+|Balisage pylône SFR site 240087 (Hivory)
+|340.00000000
+
+|Balisage pylône SFR site 240087 (Hivory)
+|3410.00000000
+
+|EL BJORN low intensity IR AWL system
+|2700.00000000
+|===
+
+=== Queries with Grouping
+
+Grouping clause add the capability to aggregate data. The <<basic-query-with-formulas>> is not useful, since there is one line per offer line. It is possible to use grouping in order to get one line per offer, like in the following sample:
+
+[source,sql]
+.TQL Sample With Grouping And Formulas
+----
+select
+    ll.lead.rep.mainSubsidiary as salesmanSubsidiary,   <1>
+    count(ll.id),                                       <2>
+    sum(ll.qty * ll.salePrice)                          <2>
+from LeadLine ll
+group by ll.lead.rep.mainSubsidiary                     <1>
+----
+<1> Standard field, it has to be listed in #Group by clause#;
+<2> You can use #count# or #sum# aggregation functions.
+
+WARNING: Column Aliases are not supported on aggregated columns
+
+|===
+|salesmanSubsidiary|count(ll.id)    |sum(ll.qty * ll.salePrice)
+
+|CITEL_2CP         |118605|212619001943.17760000
+|CITEL_GMBH        |37336 |261342488.98760000
+|CITEL_INC         |25172 |319681146.49190000
+|CITEL_INDIA       |24868 |1122541659.94000000
+|CITEL_OOO         |10382 |3990221200.80740000
+|CITEL_SH          |269   |552810.59000000
+|OBSTA             |46151 |2762758463.12580000
+|===
+
+=== Queries Inner Joins
+
+Sometimes a column point to more than one line.
+
+It is called a *many-to-many* relationship. We cannot use referenced fields directly, you have to use what is called *joins* ... (it sounds 70th, but it is not me)
+
+In the next sample, *Items* hold many *Values*, and *Values* can be used by more than one *Item*. If we want to list Item and Values in the same table, we need some kind of cross-product between 2 sets of data.
+
+WARNING: Cardinality of cross-product of 2 sets is #M x N#, you have to use *Where clause* to reduce the number of results.
+
+[source,sql]
+.TQL Simple Join
+----
+select
+    i.name,
+    i.ref,
+    v.valueString,
+    v.associatedProperty.valueKind as kind,
+    v.associatedProperty.kindOfCharacteristic as typeOfChar,
+    v.associatedProperty.nameAlias as nameAlias
+from Item i, Value v                                    <1>
+where v in elements(i.values) and i.range.name = 'DVM'  <2>
+
+----
+<1> We list 2 tables independently
+<2> We *MUST* limit the number of results with the expression `v in elements(i.values)`
+
+.Results
+|====
+| name | ref | valueString | kind | typeOfChar | nameAlias
+
+| DVM-230-16A | 3589015 | NULL | dico | BULLET_POINTS | bulletPoints
+| DVM-230-16A | 3589015 | IP20 | string | MECA | NULL
+| DVM-230-16A | 3589015 | -40/+85°C | string | MECA | NULL
+| DVM-230-16A | 3589015 | NULL | dico | NULL | description
+| DVM-230-16A | 3589015 | NULL | dico | NULL | subFamily
+| DVM-230-16A | 3589015 | NULL | dico | MECA | NULL
+| DVM-230-16A | 3589015 | NULL | dico | NORMES | NULL
+| DVM-230-16A | 3589015 | voir schéma | dico | MECA | NULL
+| DVM-230-16A | 3589015 | NULL | dico | MECA | NULL
+| DVM-230-16A | 3589015 | NULL | dico | MECA | NULL
+| DVM-230-16A | 3589015 | NULL | dico | MECA | NULL
+| DVM-230-16A | 3589015 | 16 A | string | ELEC | NULL
+| DVM-230-16A | 3589015 | NULL | dico | ELEC | NULL
+| DVM-230-16A | 3589015 | 0.0305 kg | string | MECA | NULL
+| DVM-230-16A | 3589015 | NULL | dico | NULL | family
+| DVM-230-16A | 3589015 | 230 V monophasé | dico | ELEC | NULL
+| DVM-230-16A | 3589015 | PTFE | string | MECA | NULL
+| DVM-230-16A | 3589015 | NULL | bool | NULL | NULL
+|====
+
+== Current Driver Limitations
+
+* You will not be able to *deference* language fields. (`v.valueMap['fr']` will fail, also `v.valueMap`). More on this later.
+* We support only Inner join, not outer join. Our current join implementation is slow, we can improve that, but it is complex, more on this later.

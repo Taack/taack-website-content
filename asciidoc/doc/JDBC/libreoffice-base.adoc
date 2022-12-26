@@ -1,0 +1,10 @@
+= Libreoffice Base
+:doctype: book
+:taack-category: 1|doc
+:source-highlighter: rouge
+
+== Configure LibreOffice to use Jdk 17
+
+== Add the Jar Driver
+
+== Create a LibreOffice Base File

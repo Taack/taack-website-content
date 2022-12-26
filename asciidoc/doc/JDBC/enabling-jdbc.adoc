@@ -1,0 +1,36 @@
+= Enabling JDBC
+:doctype: book
+:taack-category: 1|doc
+:source-highlighter: rouge
+
+== Create a non-lazy service
+
+.Enabling a Jdbc for `User` domain class
+[source,groovy]
+----
+package crew
+
+import grails.compiler.GrailsCompileStatic
+import org.taack.User
+
+import javax.annotation.PostConstruct
+
+import static taack.base.TaackJdbcService.Jdbc
+
+@GrailsCompileStatic
+class CrewJdbcService {
+
+    static lazyInit = false <1>
+
+    @PostConstruct <2>
+    private static void init() {
+        def u = new User()
+        Jdbc.registerClass(User, u.username_, u.mail_, u.subsidiary_, u.firstName_, u.lastName_, u.businessUnit_, u.enabled_) <3>
+    }
+}
+----
+
+<1> The service must not be lazily initialized, it does not need to be injected somewhere
+<2> Main method listing domain class columns available through TQL
+
+
