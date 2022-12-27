@@ -110,10 +110,6 @@ digraph mygraph {
 
 == Code Sample
 
-[[table-preview]]
-.Table with its filter.
-image::table.png[Form,700,align=center,title-align=center]
-
 The right part of the preview corresponds to the DSL sample below.
 The filter is on the left of the image, see <<DslDescriptions/FilterDSL.adoc#filter-sample1>> for the corresponding code.
 
