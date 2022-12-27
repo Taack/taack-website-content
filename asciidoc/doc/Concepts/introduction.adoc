@@ -1,0 +1,49 @@
+= Taack Framework Introduction
+:doctype: book
+:taack-category: 1|doc/Concepts
+:toc:
+:source-highlighter: rouge
+
+== Goals
+
+Improve expressiveness of a typical Intranet application by using *Groovy DSL* (Domain Specific Languages).
+
+The DSLs are statically typed, most errors are detected during the development cycle and IDE can autocomplete code more easily.
+
+The Taask Framework also allow to shorten usual application actions by avoiding GSP and common operations (filter, save, show).
+
+== Architecture
+
+The *Taack Framework* depends on the *Grails* application framework. Grails brings the runtime context,
+
+Grails infrastructure has the following characteristics:
+
+* On top of SpringBoot (and Micronaut)
+* Uses Groovy as main language
+* Uses Gorm for data persistence over various technologies
+* Uses GSP or JSP for page rendering
+* Brings simplicity to Java EE by obeying to the moto *Convention over Configuration*
+
+== Actions
+
+In a web application, entry points are URLs. They are called *actions* in Grails terminology.
+
+*Actions* are responsible for updating browser state after user events (like a click, a key pressed, mouse move ...).
+
+There are 2 kinds of actions:
+
+* *ajax actions* that return data triggered by some *Javascript code* seating into the browser: this kind of actions do not change the page URL of the browser
+* *non-ajax actions* that return a complete page to the browser, along with a *new URL*.
+
+Taack Framework seats in the middle of those 2 kinds of actions: It is not a fully ajax framework, it is mostly an old school framework generating complete pages into the server, with the capability of updating a portion of a page using ajax. The browser internal state is kept minimal this way. On the server side all actions are *stateless*. On the browser side, the stack of modal windows and their layouts are stored to manage updating the content.
+
+Taack allows speeding up user interface composition without limiting usage of legacy, GSP based page.
+
+== Additional Framework Characteristics
+
+* Modular application approach
+* Few external dependencies
+* Support for *PDF*, *CSV* or *Mails* along HTML rendering
+* Statically typed
+* Intellij IDE Support
+* DSL rendering is done in only *one pass*, most of the time

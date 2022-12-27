@@ -1,0 +1,21 @@
+= Common Services
+:doctype: book
+:taack-category: 3|doc/Concepts
+:toc:
+:source-highlighter: rouge
+
+In a future release, services will be included directly in the Taack UI Grails Plugin that will be independent of App modules.
+
+== Taack-UI Module Services
+
+* `TaackUiSimpleService`: Service responsible for displaying blocks, either using ajax to change a portion of the page, or to show a new page.
+
+* `TaackSimpleSaveService`: allows saving objects to the database, initialising some fields. Report also validation errors when the object is not valid, displaying localized error message to the end user.
+
+* `TaackSimpleFilterService`: allows listing objects when displaying a table. Grouping and sorting are supported.
+
+== Additional Services
+
+* `TaackJdbcService` Service communicating with external JDBC clients
+
+* `TaackSearchService` Fulltext search support Service
