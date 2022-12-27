@@ -1,6 +1,6 @@
 = Taack JDBC Driver
 :doctype: book
-:taack-category: 0|doc
+:taack-category: 0|doc/JDBC
 :toc:
 :source-highlighter: rouge
 // ifdef::webimagesdir[:imagesdir: {webimagesdir}]

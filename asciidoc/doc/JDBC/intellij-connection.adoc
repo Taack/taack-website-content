@@ -1,6 +1,6 @@
 = Intellij JDBC Connection
 :doctype: book
-:taack-category: 1|doc
+:taack-category: 1|doc/JDBC
 :source-highlighter: rouge
 
 == Adding the Driver

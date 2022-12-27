@@ -1,6 +1,6 @@
 = Enabling JDBC
 :doctype: book
-:taack-category: 1|doc
+:taack-category: 1|doc/JDBC
 :toc:
 :source-highlighter: rouge
 

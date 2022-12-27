@@ -1,6 +1,6 @@
 = Video
 :doctype: book
-:taack-category: 2
+:taack-category: 1|resources
 :source-highlighter: rouge
 
 == Youtube Channel

@@ -1,3 +1,0 @@
-= Docs
-:doctype: book
-:taack-category: 2|doc

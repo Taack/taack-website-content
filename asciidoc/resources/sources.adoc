@@ -1,6 +1,6 @@
 = Sources
 :doctype: book
-:taack-category: 2
+:taack-category: 2|resources
 :source-highlighter: rouge
 
 == Github

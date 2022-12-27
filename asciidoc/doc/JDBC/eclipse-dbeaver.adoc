@@ -1,6 +1,6 @@
 = Eclipse DBeaver
 :doctype: book
-:taack-category: 3|doc
+:taack-category: 3|doc/JDBC
 :source-highlighter: rouge
 
 == Adding the Driver
