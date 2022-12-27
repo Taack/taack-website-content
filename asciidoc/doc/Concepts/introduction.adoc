@@ -10,11 +10,11 @@ Improve expressiveness of a typical Intranet application by using *Groovy DSL* (
 
 The DSLs are statically typed, most errors are detected during the development cycle and IDE can autocomplete code more easily.
 
-The Taask Framework also allow to shorten usual application actions by avoiding GSP and common operations (filter, save, show).
+The Taack Framework also allow to shorten usual application actions by avoiding GSP and common operations (filter, save, show).
 
 == Architecture
 
-The *Taack Framework* depends on the *Grails* application framework. Grails brings the runtime context,
+The *Taack Framework* depends on the *Grails* application framework. Grail brings the runtime context,
 
 Grails infrastructure has the following characteristics:
 
