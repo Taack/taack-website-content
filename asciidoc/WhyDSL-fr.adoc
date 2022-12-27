@@ -1,10 +1,10 @@
 = Pourquoi les DSL ?
-:taack-category: 0
+:taack-category: 01
 
 Le cadriciel Taack-ui utilise des DSLs (Domain Specific Language) pour définir l'interface utilisateur de l'application en lieu et place de template proche du HTML. Les DSL sont des langages spécialisés sur un domaine particulier. Dans certaines situations ils offrent les avantages suivants :
 
 * *Amélioration de la lisibilité* Les DSLs sont conçus pour améliorer la lisibilité en premier lieu, ce qui fait que le développement d'application se trouve simplifié par rapport à l'utilisation d'un langage plus généraliste.
 * *Plus d'expressivité* Les DSLs sont conçus pour exprimer un concept spécifique, ils sont plus concis, et plus intuitifs.
-* *Maintenance Simplifiée* Le support de l'éditeur de code peut aider s' il peut analyser statiquement le code. La maintenance et les erreurs lors de la phase de codage se trouvent donc réduite, le refactoring de code est aussi plus sûr.
+* *Maintenance Simplifiée* Le support de l'éditeur de code peut aider s'il peut analyser statiquement le code. La maintenance et les erreurs lors de la phase de codage se trouvent donc réduite, le refactoring de code est aussi plus sûr.
 
 D'une façon générale, les DSLs peuvent être un bon choix pour résoudre des problèmes récurrents et spécifiques. Le bon support de l'éditeur de code est crucial pour que l'efficacité lors du développement soit optimale.

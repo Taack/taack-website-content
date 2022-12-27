@@ -1,0 +1,34 @@
+= DSL for Grails
+:taack-category: 1
+
+Taack-UI is a plugin extending Grails by allowing to describe user interface and additional features using DSL (Domain Specific Language) statically typed.
+
+This extension simplify the following functionalities against classical Grails Application:
+
+* Security:
+** Transforming and displaying objects checking autorisations for the connected user;
+** Managing access and mask of links and form actions in a central place;
+** Object listing can display only data accessible to the user;
+
+* Solr for fulltext search:
+** Indexing and fulltext Search of domain objects;
+** Faceting;
+** Ranking;
+
+* Filtering data without queries
+* Manage file previews can be extended;
+* JDBC Driver to query Domain Objects using TQL (Taack Query Language) from Intellij, LibreOffice Base or DBeaver, as a classical datasource
+
+* File sharing via SFTP:
+** Virtual File System for each user (see <<sftp_screenshot>>)
+** Direct access to parts of the server storage for fast sharing, checking user credentials
+
+* Experimental Shell support accessible via Ssh, running the UI directly into the server (see <<ssh_screenshot>>)
+
+[[ssh_screenshot]]
+.Ssh server session
+image::screenshot-ssh.webp[]
+
+[[sftp_screenshot]]
+.Sftp file browser
+image::screenshot-sftp.webp[]

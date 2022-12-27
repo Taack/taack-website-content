@@ -1,0 +1,30 @@
+= Extension Grails DSL
+:taack-category: 1
+
+Taack-UI est une extension de Grails, permettant de décrire l’interface utilisateur et la sécurité d’une application Grails via des DSL Groovy statiquement typées. Le cadre offert par cette extension propose également de simplifier (et tester statiquement par l’IDE) les fonctionnalités suivantes par rapport à une application Grails classique :
+
+* La sécurité :
+** Transformation et affichage des objets limités aux champs modifiables par l’utilisateur ;
+** Gestion du masquage des actions accessibles à l’utilisateur à un endroit unique ;
+** Le listage des données accessibles à l’utilisateur ;
+* Le support de Solr pour la recherche textuelle :
+** Recherche et indexation textuelle des objets ;
+** Faceting
+** Ranking
+* Le filtrage des données sans avoir besoin de composer des requêtes ;
+* Gestion des aperçus de fichiers extensibles (accessible plus tard, la prévisualisation des fichiers STEP, DWG et autres en plus des formats bureautiques communs)
+* Driver JDBC, permettant le requêtage d’objet via le langage TQL (Taack Query Language) limitant la portée de la requête aux objets autorisés. Utilisable avec DBeaver, Intellij ou LibreOffice Base, comme une base de données classique.
+* Partage de fichier (expérimental) via Ssh
+** Système de fichier virtuel par utilisateur composé par le serveur d’application viaz SFTP (voir <<sftp_screenshot>>)
+*** Par exemple le répertoire /<username>/crew/pictures contient les photos des utilisateurs du système, bien que le stockage des photos sur le disque dur n’ait pas cet agencement
+*** Le fichier /<username>/crew/users.csv contient les données des utilisateurs actifs du système, bien que ce fichier ne soit généré qu’au moment de l’accès et soit non stocké ;
+** Accès à une partie du système de fichiers réels du serveur pour créer des espaces d’échange rapide ;
+* Shell (expérimental) via Ssh permettant de définir des interfaces graphiques s’exécutant entièrement sur le serveur (voir <<ssh_screenshot>>)
+
+[[ssh_screenshot]]
+.Ssh server session
+image::screenshot-ssh.webp[]
+
+[[sftp_screenshot]]
+.Sftp file browser
+image::screenshot-sftp.webp[]
