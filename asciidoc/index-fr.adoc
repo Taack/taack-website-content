@@ -8,6 +8,8 @@ Taack-UI est une extension de Grails, permettant de décrire l’interface utili
 ** Gestion du masquage des actions accessibles à l’utilisateur à un endroit unique ;
 ** Le listage des données accessibles à l’utilisateur ;
 
+* PDF, Mails, CSV, autres peuvent être rendu avec le mème code ;
+
 * Le support de Solr pour la recherche textuelle :
 ** Recherche et indexation textuelle des objets ;
 ** Faceting

@@ -10,6 +10,8 @@ This extension simplify the following functionalities against classical Grails A
 ** Managing access, mask links and form actions in a central place;
 ** Object listing can display only data accessible to the user without using `params`;
 
+* PDF, Mails, CSV, other for free, the block DSL can be used for any kind of rendering;
+
 * Solr for fulltext search:
 ** Indexing and fulltext Search of domain objects statically typed;
 ** Faceting;
