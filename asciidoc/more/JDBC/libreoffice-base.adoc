@@ -1,6 +1,6 @@
 = Libreoffice Base
 :doctype: book
-:taack-category: 1|doc/JDBC
+:taack-category: 1|more/JDBC
 :source-highlighter: rouge
 
 == Configure LibreOffice to use Jdk 17

@@ -1,0 +1,2 @@
+= Solr Search
+:taack-category: 10|more/Search

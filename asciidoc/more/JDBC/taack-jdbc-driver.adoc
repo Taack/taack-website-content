@@ -1,14 +1,8 @@
 = Taack JDBC Driver
 :doctype: book
-:taack-category: 0|doc/JDBC
+:taack-category: 0|more/JDBC
 :toc:
 :source-highlighter: rouge
-// ifdef::webimagesdir[:imagesdir: {webimagesdir}]
-// ifndef::webimagesdir[:imagesdir: images]
-// ifdef::webrootpath[:imagesoutdir: {webrootpath}]
-//:imagesdir: images
-// ifdef::webrootpath[:imagesoutdir: {webrootpath}]
-:xrefdir: .
 
 == What is it ?
 

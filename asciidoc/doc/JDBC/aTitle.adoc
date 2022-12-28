@@ -1,2 +1,0 @@
-= JDBC
-:taack-category: 50|doc/JDBC
