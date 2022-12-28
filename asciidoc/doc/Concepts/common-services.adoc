@@ -4,7 +4,7 @@
 :toc:
 :source-highlighter: rouge
 
-In a future release, services will be included directly in the Taack UI Grails Plugin that will be independent of App modules.
+In a future release, services will all be included directly in the *Taack UI* Grails Plugin that will be independent of App modules.
 
 == Taack-UI Module Services
 

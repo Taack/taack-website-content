@@ -1,0 +1,80 @@
+= Modular Directory Layout
+:doctype: book
+:taack-category: 10|doc/Concepts
+:toc:
+:source-highlighter: rouge
+
+The https://github.com/Taack/intranet[Intranet Sample App] is a modular https://gradle.org/[Gradle] application. You can get instructions to run it clicking on: link:../../first-app.adoc[First App].
+
+== Intranet Sample App Directory Layout
+
+[plantuml, format="svg", opts="inline"]
+----
+@startsalt
+{
+{T
++ <&folder> Gradle Application Root | Description
+++ <&folder> app    | Application modules folder
++++ <&folder> crew  | Mandatory base app to manage users
++++ <&folder> appModule1  | First application (Gradle module)
++++ <&folder> appModule2  | Second module
++++ <&folder> ...   | And so on
+++ <&folder> server | Server Root Application (Grails app)
+++ <&folder> gradle           | Gradle binaries
+++ <&file> build.gradle
+++ <&file> settings.gradle
+++ <&file> gradle.properties
+++ <&file> gradlew
+}
+}
+
+@endsalt
+----
+
+=== _app_ directory
+
+Hold grails plugins (or Gradle modules) that compose the Intranet application. Those plugins should have the lesser dependencies to be reusable by others.
+
+=== _crew_ directory
+
+Part of the application responsible for user management, only mandatory app that currently holds the Taack services.
+
+=== _server_ directory
+
+Grails application holding global configuration, common translations, static shared assets, and the root page.
+
+The *server* grails application depends on all application modules (or Grails plugins) defined in the app directory that are desired.
+
+== _infra_ directory
+
+Holds the sources of the *taack-ui* plugin.
+
+[plantuml, format="svg", opts="inline"]
+----
+@startsalt
+{
+{T
++ <&folder> infra     | Infra sources (see below)
+++ <&folder> client   | Browser code (Kotlin transpiled in Javascript)
+++ <&folder> gradle   | Gradle binaries
+++ <&folder> taack-jdbc-common| Common JDBC code
+++ <&folder> taack-jdbc-client| Common JDBC code
+++ <&folder> taack-ui | Taack User Interface code
+++ <&folder> gradle           | Gradle binaries
+++ <&file> build.gradle
+++ <&file> settings.gradle
+++ <&file> gradle.properties
+++ <&file> gradlew
+
+}
+}
+@endsalt
+----
+
+* _client_ project contains code that will be executed into the browser
+* _taack-jdbc-common_ common classes shared between _taack-ui_ and _taack-jdbc-client_
+* _taack-jdbc-client_ the JDBC driver (see link:../../more/JDBC/taack-jdbc-driver.adoc[taack-jdbc-driver])
+
+== _build.gradle_, _settings.gradle_ ...
+
+Usual gradle files..

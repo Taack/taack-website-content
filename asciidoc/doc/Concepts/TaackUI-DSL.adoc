@@ -5,7 +5,8 @@
 :source-highlighter: rouge
 
 == Block DSL
-Allows specifying page layout by defining blocs that contain other graphical elements. A block can be an ajax block, updated by some ajax actions.
+
+Allows specifying page layout, by defining blocs that contain other graphical elements. A block can be an ajax block, updated by some ajax actions. `ajaxBlock` can be targeted by their ID.
 
 [source,groovy]
 ----
@@ -30,14 +31,13 @@ image:screenshot-dsl-user-form-800h.webp[]
 
 == Block Elements DSLs
 
-* Form DSL: Allows to define a form to be included in a block
+* *Form DSL*: Allows to define a form to be included in a block
 
-* Show DSl: Allows to Show an object summary. It supports limited field edition
+* *Show DSl*: Allows to Show an object summary. It supports limited field edition
 
-* Table and Table filter DSL: a Table is associated to one or zero filter, filter cannot be displayed without a table.
+* *Table and Table filter DSL*: a Table is associated to one or zero filter, filters cannot be displayed without a table.
 ** Table DSL allows grouping and sorting columns
 ** Pagination is included
-
-* Chart DSL: Allows drawing graphs into a bloc
-
-* Custom DSL: to insert custom html code to be inserted into a block.
+** Table can also represent a tree
+* *Chart DSL*: Allows drawing graphs into a bloc
+* *Custom DSL*: to insert custom html code to be inserted into a block.
