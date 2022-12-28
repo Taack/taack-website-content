@@ -11,7 +11,7 @@ When `@TaackFieldEnum` annotation is specified on a class, additional symbols ar
 === Regular Classes Case
 
 .Enabling a Regular Classe code Sample
-[source,groovy]
+[,groovy]
 ----
 @GrailsCompileStatic <1>
 @TaackFieldEnum <2>
@@ -54,7 +54,7 @@ It has to implement the Grails `Validateable` traits.
 === Domain Classes Case
 
 .Enabling a Domain Classe code Sample
-[source,groovy]
+[,groovy]
 ----
 @GrailsCompileStatic
 @TaackFieldEnum
@@ -116,7 +116,7 @@ Domain classes are first class citizen to be used with Taack framework. It can u
 
 In the action where your filter is displayed, just call method `taackSimpleFilterService.list` the following code to get a list of object (taken from <<DslDescriptions/TableDSL.adoc#table-sample1>>)
 
-[source, groovy]
+[, groovy]
 ----
             def users = taackSimpleFilterService.list(User, 10, f,
                             defaultDirection) <1>
@@ -129,7 +129,7 @@ In the action where your filter is displayed, just call method `taackSimpleFilte
 <1> We pass the filter to the `list` method (parameter *f*), but all arguments except the first 2 are optional. `defaultDirection` allows to specify the default ordering of the table. 10 results are displayed at the same time.
 <2> Iteration over objects filtered
 
-[source, groovy]
+[, groovy]
 ----
 
             def objects = taackSimpleFilterService.list(
@@ -145,7 +145,7 @@ Passing the filter to the `list` method allows to restrict the query for securit
 
 In order to save a new object, or a modified object (we will see security consideration later), just call the following method into the form target action:
 
-[source, groovy]
+[, groovy]
 ----
 taackSimpleSaveService.saveThenRedirectOrRenderErrors(User, this.&index)
 ----

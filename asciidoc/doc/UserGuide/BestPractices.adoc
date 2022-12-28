@@ -21,7 +21,7 @@
 == i18n
 
 - Do not centralize i18n, use gradle module `i18n` folders
-[source,groovy]
+[,groovy]
 ----
 class Book {
     String title
