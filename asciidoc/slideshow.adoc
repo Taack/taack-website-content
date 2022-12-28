@@ -10,7 +10,7 @@ include::_settings_reveal.adoc[]
 
 = French Slides
 
-== User Interface *DSL*
+== User Interface https://en.wikipedia.org/wiki/Domain-specific_language[*DSL*]
 
 DSL (#Domain Specific Language#)
 

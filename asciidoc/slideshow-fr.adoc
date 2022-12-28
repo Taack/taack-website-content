@@ -10,7 +10,7 @@ include::_settings_reveal.adoc[]
 
 = French Slides
 
-== Langage dédié pour interface utilisateur
+== https://https://fr.wikipedia.org/wiki/Langage_d%C3%A9di%C3%A9[DSL] pour interface utilisateur
 
 ** Efficacité lors du développement et maintenance
 ** Mise en évidence des erreurs au moment du codage

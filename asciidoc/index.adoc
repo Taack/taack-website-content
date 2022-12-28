@@ -1,7 +1,7 @@
 = DSL for Grails
 :taack-category: 1
 
-Taack-UI is a plugin extending Grails by allowing to describe user interface and additional features using DSL (Domain Specific Language) statically typed.
+https://github.com/Taack/infra[Taack-UI] is a plugin extending https://grails.org/[Grails] by allowing to describe user interface and additional features using DSL (Domain Specific Language) statically typed.
 
 This extension simplify the following functionalities against classical Grails Application:
 
@@ -10,14 +10,14 @@ This extension simplify the following functionalities against classical Grails A
 ** Managing access, mask links and form actions in a central place;
 ** Object listing can display only data accessible to the user without using `params`;
 
-* PDF, Mails, CSV, other for free, the block DSL can be used for any kind of rendering;
+* PDF, Mails, CSV, other for free, the link:doc/DSLs/block-dsl.adoc[block DSL] can be used for any kind of rendering;
 
-* Solr for fulltext search:
+* Solr for link:/more/Search/Search.adoc[fulltext search]:
 ** Indexing and fulltext Search of domain objects statically typed;
 ** Faceting;
 ** Ranking;
 
-* Filtering, paginate and sorting data without queries and session data;
+* link:/doc/DSLs/filter-table-dsl.adoc[Filtering, paginate and sorting] data without queries and session data;
 * File previews can be extended;
 * JDBC Driver to query Domain Objects using #TQL# (Taack Query Language) from Intellij, LibreOffice Base or DBeaver, as a classical datasource;
 
