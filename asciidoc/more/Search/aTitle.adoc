@@ -1,2 +1,2 @@
-= JDBC
+= Search
 :taack-category: 50|more/Search
