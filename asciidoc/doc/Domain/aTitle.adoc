@@ -1,2 +1,0 @@
-= Domain
-:taack-category: 5|doc/Domain
