@@ -9,23 +9,23 @@
 
 https://github.com/Taack/taack-website-content
 
-We use asciidoc format to write documentation, for localization, we prefix the source with the language. Default language is English. `WhyDSL-fr.doc` will be the French version, `WhyDSL.adoc` the english one (default one).
+We use asciidoc format to write documentations, for localization, we suffix the file name with the language. Default language is English. `WhyDSL-fr.doc` will be the French version, `WhyDSL.adoc` the english one (default one).
 
 === Intellij Autocomplete sources
 
 https://github.com/Taack/taack-autocomplete
 
-We will release binaries in this repo, for each Intellij releases.
+We will release Intellij plugin binaries in this repo, for each Intellij releases.
 
 === Infra Sources
 
 https://github.com/Taack/infra
 
-The Infra contains 3 projects (`taack-jdbc-common` is shared):
+Infra contains 3 subprojects (`taack-jdbc-common` being shared):
 
-* `client` set of kotline files transpiled in Javascript, this project is aimed to avoid writing complex Javascript, assembly of this project is directly copied in `taack-ui` assets.
+* `client` set of kotlin files transpiled into Javascript. This project avoid writing complex Javascript, assembly of this project is directly copied in `taack-ui` assets.
 * `taack-jdbc-client` source of the JDBC Driver
-* `taack-ui` Grails plugin that contains the main source code
+* `taack-ui` Grails plugin sources
 
 
 === Intranet Sample App

@@ -6,7 +6,7 @@
 
 == Create a non-lazy service
 
-.Enabling a Jdbc for `User` domain class
+.Enabling Jdbc for `User` domain class
 [,groovy]
 ----
 package crew
@@ -26,12 +26,17 @@ class CrewJdbcService {
     @PostConstruct <2>
     private static void init() {
         def u = new User()
-        Jdbc.registerClass(User, u.username_, u.mail_, u.subsidiary_, u.firstName_, u.lastName_, u.businessUnit_, u.enabled_) <3>
+        Jdbc.registerClass(User,
+                u.username_, u.mail_,
+                u.subsidiary_, u.firstName_,
+                u.lastName_, u.businessUnit_,
+                u.enabled_) <3>
     }
 }
 ----
 
-<1> The service must not be lazily initialized, it does not need to be injected somewhere
-<2> Main method listing domain class columns available through TQL
+<1> The service must not be lazily initialized since it does not need to be injected somewhere
+<2> Method listing domain class columns available through TQL
+<3> Step 3 can be repeated for all domain classes
 
 

@@ -6,11 +6,11 @@
 
 == Goals
 
-Improve expressiveness of a typical Intranet application by using *Groovy DSL* (Domain Specific Languages).
+Improve expressiveness of a typical Intranet application by using http://docs.groovy-lang.org/docs/latest/html/documentation/core-domain-specific-languages.html[*Groovy DSL*] (Domain Specific Languages).
 
 The DSLs are statically typed, most errors are detected during the development cycle and IDE can autocomplete code more easily.
 
-The Taack Framework also allow to shorten usual application actions by avoiding GSP and common operations (filter, save, show).
+The Taack Framework also allow to shorten usual application code by avoiding GSP and common operations (filter, save, show).
 
 == Architecture
 
@@ -18,9 +18,9 @@ The *Taack Framework* depends on the *Grails* application framework. Grail bring
 
 Grails infrastructure has the following characteristics:
 
-* On top of SpringBoot (and Micronaut)
+* On top of https://spring.io/projects/spring-boot[SpringBoot] (and https://micronaut.io/[Micronaut])
 * Uses Groovy as main language
-* Uses Gorm for data persistence over various technologies
+* Uses https://gorm.grails.org/[Gorm] for data persistence over various technologies
 * Uses GSP or JSP for page rendering
 * Brings simplicity to Java EE by obeying to the moto *Convention over Configuration*
 
@@ -32,18 +32,18 @@ In a web application, entry points are URLs. They are called *actions* in Grails
 
 There are 2 kinds of actions:
 
-* *ajax actions* that return data triggered by some *Javascript code* seating into the browser: this kind of actions do not change the page URL of the browser
-* *non-ajax actions* that return a complete page to the browser, along with a *new URL*.
+* *ajax actions*: the page is updated by some *Javascript code* seating into the browser. The URL does not change (in our case).
+* *non-ajax actions*: complete page is reloaded by browser, the URL of the page might change.
 
-Taack Framework seats in the middle of those 2 kinds of actions: It is not a fully ajax framework, it is mostly an old school framework generating complete pages into the server, with the capability of updating a portion of a page using ajax. The browser internal state is kept minimal this way. On the server side all actions are *stateless*. On the browser side, the stack of modal windows and their layouts are stored to manage updating the content.
+Taack Framework seats in the middle of those 2 kinds of actions: It is not a fully ajax framework, it is mostly an old school framework generating complete pages into the server with the capability of updating a portion of a page using ajax.
 
-Taack allows speeding up user interface composition without limiting usage of legacy, GSP based page.
+The browser internal state is kept minimal this way. On the server side all actions are *stateless*. On the browser side, the stack of modal windows and their layouts are stored to manage content updates.
 
 == Additional Framework Characteristics
 
 * Modular application approach
-* Few external dependencies
+** Developer can focus only on their Gradle Modules
 * Support for *PDF*, *CSV* or *Mails* along HTML rendering
 * Statically typed
 * Intellij IDE Support
-* DSL rendering is done in only *one pass*, most of the time
+* DSL rendering is done in *one pass*, most of the time

@@ -1,4 +1,4 @@
-= Block
+= Block DSL
 :doctype: book
 :taack-category: 10|doc/DSLs
 :toc:
@@ -8,9 +8,9 @@
 * [*] Rendered into PDF
 * [ ] Rendered into CSV
 
-Top level DSL that is responsible for arranging page graphical elements and update ajaxBlock altogether. In case we are rendering a complete page, we also have to specify the page menu via the <<menu-dsl>>.
+Top level DSL that is responsible for arranging page graphical elements and update ajaxBlocks altogether. In case we are rendering a complete page, we also have to specify the page menu description via the link:menu-dsl.adoc[Menu DSL].
 
-This DSL is also responsible for managing modal windows. Open a modal using `modal` or close modal using `closeModalAndUpdateBlock`
+This DSL is also responsible for managing modal windows stack. Open a modal using `modal` or close modal using `closeModalAndUpdateBlock`.
 
 == Block Building Code Sample
 
@@ -53,31 +53,67 @@ image::screenshot-dsl-block.webp[]
                 }
             }
         }
-        taackUiSimpleService.show(b, buildMenu())
+        taackUiSimpleService.show(b, buildMenu())                   <3>
     }
 ----
 
 <1> Declare an invisible block of 1/2 window width
 <2> Declare 2 tabs inside, the first one is displayed when the page appear
+<3> Send the bloc along with the menu description to the browser.
 
-== Manage Modal Code Sample
+== Modal Stack Code Sample
+
+After processing a form, you can refresh the content of the page, or another modal below the current one. You also can reload the page, or display another page. Reloading the page allows the code to be reusable, since it does not depend on the current URL.
+
+Usually a modal is closed after processing a form. Either it is not valid, and errors are shown into the browser directly into the form, either we save the object and refresh the content.
+
+=== Close Modal and reload the page
 
 [source,groovy]
 ----
-        taackSimpleSaveService.saveThenDisplayBlockOrRenderErrors(EngineeringChangeRequest, <1>
-        new UiBlockSpecifier().ui { <2>
-            closeModalAndUpdateBlock { <3>
-                ajaxBlock ajaxBlockId, { <4>
-                    show "Projects", buildShowProjects(ecr),
-                        BlockSpec.Width.MAX, {
-                            action "Edit projects 2", ActionIcon.ADD,
-                                Ecr2Controller.&projectsForm as MC,
-                                [id: ecr.id, ajaxBlockId: ajaxBlockId], true
-                    }
+@Transactional
+@Secured(["ROLE_CMS_MANAGER", "ROLE_CMS_DIRECTOR"])
+def saveCmsInsert() {
+    taackSimpleSaveService.saveThenReloadOrRenderErrors(CmsInsert)
+}
+----
+
+If no error is detected saving CmsInsert, the page is simply reloaded.
+
+=== Close Modal and load a page
+
+[source,groovy]
+----
+@Transactional
+@Secured(["ROLE_ADMIN", "ROLE_CMS_MANAGER", "ROLE_CMS_DIRECTOR"])
+def saveCmsPage() {
+    taackSimpleSaveService.saveThenRedirectOrRenderErrors(  <1>
+        CmsPage, this.&pages as MethodClosure
+    )
+}
+----
+<1> The method closure in this controller will be loaded (respecting URL Mappings)
+
+=== Close Modal and refresh page ajax blocks
+
+.Complex Use Case: close the modal window and refresh ajaxBlock present in the page
+[source,groovy]
+----
+taackSimpleSaveService.saveThenDisplayBlockOrRenderErrors(
+    EngineeringChangeRequest,                                   <1>
+    new UiBlockSpecifier().ui {                                 <2>
+        closeModalAndUpdateBlock {                              <3>
+            ajaxBlock ajaxBlockId, {                            <4>
+                show "Projects", buildShowProjects(ecr),
+                    BlockSpec.Width.MAX, {
+                        action "Edit projects 2", ActionIcon.ADD,
+                            Ecr2Controller.&projectsForm as MC,
+                            [id: ecr.id, ajaxBlockId: ajaxBlockId], true
                 }
             }
-        })
-
+        }
+    }
+)
 ----
 
 <1> After an action implying to save an object is called into a modal, you can close the modal and refresh page elements in one action
