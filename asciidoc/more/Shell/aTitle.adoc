@@ -1,2 +1,2 @@
-= JDBC
+= Server Shell
 :taack-category: 60|more/Shell

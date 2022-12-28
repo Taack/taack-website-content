@@ -1,6 +1,7 @@
 = Use Cases
 :taack-category: 2|doc/UserGuide
 :toc:
+:source-highlighter: rouge
 
 Those use cases show what is up to the application developer responsibility (on diagrams, it is the controller actor), what is done automatically by the framework (light blue rectangle).
 

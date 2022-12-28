@@ -1,6 +1,7 @@
 = Developing Steps Overview
 :taack-category: 1|doc/UserGuide
 :toc:
+:source-highlighter: rouge
 
 == Enabling Taack framework
 
