@@ -9,7 +9,7 @@
 Your intranet project has two parts:
 
 * The app plugins, contained in the `app` folder, they are micro-projects each containing their dependencies, build, etc. `Crew` for example is an app plugin.
-For more in-depth explaination about how plugins are declared to the server link:doc/plugin.adoc#_more_in_depth_informations_about_plugins[check here].
+For more in-depth explaination about how plugins are declared to the server link:doc/plugin/taack-plugin.adoc#_about_plugins[check here].
 * The main server, this will use all of the app plugins that are implemented in its `build.gradle` and render them on the main intranet page.
 
 == Creating a new app plugin

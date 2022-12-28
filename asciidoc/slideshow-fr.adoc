@@ -10,9 +10,9 @@ include::_settings_reveal.adoc[]
 
 = French Slides
 
-== Langage dédié pour interface utilisateur (DSL)
+== Langage dédié pour interface utilisateur
 
-** Développement Rapide
+** Efficacité lors du développement et maintenance
 ** Mise en évidence des erreurs au moment du codage
 ** Concision du code
 
