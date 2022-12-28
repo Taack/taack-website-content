@@ -1,0 +1,278 @@
+= Use Cases
+:taack-category: 2|doc/UserGuide
+:toc:
+
+Those use cases show what is up to the application developer responsibility (on diagrams, it is the controller actor), what is done automatically by the framework (light blue rectangle).
+
+== Displaying a form and saving an object
+
+
+Two actions are involved, using 2 services:
+
+.Sequence Diagram Rendering Form and Process Object
+[plantuml,format="svg",opts={optsi}]
+----
+@startuml
+group Display Form
+    user -> controller : click on create or edit
+    activate controller
+    controller -> controller : buildForm
+    controller -> controller : buildBlock
+    controller -> taackUiSimpleService : show(block)
+    deactivate controller
+    activate taackUiSimpleService #005500
+    note right
+        choose Ajax or
+        full page rendering
+        to render the block
+    end note
+    taackUiSimpleService -> user : show the block containing the form
+    deactivate taackUiSimpleService
+end
+
+box "Taack Service" #LightBlue
+    participant taackUiSimpleService
+    participant taackSimpleSaveService
+end box
+
+== Edit Form ==
+
+group Save Form
+    user -> controller : click save
+    activate controller
+    controller -> taackSimpleSaveService : saveThenRedirectOrRenderErrors
+    deactivate controller
+    activate taackSimpleSaveService
+    taackSimpleSaveService -> taackSimpleSaveService : save
+    taackSimpleSaveService -> taackSimpleSaveService : redirectOrRenderErrors
+    alt valid object
+        taackSimpleSaveService -> user : redirect to target action
+    else invalid object
+        taackSimpleSaveService -> user : ajax form rendered with errors
+        deactivate taackSimpleSaveService
+    end
+end
+@enduml
+----
+
+.Code Sample: Form + Save Workflow
+[source,groovy]
+----
+    def userForm(User user) { <1>
+        if (!user)  user = new User() <2>
+
+        UiFormSpecifier f = new UiFormSpecifier() <3>
+        f.ui user, {
+            hiddenField user.subsidiary_
+            hiddenField user.origin_
+            section "User", {
+                field "Username", user.username_
+                field "First Name", user.firstName_
+                field "Last Name", user.lastName_
+                ajaxField "Manager", user.manager_, this.&selectUserM2O as MC
+                field "Trigram", user.trigram_
+                field "Passwd", user.password_
+            }
+            section "Coords", {
+                field "Business Unit", user.businessUnit_
+                field "Job", user.job_
+                field "Tel.", user.directPhone_
+                field "Other Tel.", user.additionalPhone_
+                field "Mail", user.mail_
+                field "Subsidiary", user.mainSubsidiary_
+                field "Allowed Subsidiaries", user.allowedSubsidiaries_
+            }
+            // [. . .]
+            formAction "Save", this.&saveUser as MC, user.id, true <4>
+        }
+
+        UiBlockSpecifier b = new UiBlockSpecifier()
+        b.ui {
+            modal {
+                ajaxBlock "userForm", {
+                    form "User Form", f, BlockSpec.Width.MAX
+                }
+            }
+        }
+        taackUiSimpleService.show(b) <5>
+    }
+
+    @Secured("ROLE_ADMIN") <6>
+    def saveUser(String redirectAction) { <7>
+        taackSimpleSaveService.saveThenRedirectOrRenderErrors(User, this.&listUser) <8>
+    }
+
+----
+
+<1> Action displaying the form
+<2> Create the object if object is null
+<3> Create the form
+<4> Form button that send the form data to the saveUser action
+<5> show the form
+<6> Secure the save action
+<7> Action that will save the object
+<8> Call to taackSimpleSaveService, here if the object is valid, user is redirected to `listUsers` action.
+
+== Display a table with sortable columns, inline actions, and a filter
+
+Only one action is necessary to manage pagination, filtering and sorting:
+
+.Sequence Diagram Managing Action on a Table to process a list of objects
+[plantuml,format="svg",opts={optsi}]
+----
+@startuml
+group Display Table with filter
+    loop as much as the user click on the table
+        user -> controller : filter or sort objects
+        activate controller
+        controller -> controller : buildFilter (optionaly)
+        controller -> controller : buildTableHeader
+        controller -> taackSimpleFilterService : list
+        activate taackSimpleFilterService #005500
+        return objects and counter
+        controller -> controller : build rows from objects
+        controller -> controller : buildBlock
+        controller -> taackUiSimpleService : show(block)
+        deactivate controller
+        activate taackUiSimpleService #005500
+        note right
+            choose Ajax or
+            full page rendering
+        end note
+        taackUiSimpleService -> user : show the table and the filter if any into the block
+        deactivate taackUiSimpleService
+    end
+end
+
+box "Taack Service" #LightBlue
+    participant taackUiSimpleService
+    participant taackSimpleFilterService
+end box
+
+@enduml
+----
+
+.Code Sample Filter and table
+[source,groovy]
+----
+    def index() { <1>
+        User cu = authenticatedUser as User
+
+        UiFilterSpecifier f = buildUserTableFilter cu <2>
+        UiTableSpecifier t = buildUserTable f <3>
+
+        UiBlockSpecifier b = new UiBlockSpecifier() <4>
+        b.ui {
+            ajaxBlock "userList", {
+                tableFilter "Filter", f, "Users", t, BlockSpec.Width.MAX, {
+                    if (cu.authorities*.authority.contains("ROLE_ADMIN"))
+                        action "Create User",
+                               ActionIcon.CREATE, this.&userForm as MC, true <5>
+                }
+            }
+        }
+
+        taackUiSimpleService.show(b, buildMenu()) <6>
+    }
+----
+
+<1> Action that display a list of objects
+<2> Build the filter, here the filter takes the current connected user as parameter, because we want to be able to list user team.
+<3> Build the table
+<4> Build the block containing the table and the filter
+<5> Add an action to create a new user
+<6> Show the block
+
+WARNING: We exceptionally pass the filter to the buildTable for building the query and avoiding *filter hacking*
+
+
+== Display a modal then close it and refresh part of current content
+
+.Sequence Diagram Managing Action on a Table to process a list of objects
+[plantuml,format="svg",opts={optsi}]
+----
+@startuml
+group Open Modal, Edit or create object, then refresh the page
+    user -> controller : click on create or edit
+    activate controller
+    controller -> controller : buildForm
+    controller -> controller : buildBlock
+    controller -> taackUiSimpleService : show(block)
+    deactivate controller
+    activate taackUiSimpleService #005500
+    note right
+        The block open a modal
+    end note
+    taackUiSimpleService -> user : show the block containing the form
+    deactivate taackUiSimpleService
+end
+
+box "Taack Service" #LightBlue
+    participant taackUiSimpleService
+    participant taackSimpleSaveService
+end box
+
+== Edit Form ==
+
+group Save Form
+    user -> controller : click save
+    activate controller
+    controller -> controller : buildBlock
+    note left
+        Here, the block contains
+        **closeModalAndUpdateBlock**
+    end note
+    controller -> taackSimpleSaveService : saveThenDisplayBlockOrRenderErrors
+    deactivate controller
+    activate taackSimpleSaveService
+    taackSimpleSaveService -> taackSimpleSaveService : save
+    taackSimpleSaveService -> taackSimpleSaveService : displayBlockOrRenderErrors
+    alt valid object
+        taackSimpleSaveService -> user : close modal and refresh current page
+    else invalid object
+        taackSimpleSaveService -> user : ajax form rendered with errors
+        deactivate taackSimpleSaveService
+    end
+end
+@enduml
+----
+
+.Code Sample to close modal and refresh current page
+[source,groovy]
+----
+        taackSimpleSaveService.saveThenDisplayBlockOrRenderErrors(EngineeringChangeRequest, <1>
+        new UiBlockSpecifier().ui { <2>
+            closeModalAndUpdateBlock { <3>
+                ajaxBlock ajaxBlockId, { <4>
+                    show "Projects", buildShowProjects(ecr), BlockSpec.Width.MAX, {
+                        action "Edit projects 2", ActionIcon.ADD,
+                            Ecr2Controller.&projectsForm as MC,
+                            [id: ecr.id, ajaxBlockId: ajaxBlockId], true
+                    }
+                }
+            }
+        })
+
+----
+
+<1> After an action implying to save an object is called into a modal, you can close the modal and refresh page elements in one action
+<2> `saveThenDisplayBlockOrRenderErrors` take a `UiBlockSpecifier` as parameter
+<3> `closeModalAndUpdateBlock` will first close the last opened modal and then apply the modification
+<4> Here, the block with the name contained in `ajaxBlockId` will be updated
+
+
+== TODO
+
+* Updating a portion of a page
+
+* Show some object with an editable field
+
+* Show a graph
+
+* Export a table in CSV
+
+* Rendering a block in a PDF
+
+* Rendering a block in a Mail
+
+* ...

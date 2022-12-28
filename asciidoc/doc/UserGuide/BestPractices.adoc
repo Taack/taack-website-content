@@ -1,0 +1,61 @@
+= Best Practices
+:taack-category: 10|doc/UserGuide
+:toc:
+
+== General
+
+- Use protected and final for methods in a controller that are not actions
+- Coding style: "the shortest the better", until you lower expressiveness
+- Use `@GrailsCompileStatic` or `@CompileStatic` everywhere
+- Always stateless actions, use no sessions
+- Avoid services to implement Controller traits
+- Do not annotate with `@Transactional` anything but controller actions
+
+- General rules:
+** Use final when applicable
+** Do not repeat yourself
+** keep symbols scope low
+** local variable names short
+** Explicit public method parameters and member names
+
+== i18n
+
+- Do not centralize i18n, use gradle module `i18n` folders
+[source,groovy]
+----
+class Book {
+    String title
+}
+----
+- class name localisation "book.label = Libro"
+- class field name localisation "book.title.label = Título del libro"
+- In order to be efficient
+** do not start translations too early
+** when you have a global overview, start translating
+** keep most important label short, use the `default` namespace for them, specialized label can be long
+- used convention for your i18n:
+** prefix with "default." everything that will be reused
+** do not prefix class name translated
+** for labels, prefix with "label."
+** for actions, prefix with "action."
+
+== Configuration
+
+- Use enum, in code, for configuration
+** Static test is the king
+** Groovy Enums are more readable than XML, Json, Yaml ... whatever
+
+== Security
+
+- Code managing security must be close to the place it is used
+** We do want to avoid centralisation for all concerns
+*** Create a new domain per needs, avoid cluttering `User` class
+*** Abstract concept should be avoided for security, static check is the king
+- Avoid complex rules that are not checked statically at compile time
+- Administrative rules must not rely on permission strings, a boolean value in an object is more explicite when testing in code...
+
+== You are efficient ...
+
+- when you do not break everything for altering a functionality
+- when new stuffs can be added easily
+- when different concern are kept isolated (or orthogonal, not influencing each other)

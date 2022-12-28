@@ -1,0 +1,13 @@
+= Security
+:taack-category: 11|doc/UserGuide
+:toc:
+
+== Overview
+
+#TODO incomplete#
+
+- First roles are checked for an action
+- Then in the body of the action, we load the user
+** Checking permissions and preferences
+** Language
+- if OK, display the page in localized
