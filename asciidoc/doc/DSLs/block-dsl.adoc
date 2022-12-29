@@ -10,7 +10,7 @@
 
 Top level DSL that is responsible for arranging page graphical elements and update ajaxBlocks altogether. In case we are rendering a complete page, we also have to specify the page menu description via the link:menu-dsl.adoc[Menu DSL].
 
-This DSL is also responsible for managing modal windows stack. Open a modal using `modal` or close modal using `closeModalAndUpdateBlock`.
+This DSL is also responsible for managing modal windows stack. Open a modal using `modal` or close modal using `closeModalAndUpdateBlock` (and other variants).
 
 == Block Building Code Sample
 
@@ -22,39 +22,39 @@ image::screenshot-dsl-block.webp[]
 [[block-sample1]]
 .Block Sample with Tabs
 ----
-    def editSlideshow(CmsPage slideshow) {
-        UiBlockSpecifier b = new UiBlockSpecifier()
+def editSlideshow(CmsPage slideshow) {
+    UiBlockSpecifier b = new UiBlockSpecifier()
 
-        Boolean createNew = slideshow == null
-        if (!slideshow)
-            slideshow = new CmsPage(pageType: CmsPageType.SLIDESHOW)
+    Boolean createNew = slideshow == null
+    if (!slideshow)
+        slideshow = new CmsPage(pageType: CmsPageType.SLIDESHOW)
 
-        b.ui {
-            if (createNew)
-                modal {
-                    ajaxBlock "createNew", {
-                        form "Create Slideshow",
-                                buildCmsSlideshowForm(slideshow),
-                                BlockSpec.Width.MAX
-                    }
-                }
-            else {
-                anonymousBlock BlockSpec.Width.HALF, {              <1>
-                    ajaxBlock "cmsSlideshowForm", {
-                        form "Edit Slideshow",
+    b.ui {
+        if (createNew)
+            modal {
+                ajaxBlock "createNew", {
+                    form "Create Slideshow",
                             buildCmsSlideshowForm(slideshow),
                             BlockSpec.Width.MAX
-                    }
-                }
-
-                blockTabs BlockSpec.Width.HALF, {
-                    blockTab "Images", buildImagesTab(slideshow)    <2>
-                    blockTab "Videos", buildVideosTab(slideshow)
                 }
             }
+        else {
+            anonymousBlock BlockSpec.Width.HALF, {              <1>
+                ajaxBlock "cmsSlideshowForm", {
+                    form "Edit Slideshow",
+                        buildCmsSlideshowForm(slideshow),
+                        BlockSpec.Width.MAX
+                }
+            }
+
+            blockTabs BlockSpec.Width.HALF, {
+                blockTab "Images", buildImagesTab(slideshow)    <2>
+                blockTab "Videos", buildVideosTab(slideshow)
+            }
         }
-        taackUiSimpleService.show(b, buildMenu())                   <3>
     }
+    taackUiSimpleService.show(b, buildMenu())                   <3>
+}
 ----
 
 <1> Declare an invisible block of 1/2 window width
@@ -63,9 +63,11 @@ image::screenshot-dsl-block.webp[]
 
 == Modal Stack Code Sample
 
-After processing a form, you can refresh the content of the page, or another modal below the current one. You also can reload the page, or display another page. Reloading the page allows the code to be reusable, since it does not depend on the current URL.
+After processing a form, you can refresh the content of the page, or another modal below the current one. You also can reload the page, or display another page. Reloading the page allows the code to be reusable, since it does not depend on the current URL (remember the `redirectAction` *params* you see in link:../../first-app.adoc#_adding_buttons_to_a_table_block[First App (Adding buttons to a table block)] .
 
 Usually a modal is closed after processing a form. Either it is not valid, and errors are shown into the browser directly into the form, either we save the object and refresh the content.
+
+See
 
 === Close Modal and reload the page
 

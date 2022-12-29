@@ -9,6 +9,15 @@
 * [ ] Rendered into PDF
 * [ ] Rendered into CSV
 
+== Form Validation
+
+.Localized form
+image::screenshot-form-validation.webp[]
+
+When saving an object, errors are reported, localized, with no additional cost...
+
+See Grails documentation on https://docs.grails.org/latest/ref/Constraints/Usage.html[Constraints Usage] to check your object validity before saving.
+
 == Code Sample
 
 [source,groovy]

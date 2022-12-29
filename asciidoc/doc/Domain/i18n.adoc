@@ -1,0 +1,9 @@
+= Internationalization
+:doctype: book
+:taack-category: 2|doc/Domain
+:toc:
+:source-highlighter: rouge
+
+== TODO
+
+Link to Grails i18n + table, filter, form localized..
