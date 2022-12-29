@@ -25,7 +25,9 @@ Avant toute chose, penchons-nous sur la navigation de votre nouvelle application
 static private UiMenuSpecifier buildMenu(String q = null) {
     UiMenuSpecifier m = new UiMenuSpecifier()
     m.ui {
-        menu 'Action', TurboController.&action as MethodClosure
+        menu 'Action', TurboController.&action as MC
+        // MC stands for MethodClosure
+        // import org.codehaus.groovy.runtime.MethodClosure as MC
     }
     return m
 }
@@ -35,7 +37,7 @@ Nous créons tout d'abord un objet UiMenuSpecifier, puis nous définissons le co
 
 [,groovy]
 ----
-menu 'Action', TurboController.&action as MethodClosure
+menu 'Action', TurboController.&action as MC
 ----
 
 Ici, `menu` crée un simple lien dans notre bar de navigation. `'Action'` est le nom du lien affiché et `TurboController.&action as MethodClosure` définie l'action vers laquelle le lien va rediriger.
@@ -132,7 +134,8 @@ tableSpecifier.ui Book, {
             // to redirect towards the book deletion action
             if (isAdmin) {
                 rowColumn {
-                    rowLink "Delete book", ActionIcon.DELETE, TurboController.&index as MethodClosure, book.id, false
+                    rowLink "Delete book", ActionIcon.DELETE,
+                            TurboController.&index as MC, book.id, false
                 }
             }
         }
@@ -172,7 +175,9 @@ taackUiSimpleService.show(new UiBlockSpecifier().ui {
         table 'Book table', tableSpecifier, BlockSpec.Width.MAX, {
             //Added Closure here
             if (isAdmin())
-                action 'Create book', ActionIcon.CREATE, TurboController.&bookForm as MethodClosure, [redirectAction: actionName], true
+                action 'Create book', ActionIcon.CREATE,
+                       TurboController.&bookForm as MC,
+                       [redirectAction: actionName], true
         }
     }
 }, buildMenu())
@@ -200,6 +205,13 @@ def bookForm() {
     Book book = Book.read(params.long("id")) ?: new Book(params)
 }
 ----
+OR You could simply write
+[,groovy]
+----
+def bookForm(Book book) {
+    book ?= new Book(params)
+}
+----
 
 Maintenant, nous allons créer un `FormSpecifier` pour définir notre formulaire et son contenu :
 
@@ -213,7 +225,8 @@ form.ui book, {
         field book.author_
     }
     //Save button
-    formAction "Save", this.&saveBook as MethodClosure, book.id, [redirectAction: params.get("redirectAction")], true
+    formAction 'Save', this.&saveBook as MC, book.id,
+               [redirectAction: params.get('redirectAction')], true
 }
 ----
 
@@ -241,7 +254,7 @@ N'oubliez pas de créer l'action `saveBook` :
 @Secured("ROLE_ADMIN")
 @Transactional
 def saveBook(String redirectAction) {
-    MethodClosure red = (redirectAction ? this.&"$redirectAction" : this.&index) as MethodClosure
+    MC red = (redirectAction ? this.&"$redirectAction" : this.&index) as MC
     taackSimpleSaveService.saveThenRedirectOrRenderErrors(Book, redirectAction == "null" ? null : red)
 }
 ----
@@ -276,7 +289,7 @@ Nous devons également ajouter un lien vers cette page dans le tableau. Pour ajo
 
 [,groovy]
 ----
-rowLink "Show book", ActionIcon.SHOW * ActionIconStyleModifier.SCALE_DOWN, TurboController.&showBook as MethodClosure, book.id, true
+rowLink "Show book", ActionIcon.SHOW * ActionIconStyleModifier.SCALE_DOWN, TurboController.&showBook as MC, book.id, true
 ----
 
 Cela créera un _petit_ bouton dans la cellule du tableau qui ouvrira un modal avec les détails du livre correspondant.

@@ -1,6 +1,6 @@
 = Modular Directory Layout
 :doctype: book
-:taack-category: 10|doc/Concepts
+:taack-category: 5|doc/Concepts
 :toc:
 :source-highlighter: rouge
 

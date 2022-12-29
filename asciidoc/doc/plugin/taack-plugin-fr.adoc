@@ -28,7 +28,8 @@ static final List<TaackPluginConfiguration.PluginRole> crewPluginRoles = [
 [,groovy]
 ----
 static final List<TaackPluginConfiguration.TaackLinkClass> linkClasses = [
-    new TaackPluginConfiguration.TaackLinkClass(Attachment.class, 'publicName', AttachmentController.&showAttachment as MethodClosure)
+    new TaackPluginConfiguration.TaackLinkClass(Attachment.class,
+            'publicName', AttachmentController.&showAttachment as MC)
 ]
 ----
 

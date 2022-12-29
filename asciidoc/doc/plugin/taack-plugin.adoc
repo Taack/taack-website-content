@@ -15,9 +15,15 @@ In this file we configured the following things:
 [,groovy]
 ----
 static final List<TaackPluginConfiguration.PluginRole> crewPluginRoles = [
-    new TaackPluginConfiguration.PluginRole("ROLE_CREW_ADMIN", TaackPluginConfiguration.PluginRole.RoleRanking.DIRECTOR),
-    new TaackPluginConfiguration.PluginRole("ROLE_CREW_MANAGER", TaackPluginConfiguration.PluginRole.RoleRanking.MANAGER),
-    new TaackPluginConfiguration.PluginRole("ROLE_CREW_USER", TaackPluginConfiguration.PluginRole.RoleRanking.USER),
+    new TaackPluginConfiguration.PluginRole(
+        "ROLE_CREW_ADMIN",
+        TaackPluginConfiguration.PluginRole.RoleRanking.DIRECTOR),
+    new TaackPluginConfiguration.PluginRole(
+        "ROLE_CREW_MANAGER",
+        TaackPluginConfiguration.PluginRole.RoleRanking.MANAGER),
+    new TaackPluginConfiguration.PluginRole(
+        "ROLE_CREW_USER",
+        TaackPluginConfiguration.PluginRole.RoleRanking.USER),
 ]
 ----
 
@@ -29,18 +35,22 @@ static final List<TaackPluginConfiguration.PluginRole> crewPluginRoles = [
 [,groovy]
 ----
 static final List<TaackPluginConfiguration.TaackLinkClass> linkClasses = [
-    new TaackPluginConfiguration.TaackLinkClass(Attachment.class, 'publicName', AttachmentController.&showAttachment as MethodClosure)
+    new TaackPluginConfiguration.TaackLinkClass(
+            Attachment.class,
+            'publicName',
+            AttachmentController.&showAttachment as MC)
 ]
 ----
 
-`linkClasses` contains a list of `TaackLinkClass`, those defines classes that will be linked from other objects and their default comportment (Attribute displayed as name and controller action to redirect to).
+`linkClasses` contains a list of `TaackLinkClass`, this defines classes that will be linked from other objects and their default comportment (Attribute displayed as name and controller action to redirect to).
 In this example we want Attachment to be able to be displayed in other classes under its publicName and we want it to redirect to showAttachment.
 
 == Plugin configuration
 
 [,groovy]
 ----
-static final TaackPluginConfiguration crewPluginConfiguration = new TaackPluginConfiguration("Crew",
+static final TaackPluginConfiguration pc = new TaackPluginConfiguration(
+    "Crew",
     "/crew/crew.svg", "crew", Language.values() as List,
     new TaackPluginConfiguration.IPluginRole() {
         @Override
