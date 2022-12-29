@@ -33,7 +33,8 @@ final class QueryParameter implements Validateable { <3>
         itemValue nullable: true
         range nullable: true
         monthStart min: 1, max: 12
-        monthStop min: 1, max: 12, validator: { queryParameter, monthStop ->
+        monthStop min: 1, max: 12, validator: {
+            queryParameter, monthStop ->
             if (monthStop < queryParameter.monthStart)
                 return "monthStop.greater.or.equals.to.monthStart" <5>
         }
@@ -119,12 +120,12 @@ In the action where your filter is displayed, just call method `taackSimpleFilte
 
 [, groovy]
 ----
-            def users = taackSimpleFilterService.list(User, 10, f,
-                            defaultDirection) <1>
+def users = taackSimpleFilterService.list(User, 10, f,
+                defaultDirection) <1>
 
-            for (User ru : users.aValue) { <2>
-                // [ . . . ]
-            }
+for (User ru : users.aValue) { <2>
+    // [ . . . ]
+}
 ----
 
 <1> We pass the filter to the `list` method (parameter *f*), but all arguments except the first 2 are optional. `defaultDirection` allows to specify the default ordering of the table. 10 results are displayed at the same time.
@@ -132,12 +133,10 @@ In the action where your filter is displayed, just call method `taackSimpleFilte
 
 [, groovy]
 ----
-
-            def objects = taackSimpleFilterService.list(
-                            ObjectClass, numberOfObjectReturned)
-            objects.aValue // list of objects queried. Not all objects are returned (see second parameter)
-            objects.bValue // total number of objects that can be reached by the query
-
+def objects = taackSimpleFilterService.list(
+                ObjectClass, numberOfObjectReturned)
+objects.aValue // list of objects queried. Not all objects are returned (see second parameter)
+objects.bValue // total number of objects that can be reached by the query
 ----
 
 Passing the filter to the `list` method allows to restrict the query for security purposes.
