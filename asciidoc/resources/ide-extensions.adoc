@@ -1,0 +1,16 @@
+= IDE Extension
+:doctype: book
+:taack-category: 0|resources
+:source-highlighter: rouge
+
+== Intellij
+
+In addition, you could also import the Taack-UI Live Templates to be able to get boilerplate code out of the way easily like so:
+
+video::TaackSnippetIntelliJ.webm[title=IntelliJ Live Templates, opts="autoplay,loop"]
+
+To do that download `taack-intellij-templates.zip` on the  https://github.com/Taack/taack-autocomplete/releases/tag/v1.6[release page].
+Then on IntelliJ, go to `File > Manage IDE Settings > Import Settings`.After picking the file, click "OK" when IntelliJ asks you what you want to import, and you're good to go.
+
+
+== Visual Studio Code
