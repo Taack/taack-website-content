@@ -22,7 +22,7 @@ group Querying Object using TQL
         You -> Program : Type the Query
         activate Program
         Program -> Driver : Transmit the Query
-        Driver -> Intranet : Tranmit the Query
+        Driver -> Intranet : Transmit the Query
         Intranet -> Intranet : Validate TQL Grammar
         Intranet -> Intranet : Validate Tables and fields
         Intranet -> Intranet : Translate TQL to HQL

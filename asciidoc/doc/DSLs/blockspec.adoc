@@ -1,0 +1,45 @@
+== BlockSpec list
+
+=== BlockSpec.Width
+Width ratio of the block.
+
+Possible values:
+
+* MAX
+* THREE_QUARTER
+* TWO_THIRD
+* HALF
+* THIRD
+* QUARTER
+
+
+=== blockTabs
+
+Embeds one or multiple tabs
+----
+blockTabs(BlockSpec.Width, <1>
+          Closure)         <2>
+----
+<1> link:blockspecwidth[BlockSpec.Width] value
+<2> Closure should only contain link:blocktab[blockTab] children
+
+=== blockTab
+
+Describe the content of a tab. must be children of <<blockTabs>>
+
+----
+blockTab(String,        <1>
+         Closure)       <2>
+----
+<1> Tab title
+<2> Closure containing tab content
+
+=== modal
+
+Pop a modal. Nested blocks will be displayed inside this modal.
+----
+modal(boolean,          <1>
+      Closure)          <2>
+----
+<1> If true create a new modal, if false, replace the content of the top modal (_Optional; Default value: True_)
+<2>

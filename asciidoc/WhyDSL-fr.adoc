@@ -1,6 +1,8 @@
 = Pourquoi les DSL ?
 :taack-category: 01
 
+== Pourquoi les DSL ?
+
 Le cadriciel Taack-ui utilise des DSLs (Domain Specific Language) pour définir l'interface utilisateur de l'application en lieu et place de template proche du HTML. Les DSL sont des langages spécialisés sur un domaine particulier. Dans certaines situations ils offrent les avantages suivants :
 
 * *Amélioration de la lisibilité* Les DSLs sont conçus pour améliorer la lisibilité en premier lieu, ce qui fait que le développement d'application se trouve simplifié par rapport à l'utilisation d'un langage plus généraliste.
