@@ -1,6 +1,10 @@
-== BlockSpec list
+= BlockSpec
+:doctype: book
+:taack-category: 10|doc/DSLs
+:toc:
+:source-highlighter: rouge
 
-=== BlockSpec.Width
+== Width
 Width ratio of the block.
 
 Possible values:
@@ -13,7 +17,7 @@ Possible values:
 * QUARTER
 
 
-=== blockTabs
+== blockTabs
 
 Embeds one or multiple tabs
 ----
@@ -23,7 +27,7 @@ blockTabs(BlockSpec.Width, <1>
 <1> link:blockspecwidth[BlockSpec.Width] value
 <2> Closure should only contain link:blocktab[blockTab] children
 
-=== blockTab
+== blockTab
 
 Describe the content of a tab. must be children of <<blockTabs>>
 
@@ -34,7 +38,7 @@ blockTab(String,        <1>
 <1> Tab title
 <2> Closure containing tab content
 
-=== modal
+== modal
 
 Pop a modal. Nested blocks will be displayed inside this modal.
 ----
