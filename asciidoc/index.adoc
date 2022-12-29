@@ -12,6 +12,8 @@ This extension simplify the following functionalities against classical Grails A
 
 * PDF, Mails, CSV, other for free, the link:doc/DSLs/block-dsl.adoc[block DSL] can be used for any kind of rendering;
 
+* Localization at no cost;
+
 * Reporting errors when validating an Object at no cost (See link:doc/DSLs/form-dsl.adoc#_form_validation[*form validation*]);
 
 * Solr for link:/more/Search/Search.adoc[fulltext search]:

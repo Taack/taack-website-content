@@ -23,45 +23,45 @@ See Grails documentation on https://docs.grails.org/latest/ref/Constraints/Usage
 [source,groovy]
 .Form code sample 1.
 ----
-    def userForm(User user) {
-        user ?= new User(params)
+def userForm(User user) {
+    user ?= new User(params)
 
-        UiFormSpecifier f = new UiFormSpecifier()   <1>
-        f.ui user, {                                <2>
-            hiddenField user.subsidiary_            <3>
-            section "User", {                       <4>
-                field user.username_                <5>
-                field user.firstName_
-                field user.lastName_
-                ajaxField user.manager_,            <6>
-                    this.&selectUserM2O as MC
-                field user.password_
-            }
-            section "Coords", {
-                field user.businessUnit_
-                field user.mail_
-                field user.subsidiary_
-            }
-            section "Status", {
-                field user.enabled_
-                field user.accountExpired_
-                field user.accountLocked_
-                field user.passwordExpired_
-            }
-            formAction "Save", this.&saveUser as MC, user.id,   <7>
-                [redirectAction: params.get("redirectAction")], true
+    UiFormSpecifier f = new UiFormSpecifier()   <1>
+    f.ui user, {                                <2>
+        hiddenField user.subsidiary_            <3>
+        section "User", {                       <4>
+            field user.username_                <5>
+            field user.firstName_
+            field user.lastName_
+            ajaxField user.manager_,            <6>
+                this.&selectUserM2O as MC
+            field user.password_
         }
-
-        UiBlockSpecifier b = new UiBlockSpecifier()         <8>
-        b.ui {
-            modal {
-                ajaxBlock "userForm", {
-                    form "User Form", f, BlockSpec.Width.MAX
-                }
-            }
+        section "Coords", {
+            field user.businessUnit_
+            field user.mail_
+            field user.subsidiary_
         }
-        taackUiSimpleService.show(b)                        <9>
+        section "Status", {
+            field user.enabled_
+            field user.accountExpired_
+            field user.accountLocked_
+            field user.passwordExpired_
+        }
+        formAction "Save", this.&saveUser as MC, user.id,   <7>
+            [redirectAction: params.get("redirectAction")], true
     }
+
+    UiBlockSpecifier b = new UiBlockSpecifier()         <8>
+    b.ui {
+        modal {
+            ajaxBlock "userForm", {
+                form "User Form", f, BlockSpec.Width.MAX
+            }
+        }
+    }
+    taackUiSimpleService.show(b)                        <9>
+}
 ----
 
 <1> Create the form
