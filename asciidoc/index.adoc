@@ -23,7 +23,7 @@ This extension simplify the following functionalities against classical Grails A
 
 * link:/doc/DSLs/filter-table-dsl.adoc[Filtering, paginate and sorting] data without queries and session data;
 * File previews can be extended;
-* JDBC Driver to query Domain Objects using #TQL# (Taack Query Language) from Intellij, LibreOffice Base or DBeaver, as a classical datasource;
+* JDBC Driver to query Domain Objects using #TQL# (Taack Query Language) from Intellij, LibreOffice Base or DBeaver, as a classical datasource (See link:more/JDBC/taack-jdbc-driver.adoc[*Taack JDBC Driver*]);
 
 * File sharing via SFTP:
 ** Virtual File System for each user (see <<sftp_screenshot>>);

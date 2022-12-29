@@ -85,7 +85,7 @@ WARNING: I will make videos later on how to set up the driver with those program
 
 == TQL Queries
 
-The main difference with a regular JDBC Driver and our is the Query language.
+The main difference with a regular JDBC Driver and ours is the Query language.
 
 We developed the *TQL* (Taack Query Language), here are some advantages:
 
@@ -93,7 +93,7 @@ We developed the *TQL* (Taack Query Language), here are some advantages:
 * Easy syntax:
 ** Less need of joins
 ** Referenced field access (see <<easy-syntax>> point (2))
-** Database agnostic
+* Database agnostic
 
 === Structure of Basic Queries
 
