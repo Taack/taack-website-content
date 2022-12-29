@@ -7,13 +7,13 @@
 
 First of all, you will need the following:
 
-* Java (JDK-17)
-* git
+* *Java* (JDK-17)
+* *git*
 
 You can also optionally install:
 
-* Solr-9.1.0 (Used for intranet-wide search bar)
-* Postgresql (You will need to use the Grails in-memory database if you don't have any database manager)
+* *Solr-9.1.0* (Used for intranet-wide search bar)
+* *Postgresql* (You will need to use the Grails in-memory database if you don't have any database manager)
 
 == Cloning the ready-to-dev Intranet
 
@@ -22,7 +22,7 @@ You can also optionally install:
 git clone https://github.com/Taack/intranet.git
 ----
 
-This repository includes a stripped-down version of an intranet on top of which you can build more applications. It includes "Crew", the user management system and it's security dependency: Spring Security Plugin.
+This repository includes a stripped-down version of an intranet on top of which you can build more applications. It includes "Crew", the user management system and it's security dependency: *Spring Security Plugin*.
 
 == Start your intranet
 
@@ -35,19 +35,18 @@ Navigate inside the newly cloned intranet folder and start the server by executi
 
 After a while you should see in the console:
 
-____
-Grails application running at http://localhost:9442...
-____
+`Grails application running at http://localhost:9442`
 
-You can now access the intranet by going to that address in your browser. You can also login with the default credentials (username: admin; password: ChangeIt). The password can be changed in server/grails-app/conf/application.yml.
+
+You can now access the intranet by going to that address in your browser. You can also login with the default credentials (username: *admin*; password: *ChangeIt*). The password can be changed in server/grails-app/conf/application.yml.
 
 == Set up your IDE
 
-We heavily recommend the latest IntelliJ Ultimate Edition for its extensive Groovy and Grails support. We are investigating other IDE support (Eclipse, Visual Studio Code), and also support for IntelliJ non Ultimate Edition.
+We heavily recommend the latest *IntelliJ Ultimate Edition* for its extensive *Groovy* and *Grails* support. We are investigating other IDE support (*Eclipse*, *Visual Studio Code*), and also support for IntelliJ non Ultimate Edition.
 
 === IntelliJ Ultimate Edition
 
-We recommend installing the IntelliJ Taack Plugins that you can find https://github.com/Taack/infra/releases/tag/v0.1[here].
+We recommend installing the *IntelliJ Taack Plugins* that you can find https://github.com/Taack/infra/releases/tag/v0.1[here].
 
 To open the project, select "Open project" and select `intranet/server/settings.gradle`.
 
