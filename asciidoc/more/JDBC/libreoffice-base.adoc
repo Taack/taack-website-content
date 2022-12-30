@@ -5,11 +5,11 @@
 
 == Configure LibreOffice to use Jdk 17
 
-Click on tools `Tools` > `Options`, then in the *Options - LibreOffice - User Data*, click on `LibreOffice` > `Advanced` in the tree.
+Click on tools `Tools` > `Options`, then in the *Options - LibreOffice - User Data* dialog, click on `LibreOffice` > `Advanced` in the tree.
 
 The checkbox `Use a Java runtime environment` must be checked, and verify a JRE version 17 is detected.
 
-If not, install Java 17 and repeat the process. You can click on `Add` button and follow the procedure if it is not installed.
+If not, install Java 17 and repeat the process. You can click on `Add` button and follow the procedure if it is not detected, but you know it is installed.
 
 .Java 17 is detected and selected
 image::lo-java17-conf.webp[]
@@ -20,14 +20,14 @@ Click on `Apply` or `Ok` button.
 
 Download https://github.com/Taack/infra/releases/tag/v0.1[taack-jdbc-client-0.2-SNAPSHOT-all.jar]
 
-Click on tools `Tools` > `Options`, then in the *Options - LibreOffice - User Data*, click on `LibreOffice` > `Advanced` in the tree.
+Go back to the advanced dialog.
 
 Click on `Class Path...`, in the Dialog, click on `Add Archive...`, select the file you downloaded.
 
 .Driver Added to the Runtime
 image::lo-java17-driver-conf.webp[]
 
-Click on `Ok` button, Click on `Apply` or `Ok` button.
+Click on `Ok` button.
 
 == Create a LibreOffice Base File
 
@@ -37,6 +37,8 @@ Open #LibreOffice#, Click on `Base Database`
 
 .Step 1: Select JDBC
 image::lo-base-databaseWizard-1.webp[]
+
+Click on `Next` button.
 
 === Enter Driver Location in Jar
 
@@ -98,7 +100,7 @@ Here I choose Query, and select Users query.
 
 image::lo-calc-pivotTable-layout.webp[]
 
-That it. You can edit your pivot table according to your needs.
+That's it. You can edit your pivot table according to your needs.
 
 image::lo-calc-pivotTable-results.webp[]
 
