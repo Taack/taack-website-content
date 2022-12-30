@@ -46,4 +46,96 @@ modal(boolean,          <1>
       Closure)          <2>
 ----
 <1> If true create a new modal, if false, replace the content of the top modal (_Optional; Default value: True_)
-<2>
+<2> Closure content of the modal
+
+== form
+Add a form to a block.
+----
+form(String,            <1>
+     UiFormSpecifier,   <2>
+     Width,             <3>
+     Closure)           <4>
+----
+<1> Title that will appear in form header
+<2> The form descriptor. See <<UiFormSpecifier>>
+<3> The form block <<Width>> (_Optional; Default value: MAX_)
+<4> Closure containing the actions that will appear in the form header. See <<BlockActionSpec>>
+
+== show
+Add a "show" to a block. A "show" is used to display object data with limited edition capabilities
+
+----
+show(String,            <1>
+     UiShowSpecifier,   <2>
+     Width,             <3>
+     Closure)           <4>
+----
+<1> Title that will appear in the show header
+<2> The show descriptor. See <<UiShowSpecifier>>
+<3> The show block <<Width>>
+<4> Closure containing the actions that will appear in the show header. See <<BlockActionSpec>>
+
+== table
+Add a table without filtering capabilities to a block. To use a table with a filter, see <<tableFilter>>.
+
+----
+table(String,           <1>
+      UiTableSpecifier, <2>
+      Width,            <3>
+      Closure)          <4>
+----
+
+<1> Title that will appear in the table header (_Optional_)
+<2> The table descriptor. See <<UiTableSpecifier>>
+<3> The table block <<Width>> (_Optional; Default value: MAX_)
+<4> Closure containing the actions that will appear in the table header. See <<BlockActionSpec>>
+
+== tableFilter
+Add a table and its associated filter to a block
+
+----
+tableFilter(String,             <1>
+            UiFilterSpecifier,  <2>
+            String,             <3>
+            UiTableSpecifier,   <4>
+            Width,              <5>
+            Closure)            <6>
+----
+
+<1> Title that will appear in the filter header
+<2> The filter descriptor. See <<UiFilterSpecifier>>
+<3> Title that will appear in the table header
+<4> The table descriptor. See <<UiTableSpecifier>>
+<5> The Width of the block containing the filter and table. (_Optional; Default value: MAX_)
+<6> Closure containing the actions that will appear in the table header. See <<BlockActionSpec>>
+
+== chart
+Add a chart to a block
+
+----
+chart(String,           <1>
+      UiChartSpecifier, <2>
+      Width,            <3>
+      Closure)          <4>
+----
+<1> Title that will appear in the chart header
+<2> The chart descriptor. See <<UiChartSpecifier>>
+<3> The chart block <<Width>> (_Optional; Default value: MAX_)
+<4> Closure containing the actions that will appear in the chart header
+
+== custom
+Add a block containing custom HTML code
+
+----
+custom(String,          <1>
+       String,          <2>
+       Style,           <3>
+       Width,           <4>
+       Closure)         <5>
+----
+<1> The custom block title (_Optional_)
+<2> The html code that will be rendered in the block
+<3> The template style to use. See <<Style>> (_Optional_)
+<4> The custom block <<Width>> (_Optional; Default value: MAX_)
+<5> Closure containing actions that will appear in the header of the block (_Optional_)
+
