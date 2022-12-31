@@ -215,12 +215,12 @@ Table style is specified by `Style` an optional parameter on `row` or `rowField`
 digraph mygraph {
   node [shape=box];
   ui
-  ui -> header, paginate [label = "1,1"]
-  ui -> row [label = "1,N"]
-  header -> column [label = "1,N"]
-  column -> fieldHeader, sortableFieldHeader [label = "1,N"]
-  row -> rowColumn [label = "1,N"]
-  rowColumn -> rowLink, rowField [label = "1,N"]
+  ui -> header, paginate [label = "0,1"]
+  ui -> row [label = "0,N"]
+  header -> column [label = "0,N"]
+  column, header -> fieldHeader, sortableFieldHeader [label = "1,N"]
+  row -> rowColumn [label = "0,N"]
+  rowColumn, row -> rowLink, rowField [label = "0,N"]
 }
 ----
 
