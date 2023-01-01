@@ -5,4 +5,8 @@
 
 == Youtube Channel
 
-https://www.youtube.com/channel/UCPB81L10AKGXgqPc-zhsvVA
+[Taack]https://www.youtube.com/channel/UCPB81L10AKGXgqPc-zhsvVA
+
+Presenting the Intranet app:
+
+video::OYtrOL5adj8[youtube]
