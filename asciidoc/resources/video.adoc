@@ -3,10 +3,9 @@
 :taack-category: 1|resources
 :source-highlighter: rouge
 
-== Youtube Channel
+== Youtube
 
-[Taack]https://www.youtube.com/channel/UCPB81L10AKGXgqPc-zhsvVA
+https://www.youtube.com/channel/UCPB81L10AKGXgqPc-zhsvVA[Taack Channel]
 
-Presenting the Intranet app:
-
+.Presenting the Intranet app
 video::OYtrOL5adj8[youtube, width=640, height=480]
