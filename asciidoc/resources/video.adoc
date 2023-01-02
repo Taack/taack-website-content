@@ -9,4 +9,4 @@
 
 Presenting the Intranet app:
 
-video::OYtrOL5adj8[youtube]
+video::OYtrOL5adj8[youtube, width=640, height=480]
