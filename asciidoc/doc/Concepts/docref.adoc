@@ -1,6 +1,6 @@
 = Reference Doc.
 :doctype: book
-:taack-category: 10|doc/DSLs
+:taack-category: 6|doc/Concepts
 :toc:
 :source-highlighter: rouge
 
@@ -27,7 +27,7 @@ blockTabs(BlockSpec.Width, <1>
           Closure)         <2>
 ----
 <1> <<Width>> value
-<2> Closure should only contain link:blocktab[blockTab] children
+<2> Closure should only contain <<blockTab>> children
 
 === blockTab
 

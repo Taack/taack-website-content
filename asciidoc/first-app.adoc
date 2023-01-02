@@ -188,7 +188,7 @@ Now an admin will see a create button on the top-right of the table.
 The `action` method is composed of the following parameters:
 
 1) The title/alt of the button.
-2) The icon used by the button, must be an link:TODO[ActionIcon] enum value.
+2) The icon used by the button, must be an xref:doc/Concepts/docref.adoc#_actionicon[ActionIcon] enum value.
 3) The action that the button will redirect to
 4) The parameters to be sent with the redirection (In this case we specify where we want to redirect after saving the Book)
 5) If we render with ajax in a modal
@@ -300,7 +300,7 @@ rowLink "Show book",
 
 This will create a _small_ button in the table cell that will open a modal with the corresponding book information.
 
-Note that `ActionIcon` was multiplied with a `ActionIconStyleModifier` to change it's size in this case. For more details check the link:TODO[ActionIcon] documentation.
+Note that `ActionIcon` was multiplied with a `ActionIconStyleModifier` to change it's size in this case. For more details check the xref:doc/Concepts/docref.adoc#_actionicon[ActionIcon] documentation.
 
 == Deleting an object
 
