@@ -188,7 +188,7 @@ Maintenant un admin pourra voir un bouton "Créer" en haut à droite du tableau.
 La méthode `action` est composée des paramètres suivants :
 
 1) Le titre du bouton.
-2) L'icône du bouton (doit être une valeur de l'enum link:TODO[ActionIcon]).
+2) L'icône du bouton (doit être une valeur de l'enum xref:doc/Concepts/docref.adoc#_actionicon[ActionIcon]).
 3) L'action vers laquelle le bouton va rediriger.
 4) Les paramètres à envoyer lors de la redirection (ici, nous indiquons l'action vers laquelle on sera redirigé après avoir enregistré le livre).
 5) Un paramètre pour indiquer si nous affichons dans un modal avec ajax.
@@ -294,7 +294,7 @@ rowLink "Show book", ActionIcon.SHOW * ActionIconStyleModifier.SCALE_DOWN, Turbo
 
 Cela créera un _petit_ bouton dans la cellule du tableau qui ouvrira un modal avec les détails du livre correspondant.
 
-Notez qu'ici, `ActionIcon` a été multiplié avec un `ActionIconStyleModifier` pour modifier la taille de l'icône. Pour plus de détails, consultez le chapitre détaillé : link:TODO[ActionIcon].
+Notez qu'ici, `ActionIcon` a été multiplié avec un `ActionIconStyleModifier` pour modifier la taille de l'icône. Pour plus de détails, consultez le chapitre détaillé : xref:doc/Concepts/docref.adoc#_actionicon[ActionIcon].
 
 == Supprimer un objet
 
