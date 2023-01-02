@@ -32,8 +32,6 @@ include::_settings_reveal.adoc[]
 [source,groovy]
 ----
         new UiFormSpecifier().ui user, {
-            hiddenField user.subsidiary_
-            hiddenField user.origin_
             section "User", {
                 field user.username_
                 field user.firstName_
