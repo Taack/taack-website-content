@@ -13,11 +13,11 @@ The https://github.com/Taack/intranet[Intranet Sample App] is a modular https://
 @startsalt
 {
 {T
-+ <&folder> Gradle Application Root | Description
-++ <&folder> app    | Application modules folder
++ <&folder> Intranet | Root Directory
+++ <&folder> app    | Application Modules Directory
 +++ <&folder> crew  | Mandatory base app to manage users
 +++ <&folder> appModule1  | First application (Gradle module)
-+++ <&folder> appModule2  | Second module
++++ <&folder> appModule2  | Second application
 +++ <&folder> ...   | And so on
 ++ <&folder> server | Server Root Application (Grails app)
 ++ <&folder> gradle           | Gradle binaries
@@ -56,9 +56,8 @@ Holds the sources of the *taack-ui* plugin.
 {T
 + <&folder> infra     | Infra sources (see below)
 ++ <&folder> client   | Browser code (Kotlin transpiled in Javascript)
-++ <&folder> gradle   | Gradle binaries
 ++ <&folder> taack-jdbc-common| Common JDBC code
-++ <&folder> taack-jdbc-client| Common JDBC code
+++ <&folder> taack-jdbc-client| Client JDBC code
 ++ <&folder> taack-ui | Taack User Interface code
 ++ <&folder> gradle           | Gradle binaries
 ++ <&file> build.gradle
