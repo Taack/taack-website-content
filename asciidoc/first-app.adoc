@@ -14,7 +14,16 @@ For more in-depth explaination about how plugins are declared to the server link
 
 == Creating a new app plugin
 
-TODO: Create-taack-app turbo explaination here
+In order to create a new app plugin (a Gradle module), be sure to pull latest version  of your intranet from our github repository (see link:installation.adoc[installation])
+
+Once it is done, you can issue the following command from your intranet root folder:
+
+[,bash]
+----
+./gradlew server:taackCreateApp -Pargs='-name=testApp'
+----
+
+The newly created app should appear in the `app` folder.
 
 == Building a app-wide menu
 
