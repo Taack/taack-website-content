@@ -25,6 +25,20 @@ Once it is done, you can issue the following command from your intranet root fol
 
 The newly created app should appear in the `app` folder.
 
+Next we need to make the `server` Grails app aware of our new plugin to embed it in the application server. To do so, just add:
+
+----
+include 'app:testApp'
+----
+
+Into `settings.gradle` file and
+
+----
+implementation project(':app:tut')
+----
+
+Into the `server/build.gradle` file in the #plugin# section.
+
 == Building a app-wide menu
 
 First of all, let's work on navigation for your new app. First thing to do is define how the menu is gonna be built the basic boilerplate for that is the following:

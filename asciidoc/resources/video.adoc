@@ -12,3 +12,6 @@ video::OYtrOL5adj8[youtube, width=640, height=480]
 
 .Configure your Intranet and Intellij
 video::Q-T390A9bzY[youtube, width=640, height=480]
+
+.Create a new App in Your Intranet
+video::tTRJ6R27JNo[youtube, width=640, height=480]
