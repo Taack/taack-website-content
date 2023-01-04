@@ -1,6 +1,6 @@
 = IDE Extension
 :doctype: book
-:taack-category: 0|resources
+:taack-category: 0|more/resources
 :source-highlighter: rouge
 
 == Intellij
