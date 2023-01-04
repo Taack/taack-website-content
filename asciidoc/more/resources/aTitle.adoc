@@ -1,2 +1,2 @@
 = Resources
-:taack-category: 2|resources
+:taack-category: 2|more/resources
