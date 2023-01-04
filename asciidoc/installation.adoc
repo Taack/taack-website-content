@@ -15,6 +15,23 @@ You can also optionally install:
 * *Solr-9.1.0* (Used for intranet-wide search bar)
 * *Postgresql* (You will need to use the Grails in-memory database if you don't have any database manager)
 
+=== Java Version
+
+It is mandatory to use Java Jdk 17. In order to check Java version, type the following command:
+
+[sh]
+----
+java -fullversion
+openjdk full version "17.0.5+1"
+----
+
+On Mac, you can install Jdk-17 via brew command:
+
+[sh]
+----
+brew install openjdk@17
+----
+
 == Cloning the ready-to-dev Intranet
 
 [,bash]
@@ -49,6 +66,15 @@ We heavily recommend the latest *IntelliJ Ultimate Edition* for its extensive *G
 We recommend installing the *IntelliJ Taack Plugins* that you can find https://github.com/Taack/infra/releases/tag/v0.1[here].
 
 To open the project, select "Open project" and select `intranet/server/settings.gradle`.
+
+Check Jdk used with gradle is at version 17:
+
+.Open Gradle Settings
+image:open-settings-gradle-intellij.webp[]
+
+.Check Gradle Jdk Version
+image:settings-gradle-intellij.webp[]
+
 
 === Visual Studio Code
 
