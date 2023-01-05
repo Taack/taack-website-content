@@ -4,9 +4,9 @@
 :toc:
 :source-highlighter: rouge
 
-== Block DSL
+== Foreword about Block DSL, before digging in other DSLs
 
-Allows specifying page layout, by defining blocs that contain other graphical elements. A block can be an ajax block, updated by some ajax actions. `ajaxBlock` can be targeted by their ID. Blocks can be nested.
+Bloc DSL allows specifying page layout, by defining blocs that contain other graphical elements. A block can be an ajax block, updated by some ajax actions. `ajaxBlock` can be targeted by their ID. Blocks can be nested.
 
 See link:../DSLs/block-dsl.adoc[Block DSL] dedicated page for more information.
 

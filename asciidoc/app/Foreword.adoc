@@ -1,0 +1,8 @@
+= *Foreword*
+:doctype: book
+:taack-category: 0|App
+:toc:
+
+All applications we will open will be listed here.
+
+Some applications can bring new features to the framework by extending it. This place will document those new features.

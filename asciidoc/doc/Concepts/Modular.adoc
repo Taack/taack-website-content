@@ -4,7 +4,7 @@
 :toc:
 :source-highlighter: rouge
 
-The https://github.com/Taack/intranet[Intranet Sample App] is a modular https://gradle.org/[Gradle] application. You can get instructions to run it clicking on: link:../../first-app.adoc[First App].
+The https://github.com/Taack/intranet[Intranet Sample App] is a modular https://gradle.org/[Gradle] application. You can get instructions to run it clicking on: link:../../installation.adoc[Install Sample Intranet].
 
 == Intranet Sample App Directory Layout
 
@@ -76,4 +76,4 @@ Holds the sources of the *taack-ui* plugin.
 
 == _build.gradle_, _settings.gradle_ ...
 
-Usual gradle files..
+Usual gradle build files...

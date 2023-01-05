@@ -1,9 +1,0 @@
-= Validation
-:doctype: book
-:taack-category: 1|doc/Domain
-:toc:
-:source-highlighter: rouge
-
-== TODO
-
-Link to Gorm
