@@ -1,3 +1,0 @@
-= GroovyDoc
-:doctype: book
-:taack-category: ZZZZ|more/resources
