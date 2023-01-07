@@ -27,14 +27,16 @@ The newly created app should appear in the `app` folder.
 
 Next we need to make the `server` Grails app aware of our new plugin to embed it in the application server. To do so, just add:
 
+[,gradle]
 ----
 include 'app:testApp'
 ----
 
 Into `settings.gradle` file and
 
+[,gradle]
 ----
-implementation project(':app:tut')
+implementation project(':app:testApp')
 ----
 
 Into the `server/build.gradle` file in the #plugin# section.

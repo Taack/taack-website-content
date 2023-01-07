@@ -16,7 +16,7 @@ image::screenshot-dsl-tableFilter.webp[]
 Filter DSL is always associated with a Table or a Chart. A bloc cannot contain only a filter.
 
 [[filter-code-sample]]
-== Code Sample
+=== Code Sample
 
 [source,groovy]
 [[filter-sample1]]
