@@ -8,7 +8,7 @@
 
 Bloc DSL allows specifying page layout, by defining blocs that contain other graphical elements. A block can be an ajax block, updated by some ajax actions. `ajaxBlock` can be targeted by their ID. Blocks can be nested.
 
-See link:../DSLs/block-dsl.adoc[Block DSL] dedicated page for more information.
+See link:../DSLs/block-dsl.adoc[Block DSL] dedicated page for more information. PDFs have their own block management: link:../DSLs/block-printable-dsl.adoc[Printable Blocks], but table and show DSL are usable (charts will come later).
 
 [source,groovy]
 ----
