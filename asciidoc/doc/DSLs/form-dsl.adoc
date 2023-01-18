@@ -84,10 +84,10 @@ digraph mygraph {
   node [shape=box];
   "ui"
   "ui" -> "hiddenField" [label = "0:N"]
-  "ui" -> "section" [label = "1:N"]
-  "section" -> "section"
+  "ui" -> "section" [label = "0:N"]
+  "ui" -> "col" [label = "0:N"]
   "section" -> "col" [label = "0:N"]
-  "section", "col" -> "field", "ajaxField" [label = "0:N"]
+  "ui", "section", "col" -> "field", "ajaxField" [label = "0:N"]
   "ui" -> "formAction" [label = "0:N"]
 }
 ----
