@@ -21,7 +21,7 @@ Once it is launched, clone the #plm# repository:
 git clone git@github.com:Taack/plm.git
 ----
 
-Then copy the content of the `plm` folder into your intranet `app` folder.
+Then copy the content of the `plm` folder into your intranet `app` folder (see link:../installation.adoc[intranet installation])
 
 Start your intranet issuing:
 [source,bash]
@@ -31,7 +31,7 @@ Start your intranet issuing:
 
 == FreeCAD Workbench Installation
 
-lone the #taack-plm-freecad# repository:
+Clone the #taack-plm-freecad# repository:
 
 [source,bash]
 ----
@@ -63,5 +63,6 @@ Clicking on OK button will upload the file into your Intranet. The Intranet will
 image::plmweb1-screenshot.webp[]
 
 
+WARNING: If you have many links, import them from the same computer. From other computers, download the zip file from your intranet.
 
-That's all, I will record some video demonstrating this app capabilities.
+That's all, I will record some videos demonstrating this app capabilities.
