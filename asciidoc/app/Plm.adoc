@@ -1,0 +1,67 @@
+= FreeCAD PLM
+:doctype: book
+:taack-category: 2|App
+:toc:
+
+== Server Installation
+
+=== Linux
+
+On a Linux server, grab FreeCAD AppImage file, install `xvfb-run`, then launch in background FreeCAD:
+
+[source,bash]
+----
+xvfb-run ./FreeCAD_0.20.2-2022-12-27-conda-Linux-x86_64-py310.AppImage
+----
+
+Once it is launched, clone the #plm# repository:
+
+[source,bash]
+----
+git clone git@github.com:Taack/plm.git
+----
+
+Then copy the content of the `plm` folder into your intranet `app` folder.
+
+Start your intranet issuing:
+[source,bash]
+----
+./gradlew server:bootRun
+----
+
+== FreeCAD Workbench Installation
+
+lone the #taack-plm-freecad# repository:
+
+[source,bash]
+----
+git clone git@github.com:Taack/taack-plm-freecad.git
+----
+
+Then create a link into `.local/share/FreeCAD/Mod`
+
+[source,bash]
+----
+cd .local/share/FreeCAD/Mod
+ln -s [clone_dir] .
+----
+
+== Usage
+
+.Select Taack PLM Workbench
+image::plm1-screenshot.webp[]
+
+.Click on Taack icon
+image::plm2-screenshot.webp[]
+
+.Enter your credential into your server
+image::plm3-screenshot.webp[]
+
+Clicking on OK button will upload the file into your Intranet. The Intranet will create a preview, this process might take time.
+
+.The history of the part...
+image::plmweb1-screenshot.webp[]
+
+
+
+That's all, I will record some video demonstrating this app capabilities.
