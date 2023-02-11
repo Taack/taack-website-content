@@ -3,6 +3,17 @@
 :taack-category: 2|App
 :toc:
 
+== Purpose
+
+Manage FreeCAD model sharing and linear versioning.
+
+== Roles
+
+* `ROLE_ADMIN`
+* `ROLE_PLM_USER`
+
+See link:Crew.adoc#_purpose[configure roles in Crew] to add the role into your Intranet
+
 == Server Installation
 
 === Linux

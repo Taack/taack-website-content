@@ -3,7 +3,16 @@
 :taack-category: 1|App
 :toc:
 
-== Available Controllers
+== Purpose
+
+Manage users in the system:
+
+* click on `plus` sign to add a user
+* click on #Roles#, then on the `plus` sign in the table to add a role.
+
+== Roles
+
+`ROLE_ADMIN`
 
 === Regular Controllers
 * *crew*
