@@ -57,6 +57,40 @@ After a while you should see in the console:
 
 You can now access the intranet by going to that address in your browser. You can also login with the default credentials (username: *admin*; password: *ChangeIt*). The password can be changed in server/grails-app/conf/application.yml.
 
+=== Configuring persistent Db
+
+If you want data to be persistent, change the `server/grails-app/conf/application.yml` file to use a persistent database.
+
+Here we want H2 to persist data in a file in development mode:
+
+[source,yaml]
+----
+environments:
+    development:
+        dataSource:
+            dbCreate: update
+            url: jdbc:h2:./prodDb;LOCK_TIMEOUT=10000;DB_CLOSE_ON_EXIT=FALSE
+----
+
+=== Producing a War file for Tomcat
+
+Instead of `bootRun` task, use `assemble` task:
+
+[source,bash]
+----
+./gradlew server:assemble
+----
+
+The server war are produced into `server/build/libs` folder. You can import it in your Tomcat production server or test it with:
+
+[source,bash]
+----
+cd server/libs/libs
+java -jar server-[version].jar
+----
+
+It will be faster, assets will be compiled and merged.
+
 == Set up your IDE
 
 We heavily recommend the latest *IntelliJ Ultimate Edition* for its extensive *Groovy* and *Grails* support. We are investigating other IDE support (*Eclipse*, *Visual Studio Code*), and also support for IntelliJ non Ultimate Edition.
