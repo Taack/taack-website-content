@@ -23,7 +23,21 @@ git clone git@github.com:Taack/plm.git
 
 Then copy the content of the `plm` folder into your intranet `app` folder (see link:../installation.adoc[intranet installation])
 
-Start your intranet issuing:
+Then configure the server to know about this new app by changing `server/build.gradle` file. Grails section should look like this after changes:
+
+[source,gradle]
+----
+grails {
+    exploded = true
+    plugins {
+        implementation project(':crew')
+        // other apps here ...
+        implementation project(':plm')
+    }
+}
+----
+
+Start your intranet issuing under the `intranet` folder:
 [source,bash]
 ----
 ./gradlew server:bootRun
