@@ -48,6 +48,15 @@ grails {
 }
 ----
 
+Set the FreeCAD path in the `server/conf/application.yml` file appending:
+[source,yaml]
+----
+plm:
+  freecadPath: ${HOME}/FreeCAD_0.20.2-2022-12-27-conda-Linux-x86_64-py310.AppImage
+
+
+----
+
 Start your intranet issuing under the `intranet` folder:
 [source,bash]
 ----
