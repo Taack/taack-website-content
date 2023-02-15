@@ -57,6 +57,16 @@ plm:
 
 ----
 
+You can also install #graphviz# and set the `dot` executable path. It is used to display graphs and might be useful to display *model dependency graph* in a near future. In `server/conf/application.yml`:
+[source,yaml]
+----
+exe:
+  dot:
+    path: /usr/bin/dot
+    #path: /opt/homebrew/bin/dot
+----
+
+
 Start your intranet issuing under the `intranet` folder:
 [source,bash]
 ----
