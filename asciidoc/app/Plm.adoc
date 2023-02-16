@@ -16,18 +16,52 @@ See link:Crew.adoc#_purpose[configure roles in Crew] to add the role into your I
 
 == Server Installation
 
-=== Linux
+=== Launch FreeCAD on the server
 
 On a Linux server, grab FreeCAD AppImage file, install `xvfb-run`, then launch in background FreeCAD:
 
 [source,bash]
+.Launch FreeCAD in background
 ----
 xvfb-run ./FreeCAD_0.20.2-2022-12-27-conda-Linux-x86_64-py310.AppImage
 ----
 
-Once it is launched, clone the #plm# repository:
+=== Install from Server Binaries
+
+Download the latest server binaries from https://github.com/Taack/taack-plm-freecad/releases[releases].
+
+Launch the server app:
 
 [source,bash]
+.Launch the server
+----
+java -jar server-0.3.jar
+----
+
+==== Server Arguments
+
+Options to the server can be passed this way:
+
+[source,bash]
+.Combining Options
+----
+java -DOption1=Value1 -DOption2=Value2 ... -jar server-0.3.jar
+----
+
+===== Options
+
+* Path the Intranet store its files: `-Dintranet.root=/home/test/someDir`
+* Server port: `-Dserver.port=9444`
+* Database url:`-DdataSource.url='jdbc:h2:./prodDb2;LOCK_TIMEOUT=10000;DB_CLOSE_ON_EXIT=FALSE'`
+* Freecad appimage path: `-Dplm.freecadPath=/somePath...`
+* Dot exe path: `-Dexe.dot.path=/somePath...`
+
+=== Install from Source
+
+Clone the #plm# repository:
+
+[source,bash]
+.Clone PLM repo
 ----
 git clone git@github.com:Taack/plm.git
 ----
@@ -37,6 +71,7 @@ Then copy the content of the `plm` folder into your intranet `app` folder (see l
 Then configure the server to know about this new app by changing `server/build.gradle` file. Grails section should look like this after changes:
 
 [source,gradle]
+.server configuration
 ----
 grails {
     exploded = true
@@ -49,7 +84,9 @@ grails {
 ----
 
 Set the FreeCAD path in the `server/conf/application.yml` file appending:
+
 [source,yaml]
+.Specific PLM Configuration
 ----
 plm:
   freecadPath: ${HOME}/FreeCAD_0.20.2-2022-12-27-conda-Linux-x86_64-py310.AppImage
@@ -58,7 +95,9 @@ plm:
 ----
 
 You can also install #graphviz# and set the `dot` executable path. It is used to display graphs and might be useful to display *model dependency graph* in a near future. In `server/conf/application.yml`:
+
 [source,yaml]
+.Dot executable configuration
 ----
 exe:
   dot:
@@ -68,27 +107,28 @@ exe:
 
 
 Start your intranet issuing under the `intranet` folder:
+
 [source,bash]
+.Run Server from Source
 ----
 ./gradlew server:bootRun
 ----
 
+You can produce a Jar file:
+
+[source,bash]
+.Build Server Binary from Source
+----
+./gradlew server:assemble
+----
+
+The server will be located under `server/build/libs`
+
 == FreeCAD Workbench Installation
 
-Clone the #taack-plm-freecad# repository:
+Go into #Tools# > #Addon Manager# then refresh local cache and search for *Taack*.
 
-[source,bash]
-----
-git clone git@github.com:Taack/taack-plm-freecad.git
-----
-
-Then create a link into `.local/share/FreeCAD/Mod`
-
-[source,bash]
-----
-cd .local/share/FreeCAD/Mod
-ln -s [clone_dir] .
-----
+Click on install button.
 
 == Usage
 
@@ -106,7 +146,13 @@ Clicking on OK button will upload the file into your Intranet. The Intranet will
 .The history of the part...
 image::plmweb1-screenshot.webp[]
 
-
 WARNING: If you have many links, import them from the same computer. From other computers, download the zip file from your intranet.
 
-That's all, I will record some videos demonstrating this app capabilities.
+That's it, I will record some videos demonstrating this app capabilities.
+
+== Todo
+
+* Add model graph icon
+* Update deps for a model (with Deep option)
+* Delete latest version
+* ...
