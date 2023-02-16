@@ -50,6 +50,14 @@ Navigate inside the newly cloned intranet folder and start the server by executi
 ./gradlew server:bootRun
 ----
 
+If you want gradle to watch app module to hot restart the server at each save, launch the server adding `-Dgrails.run.active=true` option:
+
+[,bash]
+----
+./gradlew -Dgrails.run.active=true server:bootRun
+----
+
+
 After a while you should see in the console:
 
 `Grails application running at http://localhost:9442`
