@@ -97,7 +97,7 @@ We heavily recommend the latest *IntelliJ Ultimate Edition* for its extensive *G
 
 === IntelliJ Ultimate Edition
 
-We recommend installing the *IntelliJ Taack Plugins* that you can install from the Intellij market place https://plugins.jetbrains.com/plugin/20792-taackuiastautocomplete[TaackUiASTAutocomplete] or directly from the https://github.com/Taack/infra/releases/tag/v0.1[source code repository].
+We recommend installing the *IntelliJ Taack Plugins* that you can install from the Intellij marketplace https://plugins.jetbrains.com/plugin/20792-taackuiastautocomplete[TaackUiASTAutocomplete] or directly from the https://github.com/Taack/infra/releases/tag/v0.1[source code repository].
 
 To open the project, select "Open project" and select `intranet/server/settings.gradle`.
 
