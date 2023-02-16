@@ -152,6 +152,8 @@ WARNING: If you have many links, import them from the same computer. From other 
 
 That's it, I will record some videos demonstrating this app capabilities.
 
+video::kdbvjWPI2UQ[youtube, width=640, height=480]
+
 == Todo
 
 * Add model graph icon
