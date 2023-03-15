@@ -97,7 +97,7 @@ digraph mygraph {
 === Inputs
 * `hiddenField`: add an input of type hidden into the form.
 * `field`: add an input with a label.
-* `ajaxField`: add a many 2 many or many to one field. The MethodClosure must point to a block showing a *modal windows*
+* `ajaxField`: add a many 2 many or many to one field. The MethodClosure must point to a block showing a *modal window*
 
 === Structure
 * `section`: add a form section, optionally Width of the section
