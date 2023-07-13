@@ -80,7 +80,7 @@ environments:
             url: jdbc:h2:./prodDb;LOCK_TIMEOUT=10000;DB_CLOSE_ON_EXIT=FALSE
 ----
 
-=== Producing a War file for Tomcat
+=== Producing a Jar file for Tomcat
 
 Instead of `bootRun` task, use `assemble` task:
 
@@ -89,11 +89,11 @@ Instead of `bootRun` task, use `assemble` task:
 ./gradlew server:assemble
 ----
 
-The server war are produced into `server/build/libs` folder. You can import it in your Tomcat production server or test it with:
+The server jar are produced into `server/build/libs` folder. You can import it in your Tomcat production server or test it with:
 
 [source,bash]
 ----
-cd server/libs/libs
+cd server/build/libs
 java -jar server-[version].jar
 ----
 
