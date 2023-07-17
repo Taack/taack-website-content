@@ -4,7 +4,7 @@
 :source-highlighter: rouge
 :taack-category: 1|doc/plugin
 
-For a plugin to be recognized and to be shown on your intranet, you will need to create a `GrailsPlugin` that implements `TaackPlugin`.
+To ensure that a plugin is recognized and displayed on your intranet, you need to create a `GrailsPlugin` that implements `TaackPlugin`.
 
 See here for example: https://github.com/Taack/intranet/blob/main/app/crew/src/main/groovy/crew/CrewGrailsPlugin.groovy[CrewGrailsPlugin.groovy]
 
@@ -27,7 +27,7 @@ static final List<TaackPluginConfiguration.PluginRole> crewPluginRoles = [
 ]
 ----
 
-`crewPluginRoles` contains a list of `PluginRole` that relates a springSecurityService's `Role` to a `RoleRanking` going from lowest-access (USER) to highest-access (DIRECTOR).
+`crewPluginRoles` is a list of `PluginRole` objects that associate `roles` from springSecurityService with a `RoleRanking`. The RoleRanking ranges from the lowest access level (USER) to the highest access level (DIRECTOR).
 
 == Link classes
 :doctype: book
@@ -41,9 +41,7 @@ static final List<TaackPluginConfiguration.TaackLinkClass> linkClasses = [
             AttachmentController.&showAttachment as MC)
 ]
 ----
-
-`linkClasses` contains a list of `TaackLinkClass`, this defines classes that will be linked from other objects and their default comportment (Attribute displayed as name and controller action to redirect to).
-In this example we want Attachment to be able to be displayed in other classes under its publicName and we want it to redirect to showAttachment.
+`linkClasses` contains a list of `TaackLinkClass` that defines classes to be linked from other objects and their default behavior(Attribute displayed as name and controller action to redirect to). In this example, we specify that the #Attachment# class should be displayed in other classes using its #publicName# attribute, and the redirection should be set to the #showAttachment# action.
 
 == Plugin configuration
 
@@ -60,4 +58,5 @@ static final TaackPluginConfiguration pc = new TaackPluginConfiguration(
     })
 ----
 
-This is where we set the app name, its icon, its package and the language in which it's available, this is also where we indicate that the plugin uses the previously created PluginRole and LinkClasses list (In this case we only fill out the PluginRoleList).
+
+This is the section where we configure the application's name, icon, package, and available language. It is also where we specify that the plugin uses the previously defined PluginRole and LinkClasses lists. In this case, we only populate the PluginRoleList.

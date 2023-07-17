@@ -32,18 +32,19 @@ Next we need to make the `server` Grails app aware of our new plugin to embed it
 include 'app:testApp'
 ----
 
-Into `settings.gradle` file and
+Into `settings.gradle` file then
 
 [,gradle]
 ----
-implementation project(':app:testApp')
+
+ implementation project(':app:testApp')
 ----
 
 Into the `server/build.gradle` file in the #plugin# section.
 
 == Building a app-wide menu
 
-First of all, let's work on navigation for your new app. First thing to do is define how the menu is gonna be built the basic boilerplate for that is the following:
+First, let's focus on the navigation for your new app. The initial step is to define how the menu will be constructed. The basic boilerplate code for that is as follows:
 
 [,groovy]
 ----
@@ -58,14 +59,15 @@ static private UiMenuSpecifier buildMenu(String q = null) {
 }
 ----
 
-We have a UiMenuSpecifier object that is created, we then define what we want in that menu.
+We create a UiMenuSpecifier object to define the menu structure, and then specify the desired content for that menu.
 
 [,groovy]
 ----
 menu 'Action', TurboController.&action as MC
 ----
 
-Here `menu` creates a simple link in our navbar, `'Action'` is the displayed name of the link and `TurboController.&action as MethodClosure` defines to which action the link will redirect to.
+
+In this case, `menu` creates a simple link in the navigation bar. `Action` is the displayed name of the link, and `TurboController.&action` (using MethodClosure) defines the action to which the link will redirect.
 
 You can see a full list of items you can put in your menu in the link:doc/DSLs/menu-dsl.adoc[Menu DSL].
 

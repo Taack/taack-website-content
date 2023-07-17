@@ -4,6 +4,7 @@
 :toc:
 :source-highlighter: rouge
 
+[%interactive]
 * [*] Rendered into HTML
 * [*] Rendered into PDF
 * [ ] Rendered into CSV

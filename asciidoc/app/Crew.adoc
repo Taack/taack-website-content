@@ -5,6 +5,7 @@
 
 == Purpose
 
+
 Manage users in the system:
 
 * click on `plus` sign to add a user

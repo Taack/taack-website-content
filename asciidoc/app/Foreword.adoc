@@ -1,8 +1,8 @@
 = *Foreword*
-:doctype: book
+:doctype: whitepaper
 :taack-category: 0|App
 :toc:
 
-All applications we will open will be listed here.
+Hi there !!!.
 
 Some applications can bring new features to the framework by extending it. This place will document those new features.

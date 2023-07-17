@@ -1,3 +1,4 @@
-= App
-:doctype: book
-:taack-category: 7|App
+= Application
+:doctype:
+:taack-category: 56|App
+

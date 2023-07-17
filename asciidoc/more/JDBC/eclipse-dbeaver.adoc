@@ -1,5 +1,5 @@
 = Eclipse DBeaver
-:doctype: book
+:doctype: article
 :taack-category: 3|more/JDBC
 :source-highlighter: rouge
 
