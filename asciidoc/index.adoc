@@ -1,22 +1,22 @@
 = DSL for Grails
 :taack-category: 1
 
-https://github.com/Taack/infra[Taack-UI] is a plugin extending https://grails.org/[Grails] by allowing to describe user interface and other features by using http://docs.groovy-lang.org/docs/latest/html/documentation/core-domain-specific-languages.html[Groovy DSL] (Domain Specific Language) statically typed.
+https://github.com/Taack/infra[Taack-UI] is a https://grails.org/[Grails] plugin that extends the functionality of Grails by allowing the description of user interface and other features using the http://docs.groovy-lang.org/docs/latest/html/documentation/core-domain-specific-languages.html[Groovy DSL] (Domain Specific Language) with static typing.
 
 This extension add the following functionalities to classical Grails Application:
 
 * Security:
-** Transforming and displaying objects by checking user right to modify *each field*;
-** *links* and *form actions* are automatically masked if user is not allowed to process the  *action* with given parameters;
-** Limit object listing user is allowed to see (excepts for fulltext search ATM);
+** Transforming and displaying objects by checking user rights to modify *each field*;
+** *links* and *form actions* are automatically hidden if the user is not allowed to process the  *action* with the given parameters;
+** Limiting object listing that the user is allowed to see (except for full-text search at the moment);
 
-* *PDF*, *Mails*, *CSV* rendered for free. The link:doc/DSLs/block-dsl.adoc[block DSL] can be used for any kind of rendering;
+* *PDF*, *Mails*, *CSV* are rendered for free. The link:doc/DSLs/block-dsl.adoc[block DSL] can be used for rendering in any format;
 
-* Localization for free: DSLs detect i18n translations automatically;
+* Localization is provided for free as the DSL detect i18n translations automatically;
 
-* Reporting errors when validating an Object for free (See link:doc/DSLs/form-dsl.adoc#_form_validation[*form validation*]);
+* Reporting errors during Object validation for free (refer to link:doc/DSLs/form-dsl.adoc#_form_validation[*form validation*]);
 
-* Solr for link:/more/Search/Search.adoc[fulltext search]:
+* Solr is utilized for link:/more/Search/Search.adoc[fulltext search] offering features such as:
 ** Indexing and fulltext Search of domain objects statically typed;
 ** Faceting;
 ** Ranking;
@@ -25,13 +25,13 @@ This extension add the following functionalities to classical Grails Application
 * File previews can be extended;
 * *JDBC Driver* to query Domain Objects using #TQL# (Taack Query Language) from Intellij, link:more/JDBC/libreoffice-base.adoc#_open_query_as_a_pivot_table[LibreOffice Base] or DBeaver, as a classical datasource (See link:more/JDBC/taack-jdbc-driver.adoc[*Taack JDBC Driver*]);
 
-* File sharing via *SFTP* (Available soon):
-** Virtual File System for each user (see <<sftp_screenshot>>);
-** Direct access to parts of the server storage for fast sharing, checking user credentials;
+* File sharing via *SFTP* (Available soon) provides:
+** Virtual File System for each user along with an SFTP file browser (see <<sftp_screenshot>>);
+** Direct access to parts of the server storage for fast and efficient sharing while ensuring user credentials are checked;
 
 * *Git server* to manage user documentation (Available soon)
 
-* *Ssh* support accessible (Available soon), running shell UI directly within the server process (see <<ssh_screenshot>>);
+* *Ssh* support will be accessible, running shell UI directly within the server process (Coming soon; see <<ssh_screenshot>>);
 
 [[ssh_screenshot]]
 .Ssh server session

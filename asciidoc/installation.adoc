@@ -10,7 +10,7 @@ First of all, you will need the following:
 * *Java* (JDK-17)
 * *git*
 
-You can also optionally install:
+Optionally you can also install:
 
 * *Solr-9.1.0* (Used for intranet-wide search bar)
 * *Postgresql* (You will need to use the Grails in-memory database if you don't have any database manager)
@@ -99,17 +99,21 @@ java -jar server-[version].jar
 
 It will be faster, assets will be compiled and merged.
 
+* Tips:
+** Make sure not running the previous application
+
 == Set up your IDE
 
-We heavily recommend the latest *IntelliJ Ultimate Edition* for its extensive *Groovy* and *Grails* support. We are investigating other IDE support (*Eclipse*, *Visual Studio Code*), and also support for IntelliJ non Ultimate Edition.
+
+We highly recommend using the latest version of *IntelliJ Ultimate Edition* for its comprehensive support of *Groovy* and *Grails*. We are also exploring support for other IDEs such as *Eclipse* and *Visual Studio Code*, as well as considering support for IntelliJ non-Ultimate Edition.
 
 === IntelliJ Ultimate Edition
 
-We recommend installing the *IntelliJ Taack Plugins* that you can install from the Intellij marketplace https://plugins.jetbrains.com/plugin/20792-taackuiastautocomplete[TaackUiASTAutocomplete] or directly from the https://github.com/Taack/infra/releases/tag/v0.1[source code repository].
+We recommend installing the *IntelliJ Taack Plugin* that you can install from the Intellij marketplace https://plugins.jetbrains.com/plugin/20792-taackuiastautocomplete[TaackUiASTAutocomplete] or directly from the https://github.com/Taack/infra/releases/tag/v0.1[source code repository].
 
 To open the project, select "Open project" and select `intranet/server/settings.gradle`.
 
-Check Jdk used with gradle is at version 17:
+Make sure that the JDK used with Gradle is at version 17:
 
 .Open Gradle Settings
 image:open-settings-gradle-intellij.webp[]
