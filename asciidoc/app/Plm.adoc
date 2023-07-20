@@ -52,7 +52,7 @@ java -DOption1=Value1 -DOption2=Value2 ... -jar server-0.3.jar
 
 * Path the Intranet store its files: `-Dintranet.root=/home/test/someDir`
 * Server port: `-Dserver.port=9444`
-* Database url:`-DdataSource.url='jdbc:h2:./prodDb2;LOCK_TIMEOUT=10000;DB_CLOSE_ON_EXIT=FALSE'`
+* Database url: `-DdataSource.url='jdbc:h2./prodDb2;LOCK_TIMEOUT=10000;DB_CLOSE_ON_EXIT=FALSE'`
 * Freecad appimage path: `-Dplm.freecadPath=/somePath...`
 * Dot exe path: `-Dexe.dot.path=/somePath...`
 
@@ -61,17 +61,17 @@ java -DOption1=Value1 -DOption2=Value2 ... -jar server-0.3.jar
 Clone the #plm# repository:
 
 [source,bash]
-.Clone PLM repo
+.Clone PLM repository
 ----
 git clone git@github.com:Taack/plm.git
 ----
 
 Then copy the content of the `plm` folder into your intranet `app` folder (see link:../installation.adoc[intranet installation])
 
-Then configure the server to know about this new app by changing `server/build.gradle` file. Grails section should look like this after changes:
+Then, configure the server to be aware of this new app by making changes to the `server/build.gradle` file. Grails section should look like this after changes:
 
 [source,gradle]
-.server configuration
+.Server configuration
 ----
 grails {
     exploded = true
@@ -83,7 +83,7 @@ grails {
 }
 ----
 
-Set the FreeCAD path in the `server/conf/application.yml` file appending:
+Set the FreeCAD path in the `server/conf/application.yml` file by appending the following:
 
 [source,yaml]
 .Specific PLM Configuration

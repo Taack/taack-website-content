@@ -3,6 +3,4 @@
 :taack-category: 0|App
 :toc:
 
-Hi there !!!.
-
-Some applications can bring new features to the framework by extending it. This place will document those new features.
+Some applications can enhance the framework by extending it with new features. This section will document those additional features.
