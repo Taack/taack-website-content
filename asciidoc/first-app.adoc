@@ -10,13 +10,13 @@ Your intranet project has two parts:
 
 * The app plugins, contained in the `app` folder, they are micro-projects each containing their dependencies, build, etc. `Crew` for example is an app plugin.
 For more in-depth explanation about how plugins are declared to the server link:doc/plugin/taack-plugin.adoc#_about_plugins[check here].
-* The main server, this will use all of the app plugins that are implemented in its `build.gradle` and render them on the main intranet page.
+* The main server, that uses all of the app plugins that are implemented in its `build.gradle` and render them on the main intranet page.
 
 == Creating a new app plugin
 
 In order to create a new app plugin (a Gradle module), be sure to pull latest version  of your intranet from our github repository (see link:installation.adoc[installation])
 
-Once it is done, you can issue the following command from your intranet root folder:
+Once it is done, you can execute the following command from your intranet root folder:
 
 [,bash]
 ----
@@ -192,7 +192,7 @@ You can now start the server and navigate to your new app. The table should be f
 
 == Adding buttons to a table block
 
-We are going to add a button to your Book table that will open a modal in ajax to create a new Book. To do that we need to add a closure in the table like so:
+We are going to add a button to your Book table that will open a modal unsing AJAX to create a new Book. To achieve this, we need to add a closure in the table, like so:
 
 [,groovy]
 ----
@@ -271,9 +271,9 @@ b.ui {
 taackUiSimpleService.show(b)
 ----
 
-This time we don't specify `buildMenu` in our show since we don't want to menu to be rendered inside the modal!
+This time we don't specify `buildMenu` in our show since we don't want the menu to be rendered inside the modal!
 
-Don't forget to create a the `saveBook` action:
+Don't forget to create the `saveBook` action:
 
 [,groovy]
 ----
@@ -330,10 +330,6 @@ Note that `ActionIcon` was multiplied with a `ActionIconStyleModifier` to change
 
 == Deleting an object
 
-Remember that delete button we put in our table ? Let's make it work now, change the action name in the table to "[.code]``&deleteBook``" and create a new controller action named the same.
-
-
-ChatGPT
 Remember the delete button we added to our table? Let's make it functional by updating the action name in the table to "[.code]``&deleteBook``" and creating a corresponding controller action with the same name.
 
 [,groovy]

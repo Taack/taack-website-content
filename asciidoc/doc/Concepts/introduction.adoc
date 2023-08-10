@@ -26,7 +26,7 @@ The *Taack Framework* depends on the *Grails* application framework. Grails brin
 
 In a web application, entry points are URLs. They are called *actions* in Grails terminology.
 
-*Actions* are responsible for updating browser state after user events (like a click, a key pressed, mouse move ...).
+*Actions* are responsible for updating browser state following user events such as clicks, key presses, mouse movement.
 
 There are 2 kinds of actions:
 

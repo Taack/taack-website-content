@@ -3,21 +3,29 @@
 :toc:
 :source-highlighter: rouge
 
-== General
+== Coding Style Guide for Grails Application Development
 
-- Use protected and final for methods in a controller that are not actions
-- Coding style: "the shortest the better", until you lower expressiveness
-- Use `@GrailsCompileStatic` or `@CompileStatic` everywhere
-- Always stateless actions, use no sessions
-- Avoid services to implement Controller traits
-- Do not annotate with `@Transactional` anything but controller actions
+Here are the guidelines and coding style recommendations for your Grails application:
 
-- General rules:
-** Use final when applicable
-** Do not repeat yourself
-** keep symbols scope low
-** local variable names short
-** Explicit public method parameters and member names
+- Method Modifiers:
+** Use protected and final modifiers for methods in a controller that are not actions.
+- Coding Style:
+** Prioritize concise code, while maintaining clarity.
+** Employ the @GrailsCompileStatic or @CompileStatic annotations throughout the codebase.
+- Stateless Actions:
+** Always design actions to be stateless and avoid using sessions.
+- Controller Traits:
+** Refrain from utilizing services to implement Controller traits.
+- @Transactional Annotation:
+** Reserve the @Transactional annotation solely for controller actions.
+- General Rules:
+** Use the final modifier when appropriate.
+** Adhere to the DRY (Don't Repeat Yourself) principle.
+** Keep the scope of symbols low to enhance code readability.
+** Opt for concise and meaningful local variable names.
+** Clearly specify public method parameters and member names.
+
+By following these guidelines, you can maintain a clean, organized, and expressive codebase for your Grails application.
 
 == i18n
 
@@ -31,7 +39,7 @@ class Book {
 - class name localisation "book.label = Libro"
 - class field name localisation "book.title.label = Título del libro"
 - In order to be efficient
-** do not start translations too early
+** do not translate too early
 ** when you have a global overview, start translating
 ** keep most important label short, use the `default` namespace for them, specialized label can be long
 - used convention for your i18n:
@@ -48,15 +56,15 @@ class Book {
 
 == Security
 
-- Code managing security must be close to the place it is used
+- Security-related code should be located near the point of its implementation
 ** We do want to avoid centralisation for all concerns
 *** Create a new domain per needs, avoid cluttering `User` class
-*** Abstract concept should be avoided for security, static check is the king
-- Avoid complex rules that are not checked statically at compile time
-- Administrative rules must not rely on permission strings, a boolean value in an object is more explicite when testing in code...
+*** Abstract concepts should be minimized for security purposes; static checks are crucial
+- Avoid complex rules that can't be verified statically during compilation
+- Administrative rules must not rely on permission strings, a boolean value in an object is more explicite when testing in code.
 
-== You are efficient ...
+== You are efficient when:
 
-- when you do not break everything for altering a functionality
-- when new stuffs can be added easily
-- when different concern are kept isolated (or orthogonal, not influencing each other)
+- Modifications to a functionality don't cause widespread disruptions
+- Incorporating new features is straightforward
+- Different concerns remain isolated or orthogonal, minimizing mutual influence.

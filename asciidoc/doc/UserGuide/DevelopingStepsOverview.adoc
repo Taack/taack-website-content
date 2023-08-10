@@ -110,7 +110,7 @@ class CmsPage { <1>
 
 <1> No need to implement Validateable in case of domain class
 
-Domain classes are first class citizen to be used with Taack framework. It can use magick tricks of `TaackSimpleSaveService`.
+Domain classes are treated as first-class citizen within Taack framework. They can make use of the advanced functionalities provided by the  `TaackSimpleSaveService`.
 
 == Object Manipulation for Domain Classes
 
@@ -143,17 +143,17 @@ Passing the filter to the `list` method allows to restrict the query for securit
 
 === Saving Objects via Form DSL and show errors
 
-In order to save a new object, or a modified object (we will see security consideration later), just call the following method into the form target action:
+In order to save a new object, or a modified object (we will see security considerations later), just call the following method into the form target action:
 
 [, groovy]
 ----
 taackSimpleSaveService.saveThenRedirectOrRenderErrors(User, this.&index)
 ----
 
-There are 3 possible situations:
+There are 3 possible scenarios:
 
- * Either the object is valid, and the user has the necessary credential to process the object, then the browser will be redirected to the action specified on the second parameter
- * Either the object has invalid fields, then the form will be updated with the wrong field annotated (see image below)
+ * If the object is valid and the user possesses the required credentials to manipulate it, the browser will be redirected to the action specified in the second parameter.
+ * If the object contains invalid fields, the form will be updated to highlight the problematic fields (refer to the image below)
  * Either the user has no credential to process the object, an error is displayed
 
 Here, `index` is the action to go in case of success, `User` is the object class.

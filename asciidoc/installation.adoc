@@ -100,7 +100,7 @@ java -jar server-[version].jar
 It will be faster, assets will be compiled and merged.
 
 * Tips:
-** Make sure not running the previous application
+** Make sure you're not running already the application
 
 == Set up your IDE
 
