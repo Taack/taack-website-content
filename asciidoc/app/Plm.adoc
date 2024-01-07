@@ -5,7 +5,8 @@
 
 == Purpose
 
-Manage FreeCAD model sharing and linear versioning.
+Manage FreeCAD model sharing and linear versioning. This is a sample app, more to see framework capabilities than to use
+a real PLM.
 
 == Roles
 
@@ -18,13 +19,13 @@ See link:Crew.adoc#_purpose[configure roles in Crew] to add the role into your I
 
 === Launch FreeCAD on the server
 
-On a Linux server, grab FreeCAD AppImage file, install `xvfb-run`, then launch in background FreeCAD:
+On a Linux server, it is better to install the following package from your distribution:
 
-[source,bash]
-.Launch FreeCAD in background
-----
-xvfb-run ./FreeCAD_0.20.2-2022-12-27-conda-Linux-x86_64-py310.AppImage
-----
+* #Weston# Wayland server
+* #FreeCAD 0.21.2#
+* #python-protobuf# package (See <<python-protobuf-install>>)
+
+Freecad and Weston allows similar features on Wayland than Xvfb-run under X11.
 
 === Install from Server Binaries
 
@@ -35,10 +36,12 @@ Launch the server app:
 [source,bash]
 .Launch the server
 ----
-java -jar server-0.3.jar
+java -jar server-0.6.jar
 ----
 
 ==== Server Arguments
+
+See `server/grails-app/conf/application.yml` for a list of available options
 
 Options to the server can be passed this way:
 
@@ -68,43 +71,7 @@ git clone git@github.com:Taack/plm.git
 
 Then copy the content of the `plm` folder into your intranet `app` folder (see link:../installation.adoc[intranet installation])
 
-Then, configure the server to be aware of this new app by making changes to the `server/build.gradle` file. Grails section should look like this after changes:
-
-[source,gradle]
-.Server configuration
-----
-grails {
-    exploded = true
-    plugins {
-        implementation project(':crew')
-        // other apps here ...
-        implementation project(':plm')
-    }
-}
-----
-
-Set the FreeCAD path in the `server/conf/application.yml` file by appending the following:
-
-[source,yaml]
-.Specific PLM Configuration
-----
-plm:
-  freecadPath: ${HOME}/FreeCAD_0.20.2-2022-12-27-conda-Linux-x86_64-py310.AppImage
-
-
-----
-
-You can also install #graphviz# and set the `dot` executable path. It is used to display graphs and might be useful to display *model dependency graph* in a near future. In `server/conf/application.yml`:
-
-[source,yaml]
-.Dot executable configuration
-----
-exe:
-  dot:
-    path: /usr/bin/dot
-    #path: /opt/homebrew/bin/dot
-----
-
+Set the FreeCAD path in the `server/conf/application.yml` file.
 
 Start your intranet issuing under the `intranet` folder:
 
@@ -124,9 +91,10 @@ You can produce a Jar file:
 
 The server will be located under `server/build/libs`
 
+[[python-protobuf-install]]
 == FreeCAD Workbench Installation
 
-First, install `python-protobuf`. If you use FreeCAD < 0.21, dependencies are not installed automatically when installing the workbench.
+First, install `python-protobuf`. If you use FreeCAD <= 0.21, dependencies are not installed automatically when installing the workbench.
 
 [source,bash]
 .Install Protobuf for FreeCAD < 0.21
