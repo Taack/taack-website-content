@@ -29,7 +29,7 @@ Freecad and Weston allows similar features on Wayland than Xvfb-run under X11.
 
 === Install from Server Binaries
 
-Download the latest server binaries from https://github.com/Taack/taack-plm-freecad/releases[releases].
+Download the latest server binaries from https://github.com/Taack/plm/releases[releases].
 
 Launch the server app:
 
