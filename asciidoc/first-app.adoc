@@ -27,6 +27,13 @@ The newly created app should appear in the `app` folder.
 
 NOTE: Next version will fix runtime when starting the server at this point. If you read the error message, it tells it cannot find `taack-grails-plugin.java-conventions`, just replace this line with `taack-grails-plugin`. Then you will be able to launch again the server. We are trying to ensure a simpler build, which is not easy.
 
+
+== Managing Future Updates
+
+Most of the time, updating your intranet, should imply to update `buildSrc` folder, `gradle.properties`, and also, less often, apps `build.gradle` files.
+
+NOTE: In fact this process is common in long term software dev, and should not scare newcomers.
+
 == Building an app-wide menu
 
 First, let's focus on the navigation for your new app. The initial step is to define how the menu will be constructed. The basic boilerplate code for that is as follows:
