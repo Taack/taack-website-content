@@ -1,0 +1,9 @@
+= About
+:doctype: book
+:taack-category: Z|more
+
+This is the TaackMan
+
+image::adrien-taack.webp[]
+
+CrewInitiator.
