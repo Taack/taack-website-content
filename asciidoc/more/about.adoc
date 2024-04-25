@@ -4,6 +4,6 @@
 
 This is the TaackMan
 
+.Crew Initiator
 image::adrien-taack.webp[]
 
-CrewInitiator.
