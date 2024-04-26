@@ -1,0 +1,66 @@
+= News
+:doctype: book
+:taack-category: 3
+:toc:
+:source-highlighter: rouge
+
+== [WiP] Version 0.4.0
+
+To be released, this version should come with some nice changes (breaking some old code)
+
+* No more `paginate` in tables. See <<new_iterate_code>>
+* No `list`, but an `iterate` taking a closure as parameter, with a builder pattern approach to pass args
+* Menu are auto labeled now (use `lang=test` in url to translate menus). See <<new_menu_code>>
+
+[[new_iterate_code]]
+.New `iterate` usage
+[source,groovy]
+----
+iterate(taackFilterService.getBuilder(Role)                     <1>
+        .setMaxNumberOfLine(20)                                 <2>
+        .setSortOrder(TaackFilter.Order.DESC, u.authority_)     <3>
+        .build()) { Role r, Long counter ->
+            row {
+                rowColumn {
+                    rowField r.authority
+                    if (hasSelect)
+                        rowLink tr('default.role.label'),
+                                ActionIcon.SELECT * IconStyle.SCALE_DOWN,
+                                r.id, r.toString(), true
+                }
+            }
+        }
+
+----
+
+<1> iterate
+<2> Specifying max is enough to trigger paginate if more lines
+<3> Replace the old inefficient pattern to describe initial sort and order
+
+
+
+[[new_menu_code]]
+.New `menu` code
+[source,groovy]
+----
+private UiMenuSpecifier buildMenu(String q = null) {
+    UiMenuSpecifier m = new UiMenuSpecifier()
+    m.ui {
+        menu CrewController.&index as MC        <1>
+        menu CrewController.&listRoles as MC
+        menu CrewController.&hierarchy as MC
+        menuSearch this.&search as MethodClosure, q
+    }
+    m
+}
+----
+
+<1> No i18n parameter
+
+== Version 0.3.9
+
+No updates since too long, hibernation is coming to an end. This version offer:
+
+- Grails 6.2.0
+- Groovy 3.0.21
+- Bumping Various deps ... (See https://github.com/Taack/infra/compare/v0.3.8...v0.3.9[Changelog])
