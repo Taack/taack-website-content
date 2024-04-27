@@ -11,6 +11,8 @@ To be released, this version should come with some nice changes (breaking some o
 * No more `paginate` in tables. See <<new_iterate_code>>
 * No `list`, but an `iterate` taking a closure as parameter, with a builder pattern approach to pass args
 * Menu are auto labeled now (use `lang=test` in url to translate menus). See <<new_menu_code>>
+* No more #isAjax# parameter in tables ... See <<new_rowLink_code>>
+* No label needed on #rowLink# in tables. See <<new_rowLink_code>>
 
 [[new_iterate_code]]
 .New `iterate` usage
@@ -37,8 +39,6 @@ iterate(taackFilterService.getBuilder(Role)                     <1>
 <2> Specifying max is enough to trigger paginate if more lines
 <3> Replace the old inefficient pattern to describe initial sort and order
 
-
-
 [[new_menu_code]]
 .New `menu` code
 [source,groovy]
@@ -56,6 +56,19 @@ private UiMenuSpecifier buildMenu(String q = null) {
 ----
 
 <1> No i18n parameter
+
+[[new_rowLink_code]]
+.New `rowLink` code
+[source,groovy]
+----
+if (hasActions) {
+    rowColumn {
+        rowLink ActionIcon.EDIT * IconStyle.SCALE_DOWN, this.&roleForm as MC, r.id <1>
+    }
+}
+----
+
+<1> No i18n parameter, no last `isAjax` parameter
 
 == Version 0.3.9
 
