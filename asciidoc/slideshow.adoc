@@ -44,7 +44,7 @@ DSL (#Domain Specific Language#)
 [%notitle]
 === Forms
 
-image::screenshot-form-user-en.webp[background, size=cover]
+image::screenshot-form-user-en.webp[background, size=contain]
 
 [transition=convex,transition-speed=fast,transition-background=zoom]
 == Forms Validation
@@ -52,7 +52,7 @@ image::screenshot-form-user-en.webp[background, size=cover]
 [%notitle]
 === Forms Validation
 
-image::screenshot-form-user-validation-en.webp[background, size=cover]
+image::screenshot-form-user-validation-en.webp[background, size=contain]
 
 
 [.columns]
