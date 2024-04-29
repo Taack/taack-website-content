@@ -146,20 +146,20 @@ tableSpecifier.ui Book, {
 Pour chaque livre dans notre liste, nous créons une nouvelle ligne avec son titre dans la première colonne et un bouton "supprimer" dans la seconde colonne si l'utilisateur est un admin (pour le moment, nous sommes redirigés vers `index` puisque nous n'avons pas encore créé de méthode de suppression).
 
 Votre tableau est désormais complet. Nous devons maintenant simplement l'afficher sur la page.
-Pour afficher les UiSpecifiers que nous avons précédemment construits, nous devons utiliser `TaackUiSimpleService`. Il devrait être déjà importé dans le contrôleur créé par la commande `create-taack-app`.
+Pour afficher les UiSpecifiers que nous avons précédemment construits, nous devons utiliser `taackUiService`. Il devrait être déjà importé dans le contrôleur créé par la commande `create-taack-app`.
 
 Ajoutez le code suivant sous le code de votre tableau :
 
 [,groovy]
 ----
-taackUiSimpleService.show(new UiBlockSpecifier().ui {
+taackUiService.show(new UiBlockSpecifier().ui {
     ajaxBlock 'blockList', {
         table 'Book table', tableSpecifier, BlockSpec.Width.MAX
     }
 }, buildMenu())
 ----
 
-`taackUiSimpleService.show(UiBlockSpecifier block, UiMenuSpecifier menu)` sera en charge d'afficher la spécification que nous lui avons donnée. Dans ce cas, nous voulons afficher un `ajaxBlock` qui contient une `table` nommée "Book table". Nous passons notre `tableSpecifier` précédemment créé en tant qu'argument et nous réglons la largeur du tableau à `MAX` afin qu'il occupe toute la largeur de la page.
+`taackUiService.show(UiBlockSpecifier block, UiMenuSpecifier menu)` sera en charge d'afficher la spécification que nous lui avons donnée. Dans ce cas, nous voulons afficher un `ajaxBlock` qui contient une `table` nommée "Book table". Nous passons notre `tableSpecifier` précédemment créé en tant qu'argument et nous réglons la largeur du tableau à `MAX` afin qu'il occupe toute la largeur de la page.
 Nous utilisons également notre méthode statique `buildMenu()` créée précédemment, et nous la passons en tant que second argument de `show()` pour afficher notre menu avec la page.
 
 Vous pouvez maintenant lancer le serveur et accéder à votre nouvelle application. Votre tableau devrait fonctionner, mais pour le moment, vous ne devriez voir que les en-têtes, car vous n'avez pas encore de livres dans votre base de données. Continuons donc avec la création du formulaire et la sauvegarde de l'objet dans la base de données.
@@ -170,7 +170,7 @@ Nous allons ajouter un bouton dans notre tableau Book qui va ouvrir un modal en 
 
 [,groovy]
 ----
-taackUiSimpleService.show(new UiBlockSpecifier().ui {
+taackUiService.show(new UiBlockSpecifier().ui {
     ajaxBlock 'blockList', {
         table 'Book table', tableSpecifier, BlockSpec.Width.MAX, {
             //Added Closure here
@@ -230,7 +230,7 @@ form.ui book, {
 }
 ----
 
-Maintenant que votre formulaire est défini, affichons-le en utilisant `taackUiSimpleService.show()`.
+Maintenant que votre formulaire est défini, affichons-le en utilisant `taackUiService.show()`.
 
 [,groovy]
 ----
@@ -242,7 +242,7 @@ b.ui {
         }
     }
 }
-taackUiSimpleService.show(b)
+taackUiService.show(b)
 ----
 
 Cette fois, nous n'allons pas spécifier `buildMenu` dans notre show, car nous ne voulons pas que le menu soit affiché dans le modal !
@@ -264,7 +264,7 @@ Puisque nous voulons autoriser seulement les administrateurs à créer des livre
 == Afficher un objet
 
 Maintenant que nous pouvons créer des livres et les lister dans un tableau, affichons leurs détails dans un modal.
-Encore une fois, nous allons définir le Specifier et l'afficher dans un bloc via `taackUiSimpleService.show()` :
+Encore une fois, nous allons définir le Specifier et l'afficher dans un bloc via `taackUiService.show()` :
 
 [,groovy]
 ----
@@ -275,7 +275,7 @@ def showBook(Book book) {
         field "Author", book.author
     })
 
-    taackUiSimpleService.show(new UiBlockSpecifier().ui {
+    taackUiService.show(new UiBlockSpecifier().ui {
         modal {
             ajaxBlock "showBook", {
                 show "${book.title}", show, BlockSpec.Width.MAX

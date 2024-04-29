@@ -15,24 +15,22 @@ Menu DSL associate menu entries with top level actions. Menu DSL supports only 2
 [[menu-sample1]]
 .Menu Sample with conditional
 ----
-    static private UiMenuSpecifier buildMenu(String q = null) {
-        UiMenuSpecifier m = new UiMenuSpecifier() <1>
-        m.ui {
-            menu "Pages", this.&pages as MC
-            menu "Images", this.&images as MC
-            menu "PDFs", this.&pdfs as MC
-            menu "Videos", this.&videos as MC
-            menu "Menus", this.&menuEntries as MC
-            menu "Blocks", this.&blocks as MC
-            menu "Inserts", this.&inserts as MC
-            menu "Slideshows", this.&slideshows as MC
+    private UiMenuSpecifier buildMenu(String q = null) {
+        new UiMenuSpecifier().ui { <1>
+            menu this.&pages as MC
+            menu this.&images as MC
+            menu this.&pdfs as MC
+            menu this.&videos as MC
+            menu this.&menuEntries as MC
+            menu this.&blocks as MC
+            menu this.&inserts as MC
+            menu this.&slideshows as MC
             menu "Admin", { <2>
-                menu "Sync Servers", this.&sync as MC
-                menu "Conf Sites", this.&confSites as MC
+                menu this.&sync as MC
+                menu this.&confSites as MC
             }
             menuSearch CmsController.&search as MC, q
         }
-        m
     }
 
 ----

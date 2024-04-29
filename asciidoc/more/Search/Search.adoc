@@ -103,12 +103,9 @@ Here `CrewController.&showUserFromSearch` is used when clicking on the object fo
 
 [,groovy]
 ----
-def showUserFromSearch() {
-    User u = User.read(params.long('id'))
-    taackUiSimpleService.show(new UiBlockSpecifier().ui {
-        ajaxBlock 'showUserFromSearch', {
-            show u.username, crewUiService.buildUserShow(u), BlockSpec.Width.MAX
-        }
+def showUserFromSearch(User u) {
+    taackUiService.show(new UiBlockSpecifier().ui {
+        show u.username, crewUiService.buildUserShow(u), BlockSpec.Width.MAX
     }, buildMenu())
 }
 ----
@@ -139,7 +136,7 @@ private UiMenuSpecifier buildMenu(String q = null) {
 [,groovy]
 ----
 def search(String q) {
-    taackUiSimpleService.show(crewSearchService.buildSearchBlock(q), buildMenu(q))
+    taackUiService.show(crewSearchService.buildSearchBlock(q), buildMenu(q))
 }
 ----
 

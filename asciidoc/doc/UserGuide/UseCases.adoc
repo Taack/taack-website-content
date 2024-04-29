@@ -19,20 +19,20 @@ group Display Form
     activate controller
     controller -> controller : buildForm
     controller -> controller : buildBlock
-    controller -> taackUiSimpleService : show(block)
+    controller -> taackUiService : show(block)
     deactivate controller
-    activate taackUiSimpleService #005500
+    activate taackUiService #005500
     note right
         choose Ajax or
         full page rendering
         to render the block
     end note
-    taackUiSimpleService -> user : show the block containing the form
-    deactivate taackUiSimpleService
+    taackUiService -> user : show the block containing the form
+    deactivate taackUiService
 end
 
 box "Taack Service" #LightBlue
-    participant taackUiSimpleService
+    participant taackUiService
     participant taackSimpleSaveService
 end box
 
@@ -95,7 +95,7 @@ end
                 }
             }
         }
-        taackUiSimpleService.show(b) <5>
+        taackUiService.show(b) <5>
     }
 
     @Secured("ROLE_ADMIN") <6>
@@ -133,20 +133,20 @@ group Display Table with filter
         return objects and counter
         controller -> controller : build rows from objects
         controller -> controller : buildBlock
-        controller -> taackUiSimpleService : show(block)
+        controller -> taackUiService : show(block)
         deactivate controller
-        activate taackUiSimpleService #005500
+        activate taackUiService #005500
         note right
             choose Ajax or
             full page rendering
         end note
-        taackUiSimpleService -> user : show the table and the filter if any into the block
-        deactivate taackUiSimpleService
+        taackUiService -> user : show the table and the filter if any into the block
+        deactivate taackUiService
     end
 end
 
 box "Taack Service" #LightBlue
-    participant taackUiSimpleService
+    participant taackUiService
     participant taackSimpleFilterService
 end box
 
@@ -173,7 +173,7 @@ end box
             }
         }
 
-        taackUiSimpleService.show(b, buildMenu()) <6>
+        taackUiService.show(b, buildMenu()) <6>
     }
 ----
 
@@ -198,18 +198,18 @@ group Open Modal, Edit or create object, then refresh the page
     activate controller
     controller -> controller : buildForm
     controller -> controller : buildBlock
-    controller -> taackUiSimpleService : show(block)
+    controller -> taackUiService : show(block)
     deactivate controller
-    activate taackUiSimpleService #005500
+    activate taackUiService #005500
     note right
         The block open a modal
     end note
-    taackUiSimpleService -> user : show the block containing the form
-    deactivate taackUiSimpleService
+    taackUiService -> user : show the block containing the form
+    deactivate taackUiService
 end
 
 box "Taack Service" #LightBlue
-    participant taackUiSimpleService
+    participant taackUiService
     participant taackSimpleSaveService
 end box
 

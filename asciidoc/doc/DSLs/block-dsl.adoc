@@ -54,7 +54,7 @@ def editSlideshow(CmsPage slideshow) {
             }
         }
     }
-    taackUiSimpleService.show(b, buildMenu())                   <3>
+    taackUiService.show(b, buildMenu())                   <3>
 }
 ----
 

@@ -59,7 +59,7 @@ def userForm(User user) {
             }
         }
     }
-    taackUiSimpleService.show(b)                 <8>
+    taackUiService.show(b)                 <8>
 }
 ----
 
