@@ -68,7 +68,7 @@ private UiMenuSpecifier buildMenu(String q = null) {
 <1> No i18n parameter
 
 [[new_rowLink_code]]
-.New `rowLink` code
+.New `rowAction` code
 [source,groovy]
 ----
 if (hasActions) {
