@@ -4,7 +4,7 @@
 :toc:
 :source-highlighter: rouge
 
-== [WiP] Version 0.4.0
+== Version 0.4.0
 
 To be released, this version should come with some nice changes (breaking some old code)
 
@@ -13,6 +13,14 @@ To be released, this version should come with some nice changes (breaking some o
 * Menu are auto labeled now (use `lang=test` in url to translate menus). See <<new_menu_code>>
 * No more #isAjax# parameter in tables ... See <<new_rowLink_code>>
 * No label needed on #rowLink# in tables. See <<new_rowLink_code>>
+* No more ajaxBlock required for tables, forms, tableFilters
+* formAction has no more #isAjax# parameter
+* formAction has no more mandatory i18n parameter
+* form has no more mandatory i18n parameter, i18n is based on current action name
+* block action has no more mandatory i18n parameter, i18n is based on target action
+* block action has no more mandatory isAjax parameter
+* change rowLink into rowAction  <<i18n_isAjax>>
+* rowAction, optional i18n and no more isAjax  <<i18n_isAjax>>
 
 [[new_iterate_code]]
 .New `iterate` usage
@@ -26,9 +34,10 @@ iterate(taackFilterService.getBuilder(Role)                     <1>
                 rowColumn {
                     rowField r.authority
                     if (hasSelect)
-                        rowLink tr('default.role.label'),
-                                ActionIcon.SELECT * IconStyle.SCALE_DOWN,
-                                r.id, r.toString(), true
+                        rowAction
+                            ActionIcon.SELECT * IconStyle.SCALE_DOWN,
+                            CrewController.&selectRole as MC
+                            r.id                                <4>
                 }
             }
         }
@@ -38,6 +47,8 @@ iterate(taackFilterService.getBuilder(Role)                     <1>
 <1> iterate
 <2> Specifying max is enough to trigger paginate if more lines
 <3> Replace the old inefficient pattern to describe initial sort and order
+[[i18n_isAjax]]
+<4> No more i18n and isAjax parameter
 
 [[new_menu_code]]
 .New `menu` code
@@ -63,7 +74,7 @@ private UiMenuSpecifier buildMenu(String q = null) {
 ----
 if (hasActions) {
     rowColumn {
-        rowLink ActionIcon.EDIT * IconStyle.SCALE_DOWN, this.&roleForm as MC, r.id <1>
+        rowAction ActionIcon.EDIT * IconStyle.SCALE_DOWN, this.&roleForm as MC, r.id <1>
     }
 }
 ----
