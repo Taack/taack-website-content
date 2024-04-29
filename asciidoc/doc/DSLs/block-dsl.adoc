@@ -30,32 +30,28 @@ def editSlideshow(CmsPage slideshow) {
     if (!slideshow)
         slideshow = new CmsPage(pageType: CmsPageType.SLIDESHOW)
 
-    b.ui {
-        if (createNew)
-            modal {
-                ajaxBlock "createNew", {
-                    form "Create Slideshow",
-                            buildCmsSlideshowForm(slideshow),
-                            BlockSpec.Width.MAX
-                }
-            }
-        else {
-            anonymousBlock BlockSpec.Width.HALF, {              <1>
-                ajaxBlock "cmsSlideshowForm", {
-                    form "Edit Slideshow",
-                        buildCmsSlideshowForm(slideshow),
-                        BlockSpec.Width.MAX
-                }
+b.ui {
+    if (createNew)
+        modal {
+            form
+                buildCmsSlideshowForm(slideshow),
+                BlockSpec.Width.MAX
+        }
+    else {
+        anonymousBlock BlockSpec.Width.HALF, {          <1>
+            form
+                buildCmsSlideshowForm(slideshow),
+                BlockSpec.Width.MAX
             }
 
-            blockTabs BlockSpec.Width.HALF, {
-                blockTab "Images", buildImagesTab(slideshow)    <2>
-                blockTab "Videos", buildVideosTab(slideshow)
-            }
+        blockTabs BlockSpec.Width.HALF, {
+            blockTab "Images", buildImagesTab(slideshow)<2>
+            blockTab "Videos", buildVideosTab(slideshow)
         }
     }
-    taackUiService.show(b, buildMenu())                   <3>
 }
+taackUiService.show(b, buildMenu())                     <3>
+
 ----
 
 <1> Declare an invisible block of 1/2 window width
@@ -77,7 +73,7 @@ See
 @Transactional
 @Secured(["ROLE_CMS_MANAGER", "ROLE_CMS_DIRECTOR"])
 def saveCmsInsert() {
-    taackSimpleSaveService.saveThenReloadOrRenderErrors(CmsInsert)
+    taackSaveService.saveThenReloadOrRenderErrors(CmsInsert)
 }
 ----
 
@@ -90,7 +86,7 @@ If no error is detected saving CmsInsert, the page is simply reloaded.
 @Transactional
 @Secured(["ROLE_ADMIN", "ROLE_CMS_MANAGER", "ROLE_CMS_DIRECTOR"])
 def saveCmsPage() {
-    taackSimpleSaveService.saveThenRedirectOrRenderErrors(  <1>
+    taackSaveService.saveThenRedirectOrRenderErrors(  <1>
         CmsPage, this.&pages as MethodClosure
     )
 }
@@ -102,17 +98,16 @@ def saveCmsPage() {
 .Complex Use Case: close the modal window and refresh ajaxBlock present in the page
 [source,groovy]
 ----
-taackSimpleSaveService.saveThenDisplayBlockOrRenderErrors(
+taackSaveService.saveThenDisplayBlockOrRenderErrors(
     EngineeringChangeRequest,                                   <1>
     new UiBlockSpecifier().ui {                                 <2>
         closeModalAndUpdateBlock {                              <3>
-            ajaxBlock ajaxBlockId, {                            <4>
-                show "Projects", buildShowProjects(ecr),
-                    BlockSpec.Width.MAX, {
-                        action "Edit projects 2", ActionIcon.ADD,
-                            Ecr2Controller.&projectsForm as MC,
-                            [id: ecr.id, ajaxBlockId: ajaxBlockId], true
-                }
+            show "Projects", buildShowProjects(ecr),
+                BlockSpec.Width.MAX, {
+                    action
+                        ActionIcon.ADD,
+                        Ecr2Controller.&projectsForm as MC,
+                        [id: ecr.id, ajaxBlockId: ajaxBlockId]
             }
         }
     }
@@ -122,7 +117,6 @@ taackSimpleSaveService.saveThenDisplayBlockOrRenderErrors(
 <1> After an action implying to save an object is called into a modal, you can close the modal and refresh page elements in one action
 <2> `saveThenDisplayBlockOrRenderErrors` take a `UiBlockSpecifier` as parameter
 <3> `closeModalAndUpdateBlock` will first close the last opened modal and then apply the modification
-<4> Here, the block with the name contained in `ajaxBlockId` will be updated
 
 == Block DSL Symbols Hierarchy
 
@@ -140,3 +134,4 @@ digraph mygraph {
 }
 ----
 
+`ajaxBlock` can surround other elements and allows to update only a portion of the page.

@@ -162,7 +162,7 @@ t.ui User, { <2>
                 rowField attachmentUiService.preview(picture?.id) <11>
             }
             rowColumn {
-                rowLink "Edit User", <12>
+                rowAction "Edit User", <12>
                     ActionIcon.EDIT,
                     this.&userForm as MC, ru.id
                 rowField ru.username_ <13>
@@ -178,7 +178,7 @@ t.ui User, { <2>
             }
             rowColumn {
                 if (!hasSelect)
-                    rowLink "Edit Roles",
+                    rowAction "Edit Roles",
                         ActionIcon.EDIT,
                         this.&editUserRoles as MC, ru.id, true
                 rowField ru.authorities*.authority.join(', ')
@@ -220,7 +220,7 @@ digraph mygraph {
   header -> column [label = "0,N"]
   column, header -> fieldHeader, sortableFieldHeader [label = "1,N"]
   row -> rowColumn [label = "0,N"]
-  rowColumn, row -> rowLink, rowField [label = "0,N"]
+  rowColumn, row -> rowAction, rowField [label = "0,N"]
 }
 ----
 

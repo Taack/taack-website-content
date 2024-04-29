@@ -134,7 +134,7 @@ tableSpecifier.ui Book, {
             // to redirect towards the book deletion action
             if (isAdmin) {
                 rowColumn {
-                    rowLink "Delete book", ActionIcon.DELETE,
+                    rowAction "Delete book", ActionIcon.DELETE,
                             TurboController.&index as MC, book.id, false
                 }
             }
@@ -255,7 +255,7 @@ N'oubliez pas de créer l'action `saveBook` :
 @Transactional
 def saveBook(String redirectAction) {
     MC red = (redirectAction ? this.&"$redirectAction" : this.&index) as MC
-    taackSimpleSaveService.saveThenRedirectOrRenderErrors(Book, redirectAction == "null" ? null : red)
+    taackSaveService.saveThenRedirectOrRenderErrors(Book, redirectAction == "null" ? null : red)
 }
 ----
 
@@ -289,7 +289,7 @@ Nous devons également ajouter un lien vers cette page dans le tableau. Pour ajo
 
 [,groovy]
 ----
-rowLink "Show book", ActionIcon.SHOW * ActionIconStyleModifier.SCALE_DOWN, TurboController.&showBook as MC, book.id, true
+rowAction "Show book", ActionIcon.SHOW * ActionIconStyleModifier.SCALE_DOWN, TurboController.&showBook as MC, book.id, true
 ----
 
 Cela créera un _petit_ bouton dans la cellule du tableau qui ouvrira un modal avec les détails du livre correspondant.

@@ -11,9 +11,9 @@ To be released, this version should come with some nice changes (breaking some o
 * No more `paginate` in tables. See <<new_iterate_code>>
 * No `list`, but an `iterate` taking a closure as parameter, with a builder pattern approach to pass args
 * Menu are auto labeled now (use `lang=test` in url to translate menus). See <<new_menu_code>>
-* No more #isAjax# parameter in tables ... See <<new_rowLink_code>>
+* No more #isAjax# parameter in tables ... See <<new_rowAction_code>>
 * change rowLink into rowAction  <<i18n_isAjax>>
-* No label needed on #rowAction# in tables. See <<new_rowLink_code>>
+* No label needed on #rowAction# in tables. See <<new_rowAction_code>>
 * No more ajaxBlock required for tables, forms, tableFilters
 * formAction has no more #isAjax# parameter
 * formAction has no more mandatory i18n parameter
@@ -67,7 +67,7 @@ private UiMenuSpecifier buildMenu(String q = null) {
 
 <1> No i18n parameter
 
-[[new_rowLink_code]]
+[[new_rowAction_code]]
 .New `rowAction` code
 [source,groovy]
 ----

@@ -147,7 +147,7 @@ new UiTableSpecifier().ui {
             // to redirect towards the book deletion action
             if (isAdmin) {
                 rowColumn {
-                    rowLink ActionIcon.DELETE,
+                    rowAction ActionIcon.DELETE,
                             this.&deleteBook as MC, book.id
                 }
             }
@@ -282,7 +282,7 @@ We also need to display a link to this page in the table, to add a link in the t
 
 [,groovy]
 ----
-rowLink
+rowAction
         ActionIcon.SHOW * ActionIconStyleModifier.SCALE_DOWN, <1>
         TurboController.&showBook as MC, book.id
 ----

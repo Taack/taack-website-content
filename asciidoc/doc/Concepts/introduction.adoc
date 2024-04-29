@@ -28,12 +28,7 @@ In a web application, entry points are URLs. They are called *actions* in Grails
 
 *Actions* are responsible for updating browser state following user events such as clicks, key presses, mouse movement.
 
-There are 2 kinds of actions:
-
-* *ajax actions*: the page is updated by some *Javascript code* seating into the browser. The URL displayed in the browser does not change (in our case).
-* *non-ajax actions*: complete page is reloaded by browser. The URL displayed might change.
-
-The Taack Framework sits in the middle of these two kinds of actions: It is not a fully AJAX framework; rather, it is mostly an old-school framework that generates complete pages on the server but also has the capability of updating a portion of a page using AJAX.
+The Taack Framework is not a fully AJAX framework; rather, it is mostly an old-school framework that generates complete pages on the server but also has the capability of updating a portion of a page using AJAX.
 
 This approach helps keep the browser's internal state minimal. On the server side, all actions are *stateless*. On the browser side, the stack of modal windows and their layouts, defined by blocks, are stored to manage content updates."
 

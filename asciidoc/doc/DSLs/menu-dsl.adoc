@@ -16,7 +16,7 @@ Menu DSL associate menu entries with top level actions. Menu DSL supports only 2
 .Menu Sample with conditional
 ----
     private UiMenuSpecifier buildMenu(String q = null) {
-        new UiMenuSpecifier().ui { <1>
+        new UiMenuSpecifier().ui {          <1>
             menu this.&pages as MC
             menu this.&images as MC
             menu this.&pdfs as MC
@@ -25,7 +25,7 @@ Menu DSL associate menu entries with top level actions. Menu DSL supports only 2
             menu this.&blocks as MC
             menu this.&inserts as MC
             menu this.&slideshows as MC
-            menu "Admin", { <2>
+            menu "Admin", {                 <2>
                 menu this.&sync as MC
                 menu this.&confSites as MC
             }
@@ -42,7 +42,7 @@ Menu DSL associate menu entries with top level actions. Menu DSL supports only 2
 image:screenshot-dsl-menu.webp[]
 
 [graphviz,format="svg",align=center]
-.Symbols hierachy diagram for Menu DSL
+.Symbols hierarchy diagram for Menu DSL
 ----
 digraph mygraph {
   node [shape=box];

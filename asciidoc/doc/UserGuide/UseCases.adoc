@@ -33,7 +33,7 @@ end
 
 box "Taack Service" #LightBlue
     participant taackUiService
-    participant taackSimpleSaveService
+    participant taackSaveService
 end box
 
 == Edit Form ==
@@ -41,16 +41,16 @@ end box
 group Save Form
     user -> controller : click save
     activate controller
-    controller -> taackSimpleSaveService : saveThenRedirectOrRenderErrors
+    controller -> taackSaveService : saveThenRedirectOrRenderErrors
     deactivate controller
-    activate taackSimpleSaveService
-    taackSimpleSaveService -> taackSimpleSaveService : save
-    taackSimpleSaveService -> taackSimpleSaveService : redirectOrRenderErrors
+    activate taackSaveService
+    taackSaveService -> taackSaveService : save
+    taackSaveService -> taackSaveService : redirectOrRenderErrors
     alt valid object
-        taackSimpleSaveService -> user : redirect to target action
+        taackSaveService -> user : redirect to target action
     else invalid object
-        taackSimpleSaveService -> user : ajax form rendered with errors
-        deactivate taackSimpleSaveService
+        taackSaveService -> user : ajax form rendered with errors
+        deactivate taackSaveService
     end
 end
 @enduml
@@ -59,48 +59,45 @@ end
 .Code Sample: Form + Save Workflow
 [,groovy]
 ----
-    def userForm(User user) { <1>
-        if (!user)  user = new User() <2>
+    def userForm(User user) {                           <1>
+        user ?= new User()                              <2>
 
-        UiFormSpecifier f = new UiFormSpecifier() <3>
+        UiFormSpecifier f = new UiFormSpecifier()       <3>
         f.ui user, {
             hiddenField user.subsidiary_
             hiddenField user.origin_
             section "User", {
-                field "Username", user.username_
-                field "First Name", user.firstName_
-                field "Last Name", user.lastName_
-                ajaxField "Manager", user.manager_, this.&selectUserM2O as MC
-                field "Trigram", user.trigram_
-                field "Passwd", user.password_
+                field user.username_
+                field user.firstName_
+                field user.lastName_
+                ajaxField user.manager_, this.&selectUserM2O as MC
+                field user.trigram_
+                field user.password_
             }
             section "Coords", {
-                field "Business Unit", user.businessUnit_
-                field "Job", user.job_
-                field "Tel.", user.directPhone_
-                field "Other Tel.", user.additionalPhone_
-                field "Mail", user.mail_
-                field "Subsidiary", user.mainSubsidiary_
-                field "Allowed Subsidiaries", user.allowedSubsidiaries_
+                field user.businessUnit_
+                field user.job_
+                field user.directPhone_
+                field user.additionalPhone_
+                field user.mail_
+                field user.mainSubsidiary_
+                field user.allowedSubsidiaries_
             }
             // [. . .]
-            formAction "Save", this.&saveUser as MC, user.id, true <4>
+            formAction this.&saveUser as MC, user.id    <4>
         }
 
-        UiBlockSpecifier b = new UiBlockSpecifier()
-        b.ui {
+        taackUiService.show new UiBlockSpecifier().ui { <5>
             modal {
-                ajaxBlock "userForm", {
-                    form "User Form", f, BlockSpec.Width.MAX
-                }
+                form "User Form", f, BlockSpec.Width.MAX
             }
         }
-        taackUiService.show(b) <5>
     }
 
-    @Secured("ROLE_ADMIN") <6>
-    def saveUser(String redirectAction) { <7>
-        taackSimpleSaveService.saveThenRedirectOrRenderErrors(User, this.&listUser) <8>
+    @Transactional
+    @Secured("ROLE_ADMIN")                              <6>
+    def saveUser() {                                    <7>
+        taackSaveService.saveThenRedirectOrRenderErrors(User, this.&listUser) <8>
     }
 
 ----
@@ -112,7 +109,7 @@ end
 <5> show the form
 <6> Secure the save action
 <7> Action that will save the object
-<8> Call to taackSimpleSaveService, here if the object is valid, user is redirected to `listUsers` action.
+<8> Call to taackSaveService, here if the object is valid, user is redirected to `listUsers` action.
 
 == Display a table with sortable columns, inline actions, and a filter
 
@@ -147,7 +144,7 @@ end
 
 box "Taack Service" #LightBlue
     participant taackUiService
-    participant taackSimpleFilterService
+    participant taackFilterService
 end box
 
 @enduml
@@ -156,24 +153,20 @@ end box
 .Code Sample Filter and table
 [,groovy]
 ----
-    def index() { <1>
+    def index() {                                                   <1>
         User cu = authenticatedUser as User
 
-        UiFilterSpecifier f = buildUserTableFilter cu <2>
-        UiTableSpecifier t = buildUserTable f <3>
+        UiFilterSpecifier f = buildUserTableFilter cu               <2>
+        UiTableSpecifier t = buildUserTable f                       <3>
 
-        UiBlockSpecifier b = new UiBlockSpecifier() <4>
+        UiBlockSpecifier b = new UiBlockSpecifier()                 <4>
         b.ui {
-            ajaxBlock "userList", {
-                tableFilter "Filter", f, "Users", t, BlockSpec.Width.MAX, {
-                    if (cu.authorities*.authority.contains("ROLE_ADMIN"))
-                        action "Create User",
-                               ActionIcon.CREATE, this.&userForm as MC, true <5>
-                }
+            tableFilter "Filter", f, "Users", t, BlockSpec.Width.MAX, {
+                action ActionIcon.CREATE, this.&userForm as MC      <5>
             }
         }
 
-        taackUiService.show(b, buildMenu()) <6>
+        taackUiService.show(b, buildMenu())                         <6>
     }
 ----
 
@@ -210,7 +203,7 @@ end
 
 box "Taack Service" #LightBlue
     participant taackUiService
-    participant taackSimpleSaveService
+    participant taackSaveService
 end box
 
 == Edit Form ==
@@ -223,16 +216,16 @@ group Save Form
         Here, the block contains
         **closeModalAndUpdateBlock**
     end note
-    controller -> taackSimpleSaveService : saveThenDisplayBlockOrRenderErrors
+    controller -> taackSaveService : saveThenDisplayBlockOrRenderErrors
     deactivate controller
-    activate taackSimpleSaveService
-    taackSimpleSaveService -> taackSimpleSaveService : save
-    taackSimpleSaveService -> taackSimpleSaveService : displayBlockOrRenderErrors
+    activate taackSaveService
+    taackSaveService -> taackSaveService : save
+    taackSaveService -> taackSaveService : displayBlockOrRenderErrors
     alt valid object
-        taackSimpleSaveService -> user : close modal and refresh current page
+        taackSaveService -> user : close modal and refresh current page
     else invalid object
-        taackSimpleSaveService -> user : ajax form rendered with errors
-        deactivate taackSimpleSaveService
+        taackSaveService -> user : ajax form rendered with errors
+        deactivate taackSaveService
     end
 end
 @enduml
@@ -241,19 +234,17 @@ end
 .Code Sample to close modal and refresh current page
 [,groovy]
 ----
-        taackSimpleSaveService.saveThenDisplayBlockOrRenderErrors(EngineeringChangeRequest, <1>
-        new UiBlockSpecifier().ui { <2>
-            closeModalAndUpdateBlock { <3>
-                ajaxBlock ajaxBlockId, { <4>
-                    show "Projects", buildShowProjects(ecr), BlockSpec.Width.MAX, {
-                        action "Edit projects 2", ActionIcon.ADD,
-                            Ecr2Controller.&projectsForm as MC,
-                            [id: ecr.id, ajaxBlockId: ajaxBlockId], true
-                    }
-                }
-            }
-        })
-
+taackSaveService.saveThenDisplayBlockOrRenderErrors(EngineeringChangeRequest,   <1>
+new UiBlockSpecifier().ui {                                                     <2>
+    closeModalAndUpdateBlock {                                                  <3>
+        show "Projects", buildShowProjects(ecr), BlockSpec.Width.MAX, {
+            action
+                ActionIcon.ADD,
+                Ecr2Controller.&projectsForm as MC,
+                [id: ecr.id, ajaxBlockId: ajaxBlockId]
+        }
+    }
+})
 ----
 
 <1> After an action implying to save an object is called into a modal, you can close the modal and refresh page elements in one action
