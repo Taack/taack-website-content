@@ -12,15 +12,14 @@ To be released, this version should come with some nice changes (breaking some o
 * No `list`, but an `iterate` taking a closure as parameter, with a builder pattern approach to pass args
 * Menu are auto labeled now (use `lang=test` in url to translate menus). See <<new_menu_code>>
 * No more #isAjax# parameter in tables ... See <<new_rowLink_code>>
-* No label needed on #rowLink# in tables. See <<new_rowLink_code>>
+* change rowLink into rowAction  <<i18n_isAjax>>
+* No label needed on #rowAction# in tables. See <<new_rowLink_code>>
 * No more ajaxBlock required for tables, forms, tableFilters
 * formAction has no more #isAjax# parameter
 * formAction has no more mandatory i18n parameter
 * form has no more mandatory i18n parameter, i18n is based on current action name
 * block action has no more mandatory i18n parameter, i18n is based on target action
 * block action has no more mandatory isAjax parameter
-* change rowLink into rowAction  <<i18n_isAjax>>
-* rowAction, optional i18n and no more isAjax  <<i18n_isAjax>>
 
 [[new_iterate_code]]
 .New `iterate` usage
