@@ -11,7 +11,7 @@ To be released... this version should come with some nice changes (breaking some
 
 - Merge search menu, icon menu, and language Menu, see <<new_menu_layout>>
 - Keep some params ... (lang, subsidiary, stock, others ...) via menu DSL
-** Move supported Language into menus, see <<new_menu_layout_code>>
+** Move supported Language into menus (from plugin declaration), see <<new_menu_layout_code>>
 - Allow debugging Kotlin JS code, see <<new_allow_kotlinjs_debug>>
 - Fix file path when updating. The same way as for O2M, with preview
 - Improve restore state
