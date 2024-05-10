@@ -122,54 +122,67 @@ Date Created is empty for old users, and manager cells are also empty for some u
 [[table-sample1]]
 .Table Sample: Header, Rows and a default sorting
 ----
-User u = new User(manager: new User(), enabled: true)
-UiTableSpecifier t = new UiTableSpecifier()
-ColumnHeaderFieldSpec.SortableDirection defaultDirection <1>
-t.ui User, { <2>
-    header { <3>
+new UiTableSpecifier().ui {
+    User u = new User(manager: new User(), enabled: true)
+    header {                                                <1>
         if (!hasSelect) {
-            column {
-                fieldHeader "Picture" <4>
-            }
+            fieldHeader tr('picture.header.label')          <2>
         }
         column {
-            sortableFieldHeader u.username_ <5>
-            defaultDirection = sortableFieldHeader u.dateCreated_,
-                ColumnHeaderFieldSpec.DefaultSortingDirection.DESC <6>
+            sortableFieldHeader u.username_                 <3>
+            sortableFieldHeader u.dateCreated_
         }
         column {
-            sortableFieldHeader u.mainSubsidiary_
-            sortableFieldHeader u.manager_, u.manager.username_ <7>
+            sortableFieldHeader u.subsidiary_
+            sortableFieldHeader u.manager_, u.manager.username_
         }
         column {
             sortableFieldHeader u.lastName_
             sortableFieldHeader u.firstName_
         }
         column {
-            fieldHeader "Roles"
+            fieldHeader tr('default.roles.label')
         }
     }
+    boolean canSwitchUser = crewSecurityService.canSwitchUser()
 
-    def users = taackSimpleFilterService.list(
-            User, 10, f, null, defaultDirection) <8>
+    TaackFilter tf = taackFilterService.getBuilder(User)
+            .setSortOrder(TaackFilter.Order.DESC, u.dateCreated_)
+            .setMaxNumberOfLine(20).addFilter(f).build()
 
-    for (User ru : users.aValue) { <9>
-        row { <10>
-            Attachment picture = ru.attachments.find {
-                it.type == Att.PICTURE
+    iterate(tf) { User ru ->                                <4>
+        row {                                               <5>
+            boolean hasActions = crewSecurityService.canEdit(ru)
+            if (!hasSelect) {
+                rowColumn {
+                    rowField attachmentUiService.preview(ru.mainPicture?.id)
+                }
             }
             rowColumn {
-                rowField attachmentUiService.preview(picture?.id) <11>
-            }
-            rowColumn {
-                rowAction "Edit User", <12>
-                    ActionIcon.EDIT,
-                    this.&userForm as MC, ru.id
-                rowField ru.username_ <13>
+                rowAction ActionIcon.SHOW * IconStyle.SCALE_DOWN,
+                        CrewController.&showUser as MC, ru.id
+                if (hasSelect)
+                    rowAction "Select User",
+                        ActionIcon.SELECT * IconStyle.SCALE_DOWN,
+                        ru.id, ru.toString()
+                else if (hasActions) {
+                    rowAction ActionIcon.EDIT * IconStyle.SCALE_DOWN,
+                        CrewController.&editUser as MC, ru.id
+                    if (canSwitchUser && ru.enabled)
+                        rowAction ActionIcon.SHOW * IconStyle.SCALE_DOWN,
+                            CrewController.&switchUser as MC, ru.id
+                    else if (canSwitchUser && !ru.enabled) {
+                        rowAction ActionIcon.MERGE * IconStyle.SCALE_DOWN,
+                            CrewController.&replaceUser as MC, ru.id
+                        rowAction ActionIcon.DELETE * IconStyle.SCALE_DOWN,
+                            CrewController.&deleteUser as MC, ru.id
+                    }
+                }
+                rowField ru.username_
                 rowField ru.dateCreated_
             }
             rowColumn {
-                rowField ru.mainSubsidiary_
+                rowField ru.subsidiary_
                 rowField ru.manager?.username
             }
             rowColumn {
@@ -177,31 +190,20 @@ t.ui User, { <2>
                 rowField ru.firstName_
             }
             rowColumn {
-                if (!hasSelect)
-                    rowAction "Edit Roles",
-                        ActionIcon.EDIT,
-                        this.&editUserRoles as MC, ru.id, true
+                if (hasActions && !hasSelect)
+                    rowAction ActionIcon.EDIT * IconStyle.SCALE_DOWN,
+                        CrewController.&editUserRoles as MC, ru.id
                 rowField ru.authorities*.authority.join(', ')
             }
         }
     }
-    paginate(10, params.long("offset"), users.bValue) <14>
 }
 ----
-<1> Default sort variable storage
-<2> Pass the class of the object and the specifications of the table
-<3> Header part of the table specifications
-<4> Non-sortable field header
-<5> Sortable field header, notice the underscore at the end of the variable name
-<6> Initialise default sort
-<7> If the field contains an object, the path to the value to sort is specified via an array
-<8> `taackSimpleFilterService`, responsible for sorting, filtering and pagination
-<9> Iterate over objects
-<10> Specify a row
-<11> Cell containing only 1 value, it is not mandatory to pass underscore version
-<12> Icon that will call `userForm` on user displayed into the row
-<13> Simple value added to a cell
-<14> Pagination
+<1> Header part of the table specifications
+<2> Non-sortable field header
+<3> Sortable field header
+<4> `iterate`, specifying sort, paginate and filtering
+<5> *row* DSL
 
 ActionIcon can be modified by ActionIconModifier
 
@@ -215,8 +217,8 @@ Table style is specified by `Style` an optional parameter on `row` or `rowField`
 digraph mygraph {
   node [shape=box];
   ui
-  ui -> header, paginate [label = "0,1"]
-  ui -> row [label = "0,N"]
+  ui -> header, iterate [label = "0,1"]
+  iterate -> row [label = "0,N"]
   header -> column [label = "0,N"]
   column, header -> fieldHeader, sortableFieldHeader [label = "1,N"]
   row -> rowColumn [label = "0,N"]
