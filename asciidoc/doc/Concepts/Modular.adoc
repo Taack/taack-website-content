@@ -33,7 +33,7 @@ The https://github.com/Taack/intranet[Intranet Sample App] is a modular https://
 
 === _app_ directory
 
-Hold grails plugins (or Gradle modules) that compose the Intranet application. Those plugins should have the minimal dependencies in order to maximize reusability by others.
+Hold grails plugins (or Gradle modules) that compose the Intranet application. Those plugins should have minimal dependencies to maximize reusability by others.
 
 === _crew_ directory
 
