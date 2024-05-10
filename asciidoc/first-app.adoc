@@ -2,6 +2,7 @@
 :doctype: book
 :taack-category: 2
 :toc:
+:icons: font
 :source-highlighter: rouge
 
 == How app works with Taack Framework
@@ -9,12 +10,12 @@
 Your intranet project has two parts:
 
 * The app plugins, contained in the `app` folder, they are micro-projects each containing their dependencies, build, etc. `Crew` for example is an app plugin.
-For more in-depth explanation about how plugins are declared to the server link:doc/plugin/taack-plugin.adoc#_about_plugins[check here].
-* The main server, that uses all of the app plugins that are implemented in its `build.gradle` and render them on the main intranet page.
+For more in-depth explanation about how plugins are declared to the server, link:doc/plugin/taack-plugin.adoc#_about_plugins[check here].
+* The main server, that uses all the app plugins that are implemented in its `build.gradle` and render them on the main intranet page.
 
 == Creating a new app plugin
 
-In order to create a new app plugin (a Gradle module), be sure to pull latest version  of your intranet from our github repository (see link:installation.adoc[installation])
+To create a new app plugin (a Gradle module), be sure to pull the latest version of your intranet from our GitHub repository (see link:installation.adoc[installation])
 
 Once it is done, you can execute the following command from your intranet root folder:
 
@@ -25,14 +26,11 @@ Once it is done, you can execute the following command from your intranet root f
 
 The newly created app should appear in the `app` folder.
 
-NOTE: Next version will fix runtime when starting the server at this point. If you read the error message, it tells it cannot find `taack-grails-plugin.java-conventions`, just replace this line with `taack-grails-plugin`. Then you will be able to launch again the server. We are trying to ensure a simpler build, which is not easy.
-
-
 == Managing Future Updates
 
 Most of the time, updating your intranet, should imply to update `buildSrc` folder, `gradle.properties`, and also, less often, apps `build.gradle` files.
 
-NOTE: In fact this process is common in long term software dev, and should not scare newcomers.
+NOTE: In fact, this process is common in long-term software dev, and should not scare newcomers.
 
 == Building an app-wide menu
 
@@ -41,17 +39,15 @@ First, let's focus on the navigation for your new app. The initial step is to de
 [,groovy]
 ----
 static private UiMenuSpecifier buildMenu(String q = null) {
-    UiMenuSpecifier m = new UiMenuSpecifier()
-    m.ui {
-        menu TurboController.&action as MC
-        // MC stands for MethodClosure
+    new UiMenuSpecifier().ui {
+        menu SomeController.&action as MC
+        menu this.&anotherAction as MC
         // import org.codehaus.groovy.runtime.MethodClosure as MC
     }
-    return m
 }
 ----
 
-We create a UiMenuSpecifier object to define the menu structure, and then specify the desired content for that menu.
+We create a link:doc/DSLs/menu-dsl.adoc[UiMenuSpecifier] object to define the menu structure, and then specify the desired content for that menu.
 
 [,groovy]
 ----

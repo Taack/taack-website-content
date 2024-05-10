@@ -9,47 +9,41 @@
 * [ ] Rendered into PDF
 * [ ] Rendered into CSV
 
-Menu DSL associate menu entries with top level actions. Menu DSL supports only 2 levels max (without taking into account `section`).
+Menu DSL associate menu entries with top level actions.
+Menu DSL supports only 2 levels max (without taking into account `section`).
 
 [source,groovy]
 [[menu-sample1]]
 .Menu Sample with conditional
 ----
     private UiMenuSpecifier buildMenu(String q = null) {
-        new UiMenuSpecifier().ui {          <1>
-            menu this.&pages as MC
-            menu this.&images as MC
-            menu this.&pdfs as MC
-            menu this.&videos as MC
-            menu this.&menuEntries as MC
-            menu this.&blocks as MC
-            menu this.&inserts as MC
-            menu this.&slideshows as MC
-            menu "Admin", {                 <2>
-                menu this.&sync as MC
-                menu this.&confSites as MC
-            }
-            menuSearch CmsController.&search as MC, q
+        new UiMenuSpecifier().ui {                          <1>
+            menu CrewController.&index as MC
+            menu CrewController.&listRoles as MC
+            menu CrewController.&hierarchy as MC
+            menuIcon ActionIcon.CONFIG_USER, this.&editUser as MC   <4>
+            menuIcon ActionIcon.EXPORT_PDF, this.&downloadBinPdf as MC
+            menuSearch this.&search as MethodClosure, q     <2>
+            menuOptions(SupportedLanguage.fromContext())    <3>
         }
     }
-
 ----
 
 <1> Create a new menu
-<2> Declare a secondary level menu
+<2> Search menu
+<3> Languages entries
+<4> Icon entries (hoover message automatically deduced) .Corresponding Menu Rendering.
 
-.Corresponding Menu Rendering.
-image:screenshot-dsl-menu.webp[]
+image:screenshot-dsl-menu-041.webp[]
 
 [graphviz,format="svg",align=center]
-.Symbols hierarchy diagram for Menu DSL
+.Symbol's hierarchy diagram for Menu DSL
 ----
 digraph mygraph {
-  node [shape=box];
-  ui -> menu, menuIcon, section [label = "0,N"]
-  ui -> menuSearch [label = "0,1"]
-  menu -> subMenu [label = "1,N"]
-  section -> subMenu [label = "1,N"]
-  }
+    node [shape=box];
+    ui -> menu, menuIcon, subMenu, menuOption [label = "0,N"]
+    ui -> menuSearch [label = "0,1"]
+    subMenu -> menu [label = "1,N"]
+}
 ----
 

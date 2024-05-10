@@ -6,7 +6,7 @@
 
 To ensure that a plugin is recognized and displayed on your intranet, you need to create a `GrailsPlugin` that implements `TaackPlugin`.
 
-See here for example: https://github.com/Taack/intranet/blob/main/app/crew/src/main/groovy/crew/CrewGrailsPlugin.groovy[CrewGrailsPlugin.groovy]
+See here: https://github.com/Taack/intranet/blob/main/app/crew/src/main/groovy/crew/CrewGrailsPlugin.groovy[CrewGrailsPlugin.groovy]
 
 In this file we configured the following things:
 
@@ -49,7 +49,7 @@ static final List<TaackPluginConfiguration.TaackLinkClass> linkClasses = [
 ----
 static final TaackPluginConfiguration pc = new TaackPluginConfiguration(
     "Crew",
-    "/crew/crew.svg", "crew", Language.values() as List,
+    "/crew/crew.svg", "crew",
     new TaackPluginConfiguration.IPluginRole() {
         @Override
         List<TaackPluginConfiguration.PluginRole> getPluginRoles() {
