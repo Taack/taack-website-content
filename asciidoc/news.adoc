@@ -5,9 +5,24 @@
 :source-highlighter: rouge
 
 
-== Version 0.4.1
+== Version 0.4.2
 
 To be released... this version should come with some nice changes (breaking some old code sometime)
+
+- Improve DSL hierarchy
+* hidden fields on top only for readability
+* no redundant parameter passing in form
+* no redundant parameter passing in filter
+* filterField only under section only
+* form top level field only on header
+- hook for form fields to display M2M nicely
+- hook to register typical object filter
+- Improve restore state
+- Fix table grouping / trees with paginate
+- TBD
+
+
+== Version 0.4.1
 
 - Merge search menu, icon menu, and language Menu, see <<new_menu_layout>>
 - Keep some params ... (lang, subsidiary, stock, others ...) via menu DSL
