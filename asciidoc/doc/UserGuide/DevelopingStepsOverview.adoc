@@ -14,9 +14,9 @@ When `@TaackFieldEnum` annotation is specified on a class, additional symbols ar
 .Enabling a Regular Classe code Sample
 [,groovy]
 ----
-@GrailsCompileStatic <1>
-@TaackFieldEnum <2>
-final class QueryParameter implements Validateable { <3>
+@GrailsCompileStatic                                    <1>
+@TaackFieldEnum                                         <2>
+final class QueryParameter implements Validateable {    <3>
     Currency currency = Currency.EUR
     Short monthStart = 1
     Short monthStop = 12
@@ -29,14 +29,14 @@ final class QueryParameter implements Validateable { <3>
     Integer yearStart
     Integer yearStop = Calendar.instance.get(Calendar.YEAR)
 
-    static constraints = { <4>
+    static constraints = {                              <4>
         itemValue nullable: true
         range nullable: true
         monthStart min: 1, max: 12
-        monthStop min: 1, max: 12, validator: {
+        monthStop min: 1, max: 12, validator: {         <5>
             queryParameter, monthStop ->
             if (monthStop < queryParameter.monthStart)
-                return "monthStop.greater.or.equals.to.monthStart" <5>
+                return "monthStop.greater.or.equals.to.monthStart"
         }
     }
 }
@@ -49,18 +49,19 @@ final class QueryParameter implements Validateable { <3>
 <4> Constraints definition
 <5> Validation can be a closure returning a translation key.
 
-This sample code show a standard class (i.e. not defined into the domain directory) being enabled to be used in Taack framework. It obviously cannot be saved and retrieve or listed, since it is not a persistent domain class.
+This sample code shows a standard class (i.e., not defined into the domain directory) being enabled to be used in the Taack framework.
+It cannot be saved and retrieve or listed, since it is not a persistent domain class.
 
 It has to implement the Grails `Validateable` traits.
 
 === Domain Classes Case
 
-.Enabling a Domain Classe code Sample
+.Enabling a Domain Class code Sample
 [,groovy]
 ----
 @GrailsCompileStatic
 @TaackFieldEnum
-class CmsPage { <1>
+class CmsPage {                             <1>
     Subsidiary subsidiary
     Date dateCreated
     Date lastUpdated
@@ -110,26 +111,29 @@ class CmsPage { <1>
 
 <1> No need to implement Validateable in case of domain class
 
-Domain classes are treated as first-class citizen within Taack framework. They can make use of the advanced functionalities provided by the  `TaackSaveService`.
+Domain classes are treated as first-class citizens within the Taack framework. They can make use of the advanced functionalities provided by the  `TaackSaveService`.
 
 == Object Manipulation for Domain Classes
 
-=== Listing Objects via Filter DSL
+=== Listing Objects in Tables
 
-In the action where your filter is displayed, just call method `taackSimpleFilterService.list` the following code to get a list of object (taken from <<DslDescriptions/TableDSL.adoc#table-sample1>>)
+Table DSL add `iterate` symbol that allows to display objects listing:
 
 [, groovy]
 ----
-def users = taackSimpleFilterService.list(User, 10, f,
-                defaultDirection) <1>
+TaackFilter tf = taackFilterService.getBuilder(User)        <1>
+        .setSortOrder(TaackFilter.Order.DESC, u.dateCreated_)
+        .setMaxNumberOfLine(20).addFilter(f).build()
 
-for (User ru : users.aValue) { <2>
-    // [ . . . ]
+iterate(tf) { User ru ->                                    <2>
+    row {                                                   <3>
+    }
 }
 ----
 
-<1> We pass the filter to the `list` method (parameter *f*), but all arguments except the first 2 are optional. `defaultDirection` allows to specify the default ordering of the table. 10 results are displayed at the same time.
-<2> Iteration over objects filtered
+<1> Specify filters, securing lists of objects, along with some display constraints
+<2> Iterate over this `TaackFilter`, with a `row` closure
+<3> Draw the row ...
 
 [, groovy]
 ----
