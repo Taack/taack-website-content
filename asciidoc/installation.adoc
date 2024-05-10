@@ -1,23 +1,24 @@
 = Installation
 :doctype: book
 :taack-category: 1
+:icons: font
 :toc:
 
 == Requirements
 
 First of all, you will need the following:
 
-* *Java* (JDK-17)
+* *Java* (JDK-17 or JDK-19)
 * *git*
 
 Optionally you can also install:
 
-* *Solr-9.1.0* (Used for intranet-wide search bar)
-* *Postgresql* (You will need to use the Grails in-memory database if you don't have any database manager)
+* *Solr-9.6.0* (Used for intranet-wide search bar)
+* *Postgresql*
 
 === Java Version
 
-It is mandatory to use Java Jdk 17. In order to check Java version, type the following command:
+In order to check Java version, type the following command:
 
 [sh]
 ----
@@ -39,7 +40,7 @@ brew install openjdk@17
 git clone https://github.com/Taack/intranet.git
 ----
 
-This repository includes a stripped-down version of an intranet on top of which you can build more applications. It includes "Crew", the user management system and it's security dependency: *Spring Security Plugin*.
+This repository includes a stripped-down version of an intranet on top of which you can build more applications. It includes "Crew", the user management system, and it's security dependency: *Spring Security Plugin*.
 
 == Start your intranet
 
@@ -63,7 +64,7 @@ After a while you should see in the console:
 `Grails application running at http://localhost:9442`
 
 
-You can now access the intranet by going to that address in your browser. You can also login with the default credentials (username: *admin*; password: *ChangeIt*). The password can be changed in server/grails-app/conf/application.yml.
+You can now access the intranet by going to that address in your browser. You can also log in with the default credentials (username: *admin*; password: *ChangeIt*). The password can be changed in server/grails-app/conf/application.yml.
 
 === Configuring persistent Db
 
@@ -99,8 +100,7 @@ java -jar server-[version].jar
 
 It will be faster, assets will be compiled and merged.
 
-* Tips:
-** Make sure you're not running already the application
+TIP: Make sure you're not running already the application
 
 == Set up your IDE
 
@@ -113,7 +113,7 @@ We recommend installing the *IntelliJ Taack Plugin* that you can install from th
 
 To open the project, select "Open project" and select `intranet/server/settings.gradle`.
 
-Make sure that the JDK used with Gradle is at version 17:
+Make sure that the JDK used with Gradle is at version 17 (or 19):
 
 .Open Gradle Settings
 image:open-settings-gradle-intellij.webp[]
