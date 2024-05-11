@@ -11,7 +11,8 @@
 * [ ] Rendered into Mail
 * [ ] Rendered into CSV
 
-image::screenshot-dsl-tableFilter.webp[]
+.Filter applied to a table, from <<filter-sample1>>
+image::screenshot-dsl-filter.webp[width=250,align=center]
 
 Filter DSL is always associated with a Table or a Chart. A bloc cannot contain only a filter.
 
@@ -20,20 +21,20 @@ Filter DSL is always associated with a Table or a Chart. A bloc cannot contain o
 
 [source,groovy]
 [[filter-sample1]]
-.Filter Sample 1
+.Filter Sample Code 1
 ----
-UiFilterSpecifier f = new UiFilterSpecifier() <1>
+UiFilterSpecifier f = new UiFilterSpecifier()           <1>
 
-f.ui User, { <2>
-    section "User", { <3>
-        filterField u.username_ <4>
+f.ui User, {                                            <2>
+    section "User", {                                   <3>
+        filterField u.username_                         <4>
         filterField u.lastName_
         filterField u.firstName_
-        filterField u.manager_, u.manager.username_ <5>
+        filterField u.manager_, u.manager.username_     <5>
         filterField u.mainSubsidiary_
         filterField u.allowedSubsidiaries_
         filterField u.enabled_
-        filterFieldExpressionBool "My Team", <6>
+        filterFieldExpressionBool "My Team",            <6>
             new FilterExpression(u.selfObject_,
                     Operator.IN,
                     cu.allManagedUsers_),
@@ -83,6 +84,7 @@ f
 digraph mygraph {
   node [shape=box];
   "ui"
+  "ui" -> hiddenId [label = "0,1"]
   "ui" -> "section" [label = "1,N"]
   "section" -> "section"
   "section" -> "filterField", "filterFieldExpressionBool", "filterFieldInverse" [label = "0,N"]
@@ -96,7 +98,7 @@ digraph mygraph {
 
 === Inputs
 * `filterField`: add object field to be transmitted to the filter action
-* `filterFieldInverse`: filter objects if another objects point to it.
+* `filterFieldInverse`: filter objects if another object points to it.
 * `filterFieldExpressionBool`: allows changing where clause in the filter action by using FilterExpression, last parameter is the default value.
 
 === Structure
@@ -211,18 +213,20 @@ Table style is specified by `Style` an optional parameter on `row` or `rowField`
 
 === DSL Symbols Hierarchy
 
-[graphviz,format="svg",align=center]
 .Symbols hierachy diagram for Table DSL
+[graphviz,format="svg",align=center]
 ----
 digraph mygraph {
   node [shape=box];
   ui
   ui -> header, iterate [label = "0,1"]
   iterate -> row [label = "0,N"]
+  ui -> row,rowIndent [label = "0,N"]
   header -> column [label = "0,N"]
   column, header -> fieldHeader, sortableFieldHeader [label = "1,N"]
-  row -> rowColumn [label = "0,N"]
-  rowColumn, row -> rowAction, rowField [label = "0,N"]
+  row,rowIndent -> rowColumn [label = "0,N"]
+  rowColumn,row,rowIndent -> rowAction, rowField [label = "0,N"]
+  rowIndent -> rowTree [label = "0,1"]
 }
 ----
 
