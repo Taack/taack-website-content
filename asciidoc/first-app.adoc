@@ -21,7 +21,7 @@ Once it is done, you can execute the following command from your intranet root f
 
 [,bash]
 ----
-./gradlew server:taackCreateApp -Pargs='-name=testApp'
+./gradlew -PmodName=myToto server:generateTaackAppTask
 ----
 
 The newly created app should appear in the `app` folder.
