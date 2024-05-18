@@ -26,6 +26,11 @@ Once it is done, you can execute the following command from your intranet root f
 
 The newly created app should appear in the `app` folder.
 
+If you want the IDE to detect the newly created app module, you have to reload gradle projects, clicking on the following icon:
+
+.Gradle Reload
+image::screenshot-new-app-gradle-reload.webp[Reload,width=520,align="left"]
+
 == Managing Future Updates
 
 Most of the time, updating your intranet, should imply to update `buildSrc` folder, `gradle.properties`, and also, less often, apps `build.gradle` files.
