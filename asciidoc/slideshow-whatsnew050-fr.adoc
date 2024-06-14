@@ -1,0 +1,51 @@
+include::_settings_reveal.adoc[]
+:source-highlighter: highlightjs
+:highlightjs-languages: groovy, gnuplot
+:title-slide-transition: zoom
+:title-slide-transition-speed: fast
+:icons: font
+:docinfo: shared
+:customcss: custom.css
+:revealjs_height: 512
+
+= Quoi de neuf ?
+Version 0.5.0
+
+== Basé sur Bootstrap uniquement
+
+* Themable
+** Schemas de couleur du bureau (light ou dark)
+** Taille des composants modifiables
+** Autres préférences plus tard
+* Plus simple d'étendre les fonctionnalités
+
+== Optimisation du chargement des pages
+
+* Optimisation de la taille des fichiers assets
+* CSS plus concis
+
+== Changement du codage
+
+=== DSL pour la disposition des objets
+
+* Définition de la disposition commune pour les form et blocs
+** `col` et `row`
+** `tabs` et `tab`
+* Argument `With` réservé à `col`
+* Meilleurs paramètres par défaut pour la largeur des composants.
+
+=== DSL Menu pour les blocs
+
+* Les actions icônes sont remplacées par le DSL Menu
+* Possibilité de ne pas utiliser d'actions icônes
+* Traduction auto des actions de base
+
+== Simplification du code
+
+* Maintenance du code plus aisée
+* Contributions externes plus simples
+* Meilleure évolutivité
+* Application de test pour débugage
+
+
+// asciidoctor-revealjs -r asciidoctor-diagram -a revealjsdir=https://cdn.jsdelivr.net/npm/reveal.js@3.9.2  -a data-uri slideshow-whatsnew050-fr.adoc.adoc
