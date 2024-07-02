@@ -4,6 +4,15 @@
 :toc:
 :source-highlighter: rouge
 
+== Version 0.5.1
+
+* No more TaackPlugin, register extensions independently
+* Remove Charts DSL
+* Fix Diagram DSL
+
+== Version 0.5.0
+
+slide::[fn=slideshow-whatsnew050-en]
 
 == Version 0.4.2
 

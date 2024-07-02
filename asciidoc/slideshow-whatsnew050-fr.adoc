@@ -9,36 +9,35 @@ include::_settings_reveal.adoc[]
 :revealjs_height: 512
 
 = Quoi de neuf ?
-Version 0.5.0
+Version 0.5.X
 
-== Basé sur Bootstrap uniquement
+== Basée sur Bootstrap uniquement
 
 * Themable
 ** Schemas de couleur du bureau (light ou dark)
-** Taille des composants modifiables
-** Autres préférences plus tard
-* Plus simple d'étendre les fonctionnalités
+** Taille des composants ajustable
+* Plus extensible
 
 == Optimisation du chargement des pages
 
 * Optimisation de la taille des fichiers assets
-* CSS plus concis
+* CSS plus concis et factorisé
 
 == Changement du codage
 
 === DSL pour la disposition des objets
 
-* Définition de la disposition commune pour les form et blocs
+* Définition de la disposition est maintenant identique pour les form et blocs
 ** `col` et `row`
 ** `tabs` et `tab`
-* Argument `With` réservé à `col`
-* Meilleurs paramètres par défaut pour la largeur des composants.
+* Argument `With` uniquement réservé à `col`
+* Meilleurs paramètres par défaut.
 
 === DSL Menu pour les blocs
 
 * Les actions icônes sont remplacées par le DSL Menu
 * Possibilité de ne pas utiliser d'actions icônes
-* Traduction auto des actions de base
+* Traduction automatique des actions de base
 
 == Simplification du code
 
