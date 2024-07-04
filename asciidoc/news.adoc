@@ -6,9 +6,65 @@
 
 == Version 0.5.1
 
-* No more TaackPlugin, register extensions independently
+* <<_replacement_tp>>, app module register themselves independently
 * Remove Charts DSL
-* Fix Diagram DSL
+* Fix Diagram DSL, <<_replacement_chart>>
+* Allow Diagrams into PDF (See <<_diagrams_into_pdf>> and <<_diagrams_output>>)
+
+[[_replacement_tp]]
+.Replacement of TaackPlugin
+[source,groovy]
+----
+@PostConstruct
+void init() {
+    TaackUiEnablerService.securityClosure(
+        this.&securityClosure,
+        CrewController.&editUser as MC,
+        CrewController.&saveUser as MC)
+    TaackAppRegisterService.register(
+        new TaackApp(
+            CrewController.&index as MC,                    <1>
+            new String(
+                this.class
+                    .getResourceAsStream("/crew/crew.svg")  <2>
+                    .readAllBytes()
+            )
+        )
+    )
+}
+----
+
+<1> Entry Point
+<2> Icon
+
+[[_replacement_chart]]
+.Replacement of Charts: Diagrams
+[source,groovy]
+----
+private static UiDiagramSpecifier d1() {
+    new UiDiagramSpecifier().ui {
+        bar(["T1", "T2", "T3", "T4"] as List<String>, false, {
+            dataset 'Truc1', [1.0, 2.0, 1.0, 4.0]
+            dataset 'Truc2', [2.0, 0.1, 1.0, 0.0]
+            dataset 'Truc3', [2.0, 0.1, 1.0, 1.0]
+        }, DiagramTypeSpec.HeightWidthRadio.ONE)
+    }
+}
+----
+
+[[_diagrams_into_pdf]]
+.PDF containing diagrams
+[source,groovy]
+----
+printableBody {
+    diagram(d1(), BlockSpec.Width.HALF)
+    diagram(d2(), BlockSpec.Width.HALF)
+}
+----
+
+[[_diagrams_output]]
+.Stacked Bar Diagrams
+image::news-diagrams.webp[width=480]
 
 == Version 0.5.0
 

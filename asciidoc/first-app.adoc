@@ -4,6 +4,7 @@
 :toc:
 :icons: font
 :source-highlighter: rouge
+:rouge-style: monokai
 :experimental:
 
 == How app works with Taack Framework
