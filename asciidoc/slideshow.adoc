@@ -29,16 +29,16 @@ DSL (#Domain Specific Language#)
 
 [source,groovy]
 ----
-        new UiFormSpecifier().ui user, {
-            section "User", {
-                field user.username_
-                field user.firstName_
-                field user.lastName_
-                ajaxField user.manager_, this.&selectUserM2O
-                field user.password_
-            }
-        // [ . . . ]
-        }
+new UiFormSpecifier().ui user, {
+    section "User", {
+        field user.username_
+        field user.firstName_
+        field user.lastName_
+        ajaxField user.manager_, this.&selectUser
+        field user.password_
+    }
+// [ . . . ]
+}
 ----
 
 [%notitle]
@@ -73,5 +73,5 @@ image::screenshot-form-user-validation-en.webp[background, size=contain]
 == Extend components
 
 ** File Previews
-** Full Text Search
+** Full-Text Search
 ** JDBC driver to Query Model

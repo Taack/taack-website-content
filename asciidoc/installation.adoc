@@ -3,6 +3,7 @@
 :taack-category: 1
 :icons: font
 :toc:
+:experimental:
 
 == Requirements
 
@@ -13,12 +14,12 @@ First of all, you will need the following:
 
 Optionally you can also install:
 
-* *Solr-9.6.0* (Used for intranet-wide search bar)
+* *Solr-9.6.x* (Used for intranet-wide search bar)
 * *Postgresql*
 
 === Java Version
 
-In order to check Java version, type the following command:
+To check Java versions, type the following command:
 
 [sh]
 ----
@@ -40,7 +41,7 @@ brew install openjdk@17
 git clone https://github.com/Taack/intranet.git
 ----
 
-This repository includes a stripped-down version of an intranet on top of which you can build more applications. It includes "Crew", the user management system, and it's security dependency: *Spring Security Plugin*.
+This repository includes a stripped-down version of an intranet on top of which you can build more applications. It includes "Crew", the user management system, and its security dependency: *Spring Security Plugin*.
 
 == Start your intranet
 
@@ -51,20 +52,18 @@ Navigate inside the newly cloned intranet folder and start the server by executi
 ./gradlew server:bootRun
 ----
 
-If you want gradle to watch app module to hot restart the server at each save, launch the server adding `-Dgrails.run.active=true` option:
+If you want Gradle to watch app module to hot restart the server at each modification, launch the server adding the `-Dgrails.run.active=true` option:
 
 [,bash]
 ----
 ./gradlew -Dgrails.run.active=true server:bootRun
 ----
 
-
 After a while you should see in the console:
 
 `Grails application running at http://localhost:9442`
 
-
-You can now access the intranet by going to that address in your browser. You can also log in with the default credentials (username: *admin*; password: *ChangeIt*). The password can be changed in server/grails-app/conf/application.yml.
+You can now access the intranet by going to that address in your browser. You can also log in with the default credentials (username: *admin*; password: *ChangeIt*). The password can be changed in `server/grails-app/conf/application.yml`.
 
 === Configuring persistent Db
 
@@ -90,7 +89,7 @@ Instead of `bootRun` task, use `assemble` task:
 ./gradlew server:assemble
 ----
 
-The server jar are produced into `server/build/libs` folder. You can import it in your Tomcat production server or test it with:
+The server jar file is produced into `server/build/libs` folder. You can import it in your Tomcat production server or test it with:
 
 [source,bash]
 ----
@@ -100,7 +99,7 @@ java -jar server-[version].jar
 
 It will be faster, assets will be compiled and merged.
 
-TIP: Make sure you're not running already the application
+TIP: Make sure you're not already running the application
 
 == Set up your IDE
 
@@ -111,7 +110,7 @@ We highly recommend using the latest version of *IntelliJ Ultimate Edition* for 
 
 We recommend installing the *IntelliJ Taack Plugin* that you can install from the Intellij marketplace https://plugins.jetbrains.com/plugin/20792-taackuiastautocomplete[TaackUiASTAutocomplete] or directly from the https://github.com/Taack/infra/releases/tag/v0.1[source code repository].
 
-To open the project, select "Open project" and select `intranet/server/settings.gradle`.
+To open the project, select menu:File[Open project]  and select `intranet/server/settings.gradle`.
 
 Make sure that the JDK used with Gradle is at version 17 (or 19):
 
