@@ -1,3 +1,4 @@
+:taack-height: 640
 include::_settings_reveal.adoc[]
 :source-highlighter: highlightjs
 :highlightjs-languages: groovy, gnuplot
@@ -6,7 +7,6 @@ include::_settings_reveal.adoc[]
 :icons: font
 :docinfo: shared
 :customcss: custom.css
-:revealjs_height: 512
 
 = Quoi de neuf ?
 Version 0.5.X

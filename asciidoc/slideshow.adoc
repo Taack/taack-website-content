@@ -6,7 +6,7 @@ include::_settings_reveal.adoc[]
 :icons: font
 :docinfo: shared
 :customcss: custom.css
-:revealjs_height: 512
+:taack-height: 512
 
 = French Slides
 
