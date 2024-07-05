@@ -15,18 +15,18 @@ For more information, please refer to the dedicated page on link:../DSLs/block-d
 UiBlockSpecifier b = new UiBlockSpecifier() <1>
 b.ui {
     modal {                                 <2>
-        form f, BlockSpec.Width.MAX         <3>
+        form f                              <3>
     }
 }
 ----
 
 <1> Create the block, constructed via the ui method
-<2> This block will contain a modal window (which is also a block)
+<2> This block will contain a modal window, which is also a block
 <3> This ajax block will contain one form
 
 [[form-html-output]]
 .Form inside a modal Window.
-image:screenshot-dsl-user-form-800h.webp[]
+image::screenshot-dsl-user-form-800h.webp[]
 
 == Block Elements DSLs
 

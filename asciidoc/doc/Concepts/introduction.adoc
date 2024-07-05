@@ -6,19 +6,19 @@
 
 == Goals
 
-Improve expressiveness of a typical Intranet application by using http://docs.groovy-lang.org/docs/latest/html/documentation/core-domain-specific-languages.html[*Groovy DSL*] (Domain Specific Languages).
+Improve the expressiveness of a typical Intranet application by using http://docs.groovy-lang.org/docs/latest/html/documentation/core-domain-specific-languages.html[*Groovy DSL*] (Domain-Specific Languages).
 
-*DSLs* are statically typed, most errors are detected during the development cycle and IDE can autocomplete code more easily.
+*DSLs* are statically typed, most errors are detected during the development cycle, and the IDE can autocomplete code more easily.
 
-The Taack Framework also allows to shorten usual application code by avoiding *GSPs* and manage common operations (filter, save, show).
+The Taack Framework also allows shortening usual application code by avoiding *GSPs* and managing common operations (filter, save, show).
 
 == Architecture
 
 The *Taack Framework* depends on the *Grails* application framework. Grails brings the runtime context. The Grails infrastructure has the following characteristics:
 
 * On top of https://spring.io/projects/spring-boot[SpringBoot] (and https://micronaut.io/[Micronaut])
-* Uses Groovy as main language
-* Uses https://gorm.grails.org/[Gorm] for data persistence over various technologies
+* Uses Groovy as the main language
+* Use https://gorm.grails.org/[Gorm] for data persistence over various technologies
 * Uses GSP or JSP for page rendering
 * Brings simplicity to Java EE by adhering to the moto *Convention over Configuration*
 
@@ -26,16 +26,16 @@ The *Taack Framework* depends on the *Grails* application framework. Grails brin
 
 In a web application, entry points are URLs. They are called *actions* in Grails terminology.
 
-*Actions* are responsible for updating browser state following user events such as clicks, key presses, mouse movement.
+*Actions* are responsible for updating the browser state following user events such as clicks, key presses, and mouse movements.
 
 The Taack Framework is not a fully AJAX framework; rather, it is mostly an old-school framework that generates complete pages on the server but also has the capability of updating a portion of a page using AJAX.
 
-This approach helps keep the browser's internal state minimal. On the server side, all actions are *stateless*. On the browser side, the stack of modal windows and their layouts, defined by blocks, are stored to manage content updates."
+This approach helps keep the browser's internal state minimal. On the server side, all actions are *stateless*. On the browser side, the stack of modal windows and their layouts, defined by blocks, are stored to manage content updates.
 
 == Additional Framework Characteristics
 
 * Modular application approach
-** Developer can focus solely on their Gradle Modules
+** Developers can focus solely on their Gradle Modules
 * Support for *PDF*, *CSV* or *Mails* in addition to HTML rendering
 * Statically typed
 * Intellij IDE Support

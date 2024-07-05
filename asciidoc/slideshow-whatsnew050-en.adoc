@@ -6,9 +6,9 @@ include::_settings_reveal.adoc[]
 :icons: font
 :docinfo: shared
 :customcss: custom.css
-:revealjs_height: 512
+:revealjs_height: 640
 
-= What's New ?
+= What's New?
 Version 0.5.X
 
 == Based on Bootstrap

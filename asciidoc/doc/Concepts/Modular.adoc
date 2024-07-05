@@ -70,6 +70,6 @@ Holds the sources of the *taack-ui* plugin.
 @endsalt
 ----
 
-* _browser_ folder contains code that will be executed into the browser
+* the _browser_ folder contains code that will be executed into the browser
 * _taack-jdbc-common_ common classes shared between _taack-ui_ and _taack-jdbc-client_
 * _taack-jdbc-client_ the JDBC driver (see link:../../more/JDBC/taack-jdbc-driver.adoc[taack-jdbc-driver])
