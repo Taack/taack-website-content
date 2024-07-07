@@ -1,4 +1,4 @@
-= Installation
+= Installer
 :doctype: book
 :taack-category: 1
 :toc:
