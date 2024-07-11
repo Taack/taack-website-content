@@ -63,8 +63,8 @@ printableBody {
 ----
 
 [[_diagrams_output]]
-.Stacked Bar Diagrams
-image::news-diagram.svg[width=480]
+.Stacked Bar Diagram
+image:news-diagram.svg[width=480]
 
 == Version 0.5.0
 
