@@ -17,7 +17,7 @@ For more in-depth explanation about how plugins are declared to the server, link
 
 == Creating a new app plugin
 
-To create a new app plugin (a Gradle module), be sure to pull the latest version of your intranet from our GitHub repository (see link:installation.adoc[installation])
+To create a new app plugin (a Gradle module), be sure to pull the latest version of your intranet from our GitHub repository (see link:install.adoc[installation])
 
 Once it is done, you can execute the following command from your intranet root folder:
 
@@ -248,7 +248,7 @@ taackUiService.show(b)
 
 This time we don't specify `buildMenu` in our show since we don't want the menu to be rendered inside the modal!
 
-Don't forget to create the `saveBook` action:
+Remember to create the `saveBook` action:
 
 [,groovy]
 ----
@@ -261,7 +261,7 @@ def saveBook(String redirectAction) {
 
 N.B.: See link:doc/DSLs/block-dsl.adoc#_modal_stack_code_sample[Close Modal and reload page] for not having to use `redirectAction` when saving...
 
-Since we only want admin to be able to create book, we add the `@Secured` annotation, for more information about security annotations we recommend to check out the https://grails.github.io/grails-spring-security-core/5.0.0-RC1/index.html#secured-annotation[grails-spring-security-core] documentation.
+Since we only want admin to be able to create a book, we add the `@Secured` annotation, for more information about security annotations we recommend to check out the https://grails.github.io/grails-spring-security-core/5.0.0-RC1/index.html#secured-annotation[grails-spring-security-core] documentation.
 
 == Showing an object
 
@@ -315,7 +315,7 @@ def deleteBook(Book book) {
 }
 ----
 
-N.B.: In some cases, it is better to add a field `enable` to mask disabled object instead of deleting them.
+N.B.: In some cases, it is better to add a field `enable` to mask disabled objects instead of deleting them.
 
 That's it!
 We use Grails `delete` method to delete the book from the database and then redirect back to the `index` action where the book table is.

@@ -1,4 +1,4 @@
-= Installation
+= Install
 :doctype: book
 :taack-category: 1
 :icons: font
