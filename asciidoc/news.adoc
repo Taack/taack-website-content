@@ -28,7 +28,7 @@ table rawImg as "Pic", username as "Name", manager as "Manager"
 
 ----
 
-.Result
+.Results
 image::news-table.webp[width=1024]
 
 == Version 0.5.1
