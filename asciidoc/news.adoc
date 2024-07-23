@@ -4,9 +4,36 @@
 :toc:
 :source-highlighter: rouge
 
+== Version 0.5.2
+
+* JDBC client is now also an AsciidoctorJ extension
+* Add getters to JDBC accessible domain fields
+* Add DSL <<tql_tdl>> for describing how to display queried data (either table or barchart)
+* Restore manual labeling on menus
+* More on diagram DSL (Thanks Chong and ZhenQing)
+* Better customisation
+
+[[tql_tdl]]
+.TQL and TDL (Taack Display Language)
+[source,sql]
+----
+select
+    u.rawImg,
+    u.username,
+    u.manager.username
+from User u
+where u.dateCreated > '2024-01-01' and u.manager.username = 'admin';
+--
+table rawImg as "Pic", username as "Name", manager as "Manager"
+
+----
+
+.Result
+image::news-table.webp[width=1024]
+
 == Version 0.5.1
 
-* <<_replacement_tp>>, app module register themselves independently
+* <<_replacement_tp>>, app module registers itself independently
 * Remove Charts DSL
 * Fix Diagram DSL, <<_replacement_chart>>
 * Allow Diagrams into PDF (See <<_diagrams_into_pdf>> and <<_diagrams_output>>)
