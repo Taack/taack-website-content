@@ -2,6 +2,8 @@
 :doctype: book
 :taack-category: 4|App
 :toc:
+:source-highlighter: rouge
+
 
 == Purpose
 
