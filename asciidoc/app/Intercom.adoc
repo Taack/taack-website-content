@@ -24,7 +24,7 @@ video::2r0fSRmL2Io[youtube,width=1920,height=720]
 
 === TQL and TDL inlined into asciidoc
 
-Intercom supports docs inlining reveal.js slideshows and TQL with TDL.
+Intercom supports docs inlining reveal.js slideshows and TQL with TDL. See https://github.com/Taack/infra/releases/tag/v0.5.2[taack-jdbc-client-1.0-SNAPSHOT-all download page]
 
 .Table exemple
 ====
