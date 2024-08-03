@@ -71,9 +71,6 @@ barchart counter as "Counter"
 
 ----
 
-<1> TQL (Taack Query Language), kind of HQL subset
-<2> TDL (Taack Display Language), tell how to display queried data.
-
 
 .Results
 image::news-diagram.webp[width=1024]
