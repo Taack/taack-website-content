@@ -18,6 +18,10 @@ See link:Crew.adoc#_purpose[configure roles in Crew] to add the role into your I
 
 == AsciidoctorJ extensions
 
+Vidéo demonstrating Intellij integration:
+
+video::2r0fSRmL2Io[youtube]
+
 === TQL and TDL inlined into asciidoc
 
 Intercom supports docs inlining reveal.js slideshows and TQL with TDL.
