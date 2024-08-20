@@ -3,26 +3,17 @@
 :taack-category: 10|more/Search
 :source-highlighter: rouge
 :toc:
+:icons: font
 
-== Install Solr-9.1.0
+== Install Solr
 
-=== Download and extract binaries
-
-[bash]
-----
-curl -L -o solr-9.1.0.tgz https://www.apache.org/dyn/closer.lua/solr/solr/9.1.0/solr-9.1.0.tgz?action=download
-----
-
-[bash]
-----
-tar xvfz solr-9.1.0.tgz
-----
+Download and extract latest binary version (see https://solr.apache.org/downloads.html[Solr download page])
 
 === Launch and create `taack` core
 
 [bash]
 ----
-cd solr-9.1.0
+cd solr-<version>
 bin/solr start
 bin/solr create_core -c taack
 bin/solr config -c taack -p 8983 -action set-user-property -property update.autoCreateFields -value false
@@ -39,13 +30,13 @@ The file `mapping-ISOLatin1Accent.txt` is located in the `intranet` folder:
 cp intranet/server/taack/taack_core_config/conf/mapping-ISOLatin1Accent.txt solr-9.1.0/server/solr/taack/conf/mapping-ISOLatin1Accent.txt
 ----
 
-The rest of the configuration should be done at runtime. Only this file is mandatory.
+The rest of the configuration should be made at runtime. Only this file is mandatory.
 
-== Code adding domain class objects to solr index
+== Adding objects to solr index
 
-=== Indexing a domain
+=== Indexing a domain class
 
-In the `intranet` project, look at `app/crew/grails-app/services/crew/CrewSearchService.groovy`
+In the `intranet` project, look at https://github.com/Taack/intranet/blob/main/app/crew/grails-app/services/crew/CrewSearchService.groovy[`CrewSearchService.groovy`]
 
 [,groovy]
 ----
@@ -59,16 +50,14 @@ private void init() {
         u ?= new User()
         indexField "User Name (without Accents)",
             SolrFieldType.TXT_NO_ACCENT, u.username_
-        indexField "User Name", SolrFieldType.TXT_GENERAL, u.username_
-        indexField "First Name", SolrFieldType.TXT_NO_ACCENT, u.firstName_
-        indexField "Last Name", SolrFieldType.TXT_NO_ACCENT, u.lastName_
-        indexField "Subsidiary", SolrFieldType.POINT_STRING,
-            "mainSubsidiary", true, u.subsidiary?.toString()
-        indexField "Business Unit", SolrFieldType.POINT_STRING,
-            "businessUnit", true, u.businessUnit?.toString()
-        indexField "Date Created", SolrFieldType.DATE, 0.5f, true,  <3>
+        indexField SolrFieldType.TXT_GENERAL, u.username_
+        indexField SolrFieldType.TXT_NO_ACCENT, u.firstName_
+        indexField SolrFieldType.TXT_NO_ACCENT, u.lastName_
+        indexField SolrFieldType.POINT_STRING, "mainSubsidiary", true, u.subsidiary?.toString()
+        indexField SolrFieldType.POINT_STRING, "businessUnit", true, u.businessUnit?.toString()
+        indexField SolrFieldType.DATE, 0.5f, true,  <3>
             u.dateCreated_
-        indexField "User Created", SolrFieldType.POINT_STRING,      <3>
+        indexField SolrFieldType.POINT_STRING,      <3>
             "userCreated",  // Faceting String
             0.5f,           // Boost factor
             true, u.userCreated?.username
@@ -87,7 +76,7 @@ You have different choices to process text:
 
 You can index the same field more than once.
 
-=== Labeling the object found
+=== Labeling objects found
 
 [,groovy]
 ----
@@ -97,7 +86,7 @@ String labeling(Long id) {
 }
 ----
 
-=== How to display the object
+=== Displaying the selected object
 
 Here `CrewController.&showUserFromSearch` is used when clicking on the object found:
 
@@ -114,20 +103,18 @@ def showUserFromSearch(User u) {
 
 [,groovy]
 ----
-private UiMenuSpecifier buildMenu(String q = null) {
-    UiMenuSpecifier m = new UiMenuSpecifier()
-    m.ui {
-        menu 'Users', CrewController.&index as MC
-        menu 'Roles', CrewController.&listRoles as MC
-        menu 'Alerts', CrewController.&listAlerts as MC
-        menu 'Hierarchy', CrewController.&hierarchy as MC
-        menuIcon 'Config MySelf', ActionIcon.CONFIG_USER,
-            this.&editUser as MC,
-            [id: springSecurityService.currentUserId], true
-        menuSearch this.&search as MethodClosure, q         <1>
+    private UiMenuSpecifier buildMenu(String q = null) {
+        new UiMenuSpecifier().ui {
+            menu CrewController.&index as MC
+            menu CrewController.&listRoles as MC
+            menu CrewController.&hierarchy as MC
+            menuIcon ActionIcon.CONFIG_USER, this.&editUser as MC
+            menuIcon ActionIcon.EXPORT_CSV, this.&downloadBinPdf as MC
+            menuIcon ActionIcon.EXPORT_PDF, this.&downloadBinPdf2 as MC
+            menuSearch this.&search as MethodClosure, q     <1>
+            menuOptions(SupportedLanguage.fromContext())
+        }
     }
-    m
-}
 ----
 <1> Add `menuSearch` entry
 

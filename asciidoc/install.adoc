@@ -1,25 +1,20 @@
 = Install
-:doctype: book
-:taack-category: 1
-:icons: font
-:toc:
-:experimental:
 
 == Requirements
 
-First of all, you will need the following:
+First, install the following:
 
 * *Java* (JDK-17 or JDK-19)
 * *git*
 
-Optionally you can also install:
+Optionally, you can also install:
 
 * *Solr-9.6.x* (Used for intranet-wide search bar)
 * *Postgresql*
 
 === Java Version
 
-To check Java versions, type the following command:
+Type the following command:
 
 [sh]
 ----
@@ -27,7 +22,7 @@ java -fullversion
 openjdk full version "17.0.5+1"
 ----
 
-On Mac, you can install Jdk-17 via brew command:
+On Mac, you can install Jdk-17 using brew command:
 
 [sh]
 ----
