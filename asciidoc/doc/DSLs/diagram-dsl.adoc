@@ -101,7 +101,7 @@ image:diag-dsl-pie.webp[]
 
 === Wiskers
 
-.Wiskers chart
+.Whiskers chart
 ====
 .Code Sample
 [source,groovy]
@@ -133,13 +133,15 @@ image:diag-dsl-whiskers.webp[]
 == DSL Symbols Hierarchy
 
 [graphviz,format="svg",align=center]
-.Symbols hierachy diagram for Graph DSL
+.Symbol hierarchy diagram for Diagram DSL
 ----
 digraph mygraph {
   node [shape=box];
   ui
   ui -> bar, scatter, line, area, pie, whiskers
   bar, scatter, line, area, pie, whiskers -> labels [label = "1:1"]
-  bar, scatter, line, area, pie , whiskers-> dataset [label = "1:N"]
+  bar, scatter, line, area, pie -> dataset [label = "1:N"]
+  whiskers -> wdataset [label = "1:N"]
+  wdataset -> boxData [label = "1:N"]
 }
 ----
