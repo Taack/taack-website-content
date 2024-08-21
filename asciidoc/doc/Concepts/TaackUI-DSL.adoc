@@ -38,6 +38,6 @@ image::screenshot-dsl-user-form-800h.webp[]
 ** Table DSL allows grouping and sorting columns
 ** Pagination is included
 ** Table can also represent a tree
-* link:../DSLs/graph-dsl.adoc[*Chart DSL*]: Allows drawing graphs into a block
+* link:../DSLs/graph-dsl.adoc[*Diagram DSL*]: Allows drawing diagrams into a block
 * *Custom DSL*:
 Allows inserting custom HTML code into a block.
