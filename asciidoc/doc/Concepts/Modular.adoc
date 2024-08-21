@@ -4,11 +4,14 @@
 :toc:
 :source-highlighter: rouge
 
-The https://github.com/Taack/intranet[Intranet Sample App] is a modular https://gradle.org/[Gradle] application. You can get instructions to run it clicking on: link:../../installation.adoc[Install Sample Intranet].
+= Modular Application Development
+
+The https://github.com/Taack/intranet[Intranet Sample App] is a modular https://gradle.org/[Gradle] application. You can get instructions to run it clicking on: link:../../usage.adoc[Install Sample Intranet].
 
 == Intranet Sample App Directory Layout
 
-[plantuml, format="svg", opts="inline"]
+
+[plantuml, format="svg", opts="inline", theme="spacelab"]
 ----
 @startsalt
 {
@@ -33,9 +36,9 @@ The https://github.com/Taack/intranet[Intranet Sample App] is a modular https://
 
 === _app_ directory
 
-Hold grails plugins (or Gradle modules) that compose the Intranet application. Those plugins should have minimal dependencies to maximize reusability by others.
+Hold Grails plugins (or Gradle modules) that compose the Intranet application. Those plugins should have minimal dependencies to maximize reusability by others.
 
-=== _crew_ directory
+==== _crew_ directory
 
 Part of the application responsible for user management, only mandatory app that currently holds the Taack services.
 
@@ -45,7 +48,11 @@ Grails application holding global configuration, common translations, static sha
 
 The *server* grails application depends on all application modules (or Grails plugins) defined in the app directory that are desired.
 
-== _infra_ directory
+=== _buildSrc_
+
+Common Gradle configuration. Additional Gradle tasks might be defined into this directory using Groovy language.
+
+== _infra_ repository
 
 Holds the sources of the *taack-ui* plugin.
 

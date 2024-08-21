@@ -7,7 +7,7 @@
 
 == Version 0.5.3
 
-* Fix form checkbox, code clean up
+* Fix form checkbox
 * Allow alias in *TQL* for formula columns
 * Code cleanup and increment dependency versions
 

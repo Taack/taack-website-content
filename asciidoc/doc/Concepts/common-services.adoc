@@ -8,9 +8,9 @@ In a future release, services will all be included directly in the *Taack UI* Gr
 
 == Taack-UI Module Services
 
-* `TaackUiService`: Service responsible for displaying blocks, either using ajax to change a portion of the page, or to show a new page.
+* `TaackUiService`: Service responsible for displaying blocks, either using #ajax# to change a portion of the page, or to show a new page.
 
-* `TaackSaveService`: allows saving objects to the database, initializing some fields. Report also validation errors when the object is not valid, displaying localized error messages to the end user.
+* `TaackSaveService`: allows saving objects to the database, initializing some fields. Report errors when the object is not valid, displaying localized error messages to the end user.
 
 * `TaackFilterService`: allows listing objects when displaying a table. Grouping and sorting are supported.
 

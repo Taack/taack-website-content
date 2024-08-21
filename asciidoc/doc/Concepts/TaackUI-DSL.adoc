@@ -4,9 +4,9 @@
 :toc:
 :source-highlighter: rouge
 
-== Foreword about Block DSL, before digging in other DSLs
+== Foreword about Block DSL
 
-The Block DSL enables the specification of page layout by defining blocks that contain other graphical elements. A block can be an AJAX block, which can be updated by AJAX actions. `AJAX blocks` can be targeted using their ID. Blocks can also be nested.
+The Block DSL enables the specification of the page layout by defining blocks that contain graphical elements. A block can be updated by  actions. `AJAX blocks` can be targeted using their ID. Blocks can also be nested.
 
 For more information, please refer to the dedicated page on link:../DSLs/block-dsl.adoc[Block DSL]. PDFs have their own block management through link:../DSLs/block-printable-dsl.adoc[Printable Blocks], while the table and show DSLs are also applicable (charts will be available later).
 
@@ -38,6 +38,6 @@ image::screenshot-dsl-user-form-800h.webp[]
 ** Table DSL allows grouping and sorting columns
 ** Pagination is included
 ** Table can also represent a tree
-* link:../DSLs/graph-dsl.adoc[*Diagram DSL*]: Allows drawing diagrams into a block
+* link:../DSLs/diagram-dsl.adoc[*Diagram DSL*]: Allows drawing diagrams into a block
 * *Custom DSL*:
 Allows inserting custom HTML code into a block.
