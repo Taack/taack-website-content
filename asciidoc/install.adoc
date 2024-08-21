@@ -71,9 +71,12 @@ Here we want H2 to persist data in a file in development mode:
 environments:
     development:
         dataSource:
-            dbCreate: update
-            url: jdbc:h2:./prodDb;LOCK_TIMEOUT=10000;DB_CLOSE_ON_EXIT=FALSE
+            dbCreate: update        <1>
+            url: jdbc:h2:./prodDb;LOCK_TIMEOUT=10000;DB_CLOSE_ON_EXIT=FALSE <2>
 ----
+
+<1> Creation mode (see Grails GORM docs)
+<2> `prodDb`: root of the filename containing data
 
 === Producing a Jar file for Tomcat
 
@@ -105,7 +108,7 @@ We highly recommend using the latest version of *IntelliJ Ultimate Edition* for 
 
 We recommend installing the *IntelliJ Taack Plugin* that you can install from the Intellij marketplace https://plugins.jetbrains.com/plugin/20792-taackuiastautocomplete[TaackUiASTAutocomplete] or directly from the https://github.com/Taack/infra/releases/tag/v0.1[source code repository].
 
-To open the project, select menu:File[Open project]  and select `intranet/server/settings.gradle`.
+To open the project, select menu:File[Open project]  and select `intranet/settings.gradle`.
 
 Make sure that the JDK used with Gradle is at version 17 (or 19):
 
