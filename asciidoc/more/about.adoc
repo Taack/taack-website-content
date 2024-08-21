@@ -2,8 +2,16 @@
 :doctype: book
 :taack-category: ZZZZZZZ|more
 
-This is the TaackMan
+This Application Framework kills the gap between backend developer and frontend.
 
-.Crew Initiator
-image::adrien-taack.webp[]
+GSP/JSP are always available for complexe use cases.
 
+Thanks to the Grails Framework developers to make this possible.
+
+
+== Devs
+
+.Project Leader
+image::ag.webp[]
+
+Many others coming later ...
