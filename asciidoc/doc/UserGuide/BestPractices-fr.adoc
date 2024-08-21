@@ -1,0 +1,73 @@
+= Bonnes pratiques
+:taack-category: 10|doc/UserGuide
+:toc:
+:source-highlighter: rouge
+
+== Guide de style de codage pour le développement d'applications Grails
+
+Voici quelques lignes directrices qui devraient faciliter la maintenance de l'application :
+
+- Modificateurs de méthode :
+** Utilisez des modificateurs protected, private et final pour les méthodes d'un contrôleur qui ne sont pas des actions.
+- Style de codage :
+** Donnez la priorité au code concis, tout en préservant la clarté.
+** Utilisez les annotations `@GrailsCompileStatic` ou `@CompileStatic` dans toute la base de code.
+- Actions sans état :
+** Concevez toujours les actions de manière à ce qu'elles soient sans état et évitez d'utiliser des sessions.
+- Traits du contrôleur :
+** Évitez d'utiliser des services pour implémenter les traits du contrôleur.
+- Annotation @Transactional :
+** Réservez l'annotation @Transactional uniquement aux actions du contrôleur.
+- Règles générales :
+** Utilisez le modificateur final lorsque cela est approprié.
+** Adhérez au principe DRY (Don't Repeat Yourself).
+** Gardez la portée des symboles la plus courte possible pour améliorer la lisibilité du code.
+** Optez pour des noms de variables locales concis et significatifs.
+** Spécifiez clairement les paramètres des méthodes publiques et les noms des membres.
+
+En suivant ces directives, vous pouvez maintenir une base de code propre et expressive pour votre application Grails.
+
+== i18n
+
+- Ne centralisez pas i18n, utilisez les dossiers du module d'application gradle `i18n` pour chaque application.
+
+[,groovy]
+----
+class Book {
+String title
+}
+----
+- class name localisation "book.label = Libro"
+- class field name localisation "book.title.label = Título del libro"
+- Pour être efficace
+** ne traduisez pas trop tôt
+** lorsque vous avez une vue d'ensemble globale, commencez à traduire
+** gardez l'étiquette la plus importante courte, utilisez l'espace de noms `default` pour eux, l'étiquette spécialisée peut être longue
+- Utilisez la convention pour votre i18n :
+** préfixez avec "default". tout ce qui pourrait être réutilisé
+** ne pas préfixer le nom de classe traduit
+** Dans l'application Crew, nous utilisons des fichiers de propriétés spécifiques aux actions et aux domaines (voir https://github.com/Taack/intranet/tree/main/app/crew/grails-app/i18n[dossier Crew i18n])
+
+L'i18n commun doit être localisé dans le module d'application `Crew` ou `Server`, les propriétés ne sont pas privées pour un module d'application.
+
+== Configuration
+
+- Utilisez l'énumération, dans le code, pour la configuration
+** Le statique est roi
+** Les énumérations Groovy sont lisibles (plus que XML, Json, Yaml... peu importe)
+
+== Sécurité
+
+- Le code lié à la sécurité doit être situé près du point d'influence
+** Nous voulons éviter la centralisation pour toutes les préoccupations
+*** Créez un nouveau domaine selon les besoins, évitez d'encombrer la classe `User`
+*** Les concepts abstraits doivent être minimisés pour des raisons de sécurité ; les contrôles statiques sont cruciaux
+- Évitez les règles complexes qui ne peuvent pas être vérifiées de manière statique lors de la compilation
+- Les règles administratives ne doivent pas s'appuyer sur des chaînes d'autorisation, une valeur booléenne dans un objet est plus explicite lors des tests dans le code.
+
+== Nous pouvons dire que nous sommes efficaces si :
+
+- Les petites évolutions ne déclenchent pas une réécriture complète du code
+- L'intégration de nouvelles fonctionnalités est simple
+- Les différentes préoccupations restent isolées, minimisant l'influence mutuelle
+- Les choses semblent simples
