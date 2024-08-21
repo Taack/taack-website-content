@@ -226,7 +226,7 @@ form.ui book, {
 }
 ----
 
-Once your form is defined, you can display it using the `taackUiService`.show() method
+Once your form is defined, you can display it using the `taackUiService.show()` method
 
 [,groovy]
 ----
