@@ -4,59 +4,45 @@
 :source-highlighter: rouge
 :taack-category: 1|doc/plugin
 
-To ensure that a plugin is recognized and displayed on your intranet, you need to create a `GrailsPlugin` that implements `TaackPlugin`.
+== Register an app
 
-See here: https://github.com/Taack/intranet/blob/main/app/crew/src/main/groovy/crew/CrewGrailsPlugin.groovy[CrewGrailsPlugin.groovy]
+An app registers only its *entry points* (i.e. #actions# executed when accessing app) and corresponding *svg icons*. Controller entry point names are used in localized labeling and description in `i18n` property files.
 
-In this file we configured the following things:
-
-== Roles and access
-
-[,groovy]
+.Crew app registration
+[source,groovy]
 ----
-static final List<TaackPluginConfiguration.PluginRole> crewPluginRoles = [
-    new TaackPluginConfiguration.PluginRole(
-        "ROLE_CREW_ADMIN",
-        TaackPluginConfiguration.PluginRole.RoleRanking.DIRECTOR),
-    new TaackPluginConfiguration.PluginRole(
-        "ROLE_CREW_MANAGER",
-        TaackPluginConfiguration.PluginRole.RoleRanking.MANAGER),
-    new TaackPluginConfiguration.PluginRole(
-        "ROLE_CREW_USER",
-        TaackPluginConfiguration.PluginRole.RoleRanking.USER),
-]
+@PostConstruct
+void init() {
+TaackAppRegisterService.register TaackApp(          <1>
+        CrewController.&index as MC,                <2>
+        new String(
+            this.class
+            .getResourceAsStream("/crew/crew.svg")  <3>
+            .readAllBytes())
+    )
+}
+
 ----
 
-`crewPluginRoles` is a list of `PluginRole` objects that associate `roles` from springSecurityService with a `RoleRanking`. The RoleRanking ranges from the lowest access level (USER) to the highest access level (DIRECTOR).
+<1> Call static method `TaackAppRegisterService.register`
+<2> Define entry point
+<3> Svg icon
 
-== Link classes
-:doctype: book
+== I18n
 
-[,groovy]
+In `i18n` properties, add
+
+[source,properties]
 ----
-static final List<TaackPluginConfiguration.TaackLinkClass> linkClasses = [
-    new TaackPluginConfiguration.TaackLinkClass(
-            Attachment.class,
-            'publicName',
-            AttachmentController.&showAttachment as MC)
-]
-----
-`linkClasses` contains a list of `TaackLinkClass` that defines classes to be linked from other objects and their default behavior(Attribute displayed as name and controller action to redirect to). In this example, we specify that the #Attachment# class should be displayed in other classes using its #publicName# attribute, and the redirection should be set to the #showAttachment# action.
-
-== Plugin configuration
-
-[,groovy]
-----
-static final TaackPluginConfiguration pc = new TaackPluginConfiguration(
-    "Crew",
-    "/crew/crew.svg", "crew",
-    new TaackPluginConfiguration.IPluginRole() {
-        @Override
-        List<TaackPluginConfiguration.PluginRole> getPluginRoles() {
-            crewPluginRoles
-        }
-    })
+crew.app=Crew
+crew.desc=User Management Application
+attachment.app=Attachment
+attachment.desc=Global File Manager
 ----
 
+== Default Application Mosaic
 
-This is the section where we configure the application's name, icon, package, and available language. It is also where we specify that the plugin uses the previously defined PluginRole and LinkClasses lists. In this case, we only populate the PluginRoleList.
+By default, the https://github.com/Taack/intranet/blob/main/server/grails-app/controllers/taack/website/RootController.groovy[`RootController`] in server holds the entry point. It can easily be changed.
+
+.Default Apps Mosaic
+image::root-default.webp[]
