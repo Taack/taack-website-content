@@ -1,0 +1,81 @@
+= Approche modulaire
+:doctype: book
+:taack-category: 5|doc/Concepts
+:toc:
+:source-highlighter: rouge
+
+= Applications modulaires
+
+L'application https://github.com/Taack/intranet[Exemple d'application intranet] est une application https://gradle.org/[Gradle] modulaire. Vous pouvez obtenir des instructions pour l'exécuter en cliquant sur : link:../../usage.adoc[Installer l'exemple d'intranet].
+
+== Disposition du répertoire de l'exemple d'application intranet
+
+[plantuml, format="svg", opts="inline", theme="spacelab"]
+----
+@startsalt
+{
+{T
++ <&folder> Intranet | Répertoire racine
+++ <&folder> app | Répertoire des modules d'application
++++ <&folder> crew | Application de base obligatoire pour gérer les utilisateurs
++++ <&folder> appModule1 | Première application (module Gradle)
++++ <&folder> appModule2 | Deuxième application
++++ <&folder> ... | Et ainsi de suite
+++ <&folder> buildSrc | Instructions de build Gradle
+++ <&folder> server | Application racine du serveur (application Grails)
+++ <&folder> gradle | Binaires Gradle
+++ <&file> build.gradle
+++ <&file> settings.gradle
+++ <&file> gradle.properties
+++ <&file> gradlew
+}
+}
+@endsalt
+----
+
+=== Répertoire _app_
+
+Contient les plugins Grails (ou les modules Gradle) qui composent l'application Intranet. Ces plugins doivent avoir des dépendances minimales pour maximiser la réutilisabilité par d'autres.
+
+==== Répertoire _crew_
+
+Partie de l'application responsable de la gestion des utilisateurs, seule application obligatoire qui contient actuellement les services Taack.
+
+=== Répertoire _server_
+
+Application Grails contenant la configuration globale, les traductions communes, les ressources partagées statiques et la page racine.
+
+L'application Grails *server* dépend de tous les modules d'application (ou plugins Grails) définis dans le répertoire d'application souhaité.
+
+=== _buildSrc_
+
+Configuration Gradle commune. Des tâches Gradle supplémentaires peuvent être définies dans ce répertoire à l'aide du langage Groovy.
+
+== Référentiel _infra_
+
+Contient les sources du plugin *taack-ui*.
+
+[plantuml, format="svg", opts="inline"]
+----
+@startsalt
+{
+{T
++ <&folder> infra | Sources d'infra (voir ci-dessous)
+++ <&folder> browser | Code du navigateur (Kotlin transpilé en Javascript)
+++ <&folder> taack-jdbc-common| Code JDBC commun
+++ <&folder> taack-jdbc-client| Code JDBC client
+++ <&folder> taack-ui | Code de l'interface utilisateur Taack
+++ <&folder> gradle | Binaires Gradle
+++ <&file> build.gradle
+++ <&file> settings.gradle
+++ <&file> gradle.properties
+++ <&file> gradlew
+
+}
+}
+@endsalt
+----
+
+* le dossier _browser_ contient le code qui sera exécuté dans le navigateur
+* _taack-jdbc-common_ classes communes partagées entre _taack-ui_ et _taack-jdbc-client_
+* _taack-jdbc-client_ le pilote JDBC (voir le lien :../../more/JDBC/taack-jdbc-driver.adoc[taack-jdbc-driver])

@@ -1,4 +1,4 @@
-= Taack Framework Introduction
+= Introduction au Framework Taack
 :doctype: book
 :taack-category: 1|doc/Concepts
 :toc:

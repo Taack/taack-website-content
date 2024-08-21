@@ -1,2 +1,2 @@
-= Généralités
+= Vue d'ensemble
 :taack-category: 0|doc/Concepts

@@ -1,0 +1,21 @@
+= Services communs
+:doctype: book
+:taack-category: 3|doc/Concepts
+:toc:
+:source-highlighter: rouge
+
+Dans une future version, tous les services seront inclus directement dans le plugin Grails *Taack UI* qui sera indépendant des modules d'application.
+
+== Services du module Taack-UI
+
+* `TaackUiService` : service chargé d'afficher les blocs, soit en utilisant #ajax# pour modifier une partie de la page, soit pour afficher une nouvelle page.
+
+* `TaackSaveService` : permet d'enregistrer des objets dans la base de données, en initialisant certains champs. Signale les erreurs lorsque l'objet n'est pas valide, en affichant des messages d'erreur localisés à l'utilisateur final.
+
+* `TaackFilterService` : permet de lister les objets lors de l'affichage d'une table. Le regroupement et le tri sont pris en charge.
+
+== Services supplémentaires
+
+* `TaackJdbcService` Service de communication avec des clients JDBC externes
+
+* `TaackSearchService` Service de prise en charge de la recherche en texte intégral
