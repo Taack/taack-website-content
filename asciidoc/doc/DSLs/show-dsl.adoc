@@ -23,7 +23,6 @@ s.ui partner, {
         field partner.address?.country
     }
 }
-
 ----
 <1> Icon has to be scaled down in order to feet near the field labeled "Name"
 <2> We see we can add style to create combinations of style

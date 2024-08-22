@@ -1,0 +1,147 @@
+= Diagramme DSL
+:doctype: book
+:taack-category: 3|doc/DSLs
+:toc:
+:source-highlighter: rouge
+:icons: font
+
+* [*] Rendu en HTML
+* [*] Rendu en PDF
+* [*] Rendu en Mails
+* [ ] Rendu en CSV
+
+Diagram DSL permet de dessiner rapidement des diagrammes à barres, à aires, à secteurs, à nuages ​​de points et à courbes, soit rastérisés au format PNG, soit au format SVG.
+
+ATTENTION : l'exemple de code suivant fonctionnera pour `taack-ui` 0.5.4 (la version actuelle est 0.5.3).
+
+== Exemple de code
+
+=== Barre
+
+.Barchart non empilé
+====
+.Exemple de code Barchart
+[source,groovy]
+----
+private static UiDiagramSpecifier barDiagram(boolean isStacked) {
+    new UiDiagramSpecifier().ui {
+        bar(isStacked, {
+            labels "T1", "T2", "T3", "T4"
+            dataset 'Truc1', 1.0, 2.0, 1.0, 4.0
+            dataset 'Truc2', 2.0, 0.1, 1.0, 0.0
+            dataset 'Truc3', 2.0, 0.1, 1.0, 1.0
+        })
+    }
+}
+----
+
+.Résultat
+image:diag-dsl-bar.webp[]
+====
+
+=== Ligne
+
+.Lignes
+====
+.Exemple de code de lignes
+[source,groovy]
+----
+diagram new UiDiagramSpecifier().ui({
+    line {
+        labels 1.5, 3, 4.4, 5, 7.8, 8
+        dataset "client", 10.0, 20.1, 30.0
+        dataset "admin", 5.0, 7.0
+        dataset "other", 1.0, 2.0, 3.0, 4.0, 5.0, 6.0
+    }
+})
+----
+
+.Résultat
+image:diag-dsl-line.webp[]
+====
+
+=== Secteur
+
+.Graphique à secteurs
+====
+.Exemple de code
+[source,groovy]
+----
+private static UiDiagramSpecifier pieDiagram(boolean hasSlice) {
+    new UiDiagramSpecifier().ui({
+        pie(hasSlice, {
+            labels "Pie"
+            dataset("cli", 1.47)
+            dataset("client", 0.28)
+            dataset("client1", 0.1)
+            dataset("client2", 1.45)
+            dataset("client3", 0.05)
+            dataset("client31", 0.05)
+            dataset("client32", 0.05)
+            dataset("c33", 0.05)
+            dataset("client311", 0.05)
+            dataset("client312", 0.05)
+            dataset("client313", 0.05)
+            dataset("client4", 0.8)
+            dataset("client5", 2.1)
+            dataset("client55", 0.1)
+            dataset("client555", 0.2)
+            dataset("client5555", 0.3)
+            dataset("client55555", 0.3)
+            dataset("admin", 1.6)
+            dataset("test1", 0.05)
+        })
+    })
+}
+----
+
+.Résultat
+image:diag-dsl-pie.webp[]
+====
+
+=== Wiskers
+
+.Graphique des moustaches
+====
+.Exemple de code
+[source,groovy]
+----
+diagram new UiDiagramSpecifier().ui({
+    whiskers {
+        labels "T1", "T2", "T3", "T4"
+
+        dataset 'Truc1', {
+            boxData 1.0, 2.0, 3.0, 3.5, 4.0, 4.5, 5.0
+            boxData 1.5, 2.5, 3.5, 6.0, 7.0, 8.0, 9.0
+            boxData 2.0, 2.0, 2.1, 2.5, 5.5, 5.6, 6.7
+            boxData 1.7, 1.8, 1.9, 2.0, 2.1, 2.2, 2.3
+        }
+        dataset 'Truc2', {
+            boxData 0.5, 1.0, 1.1, 1.2, 1.3, 2.0, 5.5
+            boxData 0.5, 1.0, 1.1, 1.2, 1.3, 2.0, 5.5
+            boxData 0.5, 1.0, 1.1, 1.2, 1.3, 2.0, 5.5
+            boxData 0.5, 1.0, 1.1, 1.2, 1.3, 2.0, 5.5
+        }
+    }
+})
+----
+
+.Résultat
+image:diag-dsl-whiskers.webp[]
+====
+
+== Hiérarchie des symboles DSL
+
+[graphviz,format="svg",align=center]
+.Diagramme de hiérarchie des symboles pour Diagram DSL
+----
+digraph mygraph {
+  node [shape=box];
+  ui
+  ui -> bar, scatter, line, area, pie, whiskers
+  bar, scatter, line, area, pie, whiskers -> labels [label = "1:1"]
+  bar, scatter, line, area, pie -> dataset [label = "1:N"]
+  whiskers -> wdataset [label = "1:N"]
+  wdataset -> boxData [label = "1:N"]
+}
+----

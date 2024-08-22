@@ -1,0 +1,136 @@
+= Bloc DSL
+:doctype: book
+:taack-category: 10|doc/DSLs
+:toc:
+:source-highlighter: rouge
+
+[%interactive]
+* [*] Rendu en HTML
+* [*] Rendu en PDF
+* [ ] Rendu en CSV
+
+DSL de niveau supérieur qui est responsable de l'organisation des éléments graphiques de la page et de la mise à jour des blocs ajax. Dans le cas où nous rendons une page complète, nous devons également spécifier la description du menu de la page via le lien :menu-dsl.adoc[Menu DSL].
+
+Ce DSL est également responsable de la gestion de la pile de fenêtres modales. Ouvrez une modale en utilisant `modal` ou fermez une modale en utilisant `closeModalAndUpdateBlock` (et d'autres variantes).
+
+== Exemple de code de construction de blocs
+
+[[block-preview]]
+.Exemple de bloc avec onglets (voir <<block-sample1>>).
+image::screenshot-dsl-block.webp[]
+
+[source,groovy]
+[[block-sample1]]
+.Exemple de bloc avec onglets
+----
+def editSlideshow(CmsPage slideshow) {
+    UiBlockSpecifier b = new UiBlockSpecifier()
+
+    Boolean createNew = slideshow == null
+    if (!slideshow)
+        slideshow = new CmsPage(pageType: CmsPageType.SLIDESHOW)
+
+b.ui {
+    if (createNew)
+        modal {
+            form
+                buildCmsSlideshowForm(slideshow),
+                BlockSpec.Width.MAX
+        }
+    else {
+        anonymousBlock BlockSpec.Width.HALF, {          <1>
+            form
+                buildCmsSlideshowForm(slideshow),
+                BlockSpec.Width.MAX
+            }
+
+        blockTabs BlockSpec.Width.HALF, {
+            blockTab "Images", buildImagesTab(slideshow)<2>
+            blockTab "Videos", buildVideosTab(slideshow)
+        }
+    }
+}
+taackUiService.show(b, buildMenu())                     <3>
+
+----
+
+<1> Déclarer un bloc invisible de 1/2 largeur de fenêtre
+<2> Déclarer 2 onglets à l'intérieur, le premier s'affiche lorsque la page apparaît
+<3> Envoyer le bloc avec la description du menu au navigateur.
+
+== Exemple de code de pile modale
+
+Après avoir traité un formulaire, vous pouvez actualiser le contenu de la page ou d'un autre modal sous celui en cours. Vous pouvez également recharger la page ou afficher une autre page. Le rechargement de la page permet au code d'être réutilisable, car il ne dépend pas de l'URL actuelle (rappelez-vous les *paramètres* `redirectAction` que vous voyez dans le lien :../../first-app.adoc#_adding_buttons_to_a_table_block[First App (Adding buttons to a table block)] .
+
+En général, une fenêtre modale est fermée après le traitement d'un formulaire. Soit elle n'est pas valide, et les erreurs sont affichées dans le navigateur directement dans le formulaire, soit nous enregistrons l'objet et actualisons le contenu.
+
+Voir
+
+=== Fermer la fenêtre modale et recharger la page
+
+[source,groovy]
+----
+@Transactional
+@Secured(["ROLE_CMS_MANAGER", "ROLE_CMS_DIRECTOR"])
+def saveCmsInsert() {
+    taackSaveService.saveThenReloadOrRenderErrors(CmsInsert)
+}
+----
+
+Si aucune erreur n'est enregistrement de CmsInsert détecté, la page est simplement rechargée.
+
+=== Fermer la modale et charger une page
+
+[source,groovy]
+----
+@Transactional
+@Secured(["ROLE_ADMIN", "ROLE_CMS_MANAGER", "ROLE_CMS_DIRECTOR"])
+def saveCmsPage() {
+    taackSaveService.saveThenRedirectOrRenderErrors(  <1>
+        CmsPage, this.&pages as MethodClosure
+    )
+}
+----
+<1> La fermeture de méthode dans ce contrôleur sera chargée (en respectant les mappages d'URL)
+
+=== Fermer la modale et actualiser les blocs ajax de la page
+
+.Cas d'utilisation complexe : fermer la fenêtre modale et actualiser l'ajaxBlock présent dans la page
+[source,groovy]
+----
+taackSaveService.saveThenDisplayBlockOrRenderErrors(
+    EngineeringChangeRequest,                                   <1>
+    new UiBlockSpecifier().ui {                                 <2>
+        closeModalAndUpdateBlock {                              <3>
+            show "Projects", buildShowProjects(ecr),
+                BlockSpec.Width.MAX, {
+                    action
+                        ActionIcon.ADD,
+                        Ecr2Controller.&projectsForm as MC,
+                        [id: ecr.id, ajaxBlockId: ajaxBlockId]
+            }
+        }
+    }
+)
+----
+
+<1> Après qu'une action impliquant la sauvegarde d'un objet est appelée dans une fenêtre modale, vous pouvez fermer la fenêtre modale et actualiser les éléments de la page en une seule action
+<2> `saveThenDisplayBlockOrRenderErrors` prend un `UiBlockSpecifier` comme paramètre
+<3> `closeModalAndUpdateBlock` fermera d'abord la dernière fenêtre modale ouverte, puis appliquera la modification
+
+== Symboles DSL de bloc Hiérarchie
+
+[graphviz,format="svg",align=center]
+.Diagramme de hiérarchie des symboles pour Block DSL
+----
+digraph mygraph {
+node [shape=box]; ui -> modal, closeModalAndUpdateBlock [label = "0,1"]
+closeModalAndUpdateBlock -> blockTabs, ajaxBlock [label = "1,N"]
+ui, anonymousBlock, modal -> anonymousBlock, ajaxBlock [label = "0,N"]
+ui, anonymousBlock, modal -> blockTabs [label = "0,1"]
+blockTabs -> ajaxBlockTab [label = "1,N"]
+ajaxBlock, ajaxBlockTab -> form, show, tableFilter, table, graphs, custom, anonymousBlock [label = "1,N"]
+}
+----
+
+`ajaxBlock` peut entourer d'autres éléments et permet de mettre à jour seulement une partie de la page.

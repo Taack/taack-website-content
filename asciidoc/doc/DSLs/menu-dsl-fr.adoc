@@ -4,17 +4,17 @@
 :toc:
 :source-highlighter: rouge
 
-* [*] Rendered into HTML
-* [ ] Rendered into Mails
-* [ ] Rendered into PDF
-* [ ] Rendered into CSV
+* [*] Rendu en HTML
+* [ ] Rendu en Mails
+* [ ] Rendu en PDF
+* [ ] Rendu en CSV
 
-Menu DSL associate menu entries with top level actions.
-Menu DSL supports only 2 levels max (without taking into account `section`).
+Menu DSL associe les entrées de menu aux actions de niveau supérieur.
+Menu DSL ne prend en charge que 2 niveaux maximum (sans prendre en compte `section`).
 
 [source,groovy]
 [[menu-sample1]]
-.Menu Sample with conditional
+.Exemple de menu avec condition
 ----
 private UiMenuSpecifier buildMenu(String q = null) {
     new UiMenuSpecifier().ui {                          <1>
@@ -29,15 +29,15 @@ private UiMenuSpecifier buildMenu(String q = null) {
 }
 ----
 
-<1> Create a new menu
-<2> Search menu
-<3> Languages entries
-<4> Icon entries (hoover message automatically deduced) .Corresponding Menu Rendering.
+<1> Créer un nouveau menu
+<2> Menu de recherche
+<3> Entrées de langues
+<4> Entrées d'icônes (message de l'aspirateur déduit automatiquement) .Menu correspondant Rendu.
 
 image:screenshot-dsl-menu-041.webp[]
 
 [graphviz,format="svg",align=center]
-.Symbol's hierarchy diagram for Menu DSL
+.Diagramme de hiérarchie des symboles pour Menu DSL
 ----
 digraph mygraph {
     node [shape=box];
@@ -46,4 +46,3 @@ digraph mygraph {
     subMenu -> menu [label = "1,N"]
 }
 ----
-
