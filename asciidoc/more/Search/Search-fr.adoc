@@ -1,15 +1,15 @@
-= Solr Search
+= Recherche Solr
 :doctype: book
 :taack-category: 10|more/Search
 :source-highlighter: rouge
 :toc:
 :icons: font
 
-== Install Solr
+== Installer Solr
 
-Download and extract latest binary version (see https://solr.apache.org/downloads.html[Solr download page])
+Télécharger et extraire la dernière version binaire (voir https://solr.apache.org/downloads.html[Page de téléchargement Solr])
 
-=== Launch and create `taack` core
+=== Lancer et créer le noyau `taack`
 
 [bash]
 ----
@@ -19,24 +19,24 @@ bin/solr create_core -c taack
 bin/solr config -c taack -p 8983 -action set-user-property -property update.autoCreateFields -value false
 ----
 
-WARNING: On a production server, port `8983` should not be reachable from outside.
+AVERTISSEMENT : sur un serveur de production, le port `8983` ne doit pas être accessible de l'extérieur.
 
-==== Copy the file `mapping-ISOLatin1Accent.txt` in solr configuration dir
+==== Copiez le fichier `mapping-ISOLatin1Accent.txt` dans le répertoire de configuration de solr
 
-The file `mapping-ISOLatin1Accent.txt` is located in the `intranet` folder:
+Le fichier `mapping-ISOLatin1Accent.txt` se trouve dans le dossier `intranet` :
 
 [bash]
 ----
 cp intranet/server/taack/taack_core_config/conf/mapping-ISOLatin1Accent.txt solr-9.1.0/server/solr/taack/conf/mapping-ISOLatin1Accent.txt
 ----
 
-The rest of the configuration should be made at runtime. Only this file is mandatory.
+Le reste de la configuration doit être effectué au moment de l'exécution. Seul ce fichier est obligatoire.
 
-== Adding objects to solr index
+== Ajout d'objets à l'index solr
 
-=== Indexing a domain class
+=== Indexation d'une classe de domaine
 
-In the `intranet` project, look at https://github.com/Taack/intranet/blob/main/app/crew/grails-app/services/crew/CrewSearchService.groovy[`CrewSearchService.groovy`]
+Dans le projet `intranet`, consultez https://github.com/Taack/intranet/blob/main/app/crew/grails-app/services/crew/CrewSearchService.groovy[`CrewSearchService.groovy`]
 
 [,groovy]
 ----
@@ -64,19 +64,19 @@ private void init() {
     }))
 }
 ----
-<1> See <<_how_to_display_the_object>>
-<1> See <<_labeling_the_object_found>>
-<3> `true` enable faceting
+<1> Voir <<_comment_afficher_l'objet>>
+<1> Voir <<_étiqueter_l'objet_trouvé>>
+<3> `true` active le facettage
 
-You have different choices to process text:
+Vous avez différents choix pour traiter le texte :
 
-* `POINT_STRING` will not modify the string when indexing
-* `TXT_NO_ACCENT` will remove accents
+* `POINT_STRING` ne modifiera pas la chaîne lors de l'indexation
+* `TXT_NO_ACCENT` supprimera les accents
 * ...
 
-You can index the same field more than once.
+Vous pouvez indexer le même champ plusieurs fois.
 
-=== Labeling objects found
+=== Étiquetage des objets trouvés
 
 [,groovy]
 ----
@@ -86,9 +86,9 @@ String labeling(Long id) {
 }
 ----
 
-=== Displaying the selected object
+=== Affichage de l'objet sélectionné
 
-Here `CrewController.&showUserFromSearch` is used when clicking on the object found:
+Ici, `CrewController.&showUserFromSearch` est utilisé lors d'un clic sur l'objet trouvé :
 
 [,groovy]
 ----
@@ -99,7 +99,7 @@ def showUserFromSearch(User u) {
 }
 ----
 
-=== Adding search bar
+=== Ajout d'une barre de recherche
 
 [,groovy]
 ----
@@ -116,9 +116,9 @@ private UiMenuSpecifier buildMenu(String q = null) {
     }
 }
 ----
-<1> Add `menuSearch` entry
+<1> Ajouter une entrée `menuSearch`
 
-=== Search action
+=== Action de recherche
 
 [,groovy]
 ----
@@ -133,6 +133,6 @@ UiBlockSpecifier buildSearchBlock(String q) {
     taackSearchService.search(q, CrewController.&search as MethodClosure, User) <1>
 }
 ----
-<1> the last parameter is a list of classes we want to target into this search block
+<1> le dernier paramètre est une liste de classes que nous voulons cibler dans ce bloc de recherche
 
-We can have more than 1 search result block into a page.
+Nous pouvons avoir plus d'un bloc de résultats de recherche dans une page.

@@ -12,6 +12,6 @@ Thanks to the Grails Framework developers to make this possible.
 == Devs
 
 .Project Leader
-image::ag.webp[]
+image::ag.webp[width=480]
 
 Many others coming later ...
