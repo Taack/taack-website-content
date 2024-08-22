@@ -4,6 +4,9 @@
 :toc:
 :source-highlighter: rouge
 
+== Version 0.5.4
+
+* Travail sur les diagram DSL (Voir link:doc/DSLs/diagram-dsl-fr.adoc[])
 
 == Version 0.5.3
 

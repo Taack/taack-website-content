@@ -5,6 +5,10 @@
 :source-highlighter: rouge
 
 
+== Version 0.5.4
+
+* Rework diagram DSL (See link:doc/DSLs/diagram-dsl.adoc[])
+
 == Version 0.5.3
 
 * Fix form checkbox
