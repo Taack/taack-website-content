@@ -4,7 +4,7 @@
 :toc:
 :source-highlighter: rouge
 
-== Créer un service non paresseux
+== Créer un service à l'initialisation autonome
 
 .Activation de Jdbc pour la classe de domaine `User`
 [,groovy]
@@ -36,6 +36,6 @@ class CrewJdbcService {
 
 ----
 
-<1> Le service ne doit pas être initialisé de manière paresseuse car il n'a pas besoin d'être injecté quelque part
+<1> Le service ne doit pas être initialisé de manière paresseuse, car il n'a pas besoin d'être injecté quelque part (docn implicitement initialisé).
 <2> Méthode répertoriant les colonnes de classe de domaine disponibles via TQL
 <3> L'étape 3 peut être répétée pour toutes les classes de domaine
