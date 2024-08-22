@@ -3,6 +3,7 @@
 :taack-category: 1|doc/DSLs
 :toc:
 :source-highlighter: rouge
+:icons: font
 
 * [*] Rendu en HTML
 * [ ] Rendu en Mails

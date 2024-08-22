@@ -3,6 +3,7 @@
 :taack-category: 1|more/JDBC
 :toc:
 :source-highlighter: rouge
+:icons: font
 
 == Créer un service à l'initialisation autonome
 
@@ -21,21 +22,21 @@ import static taack.base.TaackJdbcService.Jdbc
 @GrailsCompileStatic
 class CrewJdbcService {
 
-    static lazyInit = false <1>
+    static lazyInit = false                 <1>
 
-    @PostConstruct <2>
+    @PostConstruct                          <2>
     private static void init() {
         def u = new User()
         Jdbc.registerClass(User,
                 u.username_, u.mail_,
                 u.subsidiary_, u.firstName_,
                 u.lastName_, u.businessUnit_,
-                u.enabled_) <3>
+                u.enabled_)                 <3>
     }
 }
 
 ----
 
-<1> Le service ne doit pas être initialisé de manière paresseuse, car il n'a pas besoin d'être injecté quelque part (docn implicitement initialisé).
-<2> Méthode répertoriant les colonnes de classe de domaine disponibles via TQL
+<1> Le service ne doit pas être initialisé de manière "paresseuse", car il n'a *pas* besoin d'être injecté quelque part (donc implicitement initialisé).
+<2> Méthode répertoriant *les colonnes* de classe de domaine disponibles via TQL
 <3> L'étape 3 peut être répétée pour toutes les classes de domaine

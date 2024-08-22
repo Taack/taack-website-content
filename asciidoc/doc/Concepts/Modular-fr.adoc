@@ -3,6 +3,7 @@
 :taack-category: 5|doc/Concepts
 :toc:
 :source-highlighter: rouge
+:icons: font
 
 = Applications modulaires
 

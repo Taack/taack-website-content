@@ -3,6 +3,7 @@
 :taack-category: 2|doc/Concepts
 :toc:
 :source-highlighter: rouge
+:icons: font
 
 == Avant-propos sur Block DSL
 

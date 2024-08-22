@@ -1,12 +1,13 @@
-= Taack JDBC Pilote
+= Pilote Taack JDBC
 :doctype: book
 :taack-category: 0|more/JDBC
 :toc:
 :source-highlighter: rouge
+:icons: font
 
 == Qu'est-ce que c'est ?
 
-JDBC signifie *Java Database Connectivity*. C'est un composant Java ancien, important et très utilisé. Il simplifie l'interrogation et l'édition des données entre différents Programmemes.
+JDBC signifie *Java Database Connectivity*. C'est un composant Java ancien, important et très utilisé. Il simplifie l'interrogation et l'édition des données entre différents programmes.
 
 Notre implémentation JDBC actuelle permet uniquement d'interroger les données depuis l'intranet.
 
@@ -14,7 +15,7 @@ La mise à jour des données par ce biais est un sujet complexe. Nous devons gé
 
 C'est en cours.
 
-.Diagramme de séquence lors de l'exécution d'une requête sans erreur
+.Diagramme de séquence lors de l'exécution d'une requête sans erreurs
 [plantuml,format="svg",opts="online"]
 ----
 @startuml
@@ -65,7 +66,7 @@ end box
 
 Seuls *3 logiciels* ont été testés avec ce pilote jusqu'à présent :
 |===
-|Programmeme |Introspection ?|Interrogation ? |Mise à jour ? | Insertion ?
+|Programme |Introspection ?|Interrogation ? |Mise à jour ? | Insertion ?
 
 |LibreOffice 7.3 |Liste de tables uniquement|Oui |Non | Non
 |dBeaver |Oui |Oui |Pas encore | Pas encore
@@ -81,7 +82,7 @@ Il existe 2 modèles de travail pour analyser les données :
 ** Utiliser la requête saisie directement dans *LibreOffice*
 ** Ou travailler avec une *extraction CSV* et la mettre dans n'importe quel logiciel (y compris *Office*)
 
-ATTENTION : je ferai des vidéos plus tard sur la façon de configurer le pilote avec ces Programmemes.
+WARNING: je ferai des vidéos plus tard sur la façon de configurer le pilote avec ces Programmemes.
 
 == Requêtes TQL
 
@@ -150,6 +151,90 @@ AVERTISSEMENT : le nom d'alias de colonne doit commencer par une lettre minuscul
 
 === Requêtes avec regroupement
 
-La clause de regroupement ajoute la capacité d'agréger les données. La <<requête de base avec formules>> n'est pas utile, car il y a une ligne par ligne d'offre. Il est possible d'utiliser le regroupement afin d'obtenir une ligne par offre, comme dans l'exemple suivant :
+La clause de regroupement ajoute la possibilité d'agréger des données.
 
-[source
+La clause <<basic-query-with-formulas>> n'a pas une ligne par ligne d'offre.
+Il est possible d'utiliser le regroupement afin d'obtenir une ligne par offre, comme dans l'exemple suivant :
+
+[source,sql]
+.Exemple TQL avec regroupement et formules
+----
+select
+    ll.lead.rep.mainSubsidiary as salesmanSubsidiary, <1>
+    count(ll.id), <2>
+    sum(ll.qty * ll.salePrice) <2>
+from LeadLine ll
+group by ll.lead.rep.mainSubsidiary <1>
+----
+<1> Champ standard, il doit être répertorié dans la clause #Group by# ;
+<2> Vous pouvez utiliser les fonctions d'agrégation #count# ou #sum#.
+
+WARNING: les alias de colonne ne sont pas pris en charge sur les colonnes agrégées
+
+|===
+|salesmanSubsidiary|count(ll.id) |sum(ll.qty * ll.salePrice)
+
+|CITEL_2CP |118605|212619001943.17760000
+|CITEL_GMBH |37336 |261342488.98760000
+|CITEL_INC |25172 |319681146.49190000
+|CITEL_INDIA |24868 |1122541659.94000000
+|CITEL_OOO |10382 |3990221200.80740000
+|CITEL_SH |269 |552810.59000000
+|OBSTA |46151 |2762758463.12580000
+|===
+
+=== Requêtes Jointures internes
+
+Parfois, une colonne pointe vers plusieurs lignes.
+
+Cela s'appelle une relation *plusieurs-à-plusieurs*. Nous ne pouvons pas utiliser directement les champs référencés, vous devez utiliser ce que l'on appelle des *jointures*... (ça sonne comme 70e, mais ce n'est pas moi)
+
+Dans l'exemple suivant, les *éléments* contiennent de nombreuses *valeurs*, et les *valeurs* peuvent être utilisées par plusieurs *éléments*. Si nous voulons lister les éléments et les valeurs dans la même table, nous avons besoin d'une sorte de produit croisé entre 2 ensembles de données.
+
+WARNING: La cardinalité du produit croisé de 2 ensembles est #M x N#, vous devez utiliser la *clause Where* pour réduire le nombre de résultats.
+
+[source,sql]
+.TQL Simple Join
+----
+select
+    i.name,
+    i.ref,
+    v.valueString,
+    v.associatedProperty.valueKind as kind,
+    v.associatedProperty.kindOfCharacteristic as typeOfChar,
+    v.associatedProperty.nameAlias ​​as nameAlias
+from Item i, Value v <1>
+where v in elements(i.values) and i.range.name = 'DVM' <2>
+
+----
+<1> Nous listons 2 tables indépendamment
+<2> Nous *DOIT* limiter le nombre de résultats avec l'expression `v in elements(i.values)`
+
+.Results
+|====
+| name | ref | valueString | kind | typeOfChar | nameAlias
+
+| DVM-230-16A | 3589015 | NULL | dico | BULLET_POINTS | bulletPoints
+| DVM-230-16A | 3589015 | IP20 | chaîne | MECA | NULL
+| DVM-230-16A | 3589015 | -40/+85°C | chaîne | MECA | NULL
+| DVM-230-16A | 3589015 | NULL | dico | NULL | description
+| DVM-230-16A | 3589015 | NULL | dico | NULL | sous-famille
+| DVM-230-16A | 3589015 | NULL | dico | MECA | NULL
+| DVM-230-16A | 3589015 | NULL | dico | NORMES | NULL
+| DVM-230-16A | 3589015 | voir schéma | dico | MECA | NULL
+| DVM-230-16A | 3589015 | NULL | dico | MECA | NULL
+| DVM-230-16A | 3589015 | NULL | dico | MECA | NULL
+| DVM-230-16A | 3589015 | NULL | dico | MECA | NULL
+| DVM-230-16A | 3589015 | 16 A | chaîne | ÉLECTRIQUE | NULL
+| DVM-230-16A | 3589015 | NULL | dico | ÉLECTRIQUE | NULL
+| DVM-230-16A | 3589015 | 0,0305 kg | chaîne | MECA | NULL
+| DVM-230-16A | 3589015 | NULL | dico | NULL | famille
+| DVM-230-16A | 3589015 | 230 V monophasé | dico | ELEC | NULL
+| DVM-230-16A | 3589015 | PTFE | string | MECA | NULL
+| DVM-230-16A | 3589015 | NULL | bool | NULL | NULL
+|====
+
+== Limitations actuelles du pilote
+
+* Vous ne pourrez pas *déférencer* les champs de langue. (`v.valueMap['fr']` échouera, ainsi que `v.valueMap`). Plus d'informations à ce sujet plus tard.
+* Nous ne prenons en charge que la jointure interne, pas la jointure externe. Notre implémentation actuelle de jointure est lente, nous pouvons l'améliorer, mais elle est complexe, plus d'informations à ce sujet plus tard.

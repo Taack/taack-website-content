@@ -5,24 +5,24 @@
 :source-highlighter: rouge
 :icons: font
 
-== Filter
+== Filtre
 
-* [*] Rendered into HTML
-* [ ] Rendered into PDF
-* [ ] Rendered into Mail
-* [ ] Rendered into CSV
+* [*] Rendu en HTML
+* [ ] Rendu en PDF
+* [ ] Rendu en Mail
+* [ ] Rendu en CSV
 
-.Filter applied to a table, from <<filter-sample1>>
+.Filtre appliqué à un tableau, à partir de <<filter-sample1>>
 image::screenshot-dsl-filter.webp[width=250,align=center]
 
-Filter DSL is always associated with a Table or a Chart. A bloc cannot contain only a filter.
+Le Filter DSL est toujours associé à un tableau ou à un graphique. Un bloc ne peut pas contenir uniquement un filtre au plus.
 
 [[filter-code-sample]]
-=== Code Sample
+=== Exemple de code
 
-[source,groovy]
 [[filter-sample1]]
-.Filter Sample Code 1
+.Exemple de code de filtre 1
+[source,groovy]
 ----
 UiFilterSpecifier f = new UiFilterSpecifier()           <1>
 
@@ -44,16 +44,16 @@ f.ui User, {                                            <2>
 }
 ----
 
-<1> Create the filter
-<2> pass the object class and the closure containing the specifications of the filter via the `ui` method
-<3> Create a section labeled "User"
-<4> Add field to the filter, note the *underscore* at the end of the field name
-<5> if the field is an object, pass an array with all steps necessary to target the field you want to filter on
-<6> `filterFieldExpressionBool` allow more complex filter
+<1> Créer le filtre
+<2> Transmettre la classe d'objet et la fermeture contenant les spécifications du filtre via la méthode `ui`
+<3> Créer une section intitulée "Utilisateur"
+<4> Ajouter un champ au filtre, noter le *soulignement* à la fin du nom du champ
+<5> si le champ est un objet, transmettre un tableau avec toutes les étapes nécessaires pour cibler le champ sur lequel vous souhaitez filtrer
+<6> `filterFieldExpressionBool` permet un filtre plus complexe
 
 [source,groovy]
 [[sample2]]
-.Filter Sample 2
+.Filter Exemple 2
 ----
 UiFilterSpecifier f = new UiFilterSpecifier()
 
@@ -75,55 +75,53 @@ f.ui CmsImage, cmsPage ? [id: cmsPage.id] : null, { <1>
 f
 ----
 
-<1> We can pass optional parameters to the action
+<1> Nous pouvons passer des paramètres optionnels à l'action
 
-=== DSL Symbols Hierarchy
+=== Hiérarchie des symboles du DSL
 
 [graphviz,format="svg",align=center]
-.Symbols hierachy diagram for Filter DSL
+.Diagramme de hiérarchie des symboles pour Filter DSL
 ----
 digraph mygraph {
-  node [shape=box];
-  "ui"
-  "ui" -> hiddenId [label = "0,1"]
-  "ui" -> "section" [label = "1,N"]
-  "section" -> "section"
-  "section" -> "filterField", "filterFieldExpressionBool", "filterFieldInverse" [label = "0,N"]
+node [shape=box]; "ui"
+"ui" -> hiddenId [label = "0,1"]
+"ui" -> "section" [label = "1,N"]
+"section" -> "section"
+"section" -> "filterField", "filterFieldExpressionBool", "filterFieldInverse" [label = "0,N"]
 }
 ----
 
-=== DSL Elements
+=== Éléments DSL
 
-=== Root
-* `ui`: one version allows passing additional parameters to the filter action (see <<sample2>>)
+=== Racine
+* `ui` : une version permet de passer des paramètres supplémentaires à l'action de filtrage (voir <<sample2>>)
 
-=== Inputs
-* `filterField`: add object field to be transmitted to the filter action
-* `filterFieldInverse`: filter objects if another object points to it.
-* `filterFieldExpressionBool`: allows changing where clause in the filter action by using FilterExpression, last parameter is the default value.
+=== Entrées
+* `filterField` : ajouter un champ d'objet à transmettre à l'action de filtrage
+* `filterFieldInverse` : filtrer les objets si un autre objet pointe dessus.
+* `filterFieldExpressionBool` : permet de modifier la clause where dans l'action de filtrage en utilisant FilterExpression, le dernier paramètre est la valeur par défaut.
 
 === Structure
-* `section`: add a graphical filter section
+* `section` : ajouter une section de filtre graphique
 
-== Table
+== Tableau
 
-* [*] Rendered into HTML
-* [*] Rendered into PDF
-* [*] Rendered into CSV
+* [*] Rendu en HTML
+* [*] Rendu en PDF
+* [*] Rendu en CSV
 
-=== Code Sample
+=== Exemple de code
 
-The right part of the preview corresponds to the DSL sample below.
-The filter is on the left of the image, see <<DslDescriptions/FilterDSL.adoc#filter-sample1>> for the corresponding code.
+La partie droite de l'aperçu correspond à l'exemple DSL ci-dessous.
+Le filtre se trouve à gauche de l'image, voir <<DslDescriptions/FilterDSL.adoc#filter-sample1>> pour le code correspondant.
 
-The table has *pagination*, it is sorted by default against *Date Created* column, all columns are *sortable* except Picture and Roles.
-One column can contain multiple cells.
-Date Created is empty for old users, and manager cells are also empty for some users.
-
+Le tableau comporte une *pagination*, il est trié par défaut par rapport à la colonne *Date de création*, toutes les colonnes sont *triables* sauf Image et Rôles.
+Une colonne peut contenir plusieurs cellules.
+La date de création est vide pour les anciens utilisateurs, et les cellules du gestionnaire sont également vides pour certains utilisateurs.
 
 [source,groovy]
 [[table-sample1]]
-.Table Sample: Header, Rows and a default sorting
+.Exemple de tableau : en-tête, lignes et tri par défaut
 ----
 new UiTableSpecifier().ui {
     User u = new User(manager: new User(), enabled: true)
@@ -202,19 +200,19 @@ new UiTableSpecifier().ui {
     }
 }
 ----
-<1> Header part of the table specifications
-<2> Non-sortable field header
-<3> Sortable field header
-<4> `iterate`, specifying sort, paginate and filtering
+<1> Partie en-tête des spécifications de la table
+<2> En-tête de champ non triable
+<3> En-tête de champ triable
+<4> `iterate`, spécifiant le tri, la pagination et le filtrage
 <5> *row* DSL
 
-`ActionIcon` can be modified by `ActionIconModifier`
+`ActionIcon` peut être modifié par `ActionIconModifier`
 
-Table style is specified by `Style` an optional parameter on `row` or `rowField` element.
+Le style de tableau est spécifié par `Style`, un paramètre facultatif sur l'élément `row` ou `rowField`.
 
-=== DSL Symbols Hierarchy
+=== Hiérarchie des symboles DSL
 
-.Symbol's hierarchy diagram for Table DSL
+.Diagramme de hiérarchie des symboles pour le tableau DSL
 [graphviz,format="svg",align=center]
 ----
 digraph mygraph {
@@ -230,4 +228,3 @@ digraph mygraph {
   rowIndent -> rowTree [label = "0,1"]
 }
 ----
-

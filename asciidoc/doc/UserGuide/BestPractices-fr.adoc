@@ -2,6 +2,7 @@
 :taack-category: 10|doc/UserGuide
 :toc:
 :source-highlighter: rouge
+:icons: font
 
 == Guide de style de codage pour le développement d'applications Grails
 

@@ -2,6 +2,7 @@
 :taack-category: 11|doc/UserGuide
 :toc:
 :source-highlighter: rouge
+:icons: font
 
 == Spring Security
 

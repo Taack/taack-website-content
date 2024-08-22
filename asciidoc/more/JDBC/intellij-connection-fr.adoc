@@ -3,6 +3,7 @@
 :taack-category: 1|more/JDBC
 :source-highlighter: rouge
 :toc:
+:icons: font
 
 == Ajout du pilote
 

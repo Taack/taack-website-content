@@ -10,9 +10,9 @@
 * [*] Rendu en Mails
 * [ ] Rendu en CSV
 
-Diagram DSL permet de dessiner rapidement des diagrammes à barres, à aires, à secteurs, à nuages ​​de points et à courbes, soit rastérisés au format PNG, soit au format SVG.
+Diagram DSL permet de dessiner rapidement des diagrammes à barres, à aires, à secteurs, à nuages de points et à courbes, soit rastérisés au format PNG, soit au format SVG.
 
-ATTENTION : l'exemple de code suivant fonctionnera pour `taack-ui` 0.5.4 (la version actuelle est 0.5.3).
+WARNING: l'exemple de code suivant fonctionnera pour `taack-ui` 0.5.4 (la version actuelle est 0.5.3).
 
 == Exemple de code
 

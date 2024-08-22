@@ -3,6 +3,7 @@
 :toc:
 :source-highlighter: rouge
 :taack-category: 1|doc/plugin
+:icons: font
 
 == Enregistrer une application
 

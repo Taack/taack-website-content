@@ -3,6 +3,7 @@
 :taack-category: 3
 :toc:
 :source-highlighter: rouge
+:icons: font
 
 == Version 0.5.4
 

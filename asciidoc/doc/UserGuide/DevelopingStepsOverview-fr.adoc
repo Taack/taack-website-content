@@ -2,6 +2,7 @@
 :taack-category: 1|doc/UserGuide
 :toc:
 :source-highlighter: rouge
+:icons: font
 
 == Activation du framework Taack
 

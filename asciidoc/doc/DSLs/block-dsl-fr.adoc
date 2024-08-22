@@ -3,6 +3,7 @@
 :taack-category: 10|doc/DSLs
 :toc:
 :source-highlighter: rouge
+:icons: font
 
 [%interactive]
 * [*] Rendu en HTML

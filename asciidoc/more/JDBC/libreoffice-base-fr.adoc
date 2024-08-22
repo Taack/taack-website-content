@@ -3,6 +3,7 @@
 :taack-category: 1|more/JDBC
 :source-highlighter: rouge
 :toc:
+:icons: font
 
 == Configurer LibreOffice pour utiliser Jdk 17
 
@@ -71,7 +72,7 @@ image::lo-base-tables-screenshot.webp[]
 
 Cliquez sur le bouton Requêtes, puis sur `Créer une requête dans la vue SQL`
 
-ATTENTION : n'utilisez pas l'assistant. L'Intranet utilise le langage TQL pour interroger les données, LibreOffice ne connaît pas ce langage.
+WARNING: N'utilisez pas l'assistant. L'Intranet utilise le langage TQL pour interroger les données, LibreOffice ne connaît pas ce langage.
 
 image::lo-base-queries-screenshot.webp[]
 
