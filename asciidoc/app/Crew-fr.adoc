@@ -1,0 +1,23 @@
+= Crew
+:doctype: book
+:taack-category: 1|App
+:toc:
+
+== Objectif
+
+Gérer les utilisateurs dans le système :
+
+* Cliquez sur le signe `plus` pour ajouter un utilisateur
+* Cliquez sur #Roles#, puis sur le signe `plus` dans le tableau pour ajouter un rôle.
+
+== Rôles
+
+`ROLE_ADMIN`
+
+=== Contrôleurs réguliers
+* *crew*
+* *attachment*
+
+=== Contrôleurs de support
+* *modelVisitor* : Afficher un graphique du modèle
+* *progress* : Contrôleur de support pour la barre de progression

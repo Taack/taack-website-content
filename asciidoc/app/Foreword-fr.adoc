@@ -1,0 +1,6 @@
+= *Avant-propos*
+:doctype: whitepaper
+:taack-category: 0|App
+:toc:
+
+Certaines applications peuvent améliorer le framework en l'étendant avec de nouvelles fonctionnalités. Cette section documentera ces fonctionnalités supplémentaires.
