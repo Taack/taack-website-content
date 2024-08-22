@@ -1,4 +1,4 @@
-= News
+= Nouveautés
 :doctype: book
 :taack-category: 3
 :toc:
@@ -105,3 +105,176 @@ image:news-diagram.svg[width=480]
 == Version 0.5.0
 
 slide::[fn=slideshow-whatsnew050-fr]
+
+== Version 0.4.2
+
+À paraître... cette version devrait comporter quelques changements intéressants (en cassant parfois du vieux code)
+
+- Améliorer la hiérarchie DSL
+* champs cachés en haut uniquement pour la lisibilité
+* pas de passage de paramètres redondants dans le formulaire
+* pas de passage de paramètres redondants dans le filtre
+* filterField uniquement sous la section uniquement
+* champ de niveau supérieur du formulaire uniquement sur l'en-tête
+- crochet pour les champs de formulaire pour afficher M2M correctement
+- crochet pour enregistrer un filtre d'objet typique
+- Améliorer l'état de restauration
+- Correction du regroupement/des arborescences de tables avec pagination
+- À déterminer
+
+== Version 0.4.1
+
+- Fusionner le menu de recherche, le menu d'icônes et le menu de langue, voir <<new_menu_layout>>
+- Conserver certains paramètres... (lang, affiliate, stock, autres...) via le menu DSL
+** Déplacer la langue prise en charge dans les menus (à partir de la déclaration du plugin), voir <<new_menu_layout_code>>
+- Autoriser le débogage du code Kotlin JS, voir <<new_allow_kotlinjs_debug>>
+- Corriger le chemin du fichier lors de la mise à jour. De la même manière que pour O2M, avec aperçu
+- Améliorer l'état de restauration
+- Tester l'exécution du Mac et développer le redémarrage automatique à froid
+- Étiquetage automatique du champ d'index Solr, voir <<new_solr_code>>
+
+
+[[new_menu_layout]]
+.Mise à jour de la disposition des menus
+image:screenshot-news-menu-0.4.1.webp[]
+
+[[new_menu_layout_code]]
+.Mise à jour de la disposition des menus codage
+[source,groovy]
+----
+private UiMenuSpecifier buildMenu(String q = null) {
+    new UiMenuSpecifier().ui {
+        menu CrewController.&index as MC
+        menu CrewController.&listRoles as MC
+        menu CrewController.&hierarchy as MC
+        menuIcon ActionIcon.CONFIG_USER, this.&editUser as MC
+        menuIcon ActionIcon.EXPORT_PDF, this.&downloadBinPdf as MC
+        menuSearch this.&search as MethodClosure, q
+        menuOptions(SupportedLanguage.fromContext())            <1>
+    }
+}
+----
+
+<1> Le choix de la langue se trouve à droite de la barre de recherche et d'autres énumérations peuvent être ajoutées
+
+[[new_allow_kotlinjs_debug]]
+.Kotlin JS Debug HowTo
+[source,bash]
+----
+$ cd infra/browser/client                             <1>
+$ ./gradlew browserDevelopmentRun                     <2>
+$ vi intranet/server/grails-app/conf/application.yml  <3>
+# Uncomment line bellow
+# client.js.path: 'http://localhost:8080/client.js'
+
+# Then your browser should show Kotlin code !
+----
+
+<1> Déplacez-vous vers le dossier client où le code JS est généré
+<2> Lancez un serveur servant client.js et client.js.map...
+<3> Modifiez votre fichier intranet `application.yml`
+
+[[new_solr_code]]
+.Nouvelle simplification DSL Solr (plus besoin de labels)
+[source,groovy]
+----
+@PostConstruct
+private void init() {
+    taackSearchService.registerSolrSpecifier(this,
+            new SolrSpecifier(User,
+                CrewController.&showUserFromSearch as MethodClosure,
+                this.&labeling as MethodClosure, { User u ->
+        u ?= new User()
+        indexField SolrFieldType.TXT_NO_ACCENT, u.username_
+        indexField SolrFieldType.TXT_GENERAL, u.username_
+        indexField SolrFieldType.TXT_NO_ACCENT, u.firstName_
+        indexField SolrFieldType.TXT_NO_ACCENT, u.lastName_
+        indexField SolrFieldType.POINT_STRING, "mainSubsidiary", true, u.subsidiary?.toString()
+        indexField SolrFieldType.POINT_STRING, "businessUnit", true, u.businessUnit?.toString()
+        indexField SolrFieldType.DATE, 0.5f, true, u.dateCreated_
+        indexField SolrFieldType.POINT_STRING, "userCreated", 0.5f, true, u.userCreated?.username
+    }))
+}
+----
+
+== Version 0.4.0
+
+* Plus de `paginate` dans les tableaux. Voir <<new_iterate_code>>
+* Pas de `list`, mais un `iterate` prenant une fermeture comme paramètre, avec une approche de modèle de construction pour passer des arguments
+* Les menus sont désormais étiquetés automatiquement, (utilisez `lang=test` dans l'URL pour traduire les menus). Voir <<new_menu_code>>
+* Plus de paramètre #isAjax# dans les tableaux... Voir <<new_rowAction_code>>
+* Changer rowLink en rowAction <<i18n_isAjax>>
+* Pas d'étiquette nécessaire sur #rowAction# dans les tableaux. Voir <<new_rowAction_code>>
+* Plus besoin d'ajaxBlock pour les tables, les formulaires, les tableFilters
+* formAction n'a plus de paramètre #isAjax#
+* formAction n'a plus de paramètre i18n obligatoire
+* form n'a plus de paramètre i18n obligatoire, i18n est basé sur le nom de l'action actuelle
+* block action n'a plus de paramètre i18n obligatoire, i18n est basé sur l'action cible
+* block action n'a plus de paramètre isAjax obligatoire
+
+[[new_iterate_code]]
+.Nouveau : `iterate`
+[source,groovy]
+----
+iterate(taackFilterService.getBuilder(Role)                     <1>
+        .setMaxNumberOfLine(20)                                 <2>
+        .setSortOrder(TaackFilter.Order.DESC, u.authority_)     <3>
+        .build()) { Role r, Long counter ->
+            row {
+                rowColumn {
+                    rowField r.authority
+                    if (hasSelect)
+                        rowAction
+                            ActionIcon.SELECT * IconStyle.SCALE_DOWN,
+                            CrewController.&selectRole as MC
+                            r.id                                <4>
+                }
+            }
+        }
+
+----
+
+<1> itérer
+<2> Spécifier max est suffisant pour déclencher la pagination s'il y a plus de lignes
+<3> Remplacer l'ancien modèle inefficace pour décrire le tri et l'ordre initiaux
+[[i18n_isAjax]]
+<4> Plus de paramètres i18n et isAjax
+
+[[new_menu_code]]
+.Nouveau code `menu`
+[source,groovy]
+----
+private UiMenuSpecifier buildMenu(String q = null) {
+    UiMenuSpecifier m = new UiMenuSpecifier()
+    m.ui {
+        menu CrewController.&index as MC        <1>
+        menu CrewController.&listRoles as MC
+        menu CrewController.&hierarchy as MC
+        menuSearch this.&search as MethodClosure, q
+    }
+    m
+}
+----
+
+<1> Aucun paramètre i18n
+
+[[new_rowAction_code]]
+.Nouveau code `rowAction`
+[source,groovy]
+----
+if (hasActions) {
+    rowColumn {
+        rowAction ActionIcon.EDIT * IconStyle.SCALE_DOWN, this.&roleForm as MC, r.id <1>
+    }
+}
+----
+
+<1> Pas de paramètre i18n, pas de dernier paramètre `isAjax`
+
+== Version 0.3.9
+
+Aucune mise à jour depuis trop longtemps, l'hibernation touche à sa fin. Cette version offre :
+
+- Grails 6.2.0
+- Groovy 3.0.21
+- Bumping Various deps ... (Voir https://github.com/Taack/infra/compare/v0.3.8...v0.3.9[Changelog])
