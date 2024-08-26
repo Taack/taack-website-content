@@ -1,0 +1,47 @@
+= DSL for Grails
+:taack-category: 1
+:source-highlighter: rouge
+
+slide::[fn=slideshow-cn]
+
+link:https://github.com/Taack/infra[Taack-UI]是一个link:https://grails.org/[Grails]扩展插件，允许以静态link:http://docs.groovy-lang.org/docs/latest/html/documentation/core-domain-specific-languages.html[Groovy DSL] (Domain Specific Language / 领域特定语言) 的形式构建Grails项目的UI用户界面并有能力处理相关安全性问题.
+
+在常规Grails的基础上，该插件提供了以下功能：
+
+* 安全验证:
+** 依据用户权限，数据对象的**任一字段**都可被显示或编辑；
+** 无需重复代码，用户无权访问的**链接**和**操作**都将被自动隐藏；
+** 搜索给出的数据列表 (基于Solr搜索) 仅限用户可阅
+
+* 支持以相同代码编写**PDF**、*邮件*、*CSV*、或是其他格式的内容，最终通过link:doc/DSLs/block-dsl.adoc[Block DSL]导出至指定格式；
+
+* 支持多语言切换：DSL将检测i18n文本标签并获取各语言对应的翻译
+
+* 支持数据对象Validation过程中的报错显示 (请查阅link:doc/DSLs/form-dsl.adoc#_form_validation[*Form validation*]);
+
+* 支持link:/more/Search/Search.adoc[纯本文搜索] (基于Solr)，具体如：
+** 静态数据模型对象的索引及纯文本搜索;
+** 分面搜索 (Faceting);
+** 排名算法 (Ranking);
+
+* 支持数据的link:/doc/DSLs/filter-table-dsl.adoc[筛选、分页、排序]而无需手动处理；
+* 支持扩展文件预览 (除常用办公文件格式外，不久后将支持预览STEP、DWG等文件)；
+* 通过**JDBC驱动程序**，允许在DBeaver、Intellij或link:more/JDBC/libreoffice-base.adoc#_open_query_as_a_pivot_table[LibreOffice Base]上使用##TQL## (Taack Query Language / Taack查询语言) 来访问并查询数据，操作等同于一般数据库 (请查阅link:more/JDBC/taack-jdbc-driver.adoc[*Taack JDBC Driver*])；
+
+* 通过**SFTP** (即将可用) 分享文件:
+** 由服务器通过SFTP为每名用户组建虚拟文件系统 (见<<sftp_screenshot>>);
+*** 例如，文件夹 /<username>/crew/pictures 中可查看所有用户的照片，但实际上这些照片并没有存储在您的硬盘中；
+*** 文件 /<username>/crew/users.csv 中记录了所有用户的信息，但实际上该文件本身只会在您访问时同步生成，并非提前存储；
+** 可访问服务器的一部分真实文件系统以快速创建文件分享空间；
+
+* 通过**Git server**管理用户文档 (即将可用)；
+
+* 通过**Ssh** (即将可用)，允许直接在服务器中运行Shell UI (见<<ssh_screenshot>>)；
+
+[[ssh_screenshot]]
+.Ssh server session
+image::screenshot-ssh.webp[]
+
+[[sftp_screenshot]]
+.Sftp file browser
+image::screenshot-sftp.webp[]
