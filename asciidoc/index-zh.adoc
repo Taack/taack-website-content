@@ -45,3 +45,4 @@ image::screenshot-ssh.webp[]
 [[sftp_screenshot]]
 .Sftp file browser
 image::screenshot-sftp.webp[]
+
