@@ -1,0 +1,313 @@
+= 创建第一个应用 (app)
+
+== 应用是如何与Taack框架协作的
+
+您的内联网项目分为2个部分：
+
+* 子应用 (app plugins)：位于 `app` 文件夹中。每个子应用都能看成是一个微型项目，它们有自己的依赖、自己的build文件等等，例如 `Crew` 就是其中一个子应用。
+link:doc/plugin/taack-plugin-zh.adoc#_about_plugins[点击此处]以获取更多如何向服务器声明子应用的深入解释。
+* 主应用 (main server)：通过 `build.gradle` 文件装载所有子应用，并将其呈现在内联网主页面上。
+
+== 创建一个新的子应用 (app plugin)
+
+要创建新的子应用 (基于Gradle模块)，请先确保已经从我们的github库中拉取了最新版的内联网项目 (见link:install-zh.adoc[安装])。
+
+若已完成，您可于内联网根目录中执行以下命令：
+
+[,bash]
+----
+./gradlew -PmodName=myToto server:generateTaackAppTask
+----
+
+一个新创建的子应用将出现在 `app` 文件夹下。
+
+请重新加载Gradle (如下图所示点击目标按钮)，使得IDE成功检测到该子应用：
+
+.Gradle Reload
+image::screenshot-new-app-gradle-reload.webp[Reload,width=520,align="left"]
+
+== 未来的更新
+
+大多数时候，更新内联网也就意味着会更新 `buildSrc` 文件夹以及 `gradle.properties` 文件，偶尔也会更新子应用的 `build.gradle` 文件。
+
+NOTE: 事实上，这在长周期的软件开发项目中很常见，不应当让新手感到害怕。
+
+== 创建子应用的菜单
+
+首先，让我们着眼于导航栏。
+第一步学习如何构建，基本代码如下：
+
+[,groovy]
+----
+static private UiMenuSpecifier buildMenu(String q = null) {
+    new UiMenuSpecifier().ui {
+        menu SomeController.&action as MC
+        menu this.&anotherAction as MC
+        // import org.codehaus.groovy.runtime.MethodClosure as MC
+    }
+}
+----
+
+创建一个link:doc/DSLs/menu-dsl-zh.adoc[UiMenuSpecifier]实例，并写入导航栏所需内容：
+
+[,groovy]
+----
+menu TurboController.&action as MC
+----
+
+以该行代码为例，`menu` 将在导航栏中创建一个简单链接，`Action` 为该链接显示的文本，`TurboController.&action` (类型为MethodClosure) 则定义了该链接导向的目的地。
+
+导航栏中可写入更多其他类型，详情请见link:doc/DSLs/menu-dsl-zh.adoc[Menu DSL]。
+
+== 创建表格
+
+现在再来看看如何在我们的页面中呈现一张表格，样板如下：
+
+[,groovy]
+----
+UiTableSpecifier tableSpecifier = new UiTableSpecifier()
+tableSpecifier.ui {
+    //Add table content inside the closure here
+}
+----
+
+我们打算做一张表格，其内列出多个Book实例。
+于是第一步应当先定义好表头：
+
+[,groovy]
+----
+new UiTableSpecifier().ui {
+    // -- Header --
+    header {
+        column {
+            fieldHeader object.title_
+        }
+    }
+}
+----
+
+如图所示，表格的各项内容全都定义在一个闭包中，因此条件判断、循环等等的操作都可以实现。举个例子，我们想要某列只有 `ROLE_ADMIN` 用户才能看见：
+
+[,groovy]
+----
+// Look if the current user has the Role "ROLE_ADMIN"
+User cu = springSecurityService.currentUser as User
+boolean isAdmin = cu.authorities*.authority.contains("ROLE_ADMIN")
+
+new UiTableSpecifier().ui {
+    header {
+        column {
+            label object.title_
+        }
+        // Column only shown to admin
+        if (isAdmin) {
+            column {
+                label "Delete book"
+            }
+        }
+    }
+}
+----
+
+“Delete book”这列只会在用户是admin时出现。
+
+接下来我们要填充内容进我们的表格，使用 `iterate` 遍历数据库中所有的Book实例：
+
+[,groovy]
+----
+User cu = springSecurityService.currentUser as User
+boolean isAdmin = cu.authorities*.authority.contains("ROLE_ADMIN")
+
+new UiTableSpecifier().ui {
+    header {
+        column {
+            label object.title_
+        }
+        // Column only shown to admin
+        if (isAdmin) {
+            column {
+                label "Delete book"
+            }
+        }
+    }
+
+    iterate(taackFilterService.getBuilder(Book)
+            .setMaxNumberOfLine(8)
+            .setSortOrder(TaackFilter.Order.DESC, object.title_)
+            .build()) { Book book ->
+        rowColumn {
+            rowField book.title_ //The underscore is needed here
+        }
+        // If the user is an admin display a column with a button link
+        // to redirect towards the book deletion action
+        if (isAdmin) {
+            rowColumn {
+                rowAction ActionIcon.DELETE,
+                        this.&index as MC, book.id
+            }
+        }
+    }
+}
+----
+
+我们会为每一个Book创建一条新行，第一列为书名，若用户是admin则第二列为 btn:[删除] 按钮 (由于我们还未定义删除函数，因此我们暂时使该按钮导向至 `index` )。
+
+表格，即UiTableSpecifier，现已完成，接下来只需将其呈现在页面，请使用 `taackUiService` (它应当已被 `create-taack-app` 命令导入至Controller控制器中)。
+代码如下：
+
+[,groovy]
+----
+taackUiService.show(new UiBlockSpecifier().ui {
+    table tableSpecifier, BlockSpec.Width.MAX
+}, buildMenu())
+----
+
+`taackUiService.show(UiBlockSpecifier block, UiMenuSpecifier menu)` 负责将我们指定的内容呈现出来。
+在本例中，我们想要显示一个 `ajaxBlock`， 其内包含着名为“Book”的 `table`，因此我们将创建好的 `tableSpecifier` 作为传递参数，并设定表格宽度为 `MAX` 以占据整个页宽。我们还将之前完成的静态 `buildMenu()` 作为 `show()` 的第二个传递参数，以此使得该页面自带一条导航栏。
+
+现在您可以启动服务器并进入新子应用中。表格应当已正常呈现，只不过暂无数据，因为此时数据库未有任何book。
+于是下一步我们会学习如何创建一个表单，并保存数据对象至数据库中。
+
+== 为表格添加按钮
+
+我们将为您的Book表格添加一个按钮，点击后会跳出弹窗 (使用AJAX技术) 用于创建新book。
+在代码中，我们只需给table添加一个闭包，如下图：
+
+[,groovy]
+----
+taackUiService.show(new UiBlockSpecifier().ui {
+    table 'Book table', tableSpecifier, BlockSpec.Width.MAX, {
+        //Added Closure here
+        if (isAdmin())
+            action ActionIcon.CREATE, this.&bookForm as MC
+    }
+}, buildMenu())
+----
+
+仅需如此，admin用户就能在表格的右上角看见一个 btn:[创建] 按钮。
+
+该 `action` 方法由以下参数构成：
+
+. 图标：必须为 xref:doc/Concepts/docref.adoc#_actionicon[ActionIcon] 枚举类。
+. action：该按钮的重定向
+
+== 创建表单并保存数据对象
+
+接下来我们将要制作一个既能创建又可以更新数据对象的表单。
+首先需要定义一个 `bookForm` 方法，并初始化一个实例：要么新建实例，要么根据传递而来的id参数直接读取已有实例。
+
+[,groovy]
+----
+def bookForm(Book book) {
+    book ?= new Book(params)
+}
+----
+
+然后创建 `FormSpecifier` 以填充我们的表单内容。
+
+[,groovy]
+----
+UiFormSpecifier form = new UiFormSpecifier()
+form.ui book, {
+    //Section of fields
+    section "Book details", {
+        field book.title_
+        field book.author_
+    }
+    //Save button
+    formAction this.&saveBook as MC
+}
+----
+
+内容填充完成后，使用 `taackUiService.show()` 将其呈现在页面上。
+
+[,groovy]
+----
+UiBlockSpecifier b = new UiBlockSpecifier()
+b.ui {
+    modal {
+        form form, BlockSpec.Width.MAX
+    }
+}
+taackUiService.show(b)
+----
+
+这一次我们不打算传递 `buildMenu` 进入show中，因为我们并不希望又一条导航栏出现在当前弹窗中！
+
+也记得创建一个 `saveBook` 方法：
+
+[,groovy]
+----
+@Secured("ROLE_ADMIN")
+@Transactional
+def saveBook(String redirectAction) {
+    taackSaveService.saveThenReloadOrRenderErrors(Book)
+}
+----
+
+备注：保存后不需要 `redirectAction`，见link:doc/DSLs/block-dsl-zh.adoc#_modal_stack_code_sample[Close Modal and reload page]。
+
+由于我们希望只有admin才能创建book，因此我们在方法上方添加了 `@Secured` 声明，更多安全验证类信息请查阅link:https://grails.github.io/grails-spring-security-core/5.0.0-RC1/index.html#secured-annotation[grails-spring-security-core]文档。
+
+== 显示数据对象详情
+
+目前我们已经能够创建数据对象，并将所有对象显示在一个表格中。接下来我们将学习如何在弹窗中显示某个具体对象的详细信息。
+我们要再次定义一个specifier，并且最后同样要使用 `taackUiService.show()` 将其呈现出来：
+
+[,groovy]
+----
+def showUser(Book book) {
+    // Define the show displayed fields
+    UiShowSpecifier showSpec = new UiShowSpecifier().ui(book, {
+        fieldLabeled book.title_
+        fieldLabeled book.author_
+    })
+
+    taackUiService.show(new UiBlockSpecifier().ui {
+        modal {
+            show showSpec
+        }
+    })
+}
+----
+
+为了能够打开该弹窗，我们需要为表格的每行book都添加一个链接。请在每行的目标rowColumn中添加下列代码：
+
+[,groovy]
+----
+rowAction
+        ActionIcon.SHOW * StyleModifier.SCALE_DOWN, <1>
+        TurboController.&showBook as MC, book.id
+----
+
+<1> 这里我们使用了乘法运算符以减小图标的尺寸
+
+它将在表格的单元格中创建一个__小型__图标，点击后会打开弹窗，其内显示该book的详细信息。
+
+请注意这里我们让 `ActionIcon` 被一个 `ActionIconStyleModifier` 乘算，使得图标的尺寸被改变。
+
+== 删除一个数据对象
+
+记得我们在表格里添加过一个 btn:[删除] 按钮吗？
+现在就来让它发挥作用：将方法名改为"[.code]``&deleteBook``"，然后在控制器中创建一个相同名字的方法：
+
+[,groovy]
+----
+@Transactional
+@Secured(['ROLE_ADMIN'])
+def deleteBook(Book book) {
+    book.delete()
+    redirect action: 'index'
+}
+----
+
+备注：有些时候，给数据添加一个 `enable` 属性来决定遮盖或显示该数据，会比直接删除它更好。
+
+完毕！
+我们使用了Grails的 `delete` 方法来从数据库删除一个book对象，并重定向至 `index` 方法以此回到表格页面。
+
+现在您就拥有了一个针对book的完整CRUD流程，而无需任何HTML或GSP文件！
+
+*您已经做好了充分准备来探索Taack Ui框架的更多高级功能。*
+
+*欢迎！*
