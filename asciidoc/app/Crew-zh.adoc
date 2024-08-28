@@ -1,0 +1,24 @@
+= 用户
+:doctype: book
+:taack-category: 1|App
+:toc:
+:toc-title: 目录
+
+== 目的
+
+管理系统中的用户：
+
+* 点击 `plus` 按钮以添加用户
+* 点击 #Roles#, 然后在 `plus` 表中的按钮处添加角色。
+
+== 角色
+
+`ROLE_ADMIN`
+
+=== 常规控制器
+* *crew*
+* *attachment*
+
+=== 支持控制器
+* *modelVisitor*: 转储模型的图表
+* *progress*: 支持进度条控制器

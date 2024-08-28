@@ -1,0 +1,16 @@
+= IDE Extension
+:doctype: book
+:taack-category: 0|more/resources
+:source-highlighter: rouge
+
+== Intellij
+
+此外，您还可以导入 Taack-UI 实时模板，以便能够轻松地摆脱样板代码，如下所示：
+
+video::6ADI8FrnIzg[youtube,title=IntelliJ 实时模板, opts="autoplay,loop", width=640, height=480]
+
+请在 https://github.com/Taack/taack-autocomplete/releases/tag/v1.6[发布页面]上下载 `taack-intellij-templates.zip` 。
+然后在 IntelliJ 上，转到 `File > Manage IDE Settings > Import Settings`。选择文件后，当 IntelliJ 询问您要导入什么时，，单击“确定”，您就可以开始了。
+
+
+== Visual Studio 代码

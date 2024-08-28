@@ -1,0 +1,35 @@
+= 来源
+:doctype: book
+:taack-category: 2|more/resources
+:source-highlighter: rouge
+
+== Github
+
+=== 本网站内容
+
+https://github.com/Taack/taack-website-content
+
+我们使用 asciidoc 格式编写文档，为了本地化，我们在文件名后面加上语言后缀。默认语言是英语。 `WhyDSL-fr.doc` 将是法语版， `WhyDSL.adoc` 英语版（默认版）。
+
+=== Intellij Autocomplete sources
+
+https://github.com/Taack/taack-autocomplete
+
+对于每个 Intellij 版本，我们都将在这个仓库中发布 Intellij 插件的二进制文件。
+
+=== Infra Sources
+
+https://github.com/Taack/infra
+
+Infra 包含 3 个子项目 (`taack-jdbc-common`):
+
+* `client` kotlin 文件转译成 Javascript。本项目避免编写复杂的 Javascript，本项目的程序集合直接复制到 `taack-ui` assets中。
+* `taack-jdbc-client` JDBC 驱动程序的源代码
+* `taack-ui` Grails 插件源
+
+
+=== Intranet 示例应用程序
+
+https://github.com/Taack/intranet
+
+该应用程序可以作为您未来开发的基底。

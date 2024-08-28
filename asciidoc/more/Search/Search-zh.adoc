@@ -1,0 +1,139 @@
+= Solr Search
+:doctype: book
+:taack-category: 10|more/Search
+:source-highlighter: rouge
+:toc:
+:toc-title: 目录
+:icons: font
+
+== 安装 Solr
+
+下载并解压最新的二进制版本（请参阅 https://solr.apache.org/downloads.html[Solr 下载页面]）
+
+=== 启动并创建 `taack`
+
+[bash]
+----
+cd solr-<version>
+bin/solr start
+bin/solr create_core -c taack
+bin/solr config -c taack -p 8983 -action set-user-property -property update.autoCreateFields -value false
+----
+
+WARNING: 在生产服务器上，端口 `8983` 不应从外部访问。
+
+==== 复制solr 配置目录中的文件 `mapping-ISOLatin1Accent.txt`
+
+该文件 `mapping-ISOLatin1Accent.txt` 位于以下 `intranet` 文件夹中：
+
+[bash]
+----
+cp intranet/server/taack/taack_core_config/conf/mapping-ISOLatin1Accent.txt solr-9.1.0/server/solr/taack/conf/mapping-ISOLatin1Accent.txt
+----
+
+其余配置应在运行时进行。只有这个文件是强制性的。
+
+== 将对象添加到 solr 索引
+
+=== 给域类添加索引
+
+在 `intranet` 项目中, 查看 https://github.com/Taack/intranet/blob/main/app/crew/grails-app/services/crew/CrewSearchService.groovy[`CrewSearchService.groovy`]
+
+[,groovy]
+----
+@PostConstruct
+private void init() {
+    taackSearchService.registerSolrSpecifier(
+        this,
+        new SolrSpecifier(User,
+            CrewController.&showUserFromSearch as MethodClosure,    <1>
+            this.&labeling as MethodClosure, { User u ->            <2>
+        u ?= new User()
+        indexField "User Name (without Accents)",
+            SolrFieldType.TXT_NO_ACCENT, u.username_
+        indexField SolrFieldType.TXT_GENERAL, u.username_
+        indexField SolrFieldType.TXT_NO_ACCENT, u.firstName_
+        indexField SolrFieldType.TXT_NO_ACCENT, u.lastName_
+        indexField SolrFieldType.POINT_STRING, "mainSubsidiary", true, u.subsidiary?.toString()
+        indexField SolrFieldType.POINT_STRING, "businessUnit", true, u.businessUnit?.toString()
+        indexField SolrFieldType.DATE, 0.5f, true,  <3>
+            u.dateCreated_
+        indexField SolrFieldType.POINT_STRING,      <3>
+            "userCreated",  // Faceting String
+            0.5f,           // Boost factor
+            true, u.userCreated?.username
+    }))
+}
+----
+<1> 请参阅 <<_how_to_display_the_object>>
+<1> 请参阅 <<_labeling_the_object_found>>
+<3> `true` 表示启用分面
+
+您可以选择不同的方式处理文本：
+
+* `POINT_STRING` 索引时不会修改字符串
+* `TXT_NO_ACCENT` 将删除重音符号
+* ...
+
+您可以对同一字段进行多次索引。
+
+=== 标记发现的物体
+
+[,groovy]
+----
+String labeling(Long id) {
+    def u = User.read(id)
+    "User: ${u.firstName} ${u.lastName} ($id)"
+}
+----
+
+=== 显示选定的对象
+
+这里 `CrewController.&showUserFromSearch` 用于点击找到的对象时：
+
+[,groovy]
+----
+def showUserFromSearch(User u) {
+    taackUiService.show(new UiBlockSpecifier().ui {
+        show u.username, crewUiService.buildUserShow(u), BlockSpec.Width.MAX
+    }, buildMenu())
+}
+----
+
+=== 添加搜索栏
+
+[,groovy]
+----
+private UiMenuSpecifier buildMenu(String q = null) {
+    new UiMenuSpecifier().ui {
+        menu CrewController.&index as MC
+        menu CrewController.&listRoles as MC
+        menu CrewController.&hierarchy as MC
+        menuIcon ActionIcon.CONFIG_USER, this.&editUser as MC
+        menuIcon ActionIcon.EXPORT_CSV, this.&downloadBinPdf as MC
+        menuIcon ActionIcon.EXPORT_PDF, this.&downloadBinPdf2 as MC
+        menuSearch this.&search as MethodClosure, q     <1>
+        menuOptions(SupportedLanguage.fromContext())
+    }
+}
+----
+<1> 添加 `menuSearch` 条目
+
+=== 搜索操作
+
+[,groovy]
+----
+def search(String q) {
+    taackUiService.show(crewSearchService.buildSearchBlock(q), buildMenu(q))
+}
+----
+
+[,groovy]
+----
+UiBlockSpecifier buildSearchBlock(String q) {
+    taackSearchService.search(q, CrewController.&search as MethodClosure, User) <1>
+}
+----
+<1> 最后一个参数是我们希望在这个搜索块中定位的类的列表
+
+我们可以在一个页面中放置多个搜索块。

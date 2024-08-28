@@ -1,0 +1,240 @@
+= Taack JDBC Driver
+:doctype: book
+:taack-category: 0|more/JDBC
+:toc:
+:toc-title: 目录
+:source-highlighter: rouge
+:icons: font
+
+== 它是什么？
+
+JDBC 代表 *Java 数据库连接*。它是一个古老、重要且使用广泛的 Java 组件。它简化了不同程序之间的数据查询和编辑。
+
+我们当前的 JDBC 实现仅允许从 Intranet 查询数据。
+
+通过这种方式更新数据是一个复杂的问题。我们必须处理用户权限和数据验证，这些不是在数据库级别描述的，而是直接在内部网的代码中描述的。我们需要采用一些新方法来避免重复代码。
+
+這正在进行中。
+
+.执行查询时没有错误时的序列图
+[plantuml,format="svg",opts="online"]
+----
+@startuml
+group Querying Object using TQL
+        You -> Program : Type the Query
+        activate Program
+        Program -> Driver : Transmit the Query
+        Driver -> Intranet : Transmit the Query
+        Intranet -> Intranet : Validate TQL Grammar
+        Intranet -> Intranet : Validate Tables and fields
+        Intranet -> Intranet : Translate TQL to HQL
+        Intranet -> Intranet : Translate HQL to SQL
+        note right
+            **SQL** is the Database
+            Native Language
+        end note
+        Intranet -> Database : transmit the SQL
+        activate Database #000055
+        Database -> Intranet : retreive Results
+        deactivate Database
+        Intranet -> Intranet : Pack Results
+        Intranet -> Driver : Transmit the Pack
+        Driver -> Driver : Unpack
+        Driver -> Program : Transmit Results
+        Program -> You : Show Results
+        deactivate Program
+        You -> Program : You scroll on \nthe results
+        note right
+            **Program** will request for
+            more data if needed,
+            using an **offset**
+        end note
+end
+
+box "Your Computer" #LightBlue
+    participant Program
+    participant Driver
+end box
+box "The Intranet Server" #Yellow
+    participant Intranet
+    participant Database
+end box
+
+@enduml
+----
+
+== 在哪里使用该驱动程序查询数据？
+
+到目前为止，只有 *3个软件程序* 使用该驱动程序进行过测试:
+|===
+|Program            |自动完成 ?|查询 ? |更新 ? | 插入 ?
+
+|LibreOffice 7.3    |仅限表格列表|是        |否         | 否
+|dBeaver            |是            |是        |还没有    | 还没有
+|Intellij           |是            |是        |还没有    | 还没有
+|===
+
+#Introspection# *自动完成* 功能可帮助您编写查询。在输入查询时，程序将告知您可用的表和字段。
+
+分析数据有两种工作模式：
+
+* 在支持 *Introspection* 的软件中编写并测试查询;
+* 然后，可以：
+** 使用在 *LibreOffice* 中直接输入的查询
+** 或者使用 *CSV 提取* 并将其放入任何软件中（包括 *Office*）
+
+WARNING: 我稍后会制作有关如何使用这些程序设置驱动程序的视频。
+
+== TQL 查询
+
+我们与常规 JDBC 驱动程序的主要区别在于查询语言。
+
+我们开发了 *TQL* (Taack 查询语言)，其优点如下：
+
+* 安全，我们会在将查询发送到真实数据库之前检查输入的内容
+* 简单的语法：
+** 不需要 joins
+** 引用字段访问 (参见 <<easy-syntax>> 点(2))
+* 与数据库无关
+
+=== 基本查询的结构
+
+[source,sql]
+[[easy-syntax]]
+.TQL 基本示例
+----
+select                              <1>
+    l.client.firstName,             <2>
+    l.rep.username                  <2>
+from Lead l                         <3>
+where l.dateCreated > '2022-01-01'  <4>
+----
+<1> #Select 子句#，允许选择 *columns*;
+<2> #引用字段#，如果列本身是一个对象，则可以递归访问对象字段。这里 rep 是一个 `User` 包含其自身字段的对象(如 `username`);
+<3> #From 子句#, 允许选择 *表格*, 允许选择表格，这里我们使用 _别名_ `l`
+<4> #Where 子句# 允许过滤数据。
+
+=== 使用公式的基本查询
+
+可以在选择子句中添加算术公式。
+
+[source,sql]
+[[basic-query-with-formulas]]
+.带公式的 TQL 基本示例
+----
+select
+    ll.lead.name,
+    ll.qty * ll.salePrice as totalWoTaxes   <1>
+from LeadLine ll
+where ll.qty * ll.salePrice > 100           <2>
+----
+<1> #Select 子句#, 支持 `column alias` 和算术运算
+<2> #Where 子句# 也支持算术
+
+WARNING: 列别名必须以小写字母开头，并且只能是 ASCII7 字符集的一部分。
+
+.带公式的基本样本结果
+|===
+|lead.name |totalWoTaxes
+
+|Balisage pylône SFR site 240087 (Hivory)
+|250.00000000
+
+|Balisage pylône SFR site 240087 (Hivory)
+|340.00000000
+
+|Balisage pylône SFR site 240087 (Hivory)
+|3410.00000000
+
+|EL BJORN low intensity IR AWL system
+|2700.00000000
+|===
+
+=== 分组查询
+
+分组子句增加了聚合数据的功能。
+<<basic-query-with-formulas>> 没有每条报价一行。
+可以使用分组来获取每条报价一行，如以下示例所示：
+
+[source,sql]
+.带有分组和公式的 TQL 示例
+----
+select
+    ll.lead.rep.mainSubsidiary as salesmanSubsidiary,   <1>
+    count(ll.id),                                       <2>
+    sum(ll.qty * ll.salePrice)                          <2>
+from LeadLine ll
+group by ll.lead.rep.mainSubsidiary                     <1>
+----
+<1> 标准字段，必须在 #Group by 子句#;
+<2> 您可以使用 #count# 或者 #sum# 聚合函数。
+
+WARNING: 聚合列不支持列别名
+
+|===
+|salesmanSubsidiary|count(ll.id)    |sum(ll.qty * ll.salePrice)
+
+|CITEL_2CP         |118605|212619001943.17760000
+|CITEL_GMBH        |37336 |261342488.98760000
+|CITEL_INC         |25172 |319681146.49190000
+|CITEL_INDIA       |24868 |1122541659.94000000
+|CITEL_OOO         |10382 |3990221200.80740000
+|CITEL_SH          |269   |552810.59000000
+|OBSTA             |46151 |2762758463.12580000
+|===
+
+=== 查询内连接
+
+有时一列指向多行。
+
+这叫做 *多对多*。我们不能直接使用引用字段， 你必须使用所谓的 *joins* ...（听起来很 70 年代，但我不是）
+
+在下一个示例中，*Items* 包含许多 *Values*, 并且 *Values* 可以由多个 *Item* 使用。如果我们想在同一个表中列出项目和值，我们需要两组数据之间的某种交叉积。
+
+WARNING: 两个集合的叉积的基数是 #M x N#, 您必须使用 *Where 子句* 来减少结果的数量。
+
+[source,sql]
+.TQL 简单连接示例
+----
+select
+    i.name,
+    i.ref,
+    v.valueString,
+    v.associatedProperty.valueKind as kind,
+    v.associatedProperty.kindOfCharacteristic as typeOfChar,
+    v.associatedProperty.nameAlias as nameAlias
+from Item i, Value v                                    <1>
+where v in elements(i.values) and i.range.name = 'DVM'  <2>
+
+----
+<1> 我们独立列出 2 个表格
+<2> 我们 *必须* 用表达式来限制结果的数量 `v in elements(i.values)`
+
+.结果
+|====
+| name | ref | valueString | kind | typeOfChar | nameAlias
+
+| DVM-230-16A | 3589015 | NULL | dico | BULLET_POINTS | bulletPoints
+| DVM-230-16A | 3589015 | IP20 | string | MECA | NULL
+| DVM-230-16A | 3589015 | -40/+85°C | string | MECA | NULL
+| DVM-230-16A | 3589015 | NULL | dico | NULL | description
+| DVM-230-16A | 3589015 | NULL | dico | NULL | subFamily
+| DVM-230-16A | 3589015 | NULL | dico | MECA | NULL
+| DVM-230-16A | 3589015 | NULL | dico | NORMES | NULL
+| DVM-230-16A | 3589015 | voir schéma | dico | MECA | NULL
+| DVM-230-16A | 3589015 | NULL | dico | MECA | NULL
+| DVM-230-16A | 3589015 | NULL | dico | MECA | NULL
+| DVM-230-16A | 3589015 | NULL | dico | MECA | NULL
+| DVM-230-16A | 3589015 | 16 A | string | ELEC | NULL
+| DVM-230-16A | 3589015 | NULL | dico | ELEC | NULL
+| DVM-230-16A | 3589015 | 0.0305 kg | string | MECA | NULL
+| DVM-230-16A | 3589015 | NULL | dico | NULL | family
+| DVM-230-16A | 3589015 | 230 V monophasé | dico | ELEC | NULL
+| DVM-230-16A | 3589015 | PTFE | string | MECA | NULL
+| DVM-230-16A | 3589015 | NULL | bool | NULL | NULL
+|====
+
+== 当前驱动程序的限制
+
+* 您将无法 *遵从* 语言字段。 (`v.valueMap['fr']` 会失败, 还有 `v.valueMap`).
+* 我们仅支持内连接，不支持外连接。我们当前的连接实现速度很慢，我们可以改进，但它更复杂。
