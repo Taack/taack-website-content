@@ -1,4 +1,4 @@
-= Solr Search
+= Solr 搜索
 :doctype: book
 :taack-category: 10|more/Search
 :source-highlighter: rouge

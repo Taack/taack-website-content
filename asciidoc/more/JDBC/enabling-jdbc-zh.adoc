@@ -1,4 +1,4 @@
-= Enabling JDBC
+= 启用 JDBC
 :doctype: book
 :taack-category: 1|more/JDBC
 :toc:
