@@ -8,7 +8,7 @@
 
 使用link:http://docs.groovy-lang.org/docs/latest/html/documentation/core-domain-specific-languages.html[*Groovy DSL*] (Domain-Specific Languages / 领域特定语言) 以使得内联网系统更具表现力。
 
-**DSLs**属于静态类型，因此大多数错误都可以在开发过程中被检测到，同时IDE也将更轻松地自动完成代码。
+**DSL**属于静态类型，因此大多数错误都可以在开发阶段被检测到，同时IDE也将更轻松地自动完成代码。
 
 Taack框架还可以通过避免**GSP**和常见操作 (筛选、保存、显示详情) 来达成简化代码的目的。
 
@@ -34,9 +34,9 @@ Taack框架并非纯AJAX。相反，它可以说是一个老派框架，即由�
 
 == 更多的框架特点
 
-* 应用程序模块化
+* 子应用模块化
 ** 开发人员只需关注各自的模块即可
-* 除HTML渲染外，还支持**PDF**、**CSV**或**Mails**
+* 除HTML渲染外，还支持**PDF**、**CSV**或**邮件**
 * 静态类型
 * 支持Intellij IDE
 * DSL渲染大多数时候都是**单次执行**的
