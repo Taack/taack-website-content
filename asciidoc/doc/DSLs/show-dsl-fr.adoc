@@ -34,7 +34,7 @@ image::screenshot-dsl-show.webp[]
 == Hiérarchie des symboles DSL
 
 [graphviz,format="svg",align=center]
-.Hiérarchie des symboles diagramme pour le menu DSL
+.Hiérarchie des symboles diagramme pour le show DSL
 ----
 digraph mygraph {
 node [shape=box];
