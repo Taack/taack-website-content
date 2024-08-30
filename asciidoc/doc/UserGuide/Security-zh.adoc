@@ -1,0 +1,38 @@
+= 安全验证
+:taack-category: 11|doc/UserGuide
+:toc:
+:source-highlighter: rouge
+:icons: font
+
+== Spring安全验证
+
+**Taack-ui**框架会检查每个Action上的 `@Secured` 注解与当前用户的权限来决定是否显示菜单条目、访问链接、操作按钮等等。
+
+== 更精准的安全验证方式
+
+自建一个集中地用于更复杂的权限判定，以决定是否允许访问Action。
+
+.代码管理Action访问权限
+[source,groovy]
+----
+SpringSecurityService springSecurityService
+
+private securityClosure(Long id, Map p) {   <1>
+    if (!id && !p) return true
+    if (!id) return true
+    canEdit(User.read(id))
+}
+
+@PostConstruct
+void init() {
+    TaackUiEnablerService.securityClosure(
+            this.&securityClosure,          <2>
+            CrewController.&editUser as MC, <3>
+            CrewController.&saveUser as MC)
+}
+
+----
+
+<1> 参数为用户 `id` 与Action参数
+<2> 注册一个 `access constraints`
+<3> 该 `access contraints` 相关的Actions

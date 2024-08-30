@@ -1,4 +1,4 @@
-= 用户
+= Crew
 :doctype: book
 :taack-category: 1|App
 :toc:
@@ -8,8 +8,8 @@
 
 管理系统中的用户：
 
-* 点击 `plus` 按钮以添加用户
-* 点击 #Roles#, 然后在 `plus` 表中的按钮处添加角色。
+* 点击 `plus` 按钮添加新用户
+* 点击 #Roles#，然后点击表中的 `plus` 按钮添加新角色
 
 == 角色
 
