@@ -284,7 +284,7 @@ rowAction
 
 它将在表格的单元格中创建一个__小型__图标，点击后会打开弹窗，其内显示该book的详细信息。
 
-请注意这里我们让 `ActionIcon` 被一个 `ActionIconStyleModifier` 乘算，使得图标的尺寸被改变。
+请注意这里我们让 `ActionIcon` 被一个 `IconStyle` 乘算，使得图标的尺寸被改变。
 
 == 删除一个数据对象
 

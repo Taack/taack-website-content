@@ -73,7 +73,7 @@ Seuls *3 logiciels* ont été testés avec ce pilote jusqu'à présent :
 |Intellij |Oui |Oui |Pas encore | Pas encore
 |===
 
-#Introspection# vous aide lors de l'écriture de requêtes avec la *complétion automatique*. Lors de la saisie de la requête, le Programmeme vous indiquera les tables et champs disponibles.
+#Introspection# vous aide lors de l'écriture de requêtes avec la *complétion automatique*. Lors de la saisie de la requête, le programme vous indiquera les tables et champs disponibles.
 
 Il existe 2 modèles de travail pour analyser les données :
 
@@ -108,7 +108,7 @@ where l.dateCreated > '2022-01-01' <4>
 ----
 <1> #Clause Select#, permettant de sélectionner des *colonnes* ;
 <2> #Champs déférés#, si la colonne est elle-même un objet, vous pouvez accéder de manière récursive aux champs de l'objet. Ici rep est un objet `User` qui contient des champs en lui-même (comme `username`);
-<3> #Clause From#, permettant de choisir des *tables*, ici on utilise un _alias_ `l`
+<3> #Clause From#, permettant de choisir des *tables*, ici, on utilise un _alias_ `l`
 <4> #Clause Where# permettant de filtrer les données.
 
 === Requêtes de base avec des formules
@@ -167,7 +167,7 @@ group by ll.lead.rep.mainSubsidiary <1>
 <1> Champ standard, il doit être répertorié dans la clause #Group by# ;
 <2> Vous pouvez utiliser les fonctions d'agrégation #count# ou #sum#.
 
-WARNING: les alias de colonne ne sont pas pris en charge sur les colonnes agrégées
+WARNING: Les alias de colonne ne sont pas pris en charge sur les colonnes agrégées
 
 |===
 |salesmanSubsidiary|count(ll.id) |sum(ll.qty * ll.salePrice)

@@ -22,7 +22,7 @@ java -fullversion
 openjdk full version "17.0.5+1"
 ----
 
-Sur Mac, on peut utiliser brew pour l'installation du Jdk:
+Sur Mac, on peut utiliser brew pour l'installation du Jdk :
 
 [sh]
 ----
@@ -62,7 +62,9 @@ Après un certain temps, vous devriez voir dans la console le message suivant :
 Grails application running at http://localhost:9442...
 ----
 
-Vous pouvez maintenant accéder à l'Intranet en allant à cette adresse depuis votre navigateur. Vous pouvez aussi vous identifier avec les identifiants par défaut (identifiant : *admin*, mot de passe : *ChangeIt*). Le mot de passe peut être remplacé dans le fichier server/grails-app/conf/application.yml.
+Vous pouvez maintenant accéder à l'Intranet en allant à cette adresse depuis votre navigateur.
+Vous pouvez aussi vous identifier avec les identifiants par défaut (identifiant : *admin*, mot de passe : *ChangeIt*).
+Le mot de passe peut être remplacé dans le fichier `server/grails-app/conf/application.yml`.
 
 === Base de données persistante
 
@@ -99,7 +101,7 @@ cd server/build/libs
 java -jar server-[version].jar
 ----
 
-L'éxecution sera plus rapide, les fichiers statiques seront compressés et concaténés.
+L'exécution sera plus rapide, les fichiers statiques seront compressés et concaténés.
 
 TIP: Soyez sûr de ne pas avoir une instance déjà en train de fonctionner
 
@@ -110,7 +112,7 @@ Nous recommandons fortement d'utiliser la dernière version d'*IntelliJ Ultimate
 
 === IntelliJ Ultimate Edition
 
-Nous vous recommendons d'installer les plugins Taack pour IntelliJ que vous pouvez trouver dans le store Intellij https://plugins.jetbrains.com/plugin/20792-taackuiastautocomplete[TaackUiASTAutocomplete] ou en compilant les sources https://github.com/Taack/infra/releases/tag/v0.1[ici].
+Nous vous recommandons d'installer les plugins Taack pour IntelliJ que vous pouvez trouver dans le store Intellij https://plugins.jetbrains.com/plugin/20792-taackuiastautocomplete[TaackUiASTAutocomplete] ou en compilant les sources https://github.com/Taack/infra/releases/tag/v0.1[ici].
 
 Pour ouvrir le projet, sélectionnez "Open projet" et sélectionnez `intranet/settings.gradle`.
 

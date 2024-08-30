@@ -7,7 +7,7 @@
 
 == Enregistrer une application
 
-Une application enregistre uniquement ses *points d'entrée* (c'est-à-dire les #actions# exécutées lors de l'accès à l'application) et les *icônes svg* correspondantes. Les noms des points d'entrée du contrôleur sont utilisés dans l'étiquetage et la description localisés dans les fichiers de propriétés `i18n`.
+Une application enregistre uniquement ses *points d'entrée,* (c'est-à-dire les #actions# exécutées lors de l'accès à l'application) et les *icônes svg* correspondantes. Les noms des points d'entrée du contrôleur sont utilisés dans l'étiquetage et la description localisés dans les fichiers de propriétés `i18n`.
 
 .Crew app registration
 [source,groovy]

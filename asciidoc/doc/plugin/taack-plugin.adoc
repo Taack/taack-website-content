@@ -7,7 +7,7 @@
 
 == Register an app
 
-An app registers only its *entry points* (i.e. #actions# executed when accessing app) and corresponding *svg icons*. Controller entry point names are used in localized labeling and description in `i18n` property files.
+An app registers only its *entry points* (i.e., #actions# executed when accessing app) and corresponding *svg icons*. Controller entry point names are used in localized labeling and description in `i18n` property files.
 
 .Crew app registration
 [source,groovy]

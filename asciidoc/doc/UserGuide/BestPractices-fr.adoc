@@ -41,12 +41,12 @@ String title
 - class name localisation "book.label = Libro"
 - class field name localisation "book.title.label = Título del libro"
 - Pour être efficace
-** ne traduisez pas trop tôt
-** lorsque vous avez une vue d'ensemble globale, commencez à traduire
-** gardez l'étiquette la plus importante courte, utilisez l'espace de noms `default` pour eux, l'étiquette spécialisée peut être longue
+** Ne localisez pas trop tôt
+** Lorsque vous avez une vue d'ensemble globale, commencez la traduction
+** Utilisez pour les labels les plus globaux des clés courtes, utilisez l'espace de noms `default` pour eux, l'étiquette spécialisée peut être longue
 - Utilisez la convention pour votre i18n :
-** préfixez avec "default". tout ce qui pourrait être réutilisé
-** ne pas préfixer le nom de classe traduit
+** Préfixez avec "default" ce qui pourrait être réutilisé
+** Ne pas préfixer le nom de classe traduit
 ** Dans l'application Crew, nous utilisons des fichiers de propriétés spécifiques aux actions et aux domaines (voir https://github.com/Taack/intranet/tree/main/app/crew/grails-app/i18n[dossier Crew i18n])
 
 L'i18n commun doit être localisé dans le module d'application `Crew` ou `Server`, les propriétés ne sont pas privées pour un module d'application.
@@ -54,8 +54,8 @@ L'i18n commun doit être localisé dans le module d'application `Crew` ou `Serve
 == Configuration
 
 - Utilisez l'énumération, dans le code, pour la configuration
-** Le statique est roi
-** Les énumérations Groovy sont lisibles (plus que XML, Json, Yaml... peu importe)
+** La vérification statique est facilitée ;
+** Les énumérations Groovy sont plus lisibles que XML, Json, Yaml...
 
 == Sécurité
 
@@ -69,6 +69,5 @@ L'i18n commun doit être localisé dans le module d'application `Crew` ou `Serve
 == Nous pouvons dire que nous sommes efficaces si :
 
 - Les petites évolutions ne déclenchent pas une réécriture complète du code
-- L'intégration de nouvelles fonctionnalités est simple
-- Les différentes préoccupations restent isolées, minimisant l'influence mutuelle
-- Les choses semblent simples
+- L'intégration de nouvelles fonctionnalités doit être simple
+- Les différentes préoccupations doivent rester isolées, minimisant l'influence mutuelle

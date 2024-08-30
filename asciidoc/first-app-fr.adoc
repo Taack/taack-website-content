@@ -4,8 +4,9 @@
 
 Votre projet Intranet possède deux parties :
 
-* Les plugins d'applications, qui sont regroupés dans le répertoire `app` : ce sont des micro-projets qui contiennent chacun leurs propres dépendances, dossier build, etc. Par exemple, `Crew` est plugin d'application.
-link:doc/plugin-fr.adoc#_informations_avancées_sur_les_plugins[Cliquez ici] pour en savoir plus sur la façon dont les plugins d'application sont implémentés sur le serveur.
+* Les plugins d'applications, qui sont regroupés dans le répertoire `app` : ce sont des micro-projets Gradle qui contiennent chacun leurs propres dépendances, dossier build, etc. Par exemple, `Crew` est plugin d'application.
+
+link:doc/plugin/taack-plugin-fr.adoc[Enregistrer une application] pour en savoir plus sur la façon dont les plugins d'application sont implémentés sur le serveur.
 * Le serveur principal, qui va gérer tous les plugins d'applications définis dans `build.gradle` et les ajouter sur la page principale de l'Intranet.
 
 == Créer une nouvelle application
@@ -21,7 +22,7 @@ Ceci fait, exécuter la commande suivante :
 
 Une nouvelle appliquette apparaîtra dans le répertoire `app`. Pensez à recharger Gradle pour détecter sa présence dans Intellij.
 
-.Rechargter Gradle
+.Recharger Gradle
 image::screenshot-new-app-gradle-reload.webp[Reload,width=520,align="left"]
 
 == Mot sur la maintenance
@@ -54,7 +55,7 @@ menu TurboController.&action as MC
 
 Ici, `menu` crée un simple lien dans notre bar de navigation. `'Action'` est le nom du lien affiché et `TurboController.&action as MethodClosure` définie l'action vers laquelle le lien va rediriger.
 
-Vous pouvez consulter la liste complète des éléments que vous pouvez ajouter dans votre menu ici : link:TODO[Documentation].
+Vous pouvez consulter la liste complète des éléments que vous pouvez ajouter dans votre menu ici : link:doc/DSLs/menu-dsl-fr.adoc[Menu DSL].
 
 == Créer un tableau
 
@@ -188,7 +189,7 @@ Maintenant un admin pourra voir un bouton "Créer" en haut à droite du tableau.
 
 La méthode `action` est composée des paramètres suivants :
 
-. L'icône du bouton (doit être une valeur de l'enum xref:doc/Concepts/docref.adoc#_actionicon[ActionIcon]) ;
+. L'icône du bouton ;
 . L'action vers laquelle le bouton va rediriger ;
 . Le libellé sera composé et traduit en utilisant le nom de l'action.
 
@@ -280,7 +281,7 @@ rowAction
 
 <1> Cela créera un _petit_ bouton dans la cellule du tableau qui ouvrira un modal avec les détails du livre correspondant.
 
-Notez qu'ici, `ActionIcon` a été multiplié avec un `ActionIconStyleModifier` pour modifier la taille de l'icône. Pour plus de détails, consultez le chapitre détaillé : xref:doc/Concepts/docref.adoc#_actionicon[ActionIcon].
+Notez qu'ici, `ActionIcon` a été multiplié avec un `IconStyle` pour modifier la taille de l'icône.
 
 == Supprimer un objet
 

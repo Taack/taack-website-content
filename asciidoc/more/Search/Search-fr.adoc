@@ -64,13 +64,13 @@ private void init() {
     }))
 }
 ----
-<1> Voir <<_comment_afficher_l'objet>>
-<1> Voir <<_étiqueter_l'objet_trouvé>>
-<3> `true` active le facettage
+<1> Voir <<_ajout_dobjets_à_lindex_solr>>
+<2> Voir <<_affichage_de_lobjet_sélectionné>>
+<3> `true` Active les facettes
 
 Vous avez différents choix pour traiter le texte :
 
-* `POINT_STRING` ne modifiera pas la chaîne lors de l'indexation
+* `POINT_STRING` Ne modifie pas la chaîne lors de l'indexation
 * `TXT_NO_ACCENT` supprimera les accents
 * ...
 
