@@ -20,7 +20,7 @@ C'est en cours.
 ----
 @startuml
 group Querying Object using TQL
-        Vous -> Programme : Type the Query
+        Vous -> Programme : Tapper la requête
         activate Programme
         Programme -> Pilote : Transmission de la requête
         Pilote -> Intranet : Transmission de la requête
@@ -130,7 +130,7 @@ where ll.qty * ll.salePrice > 100 <2>
 <1> #Clause Select#, prend en charge à la fois les `alias de colonne` et les opérations arithmétiques
 <2> #Clause Where# prend également en charge l'arithmétique
 
-AVERTISSEMENT : le nom d'alias de colonne doit commencer par une lettre minuscule et faire uniquement partie du jeu de caractères ASCII7.
+WARNING: Le nom d'alias de colonne doit commencer par une lettre minuscule et faire uniquement partie du jeu de caractères ASCII7.
 
 .Résultats Exemple de base avec formules
 |===

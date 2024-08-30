@@ -19,7 +19,7 @@ bin/solr create_core -c taack
 bin/solr config -c taack -p 8983 -action set-user-property -property update.autoCreateFields -value false
 ----
 
-AVERTISSEMENT : sur un serveur de production, le port `8983` ne doit pas être accessible de l'extérieur.
+WARNING: Sur un serveur de production, le port `8983` ne doit pas être accessible de l'extérieur.
 
 ==== Copiez le fichier `mapping-ISOLatin1Accent.txt` dans le répertoire de configuration de solr
 
