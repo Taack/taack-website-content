@@ -9,11 +9,11 @@
 
 JDBC signifie *Java Database Connectivity*. C'est un composant Java ancien, important et très utilisé. Il simplifie l'interrogation et l'édition des données entre différents programmes.
 
-Notre implémentation JDBC actuelle permet uniquement d'interroger les données depuis l'intranet.
+L'implémentation JDBC actuelle permet uniquement d'interroger les données depuis l'intranet.
 
-La mise à jour des données par ce biais est un sujet complexe. Nous devons gérer les droits des utilisateurs et la validation des données qui ne sont pas décrits au niveau de la base de données, mais directement dans le code de l'intranet. Une nouvelle approche est nécessaire de notre côté pour éviter de dupliquer le code.
-
-C'est en cours.
+La mise à jour des données par ce biais est un sujet complexe.
+Les droits des utilisateurs et la validation des données ne sont pas décrits au niveau de la base de données, mais directement dans le code de l'intranet.
+Une nouvelle approche est nécessaire de notre côté pour éviter de dupliquer le code.
 
 .Diagramme de séquence lors de l'exécution d'une requête sans erreurs
 [plantuml,format="svg",opts="online"]
@@ -81,8 +81,6 @@ Il existe 2 modèles de travail pour analyser les données :
 * Ensuite, soit :
 ** Utiliser la requête saisie directement dans *LibreOffice*
 ** Ou travailler avec une *extraction CSV* et la mettre dans n'importe quel logiciel (y compris *Office*)
-
-WARNING: je ferai des vidéos plus tard sur la façon de configurer le pilote avec ces Programmemes.
 
 == Requêtes TQL
 
