@@ -27,7 +27,7 @@ Le fichier `mapping-ISOLatin1Accent.txt` se trouve dans le dossier `intranet` :
 
 [bash]
 ----
-cp intranet/server/taack/taack_core_config/conf/mapping-ISOLatin1Accent.txt solr-9.1.0/server/solr/taack/conf/mapping-ISOLatin1Accent.txt
+cp intranet/mapping-ISOLatin1Accent.txt solr-9.6.1/server/solr/taack/conf/mapping-ISOLatin1Accent.txt
 ----
 
 Le reste de la configuration doit être effectué au moment de l'exécution. Seul ce fichier est obligatoire.

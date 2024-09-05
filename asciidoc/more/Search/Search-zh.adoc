@@ -28,7 +28,7 @@ WARNING: 在生产服务器上，端口 `8983` 不应从外部访问。
 
 [bash]
 ----
-cp intranet/server/taack/taack_core_config/conf/mapping-ISOLatin1Accent.txt solr-9.1.0/server/solr/taack/conf/mapping-ISOLatin1Accent.txt
+cp intranet/mapping-ISOLatin1Accent.txt solr-9.6.1/server/solr/taack/conf/mapping-ISOLatin1Accent.txt
 ----
 
 其余配置应在运行时进行。只有这个文件是强制性的。
