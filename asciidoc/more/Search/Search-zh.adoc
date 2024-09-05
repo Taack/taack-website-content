@@ -33,6 +33,7 @@ cp intranet/mapping-ISOLatin1Accent.txt solr-9.6.1/server/solr/taack/conf/mappin
 
 其余配置应在运行时进行。只有这个文件是强制性的。
 
+[[add-obsjects-to-solr-index]]
 == 将对象添加到 solr 索引
 
 === 给域类添加索引
@@ -65,8 +66,8 @@ private void init() {
     }))
 }
 ----
-<1> 请参阅 <<_how_to_display_the_object>>
-<1> 请参阅 <<_labeling_the_object_found>>
+<1> 请参阅 <<add-obsjects-to-solr-index>>
+<1> 请参阅 <<display-selected-object>>
 <3> `true` 表示启用分面
 
 您可以选择不同的方式处理文本：
@@ -87,6 +88,7 @@ String labeling(Long id) {
 }
 ----
 
+[[display-selected-object]]
 === 显示选定的对象
 
 这里 `CrewController.&showUserFromSearch` 用于点击找到的对象时：

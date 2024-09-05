@@ -32,6 +32,7 @@ cp intranet/mapping-ISOLatin1Accent.txt solr-9.6.1/server/solr/taack/conf/mappin
 
 Le reste de la configuration doit être effectué au moment de l'exécution. Seul ce fichier est obligatoire.
 
+[[add-obsjects-to-solr-index]]
 == Ajout d'objets à l'index solr
 
 === Indexation d'une classe de domaine
@@ -64,8 +65,8 @@ private void init() {
     }))
 }
 ----
-<1> Voir <<_ajout_dobjets_à_lindex_solr>>
-<2> Voir <<_affichage_de_lobjet_sélectionné>>
+<1> Voir <<add-obsjects-to-solr-index>>
+<2> Voir <<display-selected-object>>
 <3> `true` Active les facettes
 
 Vous avez différents choix pour traiter le texte :
@@ -86,6 +87,7 @@ String labeling(Long id) {
 }
 ----
 
+[[display-selected-object]]
 === Affichage de l'objet sélectionné
 
 Ici, `CrewController.&showUserFromSearch` est utilisé lors d'un clic sur l'objet trouvé :
