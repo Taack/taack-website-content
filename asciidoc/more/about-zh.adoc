@@ -1,0 +1,17 @@
+= 关于
+:doctype: book
+:taack-category: ZZZZZZZ|more
+
+这个应用程序框架减小了后端开发人员和前端开发人员之间的差距。
+
+GSP/JSP 始终适用于复杂的用例。
+
+感谢 Grails 框架开发人员使这成为可能。
+
+
+== 开发者
+
+.项目负责人
+image::ag.webp[width=480]
+
+...

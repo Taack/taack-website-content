@@ -17,7 +17,7 @@ UiShowSpecifier s = new UiShowSpecifier()
 s.ui partner, {
     section "Partner", {
         fieldAction "Test Icon",
-            ActionIcon.SHOW * ActionIconStyleModifier.SCALE_DOWN, <1>
+            ActionIcon.SHOW * IconStyle.SCALE_DOWN, <1>
             this.&showContact as MC, partner.id, false
         field partner.name_, Style.EMPHASIS + Style.BLUE          <2>
         field partner.branding
@@ -34,7 +34,7 @@ image::screenshot-dsl-show.webp[]
 == Hiérarchie des symboles DSL
 
 [graphviz,format="svg",align=center]
-.Hiérarchie des symboles diagramme pour le menu DSL
+.Hiérarchie des symboles diagramme pour le show DSL
 ----
 digraph mygraph {
 node [shape=box];

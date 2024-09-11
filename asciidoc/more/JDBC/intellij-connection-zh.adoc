@@ -1,0 +1,35 @@
+= 连接 Intellij JDBC
+:doctype: book
+:taack-category: 1|more/JDBC
+:source-highlighter: rouge
+:toc:
+:toc-title: 目录
+:icons: font
+
+== 添加驱动程序
+
+在数据库面板中单击 `+`, 然后 `Driver`
+
+image::intellij-jdbc-driver-configuration.webp[]
+
+添加驱动程序类应该设置该 `Class` 字段
+
+== 为此驱动程序添加数据源
+
+在数据库面板中单击 `+`, 然后 `Data Source`, 选择您在上一步中刚刚设置的名称的驱动程序。
+
+image::intellij-jdbc-dataSource-configuration.webp[]
+
+使用您的 Intranet 用户名和密码。
+
+URL 应如下所示：
+
+```
+jdbc:taack:localhost:8080/taack
+```
+
+我们强制非本地主机使用 https 连接。
+
+== 查询
+
+您应该能够浏览域类、提取 CSV 数据或执行 TQL 查询。

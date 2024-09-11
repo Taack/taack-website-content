@@ -9,18 +9,18 @@
 
 JDBC signifie *Java Database Connectivity*. C'est un composant Java ancien, important et très utilisé. Il simplifie l'interrogation et l'édition des données entre différents programmes.
 
-Notre implémentation JDBC actuelle permet uniquement d'interroger les données depuis l'intranet.
+L'implémentation JDBC actuelle permet uniquement d'interroger les données depuis l'intranet.
 
-La mise à jour des données par ce biais est un sujet complexe. Nous devons gérer les droits des utilisateurs et la validation des données qui ne sont pas décrits au niveau de la base de données, mais directement dans le code de l'intranet. Une nouvelle approche est nécessaire de notre côté pour éviter de dupliquer le code.
-
-C'est en cours.
+La mise à jour des données par ce biais est un sujet complexe.
+Les droits des utilisateurs et la validation des données ne sont pas décrits au niveau de la base de données, mais directement dans le code de l'intranet.
+Une nouvelle approche est nécessaire de notre côté pour éviter de dupliquer le code.
 
 .Diagramme de séquence lors de l'exécution d'une requête sans erreurs
 [plantuml,format="svg",opts="online"]
 ----
 @startuml
 group Querying Object using TQL
-        Vous -> Programme : Type the Query
+        Vous -> Programme : Tapper la requête
         activate Programme
         Programme -> Pilote : Transmission de la requête
         Pilote -> Intranet : Transmission de la requête
@@ -73,7 +73,7 @@ Seuls *3 logiciels* ont été testés avec ce pilote jusqu'à présent :
 |Intellij |Oui |Oui |Pas encore | Pas encore
 |===
 
-#Introspection# vous aide lors de l'écriture de requêtes avec la *complétion automatique*. Lors de la saisie de la requête, le Programmeme vous indiquera les tables et champs disponibles.
+#Introspection# vous aide lors de l'écriture de requêtes avec la *complétion automatique*. Lors de la saisie de la requête, le programme vous indiquera les tables et champs disponibles.
 
 Il existe 2 modèles de travail pour analyser les données :
 
@@ -81,8 +81,6 @@ Il existe 2 modèles de travail pour analyser les données :
 * Ensuite, soit :
 ** Utiliser la requête saisie directement dans *LibreOffice*
 ** Ou travailler avec une *extraction CSV* et la mettre dans n'importe quel logiciel (y compris *Office*)
-
-WARNING: je ferai des vidéos plus tard sur la façon de configurer le pilote avec ces Programmemes.
 
 == Requêtes TQL
 
@@ -110,7 +108,7 @@ where l.dateCreated > '2022-01-01' <4>
 ----
 <1> #Clause Select#, permettant de sélectionner des *colonnes* ;
 <2> #Champs déférés#, si la colonne est elle-même un objet, vous pouvez accéder de manière récursive aux champs de l'objet. Ici rep est un objet `User` qui contient des champs en lui-même (comme `username`);
-<3> #Clause From#, permettant de choisir des *tables*, ici on utilise un _alias_ `l`
+<3> #Clause From#, permettant de choisir des *tables*, ici, on utilise un _alias_ `l`
 <4> #Clause Where# permettant de filtrer les données.
 
 === Requêtes de base avec des formules
@@ -130,7 +128,7 @@ where ll.qty * ll.salePrice > 100 <2>
 <1> #Clause Select#, prend en charge à la fois les `alias de colonne` et les opérations arithmétiques
 <2> #Clause Where# prend également en charge l'arithmétique
 
-AVERTISSEMENT : le nom d'alias de colonne doit commencer par une lettre minuscule et faire uniquement partie du jeu de caractères ASCII7.
+WARNING: Le nom d'alias de colonne doit commencer par une lettre minuscule et faire uniquement partie du jeu de caractères ASCII7.
 
 .Résultats Exemple de base avec formules
 |===
@@ -169,7 +167,7 @@ group by ll.lead.rep.mainSubsidiary <1>
 <1> Champ standard, il doit être répertorié dans la clause #Group by# ;
 <2> Vous pouvez utiliser les fonctions d'agrégation #count# ou #sum#.
 
-WARNING: les alias de colonne ne sont pas pris en charge sur les colonnes agrégées
+WARNING: Les alias de colonne ne sont pas pris en charge sur les colonnes agrégées
 
 |===
 |salesmanSubsidiary|count(ll.id) |sum(ll.qty * ll.salePrice)

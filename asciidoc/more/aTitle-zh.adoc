@@ -1,0 +1,3 @@
+= 更多信息
+:doctype: book
+:taack-category: 6|more

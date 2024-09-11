@@ -1,15 +1,16 @@
-= Recherche Solr
+= Solr 搜索
 :doctype: book
 :taack-category: 10|more/Search
 :source-highlighter: rouge
 :toc:
+:toc-title: 目录
 :icons: font
 
-== Installer Solr
+== 安装 Solr
 
-Télécharger et extraire la dernière version binaire (voir https://solr.apache.org/downloads.html[Page de téléchargement Solr])
+下载并解压最新的二进制版本（请参阅 https://solr.apache.org/downloads.html[Solr 下载页面]）
 
-=== Lancer et créer le noyau `taack`
+=== 启动并创建 `taack`
 
 [bash]
 ----
@@ -19,25 +20,25 @@ bin/solr create_core -c taack
 bin/solr config -c taack -p 8983 -action set-user-property -property update.autoCreateFields -value false
 ----
 
-WARNING: Sur un serveur de production, le port `8983` ne doit pas être accessible de l'extérieur.
+WARNING: 在生产服务器上，端口 `8983` 不应从外部访问。
 
-==== Copiez le fichier `mapping-ISOLatin1Accent.txt` dans le répertoire de configuration de solr
+==== 复制solr 配置目录中的文件 `mapping-ISOLatin1Accent.txt`
 
-Le fichier `mapping-ISOLatin1Accent.txt` se trouve dans le dossier `intranet` :
+该文件 `mapping-ISOLatin1Accent.txt` 位于以下 `intranet` 文件夹中：
 
 [bash]
 ----
 cp intranet/mapping-ISOLatin1Accent.txt solr-9.6.1/server/solr/taack/conf/mapping-ISOLatin1Accent.txt
 ----
 
-Le reste de la configuration doit être effectué au moment de l'exécution. Seul ce fichier est obligatoire.
+其余配置应在运行时进行。只有这个文件是强制性的。
 
 [[add-obsjects-to-solr-index]]
-== Ajout d'objets à l'index solr
+== 将对象添加到 solr 索引
 
-=== Indexation d'une classe de domaine
+=== 给域类添加索引
 
-Dans le projet `intranet`, consultez https://github.com/Taack/intranet/blob/main/app/crew/grails-app/services/crew/CrewSearchService.groovy[`CrewSearchService.groovy`]
+在 `intranet` 项目中, 查看 https://github.com/Taack/intranet/blob/main/app/crew/grails-app/services/crew/CrewSearchService.groovy[`CrewSearchService.groovy`]
 
 [,groovy]
 ----
@@ -65,19 +66,19 @@ private void init() {
     }))
 }
 ----
-<1> Voir <<add-obsjects-to-solr-index>>
-<2> Voir <<display-selected-object>>
-<3> `true` Active les facettes
+<1> 请参阅 <<add-obsjects-to-solr-index>>
+<1> 请参阅 <<display-selected-object>>
+<3> `true` 表示启用分面
 
-Vous avez différents choix pour traiter le texte :
+您可以选择不同的方式处理文本：
 
-* `POINT_STRING` Ne modifie pas la chaîne lors de l'indexation
-* `TXT_NO_ACCENT` supprimera les accents
+* `POINT_STRING` 索引时不会修改字符串
+* `TXT_NO_ACCENT` 将删除重音符号
 * ...
 
-Vous pouvez indexer le même champ plusieurs fois.
+您可以对同一字段进行多次索引。
 
-=== Étiquetage des objets trouvés
+=== 标记发现的物体
 
 [,groovy]
 ----
@@ -88,9 +89,9 @@ String labeling(Long id) {
 ----
 
 [[display-selected-object]]
-=== Affichage de l'objet sélectionné
+=== 显示选定的对象
 
-Ici, `CrewController.&showUserFromSearch` est utilisé lors d'un clic sur l'objet trouvé :
+这里 `CrewController.&showUserFromSearch` 用于点击找到的对象时：
 
 [,groovy]
 ----
@@ -101,7 +102,7 @@ def showUserFromSearch(User u) {
 }
 ----
 
-=== Ajout d'une barre de recherche
+=== 添加搜索栏
 
 [,groovy]
 ----
@@ -118,9 +119,9 @@ private UiMenuSpecifier buildMenu(String q = null) {
     }
 }
 ----
-<1> Ajouter une entrée `menuSearch`
+<1> 添加 `menuSearch` 条目
 
-=== Action de recherche
+=== 搜索操作
 
 [,groovy]
 ----
@@ -135,6 +136,6 @@ UiBlockSpecifier buildSearchBlock(String q) {
     taackSearchService.search(q, CrewController.&search as MethodClosure, User) <1>
 }
 ----
-<1> le dernier paramètre est une liste de classes que nous voulons cibler dans ce bloc de recherche
+<1> 最后一个参数是我们希望在这个搜索块中定位的类的列表
 
-Nous pouvons avoir plus d'un bloc de résultats de recherche dans une page.
+我们可以在一个页面中放置多个搜索块。

@@ -27,11 +27,12 @@ The file `mapping-ISOLatin1Accent.txt` is located in the `intranet` folder:
 
 [bash]
 ----
-cp intranet/server/taack/taack_core_config/conf/mapping-ISOLatin1Accent.txt solr-9.1.0/server/solr/taack/conf/mapping-ISOLatin1Accent.txt
+cp intranet/mapping-ISOLatin1Accent.txt solr-9.6.1/server/solr/taack/conf/mapping-ISOLatin1Accent.txt
 ----
 
 The rest of the configuration should be made at runtime. Only this file is mandatory.
 
+[[add-obsjects-to-solr-index]]
 == Adding objects to solr index
 
 === Indexing a domain class
@@ -64,8 +65,8 @@ private void init() {
     }))
 }
 ----
-<1> See <<_how_to_display_the_object>>
-<1> See <<_labeling_the_object_found>>
+<1> See <<add-obsjects-to-solr-index>>
+<1> See <<display-selected-object>>
 <3> `true` enable faceting
 
 You have different choices to process text:
@@ -86,6 +87,7 @@ String labeling(Long id) {
 }
 ----
 
+[[display-selected-object]]
 === Displaying the selected object
 
 Here `CrewController.&showUserFromSearch` is used when clicking on the object found:

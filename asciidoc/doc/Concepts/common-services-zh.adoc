@@ -1,0 +1,21 @@
+= 通用Service
+:doctype: book
+:taack-category: 3|doc/Concepts
+:toc:
+:source-highlighter: rouge
+
+在未来计划中，所有Service将被放置于**Taack UI** Grails插件中，其独立于任何子应用模块。
+
+== Taack-UI模块的各个Service
+
+* `TaackUiService`: 该Service负责呈现各个块，要么使用##ajax##更新页面某一部分，要么呈现一整个新页面。
+
+* `TaackSaveService`: 负责保存数据对象至数据库，保存时会初始化某些字段；也负责向终端用户报告数据对象validation过程中的错误提示。
+
+* `TaackFilterService`: 负责对表格数据进行筛选、分组、排序。
+
+== 额外的Services
+
+* `TaackJdbcService` 负责与外部JDBC客户对接。
+
+* `TaackSearchService` 负责纯文本搜索相关

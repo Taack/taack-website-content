@@ -66,6 +66,13 @@ Common i18n should be localized into `Crew` app module or `Server`, properties a
 - Avoid complex rules that can't be verified statically during compilation
 - Administrative rules must not rely on permission strings, a boolean value in an object is more explicit when testing in code.
 
+== Domain Classes
+
+* Avoid cyclic dependencies in domain (`User` => `Cart` AND `Cart` => `User`) if domain classes belong to different app modules
+* Domain classes should be barely minimal
+* *No helper* with external dependencies in domain
+
+
 == We can tell we are efficient if:
 
 - Small evolutions do not trigger a complete code rewrite

@@ -1,0 +1,43 @@
+= Taack UI DSLs
+:doctype: book
+:taack-category: 2|doc/Concepts
+:toc:
+:source-highlighter: rouge
+:icons: font
+
+== 关于块状DSL的前言
+
+块状DSL可以通过嵌套其他内含图形元素的块来呈现页面内容。块可以通过方法 (Actions) 更新。`AJAX块` 拥有ID，可以依靠ID对其定位。块可以嵌套。
+
+更多信息请查阅link:../DSLs/block-dsl-zh.adoc[块状DSL]。PDF拥有其专属的块，即link:../DSLs/block-printable-dsl.adoc[Printable块]，其内同样可填充表格DSL、数据详情DSL (不久后图表DSL也将适配其中)。
+
+[source,groovy]
+----
+UiBlockSpecifier b = new UiBlockSpecifier() <1>
+b.ui {
+    modal {                                 <2>
+        form f                              <3>
+    }
+}
+----
+
+<1> 创建一个块, 并以ui方法构建其内部
+<2> 该块将包含一个弹窗，弹窗同样是一个块
+<3> 一个表单将被填充进该ajax块中
+
+[[form-html-output]]
+.弹窗中的表单
+image::screenshot-dsl-user-form-800h.webp[]
+
+== 包含图形元素的块状DSL
+
+* link:../DSLs/form-dsl-zh.adoc[*表单DSL*]: 允许在块内定义一个表单
+
+* link:../DSLs/show-dslzh.adoc[*数据详情DSL*]: 允许显示一个数据对象的详细信息，也同样支持编辑该对象的任一字段
+
+* link:../DSLs/filter-table-dsl.adoc[*表格DSL-可自带筛选器*]: 一张表格，可选择是否自带筛选器，但筛选器无法作为独立个体。
+** 表格DSL允许对各列进行分组或排序
+** 内含翻页功能
+** 表格也能以树状结构显示
+* link:../DSLs/diagram-dsl-zh.adoc[*图表DSL*]: 允许在块内绘画图表
+* *自定义DSL*: 允许在块内写入自定义HTML代码

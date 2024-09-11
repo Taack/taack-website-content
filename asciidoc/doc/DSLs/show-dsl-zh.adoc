@@ -1,15 +1,15 @@
-= Show DSL
+= 数据详情DSL
 :doctype: book
 :taack-category: 4|doc/DSLs
 :toc:
 :source-highlighter: rouge
 :icons: font
 
-* [*] Rendered into HTML
-* [*] Rendered into PDF
-* [ ] Rendered into CSV
+* [*] 支持HTML
+* [*] 支持PDF
+* [ ] 支持CSV
 
-This DSL is used to display information with limited edition capabilities. Field can be styled.
+该DSL用于显示数据对象详细信息，兼具编辑功能。每个字段的显示都可设置样式。
 
 [source,groovy]
 ----
@@ -25,16 +25,16 @@ s.ui partner, {
     }
 }
 ----
-<1> Icon has to be scaled down in order to feet near the field labeled "Name"
-<2> We see we can add style to create combinations of style
+<1> 图标必须为缩小版，以此能够排列在“Name”字段旁
+<2> 可设置样式，多种样式可以堆叠
 
-.Coresponding Rendering
+.相应结果
 image::screenshot-dsl-show.webp[]
 
-== DSL Symbols Hierarchy
+== DSL架构
 
 [graphviz,format="svg",align=center]
-.Symbols hierachy diagram for Show DSL
+.DSL架构图
 ----
 digraph mygraph {
   node [shape=box];

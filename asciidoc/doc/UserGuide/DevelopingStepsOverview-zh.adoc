@@ -1,0 +1,171 @@
+= 开发步骤概述
+:taack-category: 1|doc/UserGuide
+:toc:
+:source-highlighter: rouge
+:icons: font
+
+== 启用Taack框架
+
+为了使数据对象能通过表单或表格显示，该数据对象的class类需注解 `@TaackFieldEnum` 。
+
+当一个class类被 `@TaackFieldEnum` 注解后，框架将会为该类生成额外字段用于DSL中，这些字段的表现形式为原字段名后接下划线。
+
+=== 常规Class类示例
+
+.常规Class类代码示例
+[,groovy]
+----
+@GrailsCompileStatic                                    <1>
+@TaackFieldEnum                                         <2>
+final class QueryParameter implements Validateable {    <3>
+    Currency currency = Currency.EUR
+    Short monthStart = 1
+    Short monthStop = 12
+    Set<Subsidiary> subsidiaries
+    String sellerNamePattern
+    String productNameOrCodePattern
+    String customerNameOrCodePattern
+    Value itemValue
+    ItemRange range
+    Integer yearStart
+    Integer yearStop = Calendar.instance.get(Calendar.YEAR)
+
+    static constraints = {                              <4>
+        itemValue nullable: true
+        range nullable: true
+        monthStart min: 1, max: 12
+        monthStop min: 1, max: 12, validator: {         <5>
+            queryParameter, monthStop ->
+            if (monthStop < queryParameter.monthStart)
+                return "monthStop.greater.or.equals.to.monthStart"
+        }
+    }
+}
+
+----
+
+<1> 最好添加 `GrailsCompileStatic` 注解
+<2> 关键注解以启用AST转换
+<3> 声明使用Validateable接口，以实现类约束的使用 (对于Domain Class类来说并非必需)
+<4> 定义该类的约束条件
+<5> 可用闭包来实现数据对象的Validation过程，闭包的返回结果为某个翻译文本的标签
+
+该代码示例展现了一个适用于Taack框架的标准类 (即未定义至Domain目录中) 。
+它无法被保存、读取或列出，因为它并不是一个持久化Domain Class类。
+
+它必须声明使用Grails `Validateable` 接口。
+
+=== Domain Classe类示例
+
+.Domain Class类代码示例
+[,groovy]
+----
+@GrailsCompileStatic
+@TaackFieldEnum
+class CmsPage {                             <1>
+    Subsidiary subsidiary
+    Date dateCreated
+    Date lastUpdated
+
+    User userCreated
+    User userUpdated
+
+    Boolean published = false
+
+    CmsPageLayout pageLayout = CmsPageLayout.NO_SIDE_COLUMN
+    CmsPageType pageType
+
+    String name
+
+    Map<String, String> urlPart
+    Map<String, String> title
+    Map<String, String> hatContent
+    Map<String, String> bodyContent
+
+    CmsImage mainImage
+    CmsVideoFile mainVideo
+
+    Set<CmsImage> bodyImages
+
+    static hasMany = [
+            bodyImages: CmsImage
+    ]
+
+    static mappedBy = [bodyImages: "none"]
+
+    static constraints = {
+        name nullable: true
+        urlPart nullable: true
+        title nullable: true
+        hatContent nullable: true
+        bodyContent nullable: true, widget: 'textarea'
+        mainImage nullable: true
+        mainVideo nullable: true
+        bodyImages nullable: true
+    }
+
+    static mapping = {
+        autoTimestamp true
+    }
+}
+----
+
+<1> 对于Domain Class类来说，无需声明使用Validateable接口。
+
+Domain class类在Taack框架中被视为一等类，它们能够使用 `TaackSaveService` 提供的高级功能。
+
+== Domain Class类的数据对象管理
+
+=== 在表格中列出数据对象
+
+使用表格DSL和 `iterate` 以列出所有数据:
+
+[, groovy]
+----
+TaackFilter tf = taackFilterService.getBuilder(User)        <1>
+        .setSortOrder(TaackFilter.Order.DESC, u.dateCreated_)
+        .setMaxNumberOfLine(20).addFilter(f).build()
+
+iterate(tf) { User ru ->                                    <2>
+    row {                                                   <3>
+    }
+}
+----
+
+<1> 指定筛选条件
+<2> 遍历 `TaackFilter`，其内定义 `row` 闭包
+<3> 填入每行所需内容...
+
+[, groovy]
+----
+def objects = taackSimpleFilterService.list(
+                ObjectClass, numberOfObjectReturned)
+objects.aValue // list of objects queried. Not all objects are returned (see second parameter)
+objects.bValue // total number of objects that can be reached by the query
+----
+
+也可以用 `list` 方法接收筛选器传递的筛选参数并给出数据结果，该方法可以限制查询，更加安全。
+
+=== 通过表单DSL保存数据对象，并能给出报错提示
+
+为了保存一个新建/修改的数据对象 (安全策略之后再作讨论)，只需调用以下方法：
+
+[, groovy]
+----
+taackSaveService.saveThenRedirectOrRenderErrors(User, this.&index)
+----
+
+它将给出3种结果场景：
+
+ * 如果数据对象验证通过并且用户权限达标，浏览器将会导向至提前设定好的页面 (即第二个参数)
+ * 如果数据对象的某一字段验证失败，表单将会高亮显示错误字段 (如下图所示)
+ * 如果用户没有相应权限，将直接报错
+
+`index` 是成功后页面将被导向的目的地，`User` 是想要保存的数据对象的Class类。
+
+[[form-html-errors-output]]
+.如果表单验证失败，将会给予用户反馈，标记出相应错误位置并给出错误提示
+image::screenshot-form-validation.webp[]
+
+
+

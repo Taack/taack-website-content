@@ -294,7 +294,7 @@ rowAction
 
 This will create a _small_ button in the table cell that will open a modal with the corresponding book information.
 
-Note that `ActionIcon` was multiplied with a `ActionIconStyleModifier` to change it's size in this case.
+Note that `ActionIcon` was multiplied with a `IconStyle` to change it's size in this case.
 
 == Deleting an object
 

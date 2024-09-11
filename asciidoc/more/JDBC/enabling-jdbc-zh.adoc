@@ -1,0 +1,44 @@
+= 启用 JDBC
+:doctype: book
+:taack-category: 1|more/JDBC
+:toc:
+:toc-title: 目录
+:source-highlighter: rouge
+:icons: font
+
+== 创建 non-lazy 服务
+
+.为 `User` 类启用 Jdbc
+[,groovy]
+----
+package crew
+
+import grails.compiler.GrailsCompileStatic
+import org.taack.User
+
+import javax.annotation.PostConstruct
+
+import static taack.base.TaackJdbcService.Jdbc
+
+@GrailsCompileStatic
+class CrewJdbcService {
+
+    static lazyInit = false <1>
+
+    @PostConstruct <2>
+    private static void init() {
+        def u = new User()
+        Jdbc.registerClass(User,
+                u.username_, u.mail_,
+                u.subsidiary_, u.firstName_,
+                u.lastName_, u.businessUnit_,
+                u.enabled_) <3>
+    }
+}
+----
+
+<1> 该服务不能被延迟初始化，因为它不需要在某处注入
+<2> 可通过 TQL 获得的方法列出域类的列
+<3> 可以对所有域类重复步骤 3
+
+

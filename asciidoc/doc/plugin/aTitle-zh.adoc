@@ -1,0 +1,3 @@
+= Taack子应用
+:doctype: book
+:taack-category: 100|doc/plugin
