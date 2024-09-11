@@ -136,3 +136,15 @@ video::kdbvjWPI2UQ[youtube, width=640, height=480]
 * Update deps for a model (with Deep option)
 * Delete latest version
 * ...
+
+
+// # [auo@auo-systemproductname FreeCAD]$ yay -S boost cmake coin curl desktop-file-utils eigen gcc-fortran git glew hicolor-icon-theme jsoncpp libspnav med nlohmann-json opencascade pyside6-tools pyside6 python-matplotlib python-netcdf4 python-packaging python-pivy qt6-svg qt6-tools qt6-webengine shared-mime-info shiboken6 swig utf8cpp xerces-c yaml-cpp
+// git submodule update --init
+// ccmake -DFREECAD_QT_VERSION=6 ..
+// cmake .
+// make -j$(nproc --ignore=2)
+
+// sudo useradd plm --create-home
+
+// sudo su - plm
+// sudo usermod -a -G plm auo
