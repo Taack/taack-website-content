@@ -5,7 +5,7 @@
 Votre projet Intranet possède deux parties :
 
 * Les plugins d'applications, qui sont regroupés dans le répertoire `app` : ce sont des micro-projets qui contiennent chacun leurs propres dépendances, dossier build, etc. Par exemple, `Crew` est plugin d'application.
-link:doc/plugin-fr.adoc#_informations_avancées_sur_les_plugins[Cliquez ici] pour en savoir plus sur la façon dont les plugins d'application sont implémentés sur le serveur.
+link:doc/plugin/taack-plugin-fr.adoc#_enregistrer_une_application[Enregistrer une application] pour en savoir plus sur la façon dont les plugins d'application sont implémentés sur le serveur.
 * Le serveur principal, qui va gérer tous les plugins d'applications définis dans `build.gradle` et les ajouter sur la page principale de l'Intranet.
 
 == Créer une nouvelle application
@@ -16,7 +16,7 @@ Ceci fait, exécuter la commande suivante :
 
 [,bash]
 ----
-./gradlew -PmodName=myToto server:generateTaackAppTask
+./gradlew -DmodName=myToto server:generateTaackAppTask
 ----
 
 Une nouvelle appliquette apparaîtra dans le répertoire `app`. Pensez à recharger Gradle pour détecter sa présence dans Intellij.

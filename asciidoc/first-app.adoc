@@ -14,9 +14,12 @@ To create a new app plugin (a Gradle module), be sure to pull the latest version
 
 Once it is done, you can execute the following command from your intranet root folder:
 
+// setting system properties with the -D flag
+// setting project properties with the -P flag
+
 [,bash]
 ----
-./gradlew -PmodName=myToto server:generateTaackAppTask
+./gradlew -DmodName=myToto server:generateTaackAppTask
 ----
 
 The newly created app should appear in the `app` folder.
