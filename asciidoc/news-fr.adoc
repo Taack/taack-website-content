@@ -20,11 +20,11 @@ image::screenshot-news-sorting.webp[width=720,align=center]
 [source,groovy]
 ----
 def showPart(PlmFreeCadPart part, Long partVersion, Boolean isHistory) {<1>
-taackUiService.show(
-plmFreeCadUiService.buildFreeCadPartBlockShow(
-part, partVersion, false, isHistory), <2>
-buildMenu(),
-"isHistory") <3>
+    taackUiService.show(
+            plmFreeCadUiService.buildFreeCadPartBlockShow(
+                    part, partVersion, false, isHistory),               <2>
+            buildMenu(),
+            "isHistory")                                                <3>
 }
 ----
 
