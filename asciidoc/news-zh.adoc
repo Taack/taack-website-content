@@ -6,6 +6,32 @@
 :source-highlighter: rouge
 :icons: font
 
+== 0.5.6 版（修复 0.5.5 版中的错误）
+
+* 显示表格可排序列和排序方向（参见 <<sorting-screenshot>>）
+* 菜单现在像块一样刷新
+* 对于复杂布局，可以轻松重用代码。现在，我们可以保留变量，以便轻松将布局情境化（参见 <<context-keeper>>）
+
+[[sorting-screenshot]]
+.列标题显示排序方向
+image::screenshot-news-sorting.webp[width=720,align=center]
+
+[[context-keeper]]
+.如何在单击表格时保留上下文
+[source,groovy]
+----
+def showPart(PlmFreeCadPart part, Long partVersion, Boolean isHistory) {<1>
+taackUiService.show(
+plmFreeCadUiService.buildFreeCadPartBlockShow(
+part, partVersion, false, isHistory), <2>
+buildMenu(),
+"isHistory") <3>
+}
+----
+
+<1> `isHistory` 是一个动作参数
+<2> `isHistory` 用于绘制块；我们需要重新传输它以绘制完全相同的块布局，通过保留上下文
+<3>`isHistory` 键作为最后一个 `taackUiService.show` 参数传递。您可以输入许多要保留的键。
 
 == 0.5.4 版本
 

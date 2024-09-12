@@ -5,6 +5,33 @@
 :source-highlighter: rouge
 :icons: font
 
+== Version 0.5.6 (correction de bugs de la version 0.5.5)
+
+* Afficher les colonnes triables et le sens du tri (voir <<sorting-screenshot>>)
+* Les menus sont désormais actualisés comme des blocs
+* Pour les mises en page complexe, le code peut être réutilisé plus facilement. Nous pouvons maintenant conserver des variables qui contextualisent facilement la mise en page (voir <<context-keeper>>)
+
+[[sorting-screenshot]]
+.Les en-têtes de colonne indiquent les directions du tri
+image::screenshot-news-sorting.webp[width=720,align=center]
+
+[[context-keeper]]
+.Comment conserver le contexte en cliquant sur un tableau
+[source,groovy]
+----
+def showPart(PlmFreeCadPart part, Long partVersion, Boolean isHistory) {<1>
+taackUiService.show(
+plmFreeCadUiService.buildFreeCadPartBlockShow(
+part, partVersion, false, isHistory), <2>
+buildMenu(),
+"isHistory") <3>
+}
+----
+
+<1> `isHistory` est un paramètre d'action
+<2> `isHistory` est utilisé lors du dessin du bloc ; il faut le retransmettre pour dessiner exactement la même disposition de blocs, en gardant le contexte
+<3> La clé `isHistory` est passée comme dernier argument `taackUiService.show`. Vous pouvez mettre plusieurs clés à conserver.
+
 == Version 0.5.4
 
 * Travail sur les diagram DSL (Voir link:doc/DSLs/diagram-dsl-fr.adoc[])
