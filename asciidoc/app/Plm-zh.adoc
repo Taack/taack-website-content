@@ -17,6 +17,27 @@
 
 == 服务器安装
 
+=== 在新用户中安装所有内容（可选）
+
+最好将 Freecad 隔离在特定用户中，以免覆盖用户的 Freecad 配置。
+
+操作方法：
+
+. 创建新用户：
++
+[source,bash]
+----
+sudo useradd plm --create-home
+----
+. 将当前 `plm` 组添加到当前用户
++
+[source,bash]
+----
+sudo usermod -a -G plm <current user>
+----
+. 最终将 `plm` 的权限更改为允许组 `rxw`
+. 重新启动注销/登录周期或重新启动以将组更改应用于您的用户
+
 === 在服务器上启动 FreeCAD
 
 在 Linux 服务器上，最好从发行版安装以下包：

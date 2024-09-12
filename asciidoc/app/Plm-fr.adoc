@@ -17,6 +17,27 @@ Voir le lien : Crew.adoc#_purpose[configure roles in Crew] pour ajouter le rô
 
 == Installation du serveur
 
+=== Tout installer dans un nouvel utilisateur (facultatif)
+
+Il est préférable d'isoler Freecad dans un utilisateur spécifique, afin de ne pas écraser votre configuration Freecad pour votre utilisateur.
+
+Pour ce faire :
+
+. créez un nouvel utilisateur :
++
+[source,bash]
+----
+sudo useradd plm --create-home
+----
+. Ajoutez le groupe `plm` actuel à l'utilisateur actuel
++
+[source,bash]
+----
+sudo usermod -a -G plm <current user>
+----
+. Modifiez éventuellement le droit de `plm` pour autoriser le groupe `rxw`
+. Relancez le cycle de déconnexion/connexion ou redémarrez pour appliquer le changement de groupe à votre utilisateur
+
 === Lancer FreeCAD sur le serveur
 
 Sur un serveur Linux, il est préférable d'installer le package suivant à partir de votre distribution :
