@@ -2,6 +2,7 @@
 :doctype: book
 :taack-category: 2|App
 :toc:
+:icons: font
 
 == Purpose
 
@@ -117,7 +118,7 @@ The server will be located under `server/build/libs`
 First, install `python-protobuf`. If you use FreeCAD <= 0.21, dependencies are not installed automatically when installing the workbench.
 
 [source,bash]
-.Install Protobuf for FreeCAD < 0.21
+.Install Protobuf for FreeCAD
 ----
 pip install protobuf
 ----

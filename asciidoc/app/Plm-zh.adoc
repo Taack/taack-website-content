@@ -3,6 +3,7 @@
 :taack-category: 2|App
 :toc:
 :toc-title: 目录
+:icons: font
 
 == 目的
 
@@ -115,7 +116,7 @@ git clone git@github.com:Taack/plm.git
 [[python-protobuf-install]]
 == FreeCAD Workbench 的安装
 
-首先，安装 `python-protobuf`。如果您使用 FreeCAD ⇐ 0.21，则工作台时不会自动安装依赖项。
+首先，安装 `python-protobuf`。如果您使用 FreeCAD，则工作台时不会自动安装依赖项。
 
 [source,bash]
 .当 FreeCAD <0.21 安装 Protobuf

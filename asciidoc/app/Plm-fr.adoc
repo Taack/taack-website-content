@@ -2,6 +2,7 @@
 :doctype: book
 :taack-category: 2|App
 :toc:
+:icons: font
 
 == Objectif
 
@@ -115,10 +116,10 @@ Le serveur sera situé sous `server/build/libs`
 [[python-protobuf-install]]
 == Installation de FreeCAD Workbench
 
-Tout d'abord, installez `python-protobuf`. Si vous utilisez FreeCAD <= 0.21, les dépendances ne sont pas installées automatiquement lors de l'installation de l'atelier.
+Tout d'abord, installez `python-protobuf`. Si vous utilisez FreeCAD, les dépendances ne sont pas installées automatiquement lors de l'installation de l'atelier.
 
 [source,bash]
-.Installer Protobuf pour FreeCAD < 0.21
+.Installer Protobuf pour FreeCAD
 ----
 pip install protobuf
 ----
