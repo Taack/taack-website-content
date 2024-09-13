@@ -3,6 +3,7 @@
 :taack-category: 2|App
 :toc:
 :toc-title: 目录
+:icons: font
 
 == 目的
 
@@ -16,6 +17,27 @@
 请参阅 link:Crew.adoc#_purpose[Crew 中的配置角色]，将角色添加到您的 Intranet 中
 
 == 服务器安装
+
+=== 在新用户中安装所有内容（可选）
+
+最好将 Freecad 隔离在特定用户中，以免覆盖用户的 Freecad 配置。
+
+操作方法：
+
+. 创建新用户：
++
+[source,bash]
+----
+sudo useradd plm --create-home
+----
+. 将当前 `plm` 组添加到当前用户
++
+[source,bash]
+----
+sudo usermod -a -G plm <current user>
+----
+. 最终将 `plm` 的权限更改为允许组 `rxw`
+. 重新启动注销/登录周期或重新启动以将组更改应用于您的用户
 
 === 在服务器上启动 FreeCAD
 
@@ -94,7 +116,7 @@ git clone git@github.com:Taack/plm.git
 [[python-protobuf-install]]
 == FreeCAD Workbench 的安装
 
-首先，安装 `python-protobuf`。如果您使用 FreeCAD ⇐ 0.21，则工作台时不会自动安装依赖项。
+首先，安装 `python-protobuf`。如果您使用 FreeCAD，则工作台时不会自动安装依赖项。
 
 [source,bash]
 .当 FreeCAD <0.21 安装 Protobuf

@@ -6,6 +6,34 @@
 :icons: font
 
 
+== Version 0.5.6 (fix bugs from 0.5.5)
+
+* Show table sortable column and sorting direction (see <<sorting-screenshot>>)
+* Block menus are now refreshed like blocks
+* For complexe layout, code can be reused easily. We can now keep variables that contextualize the layout easily (see <<context-keeper>>)
+
+[[sorting-screenshot]]
+.Column headers show sorting directions
+image::screenshot-news-sorting.webp[width=720,align=center]
+
+[[context-keeper]]
+.How to keep the context when clicking on a table
+[source,groovy]
+----
+def showPart(PlmFreeCadPart part, Long partVersion, Boolean isHistory) {<1>
+    taackUiService.show(
+            plmFreeCadUiService.buildFreeCadPartBlockShow(
+                    part, partVersion, false, isHistory),               <2>
+            buildMenu(),
+            "isHistory")                                                <3>
+}
+----
+
+<1> `isHistory` is an action parameter
+<2> `isHistory` is used when drawing the block; we need to retransmit it to draw the exact same block layout, by keeping the context
+<3> `isHistory` key is passed as the last `taackUiService.show` argument. You can put many keys to keep.
+
+
 == Version 0.5.4
 
 * Rework diagram DSL (See link:doc/DSLs/diagram-dsl.adoc[])
@@ -41,7 +69,7 @@ table rawImg as "Pic", username as "Name", manager as "Manager"
 ----
 
 .Results
-image::news-table.webp[width=1024]
+image::news-table.webp[width=720,align=center]
 
 == Version 0.5.1
 
@@ -103,7 +131,7 @@ printableBody {
 
 [[_diagrams_output]]
 .Stacked Bar Diagram
-image:news-diagram.svg[width=480]
+image::news-diagram.svg[width=480,align=center]
 
 == Version 0.5.0
 
@@ -140,7 +168,7 @@ To be released... this version should come with some nice changes (breaking some
 
 [[new_menu_layout]]
 .Updated Menus layout
-image:screenshot-news-menu-0.4.1.webp[]
+image::screenshot-news-menu-0.4.1.webp[width=720,align=center]
 
 [[new_menu_layout_code]]
 .Menus layout code

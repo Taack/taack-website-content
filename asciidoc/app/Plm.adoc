@@ -2,11 +2,11 @@
 :doctype: book
 :taack-category: 2|App
 :toc:
+:icons: font
 
 == Purpose
 
-Manage FreeCAD model sharing and linear versioning. This is a sample app, more to see framework capabilities than to use
-a real PLM.
+Manage FreeCAD model sharing and linear versioning. This is a sample app, more to see framework capabilities than to use as a real PLM (Product Lifecycle Management).
 
 == Roles
 
@@ -17,15 +17,36 @@ See link:Crew.adoc#_purpose[configure roles in Crew] to add the role into your I
 
 == Server Installation
 
+=== Install everything in a new user (optional)
+
+It is better to isolate Freecad in a specific user, in order to not override your Freecad configuration for your user.
+
+To do so:
+
+. create a new user:
++
+[source,bash]
+----
+sudo useradd plm --create-home
+----
+. Add current `plm` group to current user
++
+[source,bash]
+----
+sudo usermod -a -G plm <current user>
+----
+. Eventually change right of `plm` to allow group `rxw`
+. Restart logout / login cycle or restart to apply group change to your user
+
 === Launch FreeCAD on the server
 
 On a Linux server, it is better to install the following package from your distribution:
 
 * #Weston# Wayland server
-* #FreeCAD 0.21.2#
+* #FreeCAD >1.0#
 * #python-protobuf# package (See <<python-protobuf-install>>)
 
-Freecad and Weston allows similar features on Wayland than Xvfb-run under X11.
+Freecad and Weston allow similar features on Wayland than Xvfb-run under X11.
 
 === Install from Server Binaries
 
@@ -56,7 +77,7 @@ java -DOption1=Value1 -DOption2=Value2 ... -jar server-0.3.jar
 * Path the Intranet store its files: `-Dintranet.root=/home/test/someDir`
 * Server port: `-Dserver.port=9444`
 * Database url: `-DdataSource.url='jdbc:h2./prodDb2;LOCK_TIMEOUT=10000;DB_CLOSE_ON_EXIT=FALSE'`
-* Freecad appimage path: `-Dplm.freecadPath=/somePath...`
+* Freecad path: `-Dplm.freecadPath=/somePath...`
 * Dot exe path: `-Dexe.dot.path=/somePath...`
 
 === Install from Source
@@ -97,7 +118,7 @@ The server will be located under `server/build/libs`
 First, install `python-protobuf`. If you use FreeCAD <= 0.21, dependencies are not installed automatically when installing the workbench.
 
 [source,bash]
-.Install Protobuf for FreeCAD < 0.21
+.Install Protobuf for FreeCAD
 ----
 pip install protobuf
 ----
@@ -143,8 +164,3 @@ video::kdbvjWPI2UQ[youtube, width=640, height=480]
 // ccmake -DFREECAD_QT_VERSION=6 ..
 // cmake .
 // make -j$(nproc --ignore=2)
-
-// sudo useradd plm --create-home
-
-// sudo su - plm
-// sudo usermod -a -G plm auo
