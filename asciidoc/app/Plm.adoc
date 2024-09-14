@@ -147,7 +147,7 @@ image::plmweb1-screenshot.webp[]
 
 WARNING: If you have many links, import them from the same computer. From other computers, download the zip file from your intranet.
 
-That's it, I will record some videos demonstrating this app capabilities.
+That's it; I will record some videos demonstrating this app capabilities.
 
 video::rF_cL2C_EAU[youtube, width=640, height=480]
 
