@@ -150,7 +150,7 @@ WARNING: 如果您有多个链接，请从同一台计算机导入它们。 对�
 
 就是这样，我将录制一些视频来演示该应用程序的功能。
 
-video::kdbvjWPI2UQ[youtube, width=640, height=480]
+video::rF_cL2C_EAU[youtube, width=640, height=480]
 
 == 待办事项
 
