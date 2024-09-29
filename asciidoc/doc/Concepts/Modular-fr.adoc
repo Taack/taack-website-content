@@ -79,4 +79,4 @@ Contient les sources du plugin *taack-ui*.
 
 * le dossier _browser_ contient le code qui sera exécuté dans le navigateur
 * _taack-jdbc-common_ classes communes partagées entre _taack-ui_ et _taack-jdbc-client_
-* _taack-jdbc-client_ le pilote JDBC (voir le lien :../../more/JDBC/taack-jdbc-driver.adoc[taack-jdbc-driver])
+* _taack-jdbc-client_ le pilote JDBC (voir le link:../../more/JDBC/taack-jdbc-driver.adoc[taack-jdbc-driver])

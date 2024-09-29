@@ -6,8 +6,13 @@
 :icons: font
 
 
+== Version 0.5.7
+
+* Bug fixes
+
 == Version 0.5.6 (fix bugs from 0.5.5)
 
+* reduce Solr and tika dependency scoping
 * Show table sortable column and sorting direction (see <<sorting-screenshot>>)
 * Block menus are now refreshed like blocks
 * For complexe layout, code can be reused easily. We can now keep variables that contextualize the layout easily (see <<context-keeper>>)

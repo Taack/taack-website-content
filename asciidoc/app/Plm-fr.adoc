@@ -14,7 +14,7 @@ un vrai PLM.
 * `ROLE_ADMIN`
 * `ROLE_PLM_USER`
 
-Voir le lien : Crew.adoc#_purpose[configure roles in Crew] pour ajouter le rôle à votre Intranet
+Voir le link: Crew.adoc#_purpose[configure roles in Crew] pour ajouter le rôle à votre Intranet
 
 == Installation du serveur
 
@@ -91,7 +91,7 @@ Cloner le dépôt #plm# :
 git clone git@github.com:Taack/plm.git
 ----
 
-Copiez ensuite le contenu du dossier `plm` dans votre dossier intranet `app` (voir le lien :../installation.adoc[intranet installation])
+Copiez ensuite le contenu du dossier `plm` dans votre dossier intranet `app` (voir le link:../installation.adoc[intranet installation])
 
 Définissez le chemin d'accès à FreeCAD dans le fichier `server/conf/application.yml`.
 
