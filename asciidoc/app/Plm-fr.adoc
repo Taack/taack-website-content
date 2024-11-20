@@ -1,0 +1,160 @@
+= FreeCAD PLM
+:doctype: book
+:taack-category: 2|App
+:toc:
+:icons: font
+
+== Objectif
+
+Gérer le partage de modèles FreeCAD et le versionnage linéaire. Il s'agit d'une application d'exemple, plus pour voir les capacités du framework que pour utiliser
+un vrai PLM.
+
+== Rôles
+
+* `ROLE_ADMIN`
+* `ROLE_PLM_USER`
+
+Voir le link: Crew.adoc#_purpose[configure roles in Crew] pour ajouter le rôle à votre Intranet
+
+== Installation du serveur
+
+=== Tout installer dans un nouvel utilisateur (facultatif)
+
+Il est préférable d'isoler Freecad dans un utilisateur spécifique, afin de ne pas écraser votre configuration Freecad pour votre utilisateur.
+
+Pour ce faire :
+
+. créez un nouvel utilisateur :
++
+[source,bash]
+----
+sudo useradd plm --create-home
+----
+. Ajoutez le groupe `plm` actuel à l'utilisateur actuel
++
+[source,bash]
+----
+sudo usermod -a -G plm <current user>
+----
+. Modifiez éventuellement le droit de `plm` pour autoriser le groupe `rxw`
+. Relancez le cycle de déconnexion/connexion ou redémarrez pour appliquer le changement de groupe à votre utilisateur
+
+=== Lancer FreeCAD sur le serveur
+
+Sur un serveur Linux, il est préférable d'installer le package suivant à partir de votre distribution :
+
+* #Weston# Serveur Wayland
+* #FreeCAD 0.21.2#
+* #python-protobuf# package (Voir <<python-protobuf-install>>)
+
+Freecad et Weston permettent des fonctionnalités similaires sur Wayland que Xvfb-run sous X11.
+
+=== Installer à partir des binaires du serveur
+
+Téléchargez les derniers binaires du serveur depuis https://github.com/Taack/plm/releases[releases].
+
+Lancez l'application serveur :
+
+[source,bash]
+.Lancez le serveur
+----
+java -jar server-0.6.jar
+----
+
+==== Arguments du serveur
+
+Voir `server/grails-app/conf/application.yml` pour une liste des options disponibles
+
+Les options au serveur peuvent être transmises de cette manière :
+
+[source,bash]
+.Combinaison d'options
+----
+java -DOption1=Value1 -DOption2=Value2 ... -jar server-0.3.jar
+----
+
+===== Options
+
+* Chemin vers lequel l'intranet stocke ses fichiers : `-Dintranet.root=/home/test/someDir`
+* Port du serveur : `-Dserver.port=9444`
+* URL de la base de données : `-DdataSource.url='jdbc:h2./prodDb2;LOCK_TIMEOUT=10000;DB_CLOSE_ON_EXIT=FALSE'`
+* Chemin d'accès à l'image de l'application Freecad : `-Dplm.freecadPath=/somePath...`
+* Chemin d'accès à Dot exe : `-Dexe.dot.path=/somePath...`
+
+=== Installer à partir de la source
+
+Cloner le dépôt #plm# :
+
+[source,bash]
+.Cloner le dépôt PLM
+----
+git clone git@github.com:Taack/plm.git
+----
+
+Copiez ensuite le contenu du dossier `plm` dans votre dossier intranet `app` (voir le link:../installation.adoc[intranet installation])
+
+Définissez le chemin d'accès à FreeCAD dans le fichier `server/conf/application.yml`.
+
+Démarrez votre intranet sous le dossier `intranet` :
+
+[source,bash]
+.Exécutez le serveur à partir de la source
+----
+./gradlew server:bootRun
+----
+
+Vous pouvez produire un fichier Jar :
+
+[source,bash]
+.Créez le binaire du serveur à partir de la source
+----
+./gradlew server:assemble
+----
+
+Le serveur sera situé sous `server/build/libs`
+
+[[python-protobuf-install]]
+== Installation de FreeCAD Workbench
+
+Tout d'abord, installez `python-protobuf`. Si vous utilisez FreeCAD, les dépendances ne sont pas installées automatiquement lors de l'installation de l'atelier.
+
+[source,bash]
+.Installer Protobuf pour FreeCAD
+----
+pip install protobuf
+----
+
+Allez dans #Outils# > #Gestionnaire de modules complémentaires# puis actualisez le cache local et recherchez *Taack*.
+
+image::addon-screenshot.webp[]
+
+Cliquez sur le bouton d'installation.
+
+== Utilisation
+
+.Sélectionnez Taack PLM Workbench
+image::plm1-screenshot.webp[]
+
+.Cliquez sur l'icône Taack
+image::plm2-screenshot.webp[]
+
+.Entrez vos informations d'identification sur votre serveur
+image::plm3-screenshot.webp[]
+
+Cliquez sur le bouton OK pour télécharger le fichier sur votre Intranet. L'Intranet créera un aperçu, ce processus peut prendre du temps.
+
+.L'historique de la pièce...
+image::plmweb1-screenshot.webp[]
+
+ATTENTION : si vous avez de nombreux liens, importez-les depuis le même ordinateur. Depuis d'autres ordinateurs, téléchargez le fichier zip depuis votre intranet.
+
+Voilà, je vais enregistrer quelques vidéos démontrant les capacités de cette application.
+
+video::rF_cL2C_EAU[youtube, width=640, height=480]
+
+== À faire
+
+* Ajouter une icône de graphique de modèle
+* Mettre à jour les dépendances pour un modèle (avec l'option Deep)
+* Supprimer la dernière version
+* ...

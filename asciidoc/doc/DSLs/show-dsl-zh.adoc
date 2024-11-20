@@ -1,0 +1,45 @@
+= 数据详情DSL
+:doctype: book
+:taack-category: 4|doc/DSLs
+:toc:
+:source-highlighter: rouge
+:icons: font
+
+* [*] 支持HTML
+* [*] 支持PDF
+* [ ] 支持CSV
+
+该DSL用于显示数据对象详细信息，兼具编辑功能。每个字段的显示都可设置样式。
+
+[source,groovy]
+----
+UiShowSpecifier s = new UiShowSpecifier()
+s.ui partner, {
+    section "Partner", {
+        fieldAction "Test Icon",
+            ActionIcon.SHOW * IconStyle.SCALE_DOWN, <1>
+            this.&showContact as MC, partner.id, false
+        field partner.name_, Style.EMPHASIS + Style.BLUE          <2>
+        field partner.branding
+        field partner.address?.country
+    }
+}
+----
+<1> 图标必须为缩小版，以此能够排列在“Name”字段旁
+<2> 可设置样式，多种样式可以堆叠
+
+.相应结果
+image::screenshot-dsl-show.webp[]
+
+== DSL架构
+
+[graphviz,format="svg",align=center]
+.DSL架构图
+----
+digraph mygraph {
+  node [shape=box];
+  ui
+  ui -> section [label = "1,N"]
+  section -> "fieldAction+field", field [label = "0,N"]
+}
+----

@@ -1,0 +1,90 @@
+= 打印块DSL
+:doctype: book
+:taack-category: 11|doc/DSLs
+:toc:
+:source-highlighter: rouge
+:icons: font
+
+* [*] 支持HTML
+* [*] 支持PDF
+* [ ] 支持CSV
+
+该块专用于打印相关，负责将页面图形元素排列到静态文档上 (通常为PDF，但将来会支持更多格式)
+DSL for printable documents, that is responsible for arranging page graphical elements onto a static doc (typically a PDF, but other formats can be added in the future).
+
+== 代码示例：构建打印块
+
+[source,groovy]
+[[printable-block-sample1]]
+.基础PDF
+----
+def p = new UiPrintableSpecifier().ui {
+    printableHeader "3.5cm", {                  <1>
+        show new UiShowSpecifier().ui {
+            fieldLabeled u.username_            <2>
+        }, BlockSpec.Width.THIRD
+        show new UiShowSpecifier().ui {
+            field """
+            <div style="text-align: center;">
+                <img style="height: 2.5cm;"
+                    src="data:image/png;base64,${png}"/>
+            </div>
+            """
+        }, BlockSpec.Width.THIRD
+        show new UiShowSpecifier().ui {
+            field 'Print Date', new Date().toString(),
+                  Style.ALIGN_RIGHT
+        }, BlockSpec.Width.THIRD
+    }
+    printableBody {                             <3>
+        def a = book.author
+        show new UiShowSpecifier().ui {
+            field """<h1>${book.name}</h1>""",
+                  Style.ALIGN_CENTER
+            fieldUnlabeled Style.MARKDOWN_BODY,
+                  book.abstractTextHtml_
+        }, BlockSpec.Width.MAX
+        show new UiShowSpecifier().ui {
+                fieldLabeled book.isbn_
+            section 'Author', {
+                fieldLabeled book.author_, a.firstName_
+                fieldLabeled book.author_, a.lastName_
+            }
+        }, BlockSpec.Width.HALF
+        show new UiShowSpecifier().ui {
+            section 'Stock', {
+                fieldLabeled book.number_
+                fieldLabeled book.stock_
+            }
+        }, BlockSpec.Width.HALF
+        table bookstoreUiService.buildBorrowedBookTable(),
+              BlockSpec.Width.MAX               <4>
+    }
+    printableFooter {                           <5>
+    }
+}
+----
+
+<1> `printableHeader` 指定页眉，将在每页开头重复该内容，可设定高度，不写则默认为2厘米。
+<2> 您可以正常使用##数据详情DSL##
+<3> `printableBody` 指定页面具体内容，可跨度多页
+<4> 您可以正常使用##表格DSL##
+<5> `printableFooter` 指定页脚，将在每页末尾重复该内容，高度不可大于2厘米。
+
+
+image:screenshot-pdf.webp[width=640px]
+
+== 打印块DSL架构
+
+[graphviz,format="svg",align=center]
+.打印块DSL架构图
+----
+digraph mygraph {
+  node [shape=box];
+  ui -> printableHeader, printableHeaderLeft, printableHeaderRight
+  ui -> printableFooter, printableBody
+  printableHeader, printableHeaderLeft, printableHeaderRight, printableFooter, printableBody -> anonymousBlock, show, table, custom
+  anonymousBlock -> anonymousBlock, show, table, custom
+}
+----
+

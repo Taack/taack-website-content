@@ -3,55 +3,48 @@
 :taack-category: 1|doc/DSLs
 :toc:
 :source-highlighter: rouge
+:icons: font
 
 * [*] Rendered into HTML
 * [ ] Rendered into Mails
 * [ ] Rendered into PDF
 * [ ] Rendered into CSV
 
-Menu DSL associate menu entries with top level actions. Menu DSL supports only 2 levels max (without taking into account `section`).
+Menu DSL associate menu entries with top level actions.
+Menu DSL supports only 2 levels max (without taking into account `section`).
 
 [source,groovy]
 [[menu-sample1]]
 .Menu Sample with conditional
 ----
-    static private UiMenuSpecifier buildMenu(String q = null) {
-        UiMenuSpecifier m = new UiMenuSpecifier() <1>
-        m.ui {
-            menu "Pages", this.&pages as MC
-            menu "Images", this.&images as MC
-            menu "PDFs", this.&pdfs as MC
-            menu "Videos", this.&videos as MC
-            menu "Menus", this.&menuEntries as MC
-            menu "Blocks", this.&blocks as MC
-            menu "Inserts", this.&inserts as MC
-            menu "Slideshows", this.&slideshows as MC
-            menu "Admin", { <2>
-                menu "Sync Servers", this.&sync as MC
-                menu "Conf Sites", this.&confSites as MC
-            }
-            menuSearch CmsController.&search as MC, q
-        }
-        m
+private UiMenuSpecifier buildMenu(String q = null) {
+    new UiMenuSpecifier().ui {                          <1>
+        menu CrewController.&index as MC
+        menu CrewController.&listRoles as MC
+        menu CrewController.&hierarchy as MC
+        menuIcon ActionIcon.CONFIG_USER, this.&editUser as MC   <4>
+        menuIcon ActionIcon.EXPORT_PDF, this.&downloadBinPdf as MC
+        menuSearch this.&search as MethodClosure, q     <2>
+        menuOptions(SupportedLanguage.fromContext())    <3>
     }
-
+}
 ----
 
 <1> Create a new menu
-<2> Declare a secondary level menu
+<2> Search menu
+<3> Languages entries
+<4> Icon entries (hoover message automatically deduced) .Corresponding Menu Rendering.
 
-.Corresponding Menu Rendering.
-image:screenshot-dsl-menu.webp[]
+image:screenshot-dsl-menu-041.webp[]
 
 [graphviz,format="svg",align=center]
-.Symbols hierachy diagram for Menu DSL
+.Symbol's hierarchy diagram for Menu DSL
 ----
 digraph mygraph {
-  node [shape=box];
-  ui -> menu, menuIcon, section [label = "0,N"]
-  ui -> menuSearch [label = "0,1"]
-  menu -> subMenu [label = "1,N"]
-  section -> subMenu [label = "1,N"]
-  }
+    node [shape=box];
+    ui -> menu, menuIcon, subMenu, menuOption [label = "0,N"]
+    ui -> menuSearch [label = "0,1"]
+    subMenu -> menu [label = "1,N"]
+}
 ----
 

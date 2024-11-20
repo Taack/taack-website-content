@@ -1,0 +1,83 @@
+= 文件架构模块化
+:doctype: book
+:taack-category: 5|doc/Concepts
+:toc:
+:source-highlighter: rouge
+:icons: font
+
+= 子应用模块化开发
+
+link:https://github.com/Taack/intranet[内联网子应用示例]是一个模块化link:https://gradle.org/[Gradle]应用。可点击link:../../usage.adoc[使用手册]以安装内联网模板项目并尝试运行。
+
+== 内联网文件架构示例
+
+
+[plantuml, format="svg", opts="inline", theme="spacelab"]
+----
+@startsalt
+{
+{T
++ <&folder> Intranet | Root Directory
+++ <&folder> app    | Application Modules Directory
++++ <&folder> crew  | Mandatory base app to manage users
++++ <&folder> appModule1  | First application (Gradle module)
++++ <&folder> appModule2  | Second application
++++ <&folder> ...   | And so on
+++ <&folder> buildSrc | Gradle Build Instructions
+++ <&folder> server | Server Root Application (Grails app)
+++ <&folder> gradle           | Gradle binaries
+++ <&file> build.gradle
+++ <&file> settings.gradle
+++ <&file> gradle.properties
+++ <&file> gradlew
+}
+}
+@endsalt
+----
+
+=== _app_ 文件夹
+
+内含组成内联网子应用的Grails插件 (或者说Grails模块)，它们应当具有最低限度的依赖，以最大限度提高自身的可重用性。
+
+==== _crew_ 文件夹
+
+为其中一个子应用，负责管理人员信息。是当前唯一一个强制性子应用，其内包含各种Taack服务。
+
+=== _server_ 文件夹
+
+为主应用，负责呈现主页面。内含全局配置，通用翻译，静态共享资源等等。
+
+该主应用立足于所有子应用模块 (定义在app文件夹中) 之上。
+
+=== _buildSrc_
+
+内含Gradle通用配置信息，还可使用Groovy语言在此文件夹中定义额外的Gradle任务 (task) 。
+
+== _infra_ 库
+
+即**Taack-ui**插件所属的库。
+
+[plantuml, format="svg", opts="inline"]
+----
+@startsalt
+{
+{T
++ <&folder> infra     | Infra sources (see below)
+++ <&folder> browser   | Browser code (Kotlin transpiled in Javascript)
+++ <&folder> taack-jdbc-common| Common JDBC code
+++ <&folder> taack-jdbc-client| Client JDBC code
+++ <&folder> taack-ui | Taack User Interface code
+++ <&folder> gradle           | Gradle binaries
+++ <&file> build.gradle
+++ <&file> settings.gradle
+++ <&file> gradle.properties
+++ <&file> gradlew
+
+}
+}
+@endsalt
+----
+
+* _browser_ 包含将在浏览器中执行的代码
+* _taack-jdbc-common_ 包含被__taack-ui__和__taack-jdbc-client__共用的class类。
+* _taack-jdbc-client_ 包含JDBC驱动程序 (见link:../../more/JDBC/taack-jdbc-driver-zh.adoc[taack-jdbc-driver])

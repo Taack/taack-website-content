@@ -1,0 +1,44 @@
+= Taack UI DSLs
+:doctype: book
+:taack-category: 2|doc/Concepts
+:toc:
+:source-highlighter: rouge
+:icons: font
+
+== Avant-propos sur Block DSL
+
+Le Block DSL permet de spécifier la mise en page en définissant des blocs contenant des éléments graphiques. Un bloc peut être mis à jour par des actions. Les « blocs AJAX » peuvent être ciblés à l'aide de leur ID. Les blocs peuvent également être imbriqués.
+
+Pour plus d'informations, veuillez vous référer à la page dédiée sur le link:../DSLs/block-dsl.adoc[Bloc DSL]. Les PDF ont leur propre gestion de blocs via le link:../DSLs/block-printable-dsl.adoc[Blocs imprimables], tandis que les DSL de tableau et d'affichage sont également applicables (les graphiques seront disponibles ultérieurement).
+
+[source,groovy]
+----
+UiBlockSpecifier b = new UiBlockSpecifier() <1>
+b.ui {
+    modal {                                 <2>
+        form f                              <3>
+    }
+}
+----
+
+<1> Créer le bloc, construit via la méthode ui
+<2> Ce bloc contiendra une fenêtre modale, qui est aussi un bloc
+<3> Ce bloc ajax contiendra un formulaire
+
+[[form-html-output]]
+.Formulaire à l'intérieur d'une fenêtre modale.
+image::screenshot-dsl-user-form-800h.webp[]
+
+== Éléments de bloc DSL
+
+* link:../DSLs/form-dsl.adoc[*Form DSL*]: Permet de définir un formulaire à inclure dans un bloc
+
+* link:../DSLs/show-dsl.adoc[*Show DSL*]: Permet d'afficher un résumé d'objet. Il prend en charge l'édition de champs limitée
+
+* link:../DSLs/filter-table-dsl.adoc[*DSL Table et filtre de table*] : une table est associée à un ou zéro filtre. Les filtres ne peuvent pas être affichés sans table.
+** Le DSL Table permet de regrouper et de trier les colonnes
+** La pagination est incluse
+** Le tableau peut également représenter un arbre
+* link:../DSLs/diagram-dsl.adoc[*DSL Diagramme*] : permet de dessiner des diagrammes dans un bloc
+* *DSL personnalisé* :
+permet d'insérer du code HTML personnalisé dans un bloc.

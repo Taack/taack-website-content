@@ -1,69 +1,62 @@
 = First app
-:doctype: book
-:taack-category: 2
-:toc:
-:source-highlighter: rouge
 
 == How app works with Taack Framework
 
 Your intranet project has two parts:
 
 * The app plugins, contained in the `app` folder, they are micro-projects each containing their dependencies, build, etc. `Crew` for example is an app plugin.
-For more in-depth explanation about how plugins are declared to the server link:doc/plugin/taack-plugin.adoc#_about_plugins[check here].
-* The main server, that uses all of the app plugins that are implemented in its `build.gradle` and render them on the main intranet page.
+For more in-depth explanation about how plugins are declared to the server, link:doc/plugin/taack-plugin.adoc#_about_plugins[check here].
+* The main server, that uses all the app plugins that are implemented in its `build.gradle` and render them on the main intranet page.
 
 == Creating a new app plugin
 
-In order to create a new app plugin (a Gradle module), be sure to pull latest version  of your intranet from our github repository (see link:installation.adoc[installation])
+To create a new app plugin (a Gradle module), be sure to pull the latest version of your intranet from our GitHub repository (see link:install.adoc[installation])
 
 Once it is done, you can execute the following command from your intranet root folder:
 
+// setting system properties with the -D flag
+// setting project properties with the -P flag
+
 [,bash]
 ----
-./gradlew server:taackCreateApp -Pargs='-name=testApp'
+./gradlew -DmodName=myToto server:generateTaackAppTask
 ----
 
 The newly created app should appear in the `app` folder.
 
-Next we need to make the `server` Grails app aware of our new plugin to embed it in the application server. To do so, just add:
+If you want the IDE to detect the newly created app module, you have to reload gradle projects, clicking on the following icon:
 
-[,gradle]
-----
-include 'app:testApp'
-----
+.Gradle Reload
+image::screenshot-new-app-gradle-reload.webp[Reload,width=520,align="left"]
 
-Into `settings.gradle` file then
+== Managing Future Updates
 
-[,gradle]
-----
+Most of the time, updating your intranet, should imply to update `buildSrc` folder, `gradle.properties`, and also, less often, apps `build.gradle` files.
 
- implementation project(':app:testApp')
-----
-
-Into the `server/build.gradle` file in the #plugin# section.
+NOTE: In fact, this process is common in long-term software dev, and should not scare newcomers.
 
 == Building an app-wide menu
 
-First, let's focus on the navigation for your new app. The initial step is to define how the menu will be constructed. The basic boilerplate code for that is as follows:
+First, let's focus on the navigation for your new app.
+The initial step is to define how the menu will be constructed.
+The basic boilerplate code for that is as follows:
 
 [,groovy]
 ----
 static private UiMenuSpecifier buildMenu(String q = null) {
-    UiMenuSpecifier m = new UiMenuSpecifier()
-    m.ui {
-        menu 'Action', TurboController.&action as MC
-        // MC stands for MethodClosure
+    new UiMenuSpecifier().ui {
+        menu SomeController.&action as MC
+        menu this.&anotherAction as MC
         // import org.codehaus.groovy.runtime.MethodClosure as MC
     }
-    return m
 }
 ----
 
-We create a UiMenuSpecifier object to define the menu structure, and then specify the desired content for that menu.
+We create a link:doc/DSLs/menu-dsl.adoc[UiMenuSpecifier] object to define the menu structure, and then specify the desired content for that menu.
 
 [,groovy]
 ----
-menu 'Action', TurboController.&action as MC
+menu TurboController.&action as MC
 ----
 
 In this case, `menu` creates a simple link in the navigation bar. `Action` is the displayed name of the link, and `TurboController.&action` (using MethodClosure) defines the action to which the link will redirect.
@@ -72,12 +65,12 @@ You can see a full list of items you can put in your menu in the link:doc/DSLs/m
 
 == Creating a table
 
-Now let's display a table in our index page, by incorporating the following boilerplate:
+Now let's display a table in our index page by incorporating the following boilerplate:
 
 [,groovy]
 ----
 UiTableSpecifier tableSpecifier = new UiTableSpecifier()
-tableSpecifier.ui Book, {
+tableSpecifier.ui {
     //Add table content inside the closure here
 }
 ----
@@ -87,35 +80,34 @@ Then we can define the table headers by adding the following in the Closure:
 
 [,groovy]
 ----
-UiTableSpecifier tableSpecifier = new UiTableSpecifier()
-tableSpecifier.ui Book, {
+new UiTableSpecifier().ui {
     // -- Header --
     header {
         column {
-            fieldHeader "Title"
+            fieldHeader object.title_
         }
     }
 }
 ----
 
-Since we are defining our table in a Closure we can add conditions, loops, etc. Let's add a column that will only be rendered if the user has the role `ROLE_ADMIN`.
+Since we are defining our table in a closure, we can add conditions, loops, etc.
+Let's add a column that will only be rendered if the user has the role `ROLE_ADMIN`.
 
 [,groovy]
 ----
 // Look if the current user has the Role "ROLE_ADMIN"
-boolean isAdmin = (springSecurityService.currentUser as User).authorities*.authority.contains("ROLE_ADMIN")
+User cu = springSecurityService.currentUser as User
+boolean isAdmin = cu.authorities*.authority.contains("ROLE_ADMIN")
 
-UiTableSpecifier tableSpecifier = new UiTableSpecifier()
-tableSpecifier.ui Book, {
-    // -- Header --
+new UiTableSpecifier().ui {
     header {
         column {
-            fieldHeader "Title"
+            label object.title_
         }
         // Column only shown to admin
         if (isAdmin) {
             column {
-                fieldHeader "Delete book"
+                label "Delete book"
             }
         }
     }
@@ -124,114 +116,96 @@ tableSpecifier.ui Book, {
 
 The column with the header "Delete book" will only appear if the current user is an admin.
 
-Now we are going to populate our table, we are going to list all Book instances in the database by using the following Grails feature: `Book.list()`.
-
-Then we are going to loop over this list and define our rows like this:
+Now we are going to populate our table, we are going to iterate Book instances in the database by using the `iterate` table DSL method.
 
 [,groovy]
 ----
-boolean isAdmin = (springSecurityService.currentUser as User).authorities*.authority.contains("ROLE_ADMIN")
+User cu = springSecurityService.currentUser as User
+boolean isAdmin = cu.authorities*.authority.contains("ROLE_ADMIN")
 
-UiTableSpecifier tableSpecifier = new UiTableSpecifier()
-tableSpecifier.ui Book, {
-    // -- Header --
+new UiTableSpecifier().ui {
     header {
         column {
-            fieldHeader "Title"
+            label object.title_
         }
         // Column only shown to admin
         if (isAdmin) {
             column {
-                fieldHeader "Delete book"
+                label "Delete book"
             }
         }
     }
 
-    //List all Book
-    def books = Book.list()
-    for (Book book in books) {
-        // Define a row for each book
-        row {
-            // Define a column displaying the title
+    iterate(taackFilterService.getBuilder(Book)
+            .setMaxNumberOfLine(8)
+            .setSortOrder(TaackFilter.Order.DESC, object.title_)
+            .build()) { Book book ->
+        rowColumn {
+            rowField book.title_ //The underscore is needed here
+        }
+        // If the user is an admin display a column with a button link
+        // to redirect towards the book deletion action
+        if (isAdmin) {
             rowColumn {
-                rowField book.title_ //The underscore is needed here
-            }
-            // If the user is an admin display a column with a button link
-            // to redirect towards the book deletion action
-            if (isAdmin) {
-                rowColumn {
-                    rowLink "Delete book", ActionIcon.DELETE,
-                            TurboController.&index as MC, book.id, false
-                }
+                rowAction ActionIcon.DELETE,
+                        this.&deleteBook as MC, book.id
             }
         }
     }
 }
 ----
 
-For each book in our list, we make a new row with the title of the book in the first column and a delete button in the second column if the user is an admin. (We're redirecting to `index` since we didn't create a delete method yet).
+For each book in our list, we make a new row with the title of the book in the first column and a btn:[Delete] button in the second column if the user is an admin.
+(We're redirecting to `index` since we didn't create a delete method yet).
 
 Your table is now complete we just need to render it on the page.
-To render previously built UiSpecifiers we need to use `TaackUiSimpleService` it should already be imported in the controller created by the `create-taack-app` command.
+To render previously built UiSpecifiers we need to use `taackUiService` it should already be imported in the controller created by the `create-taack-app` command.
 
 Add the following code below your table code:
 
 [,groovy]
 ----
-taackUiSimpleService.show(new UiBlockSpecifier().ui {
-    ajaxBlock 'blockList', {
-        table 'Book table', tableSpecifier, BlockSpec.Width.MAX
-    }
+taackUiService.show(new UiBlockSpecifier().ui {
+    table tableSpecifier
 }, buildMenu())
 ----
 
-`taackUiSimpleService.show(UiBlockSpecifier block, UiMenuSpecifier menu)` will be in charge of rendering the specification we give him. In this case we want to display an `ajaxBlock` that contains a `table` named "Book table", we pass our previously created `tableSpecifier` as an argument and we set the width of the table to `MAX` so it takes the entire page.
+`taackUiService.show(UiBlockSpecifier block, UiMenuSpecifier menu)` will be in charge of rendering the specification we give him.
+In this case we want to display an `ajaxBlock` that contains a `table` named "Book table", we pass our previously created `tableSpecifier` as an argument, and we set the width of the table to `MAX` so it takes the entire page.
 We also use our previously created static `buildMenu()` method as the second arguments on `show()` to render your menu with the page.
 
-You can now start the server and navigate to your new app. The table should be functional, but currently you will only see the table headers since there are no books in your database. So let's proceed with creating a form and saving objects into the database.
+You can now start the server and navigate to your new app.
+The table should be functional, but currently you will only see the table headers since there are no books in your database.
+So let's proceed with creating a form and saving objects into the database.
 
 == Adding buttons to a table block
 
-We are going to add a button to your Book table that will open a modal unsing AJAX to create a new Book. To achieve this, we need to add a closure in the table, like so:
+We are going to add a button to your Book table that will open a modal using AJAX to create a new Book.
+To achieve this, we need to add a closure in the table, like so:
 
 [,groovy]
 ----
-taackUiSimpleService.show(new UiBlockSpecifier().ui {
-    ajaxBlock 'blockList', {
-        table 'Book table', tableSpecifier, BlockSpec.Width.MAX, {
-            //Added Closure here
-            if (isAdmin())
-                action 'Create book', ActionIcon.CREATE,
-                       TurboController.&bookForm as MC,
-                       [redirectAction: actionName], true
-        }
+taackUiService.show(new UiBlockSpecifier().ui {
+    table 'Book table', tableSpecifier, BlockSpec.Width.MAX, {
+        //Added Closure here
+        if (isAdmin())
+            action ActionIcon.CREATE, this.&bookForm as MC
     }
 }, buildMenu())
 ----
 
-Now an admin will see a create button on the top-right of the table.
+Now an admin will see a btn:[Create] button on the top-right of the table.
 
 The `action` method is composed of the following parameters:
 
-* 1) The title/alt of the button.
-* 2) The icon used by the button, must be an xref:doc/Concepts/docref.adoc#_actionicon[ActionIcon] enum value.
-* 3) The action that the button will redirect to
-* 4) The parameters to be sent with the redirection (In this case we specify where we want to redirect after saving the Book)
-* 5) If we render with ajax in a modal
+. The icon used by the button must be an xref:doc/Concepts/docref.adoc#_actionicon[ActionIcon] enum value.
+. The action that the button will redirect to
 
 == Creating a form and saving objects
 
-We are now going to make the form that will be used both for creating but also updating them. To manage both case we are first going to define our `bookForm` action and then initialize either a new Book or read if a Book id has been passed as request parameters.
+We are now going to make the form that will be used both for creating but also updating them.
+To manage both case we are first going to define our `bookForm` action and then initialize either a new Book or read if a Book id has been passed as request parameters.
 
-[,groovy]
-----
-def bookForm() {
-    // Get book if we passed an id of the book we want to update
-    // Or create new one
-    Book book = Book.read(params.long("id")) ?: new Book(params)
-}
-----
-OR:
 [,groovy]
 ----
 def bookForm(Book book) {
@@ -251,86 +225,81 @@ form.ui book, {
         field book.author_
     }
     //Save button
-    formAction "Save", this.&saveBook as MC, book.id,
-               [redirectAction: params.get("redirectAction")], true
+    formAction this.&saveBook as MC
 }
 ----
 
-Once your form is defined, you can display it using the `taackUiSimpleService`.show() method
+Once your form is defined, you can display it using the `taackUiService.show()` method
 
 [,groovy]
 ----
 UiBlockSpecifier b = new UiBlockSpecifier()
 b.ui {
     modal {
-        ajaxBlock "bookForm", {
-            form "Book Form", form, BlockSpec.Width.MAX
-        }
+        form form, BlockSpec.Width.MAX
     }
 }
-taackUiSimpleService.show(b)
+taackUiService.show(b)
 ----
 
 This time we don't specify `buildMenu` in our show since we don't want the menu to be rendered inside the modal!
 
-Don't forget to create the `saveBook` action:
+Remember to create the `saveBook` action:
 
 [,groovy]
 ----
 @Secured("ROLE_ADMIN")
 @Transactional
 def saveBook(String redirectAction) {
-    MC red = this.&index
-    if (redirectAction) red = this.&"$redirectAction" as MC
-    taackSimpleSaveService.saveThenRedirectOrRenderErrors(Book,
-            redirectAction == "null" ? null : red)
+    taackSaveService.saveThenReloadOrRenderErrors(Book)
 }
 ----
+
 N.B.: See link:doc/DSLs/block-dsl.adoc#_modal_stack_code_sample[Close Modal and reload page] for not having to use `redirectAction` when saving...
 
-Since we only want admin to be able to create book, we add the `@Secured` annotation, for more information about security annotations we recommend to check out the https://grails.github.io/grails-spring-security-core/5.0.0-RC1/index.html#secured-annotation[grails-spring-security-core] documentation.
+Since we only want admin to be able to create a book, we add the `@Secured` annotation, for more information about security annotations we recommend to check out the https://grails.github.io/grails-spring-security-core/5.0.0-RC1/index.html#secured-annotation[grails-spring-security-core] documentation.
 
 == Showing an object
 
 Now that we can create books and see a list of them in a table, let's display them in more details in a modal.
-Once again we define the specifier and we will render it in a block through `taackUiSimpleService.show()`.
+Once again we define the specifier, and we will render it in a block through `taackUiService.show()`.
 
 [,groovy]
 ----
 def showUser(Book book) {
     // Define the show displayed fields
-    UiShowSpecifier show = new UiShowSpecifier().ui(book, {
-        field "Title", book.title
-        field "Author", book.author
+    UiShowSpecifier showSpec = new UiShowSpecifier().ui(book, {
+        fieldLabeled book.title_
+        fieldLabeled book.author_
     })
 
-    taackUiSimpleService.show(new UiBlockSpecifier().ui {
+    taackUiService.show(new UiBlockSpecifier().ui {
         modal {
-            ajaxBlock "showBook", {
-                show "${book.title}", show, BlockSpec.Width.MAX
-            }
+            show showSpec
         }
     })
 }
 ----
 
-We also need to display a link to this page in the table, to add a link in the table, add the following line in the same rowColumn (Below the book title field for example) that you want the button to appear:
+We also need to display a link to this page in the table. To add a link in the table, add the following line in the same rowColumn (Below the book title field) that you want the button to appear:
 
 [,groovy]
 ----
-rowLink "Show book",
-        ActionIcon.SHOW * ActionIconStyleModifier.SCALE_DOWN, <1>
-        TurboController.&showBook as MC, book.id, true
+rowAction
+        ActionIcon.SHOW * StyleModifier.SCALE_DOWN, <1>
+        TurboController.&showBook as MC, book.id
 ----
+
 <1> Here, we reduce the size of the icon with the multiply operator
 
 This will create a _small_ button in the table cell that will open a modal with the corresponding book information.
 
-Note that `ActionIcon` was multiplied with a `ActionIconStyleModifier` to change it's size in this case. For more details check the xref:doc/Concepts/docref.adoc#_actionicon[ActionIcon] documentation.
+Note that `ActionIcon` was multiplied with a `IconStyle` to change it's size in this case.
 
 == Deleting an object
 
-Remember the delete button we added to our table? Let's make it functional by updating the action name in the table to "[.code]``&deleteBook``" and creating a corresponding controller action with the same name.
+Remember the btn:[Delete] button we added to our table?
+Let's make it functional by updating the action name in the table to "[.code]``&deleteBook``" and creating a corresponding controller action with the same name.
 
 [,groovy]
 ----
@@ -341,12 +310,15 @@ def deleteBook(Book book) {
     redirect action: 'index'
 }
 ----
-N.B.: In some cases, it is better to add a field `enable` to mask disabled object instead of deleting them.
 
-That's it! We use Grails `delete` method to delete the book from the database and then redirect back to the `index` action where the book table is.
+N.B.: In some cases, it is better to add a field `enable` to mask disabled objects instead of deleting them.
+
+That's it!
+We use Grails `delete` method to delete the book from the database and then redirect back to the `index` action where the book table is.
 
 You now have a fully working CRUD for your book class without touching any HTML/GSP files!
 
 *You are now fully prepared to explore the more advanced features of the Taack Ui Framework.*
 
 *Welcome!*
+

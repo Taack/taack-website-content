@@ -1,0 +1,49 @@
+:taack-height: 640
+include::_settings_reveal.adoc[]
+:source-highlighter: highlightjs
+:highlightjs-languages: groovy, gnuplot
+:title-slide-transition: zoom
+:title-slide-transition-speed: fast
+:icons: font
+:docinfo: shared
+:customcss: custom.css
+
+= 新的内容 ?
+Version 0.5.X
+
+== 基于Bootstrap
+
+* 主题化
+** 桌面上的配色方案
+** 可调节的组件尺寸
+* 高扩展性
+
+== 轻量化
+
+* 更少的资源
+* 更少的 CSS 和 JS
+
+== 主要代码改进
+
+=== 新的 DSL 布局
+
+* `forms` 和 `blocks` 有相同布局
+** `col` 和 `row`
+** `tabs` 和 `tab`
+
+NOTE: `#With#` 只作用于 `#col#` 内
+
+=== blocks 的 DSL Menu
+
+* Menu DSL 替换 actions
+* 无需使用图标
+* Menus 自动翻译
+
+=== 更简洁的代码
+
+导致：
+
+* 维护更简单
+* 贡献更容易
+
+// asciidoctor-revealjs -r asciidoctor-diagram -a revealjsdir=https://cdn.jsdelivr.net/npm/reveal.js@3.9.2  -a data-uri slideshow-whatsnew050-fr.adoc.adoc

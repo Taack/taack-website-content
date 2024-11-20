@@ -1,2 +1,0 @@
-= Server Shell
-:taack-category: ZZ|more/Shell

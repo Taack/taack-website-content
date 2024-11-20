@@ -1,0 +1,168 @@
+= Étapes de développement
+:taack-category: 1|doc/UserGuide
+:toc:
+:source-highlighter: rouge
+:icons: font
+
+== Activation du framework Taack
+
+Pour pouvoir afficher un objet dans un formulaire ou un tableau filtré, cette classe doit être annotée avec l'annotation `@TaackFieldEnum`.
+
+Lorsque l'annotation `@TaackFieldEnum` est spécifiée sur une classe, des symboles supplémentaires sont générés par le framework. Ces symboles se terminent par un trait de soulignement et sont utilisés avec les différents DSL.
+
+=== Cas des classes régulières
+
+.Exemple de code d'activation d'une classe régulière
+[,groovy]
+----
+@GrailsCompileStatic                                    <1>
+@TaackFieldEnum                                         <2>
+final class QueryParameter implements Validateable {    <3>
+    Currency currency = Currency.EUR
+    Short monthStart = 1
+    Short monthStop = 12
+    Set<Subsidiary> subsidiaries
+    String sellerNamePattern
+    String productNameOrCodePattern
+    String customerNameOrCodePattern
+    Value itemValue
+    ItemRange range
+    Integer yearStart
+    Integer yearStop = Calendar.instance.get(Calendar.YEAR)
+
+    static constraints = {                              <4>
+        itemValue nullable: true
+        range nullable: true
+        monthStart min: 1, max: 12
+        monthStop min: 1, max: 12, validator: {         <5>
+            queryParameter, monthStop ->
+            if (monthStop < queryParameter.monthStart)
+                return "monthStop.greater.or.equals.to.monthStart"
+        }
+    }
+}
+
+----
+
+<1> Bonne pratique pour ajouter l'annotation `GrailsCompileStatic`
+<2> L'annotation permettant la transformation AST
+<3> La classe doit implémenter Validateable pour prendre en charge les contraintes (pas nécessaire pour les classes de domaine)
+<4> Définition des contraintes
+<5> La validation peut être une fermeture renvoyant une clé de traduction.
+
+Cet exemple de code montre une classe standard (c'est-à-dire non définie dans le répertoire du domaine) activée pour être utilisée dans le framework Taack.
+Elle ne peut pas être enregistrée et récupérée ou répertoriée, car il ne s'agit pas d'une classe de domaine persistante.
+
+Elle doit implémenter les traits `Validateable` de Grails.
+
+=== Cas des classes de domaine
+
+.Exemple de code d'activation d'une classe de domaine
+[,groovy]
+----
+@GrailsCompileStatic
+@TaackFieldEnum
+class CmsPage {                             <1>
+    Subsidiary subsidiary
+    Date dateCreated
+    Date lastUpdated
+
+    User userCreated
+    User userUpdated
+
+    Boolean published = false
+
+    CmsPageLayout pageLayout = CmsPageLayout.NO_SIDE_COLUMN
+    CmsPageType pageType
+
+    String name
+
+    Map<String, String> urlPart
+    Map<String, String> title
+    Map<String, String> hatContent
+    Map<String, String> bodyContent
+
+    CmsImage mainImage
+    CmsVideoFile mainVideo
+
+    Set<CmsImage> bodyImages
+
+    static hasMany = [
+            bodyImages: CmsImage
+    ]
+
+    static mappedBy = [bodyImages: "none"]
+
+    static constraints = {
+        name nullable: true
+        urlPart nullable: true
+        title nullable: true
+        hatContent nullable: true
+        bodyContent nullable: true, widget: 'textarea'
+        mainImage nullable: true
+        mainVideo nullable: true
+        bodyImages nullable: true
+    }
+
+    static mapping = {
+        autoTimestamp true
+    }
+}
+----
+
+<1> Pas besoin d'implémenter Validateable dans le cas d'une classe de domaine
+
+Les classes de domaine sont traitées comme des citoyens de première classe dans le cadre de Taack. Elles peuvent utiliser les fonctionnalités avancées fournies par le `TaackSaveService`.
+
+== Manipulation d'objets pour les classes de domaine
+
+=== Listing d'objets dans des tableaux
+
+Table DSL ajoute le symbole `iterate` qui permet d'afficher la liste des objets :
+[, groovy]
+----
+TaackFilter tf = taackFilterService.getBuilder(User)    <1>
+        .setSortOrder(TaackFilter.Order.DESC, u.dateCreated_)
+        .setMaxNumberOfLine(20).addFilter(f).build()
+
+iterate(tf) { User ru ->                                <2>
+    row {                                               <3>
+    }
+}
+----
+
+<1> Spécifier des filtres, sécuriser des listes d'objets, ainsi que certaines contraintes d'affichage
+<2> Itérer sur ce `TaackFilter`, avec une fermeture `row`
+<3> Dessiner la ligne ...
+
+[, groovy]
+----
+def objects = taackSimpleFilterService.list(
+                ObjectClass, numberOfObjectReturned)
+objects.aValue // list of objects queried. Not all objects are returned (see second parameter)
+objects.bValue // total number of objects that can be reached by the query
+----
+
+Passer le filtre à la méthode `list` permet de restreindre la requête pour des raisons de sécurité.
+
+=== Sauvegarder des objets via Form DSL et afficher les erreurs
+
+Pour sauvegarder un nouvel objet, ou un objet modifié (nous verrons les considérations de sécurité plus tard), il suffit d'appeler la méthode suivante dans l'action cible du formulaire :
+
+[, groovy]
+----
+taackSaveService.saveThenRedirectOrRenderErrors(User, this.&index)
+----
+
+Il existe 3 scénarios possibles :
+
+* Si l'objet est valide et que l'utilisateur possède les informations d'identification requises pour le manipuler, le navigateur sera redirigé vers l'action spécifiée dans le deuxième paramètre.
+* Si l'objet contient des champs non valides, le formulaire sera mis à jour pour mettre en évidence les champs problématiques (voir l'image ci-dessous)
+* Soit l'utilisateur n'a pas d'informations d'identification pour traiter l'objet, une erreur s'affiche
+
+Ici, `index` est l'action à effectuer en cas de succès, `User` est la classe d'objet.
+
+[[form-html-errors-output]]
+.Si le formulaire n'est pas valide, retour d'information à l'utilisateur. Notez que les erreurs signalées sont localisées.
+image::screenshot-form-validation.webp[]
+

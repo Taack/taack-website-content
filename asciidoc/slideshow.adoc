@@ -6,7 +6,7 @@ include::_settings_reveal.adoc[]
 :icons: font
 :docinfo: shared
 :customcss: custom.css
-:revealjs_height: 512
+:taack-height: 512
 
 = French Slides
 
@@ -29,23 +29,31 @@ DSL (#Domain Specific Language#)
 
 [source,groovy]
 ----
-        new UiFormSpecifier().ui user, {
-            section "User", {
-                field user.username_
-                field user.firstName_
-                field user.lastName_
-                ajaxField user.manager_, this.&selectUserM2O
-                field user.trigram_
-                field user.password_
-            }
-        // [ . . . ]
-        }
+new UiFormSpecifier().ui user, {
+    section "User", {
+        field user.username_
+        field user.firstName_
+        field user.lastName_
+        ajaxField user.manager_, this.&selectUser
+        field user.password_
+    }
+// [ . . . ]
+}
 ----
 
 [%notitle]
 === Forms
 
-image::screenshot-form-user-en.webp[background, size=cover]
+image::screenshot-form-user-en.webp[background, size=contain]
+
+[transition=convex,transition-speed=fast,transition-background=zoom]
+== Forms Validation
+
+[%notitle]
+=== Forms Validation
+
+image::screenshot-form-user-validation-en.webp[background, size=contain]
+
 
 [.columns]
 == Graphical Components
@@ -65,5 +73,5 @@ image::screenshot-form-user-en.webp[background, size=cover]
 == Extend components
 
 ** File Previews
-** Full Text Search
+** Full-Text Search
 ** JDBC driver to Query Model

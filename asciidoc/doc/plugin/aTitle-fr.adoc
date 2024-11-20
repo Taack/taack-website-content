@@ -1,0 +1,3 @@
+= Taack Plugin
+:doctype: book
+:taack-category: 100|doc/plugin

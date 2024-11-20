@@ -3,33 +3,31 @@
 :taack-category: 2|doc/Concepts
 :toc:
 :source-highlighter: rouge
+:icons: font
 
-== Foreword about Block DSL, before digging in other DSLs
+== Foreword about Block DSL
 
-The Block DSL enables the specification of page layout by defining blocks that contain other graphical elements. A block can be an AJAX block, which can be updated by AJAX actions. `AJAX blocks` can be targeted using their ID. Blocks can also be nested.
+The Block DSL enables the specification of the page layout by defining blocks that contain graphical elements. A block can be updated by  actions. `AJAX blocks` can be targeted using their ID. Blocks can also be nested.
 
 For more information, please refer to the dedicated page on link:../DSLs/block-dsl.adoc[Block DSL]. PDFs have their own block management through link:../DSLs/block-printable-dsl.adoc[Printable Blocks], while the table and show DSLs are also applicable (charts will be available later).
 
 [source,groovy]
 ----
-UiBlockSpecifier b = new UiBlockSpecifier()             <1>
+UiBlockSpecifier b = new UiBlockSpecifier() <1>
 b.ui {
-    modal {                                             <2>
-        ajaxBlock "userForm", {                         <3>
-            form "User Form", f, BlockSpec.Width.MAX    <4>
-        }
+    modal {                                 <2>
+        form f                              <3>
     }
 }
 ----
 
 <1> Create the block, constructed via the ui method
-<2> This block will contain a modal window (which is also a block)
-<3> This modal window will contain 1 ajax block with the ID `userForm`
-<4> This ajax block will contain one form, with the captation `User Form`
+<2> This block will contain a modal window, which is also a block
+<3> This ajax block will contain one form
 
 [[form-html-output]]
 .Form inside a modal Window.
-image:screenshot-dsl-user-form-800h.webp[]
+image::screenshot-dsl-user-form-800h.webp[]
 
 == Block Elements DSLs
 
@@ -41,6 +39,6 @@ image:screenshot-dsl-user-form-800h.webp[]
 ** Table DSL allows grouping and sorting columns
 ** Pagination is included
 ** Table can also represent a tree
-* link:../DSLs/graph-dsl.adoc[*Chart DSL*]: Allows drawing graphs into a block
+* link:../DSLs/diagram-dsl.adoc[*Diagram DSL*]: Allows drawing diagrams into a block
 * *Custom DSL*:
 Allows inserting custom HTML code into a block.

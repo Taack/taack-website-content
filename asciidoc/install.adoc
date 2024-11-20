@@ -1,23 +1,20 @@
-= Installation
-:doctype: book
-:taack-category: 1
-:toc:
+= Install
 
 == Requirements
 
-First of all, you will need the following:
+First, install the following:
 
-* *Java* (JDK-17)
+* *Java* (JDK-17 or JDK-19)
 * *git*
 
-Optionally you can also install:
+Optionally, you can also install:
 
-* *Solr-9.1.0* (Used for intranet-wide search bar)
-* *Postgresql* (You will need to use the Grails in-memory database if you don't have any database manager)
+* *Solr-9.6.x* (Used for intranet-wide search bar)
+* *Postgresql*
 
 === Java Version
 
-It is mandatory to use Java Jdk 17. In order to check Java version, type the following command:
+Type the following command:
 
 [sh]
 ----
@@ -25,7 +22,7 @@ java -fullversion
 openjdk full version "17.0.5+1"
 ----
 
-On Mac, you can install Jdk-17 via brew command:
+On Mac, you can install Jdk-17 using brew command:
 
 [sh]
 ----
@@ -39,7 +36,7 @@ brew install openjdk@17
 git clone https://github.com/Taack/intranet.git
 ----
 
-This repository includes a stripped-down version of an intranet on top of which you can build more applications. It includes "Crew", the user management system and it's security dependency: *Spring Security Plugin*.
+This repository includes a stripped-down version of an intranet on top of which you can build more applications. It includes "Crew", the user management system, and its security dependency: *Spring Security Plugin*.
 
 == Start your intranet
 
@@ -50,20 +47,18 @@ Navigate inside the newly cloned intranet folder and start the server by executi
 ./gradlew server:bootRun
 ----
 
-If you want gradle to watch app module to hot restart the server at each save, launch the server adding `-Dgrails.run.active=true` option:
+If you want Gradle to watch app module to hot restart the server at each modification, launch the server adding the `-Dgrails.run.active=true` option:
 
 [,bash]
 ----
 ./gradlew -Dgrails.run.active=true server:bootRun
 ----
 
-
 After a while you should see in the console:
 
 `Grails application running at http://localhost:9442`
 
-
-You can now access the intranet by going to that address in your browser. You can also login with the default credentials (username: *admin*; password: *ChangeIt*). The password can be changed in server/grails-app/conf/application.yml.
+You can now access the intranet by going to that address in your browser. You can also log in with the default credentials (username: *admin*; password: *ChangeIt*). The password can be changed in `server/grails-app/conf/application.yml`.
 
 === Configuring persistent Db
 
@@ -76,9 +71,12 @@ Here we want H2 to persist data in a file in development mode:
 environments:
     development:
         dataSource:
-            dbCreate: update
-            url: jdbc:h2:./prodDb;LOCK_TIMEOUT=10000;DB_CLOSE_ON_EXIT=FALSE
+            dbCreate: update        <1>
+            url: jdbc:h2:./prodDb;LOCK_TIMEOUT=10000;DB_CLOSE_ON_EXIT=FALSE <2>
 ----
+
+<1> Creation mode (see Grails GORM docs)
+<2> `prodDb`: root of the filename containing data
 
 === Producing a Jar file for Tomcat
 
@@ -89,7 +87,7 @@ Instead of `bootRun` task, use `assemble` task:
 ./gradlew server:assemble
 ----
 
-The server jar are produced into `server/build/libs` folder. You can import it in your Tomcat production server or test it with:
+The server jar file is produced into `server/build/libs` folder. You can import it in your Tomcat production server or test it with:
 
 [source,bash]
 ----
@@ -99,8 +97,7 @@ java -jar server-[version].jar
 
 It will be faster, assets will be compiled and merged.
 
-* Tips:
-** Make sure you're not running already the application
+TIP: Make sure you're not already running the application
 
 == Set up your IDE
 
@@ -111,9 +108,9 @@ We highly recommend using the latest version of *IntelliJ Ultimate Edition* for 
 
 We recommend installing the *IntelliJ Taack Plugin* that you can install from the Intellij marketplace https://plugins.jetbrains.com/plugin/20792-taackuiastautocomplete[TaackUiASTAutocomplete] or directly from the https://github.com/Taack/infra/releases/tag/v0.1[source code repository].
 
-To open the project, select "Open project" and select `intranet/server/settings.gradle`.
+To open the project, select menu:File[Open project]  and select `intranet/settings.gradle`.
 
-Make sure that the JDK used with Gradle is at version 17:
+Make sure that the JDK used with Gradle is at version 17 (or 19):
 
 .Open Gradle Settings
 image:open-settings-gradle-intellij.webp[]

@@ -1,0 +1,7 @@
+= *前言*
+:doctype: whitepaper
+:taack-category: 0|App
+:toc:
+:toc-title: 目录
+
+一些应用程序可以通过扩展新功能来增强框架。本节将介绍这些附加功能。

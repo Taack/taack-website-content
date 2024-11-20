@@ -3,12 +3,16 @@
 :taack-category: 5|doc/Concepts
 :toc:
 :source-highlighter: rouge
+:icons: font
 
-The https://github.com/Taack/intranet[Intranet Sample App] is a modular https://gradle.org/[Gradle] application. You can get instructions to run it clicking on: link:../../installation.adoc[Install Sample Intranet].
+= Modular Application Development
+
+The https://github.com/Taack/intranet[Intranet Sample App] is a modular https://gradle.org/[Gradle] application. You can get instructions to run it clicking on: link:../../usage.adoc[Install Sample Intranet].
 
 == Intranet Sample App Directory Layout
 
-[plantuml, format="svg", opts="inline"]
+
+[plantuml, format="svg", opts="inline", theme="spacelab"]
 ----
 @startsalt
 {
@@ -19,6 +23,7 @@ The https://github.com/Taack/intranet[Intranet Sample App] is a modular https://
 +++ <&folder> appModule1  | First application (Gradle module)
 +++ <&folder> appModule2  | Second application
 +++ <&folder> ...   | And so on
+++ <&folder> buildSrc | Gradle Build Instructions
 ++ <&folder> server | Server Root Application (Grails app)
 ++ <&folder> gradle           | Gradle binaries
 ++ <&file> build.gradle
@@ -27,15 +32,14 @@ The https://github.com/Taack/intranet[Intranet Sample App] is a modular https://
 ++ <&file> gradlew
 }
 }
-
 @endsalt
 ----
 
 === _app_ directory
 
-Hold grails plugins (or Gradle modules) that compose the Intranet application. Those plugins should have the minimal dependencies in order to maximize reusability by others.
+Hold Grails plugins (or Gradle modules) that compose the Intranet application. Those plugins should have minimal dependencies to maximize reusability by others.
 
-=== _crew_ directory
+==== _crew_ directory
 
 Part of the application responsible for user management, only mandatory app that currently holds the Taack services.
 
@@ -45,7 +49,11 @@ Grails application holding global configuration, common translations, static sha
 
 The *server* grails application depends on all application modules (or Grails plugins) defined in the app directory that are desired.
 
-== _infra_ directory
+=== _buildSrc_
+
+Common Gradle configuration. Additional Gradle tasks might be defined into this directory using Groovy language.
+
+== _infra_ repository
 
 Holds the sources of the *taack-ui* plugin.
 
@@ -55,7 +63,7 @@ Holds the sources of the *taack-ui* plugin.
 {
 {T
 + <&folder> infra     | Infra sources (see below)
-++ <&folder> client   | Browser code (Kotlin transpiled in Javascript)
+++ <&folder> browser   | Browser code (Kotlin transpiled in Javascript)
 ++ <&folder> taack-jdbc-common| Common JDBC code
 ++ <&folder> taack-jdbc-client| Client JDBC code
 ++ <&folder> taack-ui | Taack User Interface code
@@ -70,10 +78,6 @@ Holds the sources of the *taack-ui* plugin.
 @endsalt
 ----
 
-* _client_ project contains code that will be executed into the browser
+* the _browser_ folder contains code that will be executed into the browser
 * _taack-jdbc-common_ common classes shared between _taack-ui_ and _taack-jdbc-client_
 * _taack-jdbc-client_ the JDBC driver (see link:../../more/JDBC/taack-jdbc-driver.adoc[taack-jdbc-driver])
-
-== _build.gradle_, _settings.gradle_ ...
-
-Usual gradle build files...

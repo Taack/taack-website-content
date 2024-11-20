@@ -2,13 +2,37 @@
 :taack-category: 11|doc/UserGuide
 :toc:
 :source-highlighter: rouge
+:icons: font
 
-== Overview
+== Spring Security
 
-#TODO incomplete#
+*Taack-ui* framework check `@Secured` annotation on actions to display access links and icons. Menu entries, links, action buttons disappear when the user is not granted.
 
-- First roles are checked for an action
-- Then in the body of the action, we load the user
-** Checking permissions and preferences
-** Language
-- if OK, display the page in localized
+== More fine-grained approach
+
+A central place can manage more complex cases allowing or not access to an action.
+
+.Code Managing Action Access
+[source,groovy]
+----
+SpringSecurityService springSecurityService
+
+private securityClosure(Long id, Map p) {   <1>
+    if (!id && !p) return true
+    if (!id) return true
+    canEdit(User.read(id))
+}
+
+@PostConstruct
+void init() {
+    TaackUiEnablerService.securityClosure(
+            this.&securityClosure,          <2>
+            CrewController.&editUser as MC, <3>
+            CrewController.&saveUser as MC)
+}
+
+----
+
+<1> Params include user `id` and action params
+<2> Register an `access constraints`
+<3> Actions concerned by this `access contraints`

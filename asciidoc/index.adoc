@@ -1,9 +1,12 @@
 = DSL for Grails
 :taack-category: 1
+:source-highlighter: rouge
+
+slide::[fn=slideshow]
 
 https://github.com/Taack/infra[Taack-UI] is a https://grails.org/[Grails] plugin that extends the functionality of Grails by allowing the description of user interface and other features using the http://docs.groovy-lang.org/docs/latest/html/documentation/core-domain-specific-languages.html[Groovy DSL] (Domain Specific Language) with static typing.
 
-This extension add the following functionalities to classical Grails Application:
+This extension adds the following functionalities to classical Grails Application:
 
 * Security:
 ** Transforming and displaying objects by checking user rights to modify *each field*;
@@ -12,11 +15,11 @@ This extension add the following functionalities to classical Grails Application
 
 * *PDF*, *Mails*, *CSV* are rendered for free. The link:doc/DSLs/block-dsl.adoc[block DSL] can be used for rendering in any format;
 
-* Localization is provided for free as the DSL detect i18n translations automatically;
+* Localization is provided for free as the DSL detects i18n translations automatically;
 
 * Reporting errors during Object validation for free (refer to link:doc/DSLs/form-dsl.adoc#_form_validation[*form validation*]);
 
-* Solr is utilized for link:/more/Search/Search.adoc[fulltext search] offering features such as:
+* Solr is used for link:/more/Search/Search.adoc[fulltext search] offering features such as:
 ** Indexing and fulltext Search of domain objects statically typed;
 ** Faceting;
 ** Ranking;

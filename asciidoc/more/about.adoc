@@ -1,0 +1,17 @@
+= About
+:doctype: book
+:taack-category: ZZZZZZZ|more
+
+This Application Framework kills the gap between backend developer and frontend.
+
+GSP/JSP are always available for complexe use cases.
+
+Thanks to the Grails Framework developers to make this possible.
+
+
+== Devs
+
+.Project Leader
+image::ag.webp[width=480]
+
+Many others coming later ...

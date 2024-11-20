@@ -1,0 +1,17 @@
+= 视频
+:doctype: book
+:taack-category: 1|more/resources
+:source-highlighter: rouge
+
+== Youtube
+
+https://www.youtube.com/channel/UCPB81L10AKGXgqPc-zhsvVA[Taack 频道]
+
+.展示 Intranet 应用程序
+video::OYtrOL5adj8[youtube, width=640, height=480]
+
+.配置您的 Intranet 和 Intellij
+video::Q-T390A9bzY[youtube, width=640, height=480]
+
+.在您的 Intranet 中创建新的应用程序
+video::tTRJ6R27JNo[youtube, width=640, height=480]

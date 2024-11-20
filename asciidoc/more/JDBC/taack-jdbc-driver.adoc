@@ -3,6 +3,7 @@
 :taack-category: 0|more/JDBC
 :toc:
 :source-highlighter: rouge
+:icons: font
 
 == What is it ?
 
@@ -148,7 +149,9 @@ WARNING: Columns Alias name must start with a lower case letter and only be part
 
 === Queries with Grouping
 
-Grouping clause add the capability to aggregate data. The <<basic-query-with-formulas>> is not useful, since there is one line per offer line. It is possible to use grouping in order to get one line per offer, like in the following sample:
+Grouping clause adds the capability to aggregate data.
+The <<basic-query-with-formulas>> has not one line per offer line.
+It is possible to use grouping to get one line per offer, like in the following sample:
 
 [source,sql]
 .TQL Sample With Grouping And Formulas
@@ -179,11 +182,11 @@ WARNING: Column Aliases are not supported on aggregated columns
 
 === Queries Inner Joins
 
-Sometimes a column point to more than one line.
+Sometimes a column points to more than one line.
 
 It is called a *many-to-many* relationship. We cannot use referenced fields directly, you have to use what is called *joins* ... (it sounds 70th, but it is not me)
 
-In the next sample, *Items* hold many *Values*, and *Values* can be used by more than one *Item*. If we want to list Item and Values in the same table, we need some kind of cross-product between 2 sets of data.
+In the next sample, *Items* hold many *Values*, and *Values* can be used by more than one *Item*. If we want to list Items and Values in the same table, we need some kind of cross-product between 2 sets of data.
 
 WARNING: Cardinality of cross-product of 2 sets is #M x N#, you have to use *Where clause* to reduce the number of results.
 
@@ -230,5 +233,5 @@ where v in elements(i.values) and i.range.name = 'DVM'  <2>
 
 == Current Driver Limitations
 
-* You will not be able to *deference* language fields. (`v.valueMap['fr']` will fail, also `v.valueMap`). More on this later.
-* We support only Inner join, not outer join. Our current join implementation is slow, we can improve that, but it is complex, more on this later.
+* You will not be able to *deference* language fields. (`v.valueMap['fr']` will fail, also `v.valueMap`).
+* We support only Inner join, not outer join. Our current join implementation is slow, we can improve that, but it is more complex.

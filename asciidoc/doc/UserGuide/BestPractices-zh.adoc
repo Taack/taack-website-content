@@ -1,0 +1,74 @@
+= 代码规范
+:taack-category: 10|doc/UserGuide
+:toc:
+:source-highlighter: rouge
+:icons: font
+
+== Grails应用程序开发过程中的代码规范指南
+
+以下是一些有助于简化系统维护难度的要领：
+
+- 方法修饰符：
+** 为控制器中非Action的方法加上protected、private、final等修饰符。
+- 代码规范：
+** 优先使用简洁的代码，保证清晰度。
+** `@GrailsCompileStatic` 或 `@CompileStatic` 请贯穿使用在整个项目代码中。
+- 无状态Action：
+** 始终避免使用Session会话，以保持Action无状态。
+- 控制器：
+** 避免使用Service去声明 (implement) 控制器。
+- @Transactional 注解：
+** 若要使用 @Transactional 注解，请单独使用在控制器中必要的Action上。
+- 一般原则：
+** final修饰符只在适当的时候使用。
+** 遵守DRY (Don't Repeat Yourself / 不要重复自己) 原则。
+** 尽量保证代码最短以提高其可读性。
+** 局部变量名请简洁且意义明确。
+** 公共方法要明确各项参数和成员命名。
+
+遵守以上规范，您的Grails应用程序代码将显得干净且富有表现力。
+
+== 翻译
+
+- 不要把所有翻译都集中到一起，每个子应用都有各自的 `i18n` 翻译模块。
+
+[,groovy]
+----
+class Book {
+    String title
+}
+----
+- 类名翻译规范： "book.label = Libro"
+- 字段翻译规范 "book.title.label = Título del libro"
+- 提高翻译效率的方式：
+** 不要太早开始翻译
+** 全局雏形完成后再开始翻译
+** 最重要的标签要始终保持统一且简短，建议用 `default` 作为前缀统一命名。特殊的标签可以很长。
+- 使用约定俗成的标签规范：
+** 所有可被广泛复用的标签请以 `default` 作为前缀
+** 不要为类名翻译添加前缀
+** 在Crew人员管理系统里，我们专门使用了Action和Domain特定的property文件来保存翻译 (见link:https://github.com/Taack/intranet/tree/main/app/crew/grails-app/i18n[Crew i18n folder])
+
+通用的翻译标签应当保存在 `Crew` 或 `Server` 模块里，不应当是某个子应用模块私有的。
+
+== 配置
+
+- 在代码里要使用Enum枚举类来进行配置
+** “静态”永远是最优先的
+** Groovy枚举类更具可读性 (优于XML、Json、Yaml...任意其他)
+
+== 安全验证
+
+- 安全验证相关的代码应该就放在目标的附近
+** 我们希望避免所有问题混杂在一起
+*** 必要时就创建新的domain类，而不是一股脑儿全塞进 `User` 类里。
+*** 出于安全性考虑，尽量减少抽象类的概念；同时不要忘记“静态”永远是最优先的
+- 避免复杂的规则，尤其是那些会导致无法静态编译的情况
+- 权限管理不要基于字符串，在代码测试中一个数据对象的某个布尔值字段会显得更加明确。
+
+== 只要能达成以下情形，我们就是高效的：
+
+- 小改动不会导致整段代码重写
+- 能轻松地添加新功能，而无需牵扯各处
+- 不同模块彼此独立，相互之间的影响程度很小
+- 不管是啥，看起来都很简单

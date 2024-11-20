@@ -2,34 +2,36 @@
 :taack-category: 10|doc/UserGuide
 :toc:
 :source-highlighter: rouge
+:icons: font
 
 == Coding Style Guide for Grails Application Development
 
-Here are the guidelines and coding style recommendations for your Grails application:
+Here are some guidelines that should ease application maintenance:
 
 - Method Modifiers:
-** Use protected and final modifiers for methods in a controller that are not actions.
+** Use protected, private and final modifiers for methods in a controller that are not actions.
 - Coding Style:
 ** Prioritize concise code, while maintaining clarity.
-** Employ the @GrailsCompileStatic or @CompileStatic annotations throughout the codebase.
+** Employ `@GrailsCompileStatic` or `@CompileStatic` annotations throughout the codebase.
 - Stateless Actions:
 ** Always design actions to be stateless and avoid using sessions.
 - Controller Traits:
-** Refrain from utilizing services to implement Controller traits.
+** Refrain from using services to implement Controller traits.
 - @Transactional Annotation:
 ** Reserve the @Transactional annotation solely for controller actions.
 - General Rules:
 ** Use the final modifier when appropriate.
 ** Adhere to the DRY (Don't Repeat Yourself) principle.
-** Keep the scope of symbols low to enhance code readability.
+** Keep the scope of symbols the shortest to enhance code readability.
 ** Opt for concise and meaningful local variable names.
 ** Clearly specify public method parameters and member names.
 
-By following these guidelines, you can maintain a clean, organized, and expressive codebase for your Grails application.
+By following these guidelines, you can maintain a clean and expressive codebase for your Grails application.
 
 == i18n
 
-- Do not centralize i18n, use gradle module `i18n` folders
+- Do not centralize i18n, use gradle app module `i18n` folders for each app.
+
 [,groovy]
 ----
 class Book {
@@ -38,33 +40,42 @@ class Book {
 ----
 - class name localisation "book.label = Libro"
 - class field name localisation "book.title.label = Título del libro"
-- In order to be efficient
+- To be efficient
 ** do not translate too early
 ** when you have a global overview, start translating
-** keep most important label short, use the `default` namespace for them, specialized label can be long
-- used convention for your i18n:
-** prefix with "default." everything that will be reused
+** keep the most important label short, use the `default` namespace for them, specialized label can be long
+- Use convention for your i18n:
+** prefix with "default." everything that could be reused
 ** do not prefix class name translated
-** for labels, prefix with "label."
-** for actions, prefix with "action."
+** In crew app, we use actions and domains specific property files (See https://github.com/Taack/intranet/tree/main/app/crew/grails-app/i18n[Crew i18n folder])
+
+Common i18n should be localized into `Crew` app module or `Server`, properties are not private to an app module.
 
 == Configuration
 
 - Use enum, in code, for configuration
-** Static test is the king
-** Groovy Enums are more readable than XML, Json, Yaml ... whatever
+** Static is king
+** Groovy Enums are readable (more than XML, Json, Yaml ... whatever)
 
 == Security
 
-- Security-related code should be located near the point of its implementation
-** We do want to avoid centralisation for all concerns
+- Security-related code should be located near the point of influence
+** We do want to avoid centralization for all concerns
 *** Create a new domain per needs, avoid cluttering `User` class
 *** Abstract concepts should be minimized for security purposes; static checks are crucial
 - Avoid complex rules that can't be verified statically during compilation
-- Administrative rules must not rely on permission strings, a boolean value in an object is more explicite when testing in code.
+- Administrative rules must not rely on permission strings, a boolean value in an object is more explicit when testing in code.
 
-== You are efficient when:
+== Domain Classes
 
-- Modifications to a functionality don't cause widespread disruptions
+* Avoid cyclic dependencies in domain (`User` => `Cart` AND `Cart` => `User`) if domain classes belong to different app modules
+* Domain classes should be barely minimal
+* *No helper* with external dependencies in domain
+
+
+== We can tell we are efficient if:
+
+- Small evolutions do not trigger a complete code rewrite
 - Incorporating new features is straightforward
-- Different concerns remain isolated or orthogonal, minimizing mutual influence.
+- Different concerns remain isolated, minimizing mutual influence
+- Things seem simple

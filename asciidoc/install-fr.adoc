@@ -1,0 +1,128 @@
+= Installer
+
+== Prérequis
+
+Pour commencer, vous aurez besoin des éléments suivants :
+
+* *Java* (JDK-17 or JDK-19)
+* *git*
+
+En option, vous pouvez aussi installer :
+
+* *Solr-9.6.x* (Used for intranet-wide search bar)
+* *Postgresql*
+
+=== Version de Java
+
+Commande affichant la version:
+
+[sh]
+----
+java -fullversion
+openjdk full version "17.0.5+1"
+----
+
+Sur Mac, on peut utiliser brew pour l'installation du Jdk :
+
+[sh]
+----
+brew install openjdk@17
+----
+
+
+== Clonez le projet Intranet clé en main
+
+[,bash]
+----
+git clone https://github.com/Taack/intranet.git
+----
+
+Ce dépôt contient une version simplifiée d'un Intranet dans lequel vous pourrez ajouter d'autres applications. Il contient "Crew", qui est le système de gestion des utilisateurs, ainsi que sa dépendance de sécurité : *Spring Security Plugin*.
+
+== Lancez votre futur Intranet
+
+Allez dans le répertoire intranet nouvellement cloné et démarrez le serveur en exécutant cette commande :
+
+[,bash]
+----
+./gradlew server:bootRun
+----
+
+Si vous souhaitez que Gradle observe les modifications des fichiers pour recharger à chaud les modifications, lancer avec l'option `-Dgrails.run.active=true` :
+
+[,bash]
+----
+./gradlew -Dgrails.run.active=true server:bootRun
+----
+
+Après un certain temps, vous devriez voir dans la console le message suivant :
+
+[,bash]
+----
+Grails application running at http://localhost:9442...
+----
+
+Vous pouvez maintenant accéder à l'Intranet en allant à cette adresse depuis votre navigateur.
+Vous pouvez aussi vous identifier avec les identifiants par défaut (identifiant : *admin*, mot de passe : *ChangeIt*).
+Le mot de passe peut être remplacé dans le fichier `server/grails-app/conf/application.yml`.
+
+=== Base de données persistante
+
+Éditer le fichier `server/grails-app/conf/application.yml`, la section `dataSource`. Les base de données relationnelle et non relationnelle sont supportées.
+
+Pour que les données de H2 soit persistante en mode développement :
+
+[source,yaml]
+----
+environments:
+    development:
+        dataSource:
+            dbCreate: update        <1>
+            url: jdbc:h2:./prodDb;LOCK_TIMEOUT=10000;DB_CLOSE_ON_EXIT=FALSE <2>
+----
+
+<1> Mode de création des schémas (voir Grails GORM documentation)
+<2> `prodDb` : la racine du nom du fichier utilisé
+
+=== Tâche Gradle pour création de binaire Tomcat
+
+À la place de `bootRun`, utiliser la tâche `assemble` :
+
+[source,bash]
+----
+./gradlew server:assemble
+----
+
+Le binaire se trouvera dans le répertoire  `server/build/libs`. Pour l'importer ensuite dans Tomcat :
+
+[source,bash]
+----
+cd server/build/libs
+java -jar server-[version].jar
+----
+
+L'exécution sera plus rapide, les fichiers statiques seront compressés et concaténés.
+
+TIP: Soyez sûr de ne pas avoir une instance déjà en train de fonctionner
+
+
+== Configurez votre IDE
+
+Nous recommandons fortement d'utiliser la dernière version d'*IntelliJ Ultimate* Edition, pour son support étendu de Groovy et Grails. Nous étudions actuellement le support d'autres IDE (Eclipse, Visual Studio Code), ainsi que le support des autres versions d'IntelliJ.
+
+=== IntelliJ Ultimate Edition
+
+Nous vous recommandons d'installer les plugins Taack pour IntelliJ que vous pouvez trouver dans le store Intellij https://plugins.jetbrains.com/plugin/20792-taackuiastautocomplete[TaackUiASTAutocomplete] ou en compilant les sources https://github.com/Taack/infra/releases/tag/v0.1[ici].
+
+Pour ouvrir le projet, sélectionnez "Open projet" et sélectionnez `intranet/settings.gradle`.
+
+=== Visual Studio Code
+
+Si vous voulez vraiment utiliser Visual Studio Code, nous vous recommandons les extensions suivantes pour utiliser ce framework :
+
+* https://marketplace.visualstudio.com/items?itemName=vscjava.vscode-java-pack[Extension Pack for Java]
+* https://marketplace.visualstudio.com/items?itemName=marlon407.code-groovy[code-groovy]
+* https://marketplace.visualstudio.com/items?itemName=vscjava.vscode-gradle[Gradle for Java]
+* https://marketplace.visualstudio.com/items?itemName=MellowMarshmallow.groovy[Groovy]
+
+Gardez à l'esprit que la plupart des fonctionnalités de Grails et de Taack Framework ne seront pas reconnues par VSCode mais celui-ci peut toujours être utilisé. De plus, VSCode ne vous proposera pas d'aide avec les importations, la navigation dans le code ainsi que de nombreuses autres fonctionnalités pratiques puisque le support de Groovy n'est pas aussi avancé que sur IntelliJ.

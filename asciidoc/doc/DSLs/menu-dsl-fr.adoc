@@ -1,0 +1,49 @@
+= Menu DSL
+:doctype: book
+:taack-category: 1|doc/DSLs
+:toc:
+:source-highlighter: rouge
+:icons: font
+
+* [*] Rendu en HTML
+* [ ] Rendu en Mails
+* [ ] Rendu en PDF
+* [ ] Rendu en CSV
+
+Menu DSL associe les entrées de menu aux actions de niveau supérieur.
+Menu DSL ne prend en charge que 2 niveaux maximum (sans prendre en compte `section`).
+
+[source,groovy]
+[[menu-sample1]]
+.Exemple de menu avec condition
+----
+private UiMenuSpecifier buildMenu(String q = null) {
+    new UiMenuSpecifier().ui {                          <1>
+        menu CrewController.&index as MC
+        menu CrewController.&listRoles as MC
+        menu CrewController.&hierarchy as MC
+        menuIcon ActionIcon.CONFIG_USER, this.&editUser as MC   <4>
+        menuIcon ActionIcon.EXPORT_PDF, this.&downloadBinPdf as MC
+        menuSearch this.&search as MethodClosure, q     <2>
+        menuOptions(SupportedLanguage.fromContext())    <3>
+    }
+}
+----
+
+<1> Créer un nouveau menu
+<2> Menu de recherche
+<3> Entrées de langues
+<4> Entrées d'icônes (message de l'aspirateur déduit automatiquement) .Menu correspondant Rendu.
+
+image:screenshot-dsl-menu-041.webp[]
+
+[graphviz,format="svg",align=center]
+.Diagramme de hiérarchie des symboles pour Menu DSL
+----
+digraph mygraph {
+    node [shape=box];
+    ui -> menu, menuIcon, subMenu, menuOption [label = "0,N"]
+    ui -> menuSearch [label = "0,1"]
+    subMenu -> menu [label = "1,N"]
+}
+----

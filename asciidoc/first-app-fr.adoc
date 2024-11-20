@@ -1,20 +1,35 @@
 = Première application
-:doctype: book
-:taack-category: 2
-:toc:
-:source-highlighter: rouge
 
 == Comment une application fonctionne avec Taack Framework ?
 
 Votre projet Intranet possède deux parties :
 
-* Les plugins d'applications, qui sont regroupés dans le répertoire `app` : ce sont des micro-projets qui contiennent chacun leurs propres dépendances, dossier build, etc. Par exemple, `Crew` est plugin d'application.
-link:doc/plugin-fr.adoc#_informations_avancées_sur_les_plugins[Cliquez ici] pour en savoir plus sur la façon dont les plugins d'application sont implémentés sur le serveur.
+* Les plugins d'applications, qui sont regroupés dans le répertoire `app` : ce sont des micro-projets Gradle qui contiennent chacun leurs propres dépendances, dossier build, etc. Par exemple, `Crew` est plugin d'application.
+
+link:doc/plugin/taack-plugin-fr.adoc[Enregistrer une application] pour en savoir plus sur la façon dont les plugins d'application sont implémentés sur le serveur.
 * Le serveur principal, qui va gérer tous les plugins d'applications définis dans `build.gradle` et les ajouter sur la page principale de l'Intranet.
 
 == Créer une nouvelle application
 
-TODO: Create-taack-app turbo explaination here
+Pour créer une nouvelle appliquette (un plugin Grails ou module Gradle), assurez-vous d'avoir la dernière version Github de l'Intranet (voir link:install-fr.adoc[installation]).
+
+Ceci fait, exécuter la commande suivante :
+
+[,bash]
+----
+./gradlew -DmodName=myToto server:generateTaackAppTask
+----
+
+Une nouvelle appliquette apparaîtra dans le répertoire `app`. Pensez à recharger Gradle pour détecter sa présence dans Intellij.
+
+.Recharger Gradle
+image::screenshot-new-app-gradle-reload.webp[Reload,width=520,align="left"]
+
+== Mot sur la maintenance
+
+La plupart du temps, mettre à jour votre Intranet ne devrait impliquer que de mettre à jour le répertoire `buildSrc`, et le fichier `gradle.properties`.
+
+NOTE: Ne soyez pas effrayé par ce genre de procedure. Il n'y a pas vraiment de méthode parfaite.
 
 == Créer un menu
 
@@ -23,13 +38,11 @@ Avant toute chose, penchons-nous sur la navigation de votre nouvelle application
 [,groovy]
 ----
 static private UiMenuSpecifier buildMenu(String q = null) {
-    UiMenuSpecifier m = new UiMenuSpecifier()
-    m.ui {
-        menu 'Action', TurboController.&action as MC
-        // MC stands for MethodClosure
+    new UiMenuSpecifier().ui {
+        menu SomeController.&action as MC
+        menu this.&anotherAction as MC
         // import org.codehaus.groovy.runtime.MethodClosure as MC
     }
-    return m
 }
 ----
 
@@ -37,12 +50,12 @@ Nous créons tout d'abord un objet UiMenuSpecifier, puis nous définissons le co
 
 [,groovy]
 ----
-menu 'Action', TurboController.&action as MC
+menu TurboController.&action as MC
 ----
 
 Ici, `menu` crée un simple lien dans notre bar de navigation. `'Action'` est le nom du lien affiché et `TurboController.&action as MethodClosure` définie l'action vers laquelle le lien va rediriger.
 
-Vous pouvez consulter la liste complète des éléments que vous pouvez ajouter dans votre menu ici : link:TODO[Documentation].
+Vous pouvez consulter la liste complète des éléments que vous pouvez ajouter dans votre menu ici : link:doc/DSLs/menu-dsl-fr.adoc[Menu DSL].
 
 == Créer un tableau
 
@@ -62,34 +75,35 @@ Nous pouvons ensuite définir l'en-tête du tableau en ajoutant dans la closure 
 [,groovy]
 ----
 UiTableSpecifier tableSpecifier = new UiTableSpecifier()
-tableSpecifier.ui Book, {
+tableSpecifier.ui {
     // -- Header --
     header {
         column {
-            fieldHeader "Title"
+            fieldHeader object.title_
         }
     }
 }
 ----
 
-Puisque nous avons défini notre tableau dans une closure, nous pouvons ajouter des conditions, des boucles, etc. Ajoutons maintenant une colonne qui va être affichée uniquement si l'utilisateur possède le rôle `ROLE_ADMIN` :
+Puisque nous avons défini notre tableau dans une closure, nous pouvons ajouter des conditions, des boucles, etc.
+
+Ajoutons maintenant une colonne qui va être affichée uniquement si l'utilisateur possède le rôle `ROLE_ADMIN` :
 
 [,groovy]
 ----
 // Look if the current user has the Role "ROLE_ADMIN"
-boolean isAdmin = (springSecurityService.currentUser as User).authorities*.authority.contains("ROLE_ADMIN")
+User cu = springSecurityService.currentUser as User
+boolean isAdmin = cu.authorities*.authority.contains("ROLE_ADMIN")
 
-UiTableSpecifier tableSpecifier = new UiTableSpecifier()
-tableSpecifier.ui Book, {
-    // -- Header --
+new UiTableSpecifier().ui {
     header {
         column {
-            fieldHeader "Title"
+            label object.title_
         }
         // Column only shown to admin
         if (isAdmin) {
             column {
-                fieldHeader "Delete book"
+                label "Delete book"
             }
         }
     }
@@ -98,45 +112,39 @@ tableSpecifier.ui Book, {
 
 La colonne avec l'en-tête "Delete book" sera affichée seulement si l'utilisateur courant est un admin.
 
-Maintenant, nous allons remplir notre tableau. Nous allons lister toutes les instances de Book dans la base de données en utilisant la fonctionnalité de Grails suivante : `Book.list()`.
-
-Ensuite, nous allons parcourir la liste avec une boucle et définir nos lignes comme ceci :
+Maintenant, nous allons remplir notre tableau. Nous allons lister toutes les instances de Book dans la base de données en utilisant l'instruction `iterate` du DSL des tables.
 
 [,groovy]
 ----
-boolean isAdmin = (springSecurityService.currentUser as User).authorities*.authority.contains("ROLE_ADMIN")
+User cu = springSecurityService.currentUser as User
+boolean isAdmin = cu.authorities*.authority.contains("ROLE_ADMIN")
 
-UiTableSpecifier tableSpecifier = new UiTableSpecifier()
-tableSpecifier.ui Book, {
-    // -- Header --
+new UiTableSpecifier().ui {
     header {
         column {
-            fieldHeader "Title"
+            label object.title_
         }
         // Column only shown to admin
         if (isAdmin) {
             column {
-                fieldHeader "Delete book"
+                label "Delete book"
             }
         }
     }
 
-    //List all Book
-    def books = Book.list()
-    for (Book book in books) {
-        // Define a row for each book
-        row {
-            // Define a column displaying the title
+    iterate(taackFilterService.getBuilder(Book)
+            .setMaxNumberOfLine(8)
+            .setSortOrder(TaackFilter.Order.DESC, object.title_)
+            .build()) { Book book ->
+        rowColumn {
+            rowField book.title_ //The underscore is needed here
+        }
+        // If the user is an admin display a column with a button link
+        // to redirect towards the book deletion action
+        if (isAdmin) {
             rowColumn {
-                rowField book.title_ //The underscore is needed here
-            }
-            // If the user is an admin display a column with a button link
-            // to redirect towards the book deletion action
-            if (isAdmin) {
-                rowColumn {
-                    rowLink "Delete book", ActionIcon.DELETE,
-                            TurboController.&index as MC, book.id, false
-                }
+                rowAction ActionIcon.DELETE,
+                        this.&deleteBook as MC, book.id
             }
         }
     }
@@ -146,21 +154,19 @@ tableSpecifier.ui Book, {
 Pour chaque livre dans notre liste, nous créons une nouvelle ligne avec son titre dans la première colonne et un bouton "supprimer" dans la seconde colonne si l'utilisateur est un admin (pour le moment, nous sommes redirigés vers `index` puisque nous n'avons pas encore créé de méthode de suppression).
 
 Votre tableau est désormais complet. Nous devons maintenant simplement l'afficher sur la page.
-Pour afficher les UiSpecifiers que nous avons précédemment construits, nous devons utiliser `TaackUiSimpleService`. Il devrait être déjà importé dans le contrôleur créé par la commande `create-taack-app`.
+Pour afficher les UiSpecifiers que nous avons précédemment construits, nous devons utiliser `taackUiService`. Il devrait être déjà importé dans le contrôleur créé par la commande `create-taack-app`.
 
 Ajoutez le code suivant sous le code de votre tableau :
 
 [,groovy]
 ----
-taackUiSimpleService.show(new UiBlockSpecifier().ui {
-    ajaxBlock 'blockList', {
-        table 'Book table', tableSpecifier, BlockSpec.Width.MAX
-    }
+taackUiService.show(new UiBlockSpecifier().ui {
+    table tableSpecifier
 }, buildMenu())
 ----
 
-`taackUiSimpleService.show(UiBlockSpecifier block, UiMenuSpecifier menu)` sera en charge d'afficher la spécification que nous lui avons donnée. Dans ce cas, nous voulons afficher un `ajaxBlock` qui contient une `table` nommée "Book table". Nous passons notre `tableSpecifier` précédemment créé en tant qu'argument et nous réglons la largeur du tableau à `MAX` afin qu'il occupe toute la largeur de la page.
-Nous utilisons également notre méthode statique `buildMenu()` créée précédemment, et nous la passons en tant que second argument de `show()` pour afficher notre menu avec la page.
+`taackUiService.show(UiBlockSpecifier block, UiMenuSpecifier menu)` sera en charge d'afficher la spécification que nous lui avons donnée. Dans ce cas, nous voulons afficher un `ajaxBlock` qui contient une `table` nommée "Book table". Nous passons notre `tableSpecifier` précédemment créé en tant qu'argument et nous réglons la largeur du tableau à `MAX` afin qu'il occupe toute la largeur de la page.
+Nous utilisons également notre méthode statique `buildMenu()` créée auparavant, et nous la passons en tant que second argument de `show()` pour afficher notre menu avec la page.
 
 Vous pouvez maintenant lancer le serveur et accéder à votre nouvelle application. Votre tableau devrait fonctionner, mais pour le moment, vous ne devriez voir que les en-têtes, car vous n'avez pas encore de livres dans votre base de données. Continuons donc avec la création du formulaire et la sauvegarde de l'objet dans la base de données.
 
@@ -170,15 +176,11 @@ Nous allons ajouter un bouton dans notre tableau Book qui va ouvrir un modal en 
 
 [,groovy]
 ----
-taackUiSimpleService.show(new UiBlockSpecifier().ui {
-    ajaxBlock 'blockList', {
-        table 'Book table', tableSpecifier, BlockSpec.Width.MAX, {
-            //Added Closure here
-            if (isAdmin())
-                action 'Create book', ActionIcon.CREATE,
-                       TurboController.&bookForm as MC,
-                       [redirectAction: actionName], true
-        }
+taackUiService.show(new UiBlockSpecifier().ui {
+    table 'Book table', tableSpecifier, BlockSpec.Width.MAX, {
+        //Added Closure here
+        if (isAdmin())
+            action ActionIcon.CREATE, this.&bookForm as MC
     }
 }, buildMenu())
 ----
@@ -187,25 +189,14 @@ Maintenant un admin pourra voir un bouton "Créer" en haut à droite du tableau.
 
 La méthode `action` est composée des paramètres suivants :
 
-1) Le titre du bouton.
-2) L'icône du bouton (doit être une valeur de l'enum xref:doc/Concepts/docref.adoc#_actionicon[ActionIcon]).
-3) L'action vers laquelle le bouton va rediriger.
-4) Les paramètres à envoyer lors de la redirection (ici, nous indiquons l'action vers laquelle on sera redirigé après avoir enregistré le livre).
-5) Un paramètre pour indiquer si nous affichons dans un modal avec ajax.
+. L'icône du bouton ;
+. L'action vers laquelle le bouton va rediriger ;
+. Le libellé sera composé et traduit en utilisant le nom de l'action.
 
 == Créer un formulaire et sauvegarder des objets
 
 Nous allons maintenant créer le formulaire qui sera utilisé à la fois pour la création et la mise à jour des livres. Pour gérer les deux cas, nous allons d'abord définir notre action `bookForm` et ensuite initialiser soit un nouveau livre, soit regarder si l'identifiant d'une instance de livre a été passé en paramètre de la requête.
 
-[,groovy]
-----
-def bookForm() {
-    // Get book if we passed an id of the book we want to update
-    // Or create new one
-    Book book = Book.read(params.long("id")) ?: new Book(params)
-}
-----
-OR You could simply write
 [,groovy]
 ----
 def bookForm(Book book) {
@@ -225,24 +216,21 @@ form.ui book, {
         field book.author_
     }
     //Save button
-    formAction 'Save', this.&saveBook as MC, book.id,
-               [redirectAction: params.get('redirectAction')], true
+    formAction this.&saveBook as MC
 }
 ----
 
-Maintenant que votre formulaire est défini, affichons-le en utilisant `taackUiSimpleService.show()`.
+Maintenant que votre formulaire est défini, affichons-le en utilisant `taackUiService.show()`.
 
 [,groovy]
 ----
 UiBlockSpecifier b = new UiBlockSpecifier()
 b.ui {
     modal {
-        ajaxBlock "bookForm", {
-            form "Book Form", form, BlockSpec.Width.MAX
-        }
+        form form, BlockSpec.Width.MAX
     }
 }
-taackUiSimpleService.show(b)
+taackUiService.show(b)
 ----
 
 Cette fois, nous n'allons pas spécifier `buildMenu` dans notre show, car nous ne voulons pas que le menu soit affiché dans le modal !
@@ -254,8 +242,7 @@ N'oubliez pas de créer l'action `saveBook` :
 @Secured("ROLE_ADMIN")
 @Transactional
 def saveBook(String redirectAction) {
-    MC red = (redirectAction ? this.&"$redirectAction" : this.&index) as MC
-    taackSimpleSaveService.saveThenRedirectOrRenderErrors(Book, redirectAction == "null" ? null : red)
+    taackSaveService.saveThenReloadOrRenderErrors(Book)
 }
 ----
 
@@ -264,22 +251,20 @@ Puisque nous voulons autoriser seulement les administrateurs à créer des livre
 == Afficher un objet
 
 Maintenant que nous pouvons créer des livres et les lister dans un tableau, affichons leurs détails dans un modal.
-Encore une fois, nous allons définir le Specifier et l'afficher dans un bloc via `taackUiSimpleService.show()` :
+Encore une fois, nous allons définir le Specifier et l'afficher dans un bloc via `taackUiService.show()` :
 
 [,groovy]
 ----
-def showBook(Book book) {
+def showUser(Book book) {
     // Define the show displayed fields
-    UiShowSpecifier show = new UiShowSpecifier().ui(book, {
-        field "Title", book.title
-        field "Author", book.author
+    UiShowSpecifier showSpec = new UiShowSpecifier().ui(book, {
+        fieldLabeled book.title_
+        fieldLabeled book.author_
     })
 
-    taackUiSimpleService.show(new UiBlockSpecifier().ui {
+    taackUiService.show(new UiBlockSpecifier().ui {
         modal {
-            ajaxBlock "showBook", {
-                show "${book.title}", show, BlockSpec.Width.MAX
-            }
+            show showSpec
         }
     })
 }
@@ -289,12 +274,14 @@ Nous devons également ajouter un lien vers cette page dans le tableau. Pour ajo
 
 [,groovy]
 ----
-rowLink "Show book", ActionIcon.SHOW * ActionIconStyleModifier.SCALE_DOWN, TurboController.&showBook as MC, book.id, true
+rowAction
+        ActionIcon.SHOW * StyleModifier.SCALE_DOWN, <1>
+        TurboController.&showBook as MC, book.id
 ----
 
-Cela créera un _petit_ bouton dans la cellule du tableau qui ouvrira un modal avec les détails du livre correspondant.
+<1> Cela créera un _petit_ bouton dans la cellule du tableau qui ouvrira un modal avec les détails du livre correspondant.
 
-Notez qu'ici, `ActionIcon` a été multiplié avec un `ActionIconStyleModifier` pour modifier la taille de l'icône. Pour plus de détails, consultez le chapitre détaillé : xref:doc/Concepts/docref.adoc#_actionicon[ActionIcon].
+Notez qu'ici, `ActionIcon` a été multiplié avec un `IconStyle` pour modifier la taille de l'icône.
 
 == Supprimer un objet
 

@@ -1,14 +1,24 @@
 = Extension Grails DSL
 :taack-category: 1
+:source-highlighter: rouge
 
-Taack-UI est une extension de Grails, permettant de décrire l’interface utilisateur et la sécurité d’une application Grails via des DSL Groovy statiquement typées. Le cadre offert par cette extension propose également de simplifier (et tester statiquement par l’IDE) les fonctionnalités suivantes par rapport à une application Grails classique :
+slide::[fn=slideshow-fr]
 
-* La sécurité :
-** Transformation et affichage des objets limités aux champs modifiables par l’utilisateur ;
-** Gestion du masquage des actions accessibles à l’utilisateur à un endroit unique ;
-** Le listage des données accessibles à l’utilisateur ;
+https://github.com/Taack/infra[Taack-UI] est une extension de Grails, permettant de décrire l’interface utilisateur et la sécurité d’une application Grails via des DSL Groovy statiquement typées.
 
-* PDF, Mails, CSV, autres peuvent être rendu avec le mème code ;
+Cette extension ajoute les fonctionnalités suivantes par rapport à Grails :
+
+* Sécurité :
+** Edition et affichage des champs de données des objets, en respectant les droits imposés à l'utilisateur ;
+** Gestion du masquage des actions et des liens, accessibles à l’utilisateur, sans duplication de code ;
+** Le listage des données accessibles à l’utilisateur uniquement (modulo la recherche Solr qui présente un extrait des données) ;
+
+* *PDF*, *Mails*, *CSV*, autres, peuvent être composés par le mème code ;
+
+* Traductions des libéllés : les DSL détectent les clés des libéllés et utilisent la bonne traduction ;
+
+* Reporting errors during Object validation for free (refer to link:doc/DSLs/form-dsl.adoc#_form_validation[*form validation*]);
+
 
 * Le support de Solr pour la recherche textuelle :
 ** Recherche et indexation textuelle des objets ;
@@ -23,7 +33,7 @@ Taack-UI est une extension de Grails, permettant de décrire l’interface utili
 *** Par exemple le répertoire /<username>/crew/pictures contient les photos des utilisateurs du système, bien que le stockage des photos sur le disque dur n’ait pas cet agencement
 *** Le fichier /<username>/crew/users.csv contient les données des utilisateurs actifs du système, bien que ce fichier ne soit généré qu’au moment de l’accès et soit non stocké ;
 ** Accès à une partie du système de fichiers réels du serveur pour créer des espaces d’échange rapide ;
-* Shell (expérimental) via ssh permettant de définir des interfaces graphiques s’exécutant entièrement sur le serveur (voir <<ssh_screenshot>>)
+* *Shell* (expérimental) via ssh permettant de définir des interfaces graphiques s’exécutant entièrement sur le serveur (voir <<ssh_screenshot>>)
 
 [[ssh_screenshot]]
 .Ssh server session
