@@ -8,7 +8,17 @@
 
 == Version 0.5.7
 
-* Bug fixes
+* Initial Asciidoctor WYSIWYG editor
+** Support for Drag and Drop images and files
+* More diagram DSLs
+** timeSeries
+** areaChart
+** bubbleChart
+* Security
+** Sanitize displayed information by default
+** Check access on all entry points
+* Bug fixes and dependencies bump
+
 
 == Version 0.5.6 (fix bugs from 0.5.5)
 
