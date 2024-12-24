@@ -127,7 +127,7 @@ new UiTableSpecifier().ui {
     User u = new User(manager: new User(), enabled: true)
     header {                                                <1>
         if (!hasSelect) {
-            fieldHeader tr('picture.header.label')          <2>
+            label tr('picture.header.label')          <2>
         }
         column {
             sortableFieldHeader u.username_                 <3>
@@ -142,7 +142,7 @@ new UiTableSpecifier().ui {
             sortableFieldHeader u.firstName_
         }
         column {
-            fieldHeader tr('default.roles.label')
+            label tr('default.roles.label')
         }
     }
     boolean canSwitchUser = crewSecurityService.canSwitchUser()
@@ -224,7 +224,7 @@ digraph mygraph {
   header -> column [label = "0,N"]
   column, header -> fieldHeader, sortableFieldHeader [label = "1,N"]
   row,rowIndent -> rowColumn [label = "0,N"]
-  rowColumn,row,rowIndent -> rowAction, rowField [label = "0,N"]
+  rowColumn,row,rowIndent -> rowAction, rowField, rowFieldRaw [label = "0,N"]
   rowIndent -> rowTree [label = "0,1"]
 }
 ----

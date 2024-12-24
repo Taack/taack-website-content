@@ -5,6 +5,23 @@
 :source-highlighter: rouge
 :icons: font
 
+== Version 0.5.7
+
+* Suppression du paramètre dans `UiShowSpecifier().ui`
+* Travaux préliminaires sur un éditeur WYSIWYG
+** Support pour le copier / coller et le glisser / déposer
+* Nouveaux diagrammes
+** timeSeries
+** areaChart
+** bubbleChart
+* Sécurité
+** Assainissement des données affichées par défaut (Utiliser `fieldRaw` pour ne pas assainir)
+** Vérification de l'accès à tous les points d'entrée, Quel que soit le format des paramètres
+* Incrémentation des dépendances externes et fixes variés.
+
+WARNING: Remplacer `field <html code>` par `fieldRaw <html code>`
+
+
 == Version 0.5.6 (correction de bugs de la version 0.5.5)
 
 * Afficher les colonnes triables et le sens du tri (voir <<sorting-screenshot>>)
