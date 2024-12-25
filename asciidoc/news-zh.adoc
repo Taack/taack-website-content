@@ -6,6 +6,23 @@
 :source-highlighter: rouge
 :icons: font
 
+== 0.5.7 版
+
+* 清理 `show` DSL代码, 不再需要将对象参数传递给 `UiShowSpecifier().ui`
+* 初始Asciidoctor WYSIWYG编辑器
+** 支持鼠标拖放图像和文件
+* 更多图表 DSL
+** 时序图
+** 面积图
+** 气泡图
+* 安全
+** 默认情况下清理插入的html代码 (使用 `fieldRaw` 避免html代码的自动清理)
+** 检查所有入口的访问权限
+* 修复错误和依赖项冲突
+
+
+WARNING: 使用 `fieldRaw <html code>`替换 `field <html code>`
+
 == 0.5.6 版（修复 0.5.5 版中的错误）
 
 * 显示表格可排序列和排序方向（参见 <<sorting-screenshot>>）
