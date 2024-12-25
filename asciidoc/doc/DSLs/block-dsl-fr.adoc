@@ -10,7 +10,7 @@
 * [*] Rendu en PDF
 * [ ] Rendu en CSV
 
-DSL de niveau supérieur qui est responsable de l'organisation des éléments graphiques de la page et de la mise à jour des blocs ajax. Dans le cas où nous rendons une page complète, nous devons également spécifier la description du menu de la page via le lien :menu-dsl.adoc[Menu DSL].
+DSL de niveau supérieur qui est responsable de l'organisation des éléments graphiques de la page et de la mise à jour des blocs ajax. Dans le cas où nous rendons une page complète, nous devons également spécifier la description du menu de la page via le link:menu-dsl.adoc[Menu DSL].
 
 Ce DSL est également responsable de la gestion de la pile de fenêtres modales. Ouvrez une modale en utilisant `modal` ou fermez une modale en utilisant `closeModalAndUpdateBlock` (et d'autres variantes).
 
@@ -61,7 +61,7 @@ taackUiService.show(b, buildMenu())                     <3>
 
 == Exemple de code de pile modale
 
-Après avoir traité un formulaire, vous pouvez actualiser le contenu de la page ou d'un autre modal sous celui en cours. Vous pouvez également recharger la page ou afficher une autre page. Le rechargement de la page permet au code d'être réutilisable, car il ne dépend pas de l'URL actuelle (rappelez-vous les *paramètres* `redirectAction` que vous voyez dans le lien :../../first-app.adoc#_adding_buttons_to_a_table_block[First App (Adding buttons to a table block)] .
+Après avoir traité un formulaire, vous pouvez actualiser le contenu de la page ou d'un autre modal sous celui en cours. Vous pouvez également recharger la page ou afficher une autre page. Le rechargement de la page permet au code d'être réutilisable, car il ne dépend pas de l'URL actuelle, (rappelez-vous les *paramètres* `redirectAction` que vous voyez dans le link:../../first-app.adoc#_adding_buttons_to_a_table_block[First App (Adding buttons to a table block)] .
 
 En général, une fenêtre modale est fermée après le traitement d'un formulaire. Soit elle n'est pas valide, et les erreurs sont affichées dans le navigateur directement dans le formulaire, soit nous enregistrons l'objet et actualisons le contenu.
 
@@ -115,7 +115,7 @@ taackSaveService.saveThenDisplayBlockOrRenderErrors(
 )
 ----
 
-<1> Après qu'une action impliquant la sauvegarde d'un objet est appelée dans une fenêtre modale, vous pouvez fermer la fenêtre modale et actualiser les éléments de la page en une seule action
+<1> Après qu'une action impliquant la sauvegarde d'un objet est appelée dans une fenêtre modale, vous pouvez fermer la fenêtre modale et actualiser les éléments de la page en une seule action.
 <2> `saveThenDisplayBlockOrRenderErrors` prend un `UiBlockSpecifier` comme paramètre
 <3> `closeModalAndUpdateBlock` fermera d'abord la dernière fenêtre modale ouverte, puis appliquera la modification
 

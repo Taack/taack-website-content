@@ -14,7 +14,7 @@ Serveur SSH, serveur git et outil de rendu Asciidoctor, téléchargé via git.
 * `ROLE_INTERCOM_DIRECTOR`
 * `ROLE_INTERCOM_MANAGER`
 
-Voir le lien : Crew.adoc#_purpose[configure roles in Crew] pour ajouter le rôle à votre Intranet
+Voir le link:Crew.adoc#_purpose[configure roles in Crew] pour ajouter le rôle à votre Intranet
 
 == Extensions AsciidoctorJ
 

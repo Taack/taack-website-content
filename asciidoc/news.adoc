@@ -5,9 +5,26 @@
 :source-highlighter: rouge
 :icons: font
 
+== Version 0.5.7
+
+* Clean up `show` DSL code, deprecates passing object parameter to `UiShowSpecifier().ui`
+* Initial Asciidoctor WYSIWYG editor
+** Support for Drag and Drop images and files
+* More diagram DSLs
+** timeSeries
+** areaChart
+** bubbleChart
+* Security
+** Sanitize displayed information by default (use `fieldRaw` to avoid sanitizing)
+** Check access on all entry points
+* Bug fixes and dependencies bump
+
+
+WARNING: Replace `field <html code>` by `fieldRaw <html code>`
 
 == Version 0.5.6 (fix bugs from 0.5.5)
 
+* reduce Solr and tika dependency scoping
 * Show table sortable column and sorting direction (see <<sorting-screenshot>>)
 * Block menus are now refreshed like blocks
 * For complexe layout, code can be reused easily. We can now keep variables that contextualize the layout easily (see <<context-keeper>>)

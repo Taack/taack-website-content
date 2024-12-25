@@ -13,8 +13,6 @@ Our current JDBC implementation allows only to query Data from the Intranet.
 
 Updating data through this mean is a complex subject. We have to deal with user rights and Data validation that is not described at a Database level, but directly inside the code of the Intranet. Some new approach is needed on our side to avoid duplicating the code.
 
-This is underway.
-
 .Sequence Diagram when executing a Query without errors
 [plantuml,format="svg",opts="online"]
 ----
