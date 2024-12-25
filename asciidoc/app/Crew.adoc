@@ -21,3 +21,7 @@ Manage users in the system:
 === Support Controllers
 * *modelVisitor*: Dump a graph of the model
 * *progress*: Support Controller for progressbar
+
+=== External Dependency
+
+* Install `convert` from ImageMagick

@@ -21,3 +21,7 @@ Gérer les utilisateurs dans le système :
 === Contrôleurs de support
 * *modelVisitor* : Afficher un graphique du modèle
 * *progress* : Contrôleur de support pour la barre de progression
+
+=== Dépendances externes
+
+* Installer `convert` depuis ImageMagick
