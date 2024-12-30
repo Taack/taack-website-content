@@ -22,3 +22,7 @@
 === 支持控制器
 * *modelVisitor*: 转储模型的图表
 * *progress*: 支持进度条控制器
+
+=== 外部依赖
+
+* 从 ImageMagick 安装 `convert`
