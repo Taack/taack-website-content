@@ -111,6 +111,7 @@ digraph mygraph {
 * [*] Rendered into PDF
 * [*] Rendered into CSV
 
+image::screenshot-dsl-table.webp[width=250,align=center]
 === Code Sample
 
 The right part of the preview corresponds to the DSL sample below.
@@ -123,16 +124,19 @@ Date Created is empty for old users, and manager cells are also empty for some u
 
 [source,groovy]
 [[table-sample1]]
-.Table Sample: Header, Rows and a default sorting
+.Table Sample: Header, Rows, multi selection and a default sorting
 ----
 new UiTableSpecifier().ui {
     User u = new User(manager: new User(), enabled: true)
     header {                                                <1>
-        if (!hasSelect) {
-            label tr('picture.header.label')                <2>
+        columnSelect "selectedUsers", {                     <2>
+            columnSelectButton tr("action.label"), CrewController.&doSomethingForSelectedUsers as MC
         }
         column {
-            sortableFieldHeader u.username_                 <3>
+            label tr('picture.header.label')                <3>
+        }
+        column {
+            sortableFieldHeader u.username_                 <4>
             sortableFieldHeader u.dateCreated_
         }
         column {
@@ -143,70 +147,39 @@ new UiTableSpecifier().ui {
             sortableFieldHeader u.lastName_
             sortableFieldHeader u.firstName_
         }
-        column {
-            label tr('default.roles.label')
-        }
+        label tr('default.roles.label')                     <5>
     }
-    boolean canSwitchUser = crewSecurityService.canSwitchUser()
 
     TaackFilter tf = taackFilterService.getBuilder(User)
             .setSortOrder(TaackFilter.Order.DESC, u.dateCreated_)
             .setMaxNumberOfLine(20).addFilter(f).build()
 
-    iterate(tf) { User ru ->                                <4>
-        row {                                               <5>
-            boolean hasActions = crewSecurityService.canEdit(ru)
-            if (!hasSelect) {
-                rowColumn {
-                    rowField attachmentUiService.preview(ru.mainPicture?.id)
-                }
-            }
-            rowColumn {
-                rowAction ActionIcon.SHOW * IconStyle.SCALE_DOWN,
-                        CrewController.&showUser as MC, ru.id
-                if (hasSelect)
-                    rowAction "Select User",
-                        ActionIcon.SELECT * IconStyle.SCALE_DOWN,
-                        ru.id, ru.toString()
-                else if (hasActions) {
-                    rowAction ActionIcon.EDIT * IconStyle.SCALE_DOWN,
-                        CrewController.&editUser as MC, ru.id
-                    if (canSwitchUser && ru.enabled)
-                        rowAction ActionIcon.SHOW * IconStyle.SCALE_DOWN,
-                            CrewController.&switchUser as MC, ru.id
-                    else if (canSwitchUser && !ru.enabled) {
-                        rowAction ActionIcon.MERGE * IconStyle.SCALE_DOWN,
-                            CrewController.&replaceUser as MC, ru.id
-                        rowAction ActionIcon.DELETE * IconStyle.SCALE_DOWN,
-                            CrewController.&deleteUser as MC, ru.id
-                    }
-                }
-                rowField ru.username_
-                rowField ru.dateCreated_
-            }
-            rowColumn {
-                rowField ru.subsidiary_
-                rowField ru.manager?.username
-            }
-            rowColumn {
-                rowField ru.lastName_
-                rowField ru.firstName_
-            }
-            rowColumn {
-                if (hasActions && !hasSelect)
-                    rowAction ActionIcon.EDIT * IconStyle.SCALE_DOWN,
-                        CrewController.&editUserRoles as MC, ru.id
-                rowField ru.authorities*.authority.join(', ')
-            }
+    iterate(tf) { User ru ->                                <6>
+        rowSelect ru.id.toString(), true                    <7>
+        rowField attachmentUiService.preview(ru.mainPicture?.id)
+        rowColumn {
+            rowField ru.username_
+            rowField ru.dateCreated_
         }
+        rowColumn {
+            rowField ru.subsidiary_
+            rowField ru.manager_
+        }
+        rowColumn {
+            rowField ru.lastName_
+            rowField ru.firstName_
+        }
+        rowField ru.authorities*.authority.join(', ')
     }
 }
 ----
 <1> Header part of the table specifications
-<2> Non-sortable field header
-<3> Sortable field header
-<4> `iterate`, specifying sort, paginate and filtering
-<5> *row* DSL
+<2> Multiple selection part of the table
+<3> Non-sortable field header
+<4> Sortable field header
+<5> It could be wrapped *without* `column` if only one field
+<6> `iterate`, specifying sort, paginate and filtering
+<7> Checkbox in the column corresponding to the `columnSelect` in header
 
 `ActionIcon` can be modified by `ActionIconModifier`
 
@@ -221,13 +194,14 @@ digraph mygraph {
   node [shape=box];
   ui
   ui -> header, iterate [label = "0,1"]
-  iterate -> row [label = "0,N"]
   ui -> row,rowIndent [label = "0,N"]
-  header -> column [label = "0,N"]
-  column, header -> fieldHeader, sortableFieldHeader [label = "1,N"]
-  row,rowIndent -> rowColumn [label = "0,N"]
-  rowColumn,row,rowIndent -> rowAction, rowField, rowFieldRaw [label = "0,N"]
-  rowIndent -> rowTree [label = "0,1"]
+  header -> column, columnSelect [label = "0,N"]
+  columnSelect -> columnSelectButton [label = "0,N"]
+  column, header -> label, sortableFieldHeader [label = "1,N"]
+  row, iterate, rowTree -> rowColumn [label = "0,N"]
+  rowColumn, row, rowTree, iterate -> rowAction, rowField, rowFieldRaw, rowSelect [label = "0,N"]
+  rowIndent -> rowTree [label = "0,N"]
+  rowIndent -> rowIndent [label = "0,N"]
 }
 ----
 

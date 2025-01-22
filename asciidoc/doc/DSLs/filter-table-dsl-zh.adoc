@@ -111,6 +111,7 @@ digraph mygraph {
 * [*] 支持PDF
 * [*] 支持CSV
 
+image::screenshot-dsl-table.webp[width=250,align=center]
 === 代码示例
 
 表格自带**分页**。排序默认以**创建日期**列为基准，除Picture和Roles以外其他列都可点击进行重新排序。
@@ -120,16 +121,19 @@ digraph mygraph {
 
 [source,groovy]
 [[table-sample1]]
-.表格示例：表头、内容行、以及默认排序
+.表格示例：表头、内容行、多选以及默认排序
 ----
 new UiTableSpecifier().ui {
     User u = new User(manager: new User(), enabled: true)
     header {                                                <1>
-        if (!hasSelect) {
-            label tr('picture.header.label')          <2>
+        columnSelect "selectedUsers", {                     <2>
+            columnSelectButton tr("action.label"), CrewController.&doSomethingForSelectedUsers as MC
         }
         column {
-            sortableFieldHeader u.username_                 <3>
+            label tr('picture.header.label')                <3>
+        }
+        column {
+            sortableFieldHeader u.username_                 <4>
             sortableFieldHeader u.dateCreated_
         }
         column {
@@ -140,70 +144,39 @@ new UiTableSpecifier().ui {
             sortableFieldHeader u.lastName_
             sortableFieldHeader u.firstName_
         }
-        column {
-            label tr('default.roles.label')
-        }
+        label tr('default.roles.label')                     <5>
     }
-    boolean canSwitchUser = crewSecurityService.canSwitchUser()
 
     TaackFilter tf = taackFilterService.getBuilder(User)
             .setSortOrder(TaackFilter.Order.DESC, u.dateCreated_)
             .setMaxNumberOfLine(20).addFilter(f).build()
 
-    iterate(tf) { User ru ->                                <4>
-        row {                                               <5>
-            boolean hasActions = crewSecurityService.canEdit(ru)
-            if (!hasSelect) {
-                rowColumn {
-                    rowField attachmentUiService.preview(ru.mainPicture?.id)
-                }
-            }
-            rowColumn {
-                rowAction ActionIcon.SHOW * IconStyle.SCALE_DOWN,
-                        CrewController.&showUser as MC, ru.id
-                if (hasSelect)
-                    rowAction "Select User",
-                        ActionIcon.SELECT * IconStyle.SCALE_DOWN,
-                        ru.id, ru.toString()
-                else if (hasActions) {
-                    rowAction ActionIcon.EDIT * IconStyle.SCALE_DOWN,
-                        CrewController.&editUser as MC, ru.id
-                    if (canSwitchUser && ru.enabled)
-                        rowAction ActionIcon.SHOW * IconStyle.SCALE_DOWN,
-                            CrewController.&switchUser as MC, ru.id
-                    else if (canSwitchUser && !ru.enabled) {
-                        rowAction ActionIcon.MERGE * IconStyle.SCALE_DOWN,
-                            CrewController.&replaceUser as MC, ru.id
-                        rowAction ActionIcon.DELETE * IconStyle.SCALE_DOWN,
-                            CrewController.&deleteUser as MC, ru.id
-                    }
-                }
-                rowField ru.username_
-                rowField ru.dateCreated_
-            }
-            rowColumn {
-                rowField ru.subsidiary_
-                rowField ru.manager?.username
-            }
-            rowColumn {
-                rowField ru.lastName_
-                rowField ru.firstName_
-            }
-            rowColumn {
-                if (hasActions && !hasSelect)
-                    rowAction ActionIcon.EDIT * IconStyle.SCALE_DOWN,
-                        CrewController.&editUserRoles as MC, ru.id
-                rowField ru.authorities*.authority.join(', ')
-            }
+    iterate(tf) { User ru ->                                <6>
+        rowSelect ru.id.toString(), true                    <7>
+        rowField attachmentUiService.preview(ru.mainPicture?.id)
+        rowColumn {
+            rowField ru.username_
+            rowField ru.dateCreated_
         }
+        rowColumn {
+            rowField ru.subsidiary_
+            rowField ru.manager_
+        }
+        rowColumn {
+            rowField ru.lastName_
+            rowField ru.firstName_
+        }
+        rowField ru.authorities*.authority.join(', ')
     }
 }
 ----
 <1> 表格的表头部分
-<2> 不可排序的列
-<3> 可排序的列
-<4> `iterate` 遍历，内含分页、排序、筛选
-<5> *row* DSL
+<2> 表格的多项选择部分
+<3> 不可排序的列
+<4> 可排序的列
+<5> 如果只有一个字段，则可以不用 `column`包裹
+<6> `iterate` 遍历，内含分页、排序、筛选
+<7> 对应头部 `columnSelect` 的复选框
 
 `ActionIcon` 可被 `ActionIconModifier` 改变样式
 
@@ -218,13 +191,14 @@ digraph mygraph {
   node [shape=box];
   ui
   ui -> header, iterate [label = "0,1"]
-  iterate -> row [label = "0,N"]
   ui -> row,rowIndent [label = "0,N"]
-  header -> column [label = "0,N"]
-  column, header -> fieldHeader, sortableFieldHeader [label = "1,N"]
-  row,rowIndent -> rowColumn [label = "0,N"]
-  rowColumn,row,rowIndent -> rowAction, rowField, rowFieldRaw [label = "0,N"]
-  rowIndent -> rowTree [label = "0,1"]
+  header -> column, columnSelect [label = "0,N"]
+  columnSelect -> columnSelectButton [label = "0,N"]
+  column, header -> label, sortableFieldHeader [label = "1,N"]
+  row, iterate, rowTree -> rowColumn [label = "0,N"]
+  rowColumn, row, rowTree, iterate -> rowAction, rowField, rowFieldRaw, rowSelect [label = "0,N"]
+  rowIndent -> rowTree [label = "0,N"]
+  rowIndent -> rowIndent [label = "0,N"]
 }
 ----
 

@@ -110,6 +110,7 @@ node [shape=box]; "ui"
 * [*] Rendu en PDF
 * [*] Rendu en CSV
 
+image::screenshot-dsl-table.webp[width=250,align=center]
 === Exemple de code
 
 La partie droite de l'aperçu correspond à l'exemple DSL ci-dessous.
@@ -121,16 +122,19 @@ La date de création est vide pour les anciens utilisateurs, et les cellules du 
 
 [source,groovy]
 [[table-sample1]]
-.Exemple de tableau : en-tête, lignes et tri par défaut
+.Exemple de tableau : en-tête, lignes, sélection multiple et tri par défaut
 ----
 new UiTableSpecifier().ui {
     User u = new User(manager: new User(), enabled: true)
     header {                                                <1>
-        if (!hasSelect) {
-            label tr('picture.header.label')          <2>
+        columnSelect "selectedUsers", {                     <2>
+            columnSelectButton tr("action.label"), CrewController.&doSomethingForSelectedUsers as MC
         }
         column {
-            sortableFieldHeader u.username_                 <3>
+            label tr('picture.header.label')                <3>
+        }
+        column {
+            sortableFieldHeader u.username_                 <4>
             sortableFieldHeader u.dateCreated_
         }
         column {
@@ -141,70 +145,39 @@ new UiTableSpecifier().ui {
             sortableFieldHeader u.lastName_
             sortableFieldHeader u.firstName_
         }
-        column {
-            label tr('default.roles.label')
-        }
+        label tr('default.roles.label')                     <5>
     }
-    boolean canSwitchUser = crewSecurityService.canSwitchUser()
 
     TaackFilter tf = taackFilterService.getBuilder(User)
             .setSortOrder(TaackFilter.Order.DESC, u.dateCreated_)
             .setMaxNumberOfLine(20).addFilter(f).build()
 
-    iterate(tf) { User ru ->                                <4>
-        row {                                               <5>
-            boolean hasActions = crewSecurityService.canEdit(ru)
-            if (!hasSelect) {
-                rowColumn {
-                    rowField attachmentUiService.preview(ru.mainPicture?.id)
-                }
-            }
-            rowColumn {
-                rowAction ActionIcon.SHOW * IconStyle.SCALE_DOWN,
-                        CrewController.&showUser as MC, ru.id
-                if (hasSelect)
-                    rowAction "Select User",
-                        ActionIcon.SELECT * IconStyle.SCALE_DOWN,
-                        ru.id, ru.toString()
-                else if (hasActions) {
-                    rowAction ActionIcon.EDIT * IconStyle.SCALE_DOWN,
-                        CrewController.&editUser as MC, ru.id
-                    if (canSwitchUser && ru.enabled)
-                        rowAction ActionIcon.SHOW * IconStyle.SCALE_DOWN,
-                            CrewController.&switchUser as MC, ru.id
-                    else if (canSwitchUser && !ru.enabled) {
-                        rowAction ActionIcon.MERGE * IconStyle.SCALE_DOWN,
-                            CrewController.&replaceUser as MC, ru.id
-                        rowAction ActionIcon.DELETE * IconStyle.SCALE_DOWN,
-                            CrewController.&deleteUser as MC, ru.id
-                    }
-                }
-                rowField ru.username_
-                rowField ru.dateCreated_
-            }
-            rowColumn {
-                rowField ru.subsidiary_
-                rowField ru.manager?.username
-            }
-            rowColumn {
-                rowField ru.lastName_
-                rowField ru.firstName_
-            }
-            rowColumn {
-                if (hasActions && !hasSelect)
-                    rowAction ActionIcon.EDIT * IconStyle.SCALE_DOWN,
-                        CrewController.&editUserRoles as MC, ru.id
-                rowField ru.authorities*.authority.join(', ')
-            }
+    iterate(tf) { User ru ->                                <6>
+        rowSelect ru.id.toString(), true                    <7>
+        rowField attachmentUiService.preview(ru.mainPicture?.id)
+        rowColumn {
+            rowField ru.username_
+            rowField ru.dateCreated_
         }
+        rowColumn {
+            rowField ru.subsidiary_
+            rowField ru.manager_
+        }
+        rowColumn {
+            rowField ru.lastName_
+            rowField ru.firstName_
+        }
+        rowField ru.authorities*.authority.join(', ')
     }
 }
 ----
 <1> Partie en-tête des spécifications de la table
-<2> En-tête de champ non triable
-<3> En-tête de champ triable
-<4> `iterate`, spécifiant le tri, la pagination et le filtrage
-<5> *row* DSL
+<2> Partie de sélection multiple de la table
+<3> En-tête de champ non triable
+<4> En-tête de champ triable
+<5> Il pourrait être enveloppé *sans* `column` s'il n'y a qu'un seul champ
+<6> `iterate`, spécifiant le tri, la pagination et le filtrage
+<7> Case à cocher dans la colonne correspondant à `columnSelect` dans l'en-tête
 
 `ActionIcon` peut être modifié par `ActionIconModifier`
 
@@ -219,12 +192,13 @@ digraph mygraph {
   node [shape=box];
   ui
   ui -> header, iterate [label = "0,1"]
-  iterate -> row [label = "0,N"]
   ui -> row,rowIndent [label = "0,N"]
-  header -> column [label = "0,N"]
-  column, header -> fieldHeader, sortableFieldHeader [label = "1,N"]
-  row,rowIndent -> rowColumn [label = "0,N"]
-  rowColumn,row,rowIndent -> rowAction, rowField, rowFieldRaw [label = "0,N"]
-  rowIndent -> rowTree [label = "0,1"]
+  header -> column, columnSelect [label = "0,N"]
+  columnSelect -> columnSelectButton [label = "0,N"]
+  column, header -> label, sortableFieldHeader [label = "1,N"]
+  row, iterate, rowTree -> rowColumn [label = "0,N"]
+  rowColumn, row, rowTree, iterate -> rowAction, rowField, rowFieldRaw, rowSelect [label = "0,N"]
+  rowIndent -> rowTree [label = "0,N"]
+  rowIndent -> rowIndent [label = "0,N"]
 }
 ----
