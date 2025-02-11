@@ -5,6 +5,21 @@
 :source-highlighter: rouge
 :icons: font
 
+
+== Version 0.6
+
+* Load animation
+* Diagram zoom / scroll
+* Diagram tooltips
+* Table Multiselect (see <<doc/DSLs/filter-table-dsl.adoc#table-sample1>>)
+* Tabs lazy loading
+* Improve pagination
+* Optimize drawing, avoiding unnecessary draw
+* Avoid case where blocks were drawn twice
+* Improve search layout
+* Allow Big decimal on tables, shown in user's locale
+* WiP: Simple Asciidoc WYSIWYG Editor
+
 == Version 0.5.7
 
 * Clean up `show` DSL code, deprecates passing object parameter to `UiShowSpecifier().ui`

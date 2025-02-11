@@ -5,6 +5,18 @@
 :source-highlighter: rouge
 :icons: font
 
+== Version 0.6
+
+* Animation de chargement
+* Diagramme zoom / scroll
+* Diagramme tooltips
+* Selection multiple sur les tables (voir <<doc/DSLs/filter-table-dsl-fr.adoc#table-sample1>>)
+* Chargement à la demande des tab
+* Amélioration de la pagination
+* Optimisation du temps de rendu
+* Amélioration de la recherche
+* Affichage dans les tables des données de type BigDecimal, présentés selon la locale de l'utilisateur
+
 == Version 0.5.7
 
 * Suppression du paramètre dans `UiShowSpecifier().ui`
