@@ -1,0 +1,21 @@
+= Collabora Editor
+:doctype: book
+:taack-category: 4|App
+:toc:
+:source-highlighter: rouge
+
+
+== Purpose
+
+Extends Attachment Controller in Crew App.
+
+Allow editing office document using https://www.collaboraonline.com/[Collabora Online]. All attachment become editable online.
+
+== Roles
+
+* `ROLE_TEMPLATE_ADMIN`: Allow users to create new template for to create new Attachment
+
+== Screenshot
+
+image::collabora-editor.webp[]
+

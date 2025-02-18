@@ -5,6 +5,60 @@
 :source-highlighter: rouge
 :icons: font
 
+== Version 0.6.1
+
+* Diagram Action
+* Fullscreen modal (see <<_diagram_action>>)
+* Static helper (see <<_static_helper>>)
+
+[[_diagram_action]]
+.Diagram Action Usage
+[source,groovy]
+----
+new UiDiagramSpecifier().ui {
+    bar {
+        labels 'date1', 'date2', 'date3'
+        dataset 'Stuff1', 3.0, 4.0, 5.0
+
+        diagramAction this.&clickDiagram as MC, id, <1>
+        [optionalParam: 'value']                    <2>
+    }
+}
+
+def clickDiagramShape() {
+    println(params)
+    // [id: 123456, dataset: "Stuff1",
+    // optionalParam: "value"                       <2>
+    // x: "date1", y: "3.0"]
+}
+
+----
+
+<1> Diagram Action
+<2> Can pass map
+
+[[_static_helper]]
+.Static Helper Usage
+[source,groovy]
+----
+import org.codehaus.groovy.runtime.MethodClosure as MC
+
+import static taack.ui.TaackUi.createMenu           <1>
+
+@Override
+UiMenuSpecifier editorCreate() {
+    createMenu {                                    <2>
+        menu this.&createFromTemplate as MC
+        menuIcon
+            CollaboraIcons.WRITER,
+            this.&createFromTemplate as MC,
+            [collaboraApp: CollaboraApp.WRITER]
+    }
+}
+----
+
+<1> Static Import
+<2> Static Call
 
 == Version 0.6
 
