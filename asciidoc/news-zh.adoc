@@ -6,6 +6,18 @@
 :source-highlighter: rouge
 :icons: font
 
+== 0.6 版
+
+* 等待动画的加载
+* 图表的缩放/滚动
+* 图表的悬浮提示卡
+* 表格的多选功能 (详情见 <<doc/DSLs/filter-table-dsl-fr.adoc#table-sample1>>)
+* Tab的延迟加载
+* 分页功能的改进
+* 渲染时间的优化
+* 搜索功能的改进
+* 允许在表格中使用类型为 BigDecimal 的数据，以用户的区域设置来显示
+
 == 0.5.7 版
 
 * 清理 `show` DSL代码, 不再需要将对象参数传递给 `UiShowSpecifier().ui`
