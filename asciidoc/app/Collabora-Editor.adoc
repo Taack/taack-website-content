@@ -45,6 +45,10 @@ HTTP request sent, awaiting response... 200 OK
 
 == Clone and link `editor-collabora` repo
 
+[source,bash]
+----
+$ git clone https://github.com/Taack/collabora-editor.git
+----
 
 
 == Screenshot
