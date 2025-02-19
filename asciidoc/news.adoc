@@ -7,8 +7,8 @@
 
 == Version 0.6.1
 
-* Diagram Action
-* Fullscreen modal (see <<_diagram_action>>)
+* Diagram Action (see <<_diagram_action>>)
+* Fullscreen modal
 * Static helper (see <<_static_helper>>)
 
 [[_diagram_action]]
@@ -28,7 +28,7 @@ new UiDiagramSpecifier().ui {
 def clickDiagramShape() {
     println(params)
     // [id: 123456, dataset: "Stuff1",
-    // optionalParam: "value"                       <2>
+    // optionalParam: "value"                       <3>
     // x: "date1", y: "3.0"]
 }
 
@@ -36,6 +36,7 @@ def clickDiagramShape() {
 
 <1> Diagram Action
 <2> Can pass map
+<3> Action params contain *label*, *value*, *dataset name* and *map*
 
 [[_static_helper]]
 .Static Helper Usage
@@ -58,7 +59,7 @@ UiMenuSpecifier editorCreate() {
 ----
 
 <1> Static Import
-<2> Static Call
+<2> `createMenu` static call, shortcut for `new UiMenuSpecifier().ui`, other shortcuts include `createModal`, returning `UiBlockSpecifier`
 
 == Version 0.6
 
