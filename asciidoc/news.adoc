@@ -61,6 +61,8 @@ UiMenuSpecifier editorCreate() {
 <1> Static Import
 <2> `createMenu` static call, shortcut for `new UiMenuSpecifier().ui`, other shortcuts include `createModal`, returning `UiBlockSpecifier`
 
+video::wF323zHFa94[youtube, 480]
+
 == Version 0.6
 
 * Load animation
