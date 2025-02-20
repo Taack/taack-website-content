@@ -9,7 +9,7 @@
 
 * Diagram Action (see <<_diagram_action>>)
 * Fullscreen modal
-* Static helper (see <<_static_helper>>)
+* Static helpers (see <<_static_helper>>)
 
 [[_diagram_action]]
 .Diagram Action Usage
@@ -39,7 +39,7 @@ def clickDiagramShape() {
 <3> Action params contain *label*, *value*, *dataset name* and *map*
 
 [[_static_helper]]
-.Static Helper Usage
+.Static Helpers Usage
 [source,groovy]
 ----
 import org.codehaus.groovy.runtime.MethodClosure as MC

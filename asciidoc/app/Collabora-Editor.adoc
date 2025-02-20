@@ -56,3 +56,8 @@ $ git clone https://github.com/Taack/collabora-editor.git
 .Editing an ODP
 image::collabora-editor.webp[]
 
+== Video
+
+video::tB6mL07pzQQ[youtube,width=1024,height=680]
+
+
