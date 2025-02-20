@@ -232,15 +232,14 @@ end
 [,groovy]
 ----
 taackSaveService.saveThenDisplayBlockOrRenderErrors(EngineeringChangeRequest,   <1>
-new UiBlockSpecifier().ui {                 <2>
-    closeModalAndUpdateBlock {              <3>
-        show "Projects", buildShowProjects(ecr), BlockSpec.Width.MAX, {
-            action
-                ActionIcon.ADD,
-                Ecr2Controller.&projectsForm as MC,
-                [id: ecr.id, ajaxBlockId: ajaxBlockId]
+    new UiBlockSpecifier().ui {                                                 <2>
+        closeModalAndUpdateBlock {                                              <3>
+            show buildShowProjects(ecr), {
+                menuIcon
+                    ActionIcon.ADD,
+                    Ecr2Controller.&projectsForm as MC, ecr.id
+            }
         }
-    }
 })
 ----
 
