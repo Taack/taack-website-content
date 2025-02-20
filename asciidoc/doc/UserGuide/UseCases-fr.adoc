@@ -152,20 +152,19 @@ end box
 .Exemple de code Filtre et tableau
 [,groovy]
 ----
-def index() {                                       <1>
+def index() {                                                   <1>
     User cu = authenticatedUser as User
 
-    UiFilterSpecifier f = buildUserTableFilter cu   <2>
-    UiTableSpecifier t = buildUserTable f           <3>
+    UiFilterSpecifier f = buildUserTableFilter cu               <2>
+    UiTableSpecifier t = buildUserTable f                       <3>
 
-    UiBlockSpecifier b = new UiBlockSpecifier()     <4>
-    b.ui {
-        tableFilter "Filter", f, "Users", t, BlockSpec.Width.MAX, {
-            action ActionIcon.CREATE, this.&userForm as MC <5>
+    UiBlockSpecifier b = new UiBlockSpecifier().ui {            <4>
+        tableFilter(f, t) {
+            menuIcon ActionIcon.ADD, this.&userForm as MC       <5>
         }
     }
 
-    taackUiService.show(b, buildMenu())             <6>
+    taackUiService.show(b, buildMenu())                         <6>
 }
 ----
 

@@ -55,7 +55,7 @@ Common i18n should be localized into `Crew` app module or `Server`, properties a
 
 - Use enum, in code, for configuration
 ** Static is king
-** Groovy Enums are readable (more than XML, Json, Yaml ... whatever)
+** Groovy Enums are readable (more than XML, Json, Yaml ...)
 
 == Security
 
@@ -71,7 +71,6 @@ Common i18n should be localized into `Crew` app module or `Server`, properties a
 * Avoid cyclic dependencies in domain (`User` => `Cart` AND `Cart` => `User`) if domain classes belong to different app modules
 * Domain classes should be barely minimal
 * *No helper* with external dependencies in domain
-
 
 == We can tell we are efficient if:
 
