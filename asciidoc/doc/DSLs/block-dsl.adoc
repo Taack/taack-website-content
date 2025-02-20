@@ -119,16 +119,16 @@ taackSaveService.saveThenDisplayBlockOrRenderErrors(
 == Block DSL Symbols Hierarchy
 
 [graphviz,format="svg",align=center]
-.Symbols hierachy diagram for Block DSL
+.Symbols hierarchy diagram for Block DSL (without ajaxBlock)
 ----
 digraph mygraph {
   node [shape=box];
   ui -> modal, closeModalAndUpdateBlock [label = "0,1"]
-  closeModalAndUpdateBlock -> blockTabs, ajaxBlock [label = "1,N"]
-  ui, anonymousBlock, modal -> anonymousBlock, ajaxBlock [label = "0,N"]
-  ui, anonymousBlock, modal -> blockTabs [label = "0,1"]
-  blockTabs -> ajaxBlockTab [label = "1,N"]
-  ajaxBlock, ajaxBlockTab -> form, show, tableFilter, table, graphs, custom, anonymousBlock [label = "1,N"]
+  closeModalAndUpdateBlock -> tabs [label = "1,N"]
+  ui, modal -> row, tabs [label = "0,1"]
+  row -> col [label = "1,N"]
+  tabs -> tab [label = "1,N"]
+  ui, modal, tab, col -> form, show, tableFilter, table, diagram, custom [label = "1,N"]
 }
 ----
 
