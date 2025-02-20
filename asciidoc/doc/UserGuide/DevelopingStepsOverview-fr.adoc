@@ -135,16 +135,6 @@ iterate(tf) { User ru ->                                <2>
 <2> Itérer sur ce `TaackFilter`, avec une fermeture `row`
 <3> Dessiner la ligne ...
 
-[, groovy]
-----
-def objects = taackSimpleFilterService.list(
-                ObjectClass, numberOfObjectReturned)
-objects.aValue // list of objects queried. Not all objects are returned (see second parameter)
-objects.bValue // total number of objects that can be reached by the query
-----
-
-Passer le filtre à la méthode `list` permet de restreindre la requête pour des raisons de sécurité.
-
 === Sauvegarder des objets via Form DSL et afficher les erreurs
 
 Pour sauvegarder un nouvel objet, ou un objet modifié (nous verrons les considérations de sécurité plus tard), il suffit d'appeler la méthode suivante dans l'action cible du formulaire :

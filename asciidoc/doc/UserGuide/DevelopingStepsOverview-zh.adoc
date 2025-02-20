@@ -136,16 +136,6 @@ iterate(tf) { User ru ->                                    <2>
 <2> 遍历 `TaackFilter`，其内定义 `row` 闭包
 <3> 填入每行所需内容...
 
-[, groovy]
-----
-def objects = taackSimpleFilterService.list(
-                ObjectClass, numberOfObjectReturned)
-objects.aValue // list of objects queried. Not all objects are returned (see second parameter)
-objects.bValue // total number of objects that can be reached by the query
-----
-
-也可以用 `list` 方法接收筛选器传递的筛选参数并给出数据结果，该方法可以限制查询，更加安全。
-
 === 通过表单DSL保存数据对象，并能给出报错提示
 
 为了保存一个新建/修改的数据对象 (安全策略之后再作讨论)，只需调用以下方法：

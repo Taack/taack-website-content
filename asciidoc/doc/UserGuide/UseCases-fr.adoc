@@ -124,10 +124,10 @@ group Display Table with filter
         activate controller
         controller -> controller : buildFilter (optionaly)
         controller -> controller : buildTableHeader
-        controller -> taackSimpleFilterService : list
-        activate taackSimpleFilterService #005500
-        return objects and counter
-        controller -> controller : build rows from objects
+        controller -> taackFilterService : iterate
+        activate taackFilterService #005500
+        controller -> controller : build row from object
+        return loop over each row
         controller -> controller : buildBlock
         controller -> taackUiService : show(block)
         deactivate controller

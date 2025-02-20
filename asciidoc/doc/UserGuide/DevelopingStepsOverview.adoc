@@ -136,15 +136,6 @@ iterate(tf) { User ru ->                                    <2>
 <2> Iterate over this `TaackFilter`, with a `row` closure
 <3> Draw the row ...
 
-[, groovy]
-----
-def objects = taackSimpleFilterService.list(
-                ObjectClass, numberOfObjectReturned)
-objects.aValue // list of objects queried. Not all objects are returned (see second parameter)
-objects.bValue // total number of objects that can be reached by the query
-----
-
-Passing the filter to the `list` method allows to restrict the query for security purposes.
 
 === Saving Objects via Form DSL and show errors
 
