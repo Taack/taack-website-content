@@ -27,13 +27,13 @@ image::screenshot-form-validation.webp[]
 def userForm(User user) {
     user ?= new User(params)
 
-    UiFormSpecifier f = new UiFormSpecifier()   <1>
-    f.ui user, {                                <2>
-        section "User", {                       <3>
-            field user.username_                <4>
+    UiFormSpecifier f = new UiFormSpecifier()       <1>
+    f.ui user, {                                    <2>
+        section "User", {                           <3>
+            field user.username_                    <4>
             field user.firstName_
             field user.lastName_
-            ajaxField user.manager_,            <5>
+            ajaxField user.manager_,                <5>
                 this.&selectUserM2O as MC
             field user.password_
         }
@@ -48,17 +48,14 @@ def userForm(User user) {
             field user.accountLocked_
             field user.passwordExpired_
         }
-        formAction this.&saveUser as MC, <6>
+        formAction this.&saveUser as MC,            <6>
                    user.id
     }
-
-    UiBlockSpecifier b = new UiBlockSpecifier()  <7>
-    b.ui {
+    taackUiService.show new UiBlockSpecifier().ui { <7>
         modal {
-            form f, BlockSpec.Width.MAX
+            form f
         }
-    }
-    taackUiService.show(b)                 <8>
+    }                                               <8>
 }
 ----
 
