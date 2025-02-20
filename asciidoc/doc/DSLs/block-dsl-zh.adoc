@@ -25,34 +25,33 @@ image::screenshot-dsl-block.webp[]
 .代码示例
 ----
 def editSlideshow(CmsPage slideshow) {
-    UiBlockSpecifier b = new UiBlockSpecifier()
 
     Boolean createNew = slideshow == null
     if (!slideshow)
         slideshow = new CmsPage(pageType: CmsPageType.SLIDESHOW)
 
-b.ui {
-    if (createNew)
-        modal {
-            form
-                buildCmsSlideshowForm(slideshow),
-                BlockSpec.Width.MAX
-        }
-    else {
-        anonymousBlock BlockSpec.Width.HALF, {          <1>
-            form
-                buildCmsSlideshowForm(slideshow),
-                BlockSpec.Width.MAX
+    UiBlockSpecifier b = new UiBlockSpecifier().ui {
+        if (createNew)
+            modal {
+                form buildCmsSlideshowForm(slideshow)
+            }
+        else {
+            row {                                               <1>
+                col {
+                    form buildCmsSlideshowForm(slideshow)
+                }
+                col {
+                    tabs {
+                        tab "Images", buildImagesTab(slideshow) <2>
+                        tab "Videos", buildVideosTab(slideshow)
+                    }
+                }
             }
 
-        blockTabs BlockSpec.Width.HALF, {
-            blockTab "Images", buildImagesTab(slideshow)<2>
-            blockTab "Videos", buildVideosTab(slideshow)
         }
     }
+    taackUiService.show(b, buildMenu())                     <3>
 }
-taackUiService.show(b, buildMenu())                     <3>
-
 ----
 
 <1> 创建一个不可见的块作为承载主体，占据二分之一页面宽度
@@ -103,12 +102,10 @@ taackSaveService.saveThenDisplayBlockOrRenderErrors(
     EngineeringChangeRequest,                                   <1>
     new UiBlockSpecifier().ui {                                 <2>
         closeModalAndUpdateBlock {                              <3>
-            show "Projects", buildShowProjects(ecr),
-                BlockSpec.Width.MAX, {
-                    action
+            show buildShowProjects(ecr), {
+                    menuIcon
                         ActionIcon.ADD,
-                        Ecr2Controller.&projectsForm as MC,
-                        [id: ecr.id, ajaxBlockId: ajaxBlockId]
+                        Ecr2Controller.&projectsForm as MC, ecr.id
             }
         }
     }
