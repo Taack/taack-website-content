@@ -4,6 +4,37 @@
 :source-highlighter: rouge
 :icons: font
 
+== Slow Code
+
+When processing data is slow and the closure is lazy loaded, it is important to put slow code into the closure directly. This way it will only be executed if the closure is effectively displayed.
+
+[source,groovy]
+----
+def showPage() {
+    // [. . .]
+    def b = new UiBlockSpecifier().ui {
+        diagram buildDiagram()                  <1>
+        tableFilter t, f                        <2>
+    }
+
+    taackUiService.show b
+}
+
+private UiDiagramSpecifier buildDiagram() {
+    // Always called                            <3>
+    new UiDisagramSpecifier().ui {
+        // Called only when needed              <4>
+        def data = slowDataRetreiveMethod()
+        // Draw data Stuffs
+    }
+}
+----
+
+<1> `buildDiagram` is always called, even if the target to be drawn is the `tableFilter`, but the resulting closure is not called all the time
+<2> When sorting or filtering, only the table is drawn, not the diagram
+<3> Part always called
+<4> Called only if needed, slow code should be written here.
+
 == Coding Style Guide for Grails Application Development
 
 Here are some guidelines that should ease application maintenance:

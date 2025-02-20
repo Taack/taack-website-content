@@ -4,6 +4,38 @@
 :source-highlighter: rouge
 :icons: font
 
+== Portion de code lent
+
+Pour le code s'exécutant lentement, il faut le placer directement dans la closure gérant l'affichage. Il sera appelé seulement si nécessaire.
+
+[source,groovy]
+----
+def showPage() {
+    // [. . .]
+    def b = new UiBlockSpecifier().ui {
+        diagram buildDiagram()                  <1>
+        tableFilter t, f                        <2>
+    }
+
+    taackUiService.show b
+}
+
+private UiDiagramSpecifier buildDiagram() {
+    // Always called                            <3>
+    new UiDisagramSpecifier().ui {
+        // Called only when needed              <4>
+        def data = slowDataRetreiveMethod()
+        // Draw data Stuffs
+    }
+}
+----
+
+<1> `buildDiagram` est toujours appelé, même si ce qui doit être affiché est le `tableFilter`, par contre la closure ne sera exécutée que si nécessaire.
+<2> Le trie et le filtrage de la table ne redessine que la table et le filtre.
+<3> Partie toujours appelée...
+<4> Appelé seulement si nécessaire, le code lent devrait être mis là.
+
+
 == Guide de style de codage pour le développement d'applications Grails
 
 Voici quelques lignes directrices qui devraient faciliter la maintenance de l'application :
