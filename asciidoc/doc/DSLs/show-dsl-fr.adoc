@@ -36,9 +36,9 @@ image::screenshot-dsl-show.webp[]
 .Hiérarchie des symboles diagramme pour le show DSL
 ----
 digraph mygraph {
-node [shape=box];
-ui
-ui -> section [label = "1,N"]
-section -> "fieldAction+field", field, fieldRaw [label = "0,N"]
+  node [shape=box];
+  ui
+  ui -> section [label = "1,N"]
+  section -> "showAction", field, fieldRaw [label = "0,N"]
 }
 ----

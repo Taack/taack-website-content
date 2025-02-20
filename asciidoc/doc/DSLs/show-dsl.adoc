@@ -38,6 +38,6 @@ digraph mygraph {
   node [shape=box];
   ui
   ui -> section [label = "1,N"]
-  section -> "fieldAction+field", field, fieldRaw [label = "0,N"]
+  section -> "showAction", field, fieldRaw [label = "0,N"]
 }
 ----
