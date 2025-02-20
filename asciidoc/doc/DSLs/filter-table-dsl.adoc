@@ -195,8 +195,7 @@ digraph mygraph {
   ui
   ui -> header, iterate [label = "0,1"]
   ui -> row,rowIndent [label = "0,N"]
-  header -> column, columnSelect [label = "0,N"]
-  columnSelect -> columnSelectButton [label = "0,N"]
+  header -> column [label = "0,N"]
   column, header -> label, sortableFieldHeader [label = "1,N"]
   row, iterate, rowTree -> rowColumn [label = "0,N"]
   rowColumn, row, rowTree, iterate -> rowAction, rowField, rowFieldRaw, rowSelect [label = "0,N"]
