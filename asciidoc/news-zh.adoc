@@ -6,7 +6,65 @@
 :source-highlighter: rouge
 :icons: font
 
-== 0.6 版
+== 0.6.1 版本
+
+* 图表的可点击功能 (见 <<_diagram_action>>)
+* Fullscreen modal
+* Static helpers (see <<_static_helper>>)
+
+[[_diagram_action]]
+.如何使图表可点击
+[source,groovy]
+----
+new UiDiagramSpecifier().ui {
+    bar {
+        labels 'date1', 'date2', 'date3'
+        dataset 'Stuff1', 3.0, 4.0, 5.0
+
+        diagramAction this.&clickDiagram as MC, id, <1>
+        [optionalParam: 'value']                    <2>
+    }
+}
+
+def clickDiagram() {
+    println(params)
+    // [id: 123456, dataset: "Stuff1",
+    // optionalParam: "value"                       <3>
+    // x: "date1", y: "3.0"]
+}
+
+----
+
+<1> 点击后所导向的目标Action
+<2> 允许传输额外参数
+<3> 目标Action中可获得相关参数: *label*, *value*, *dataset name* 和 *map*
+
+[[_static_helper]]
+.Static Helpers
+[source,groovy]
+----
+import org.codehaus.groovy.runtime.MethodClosure as MC
+
+import static taack.ui.TaackUi.createMenu           <1>
+
+@Override
+UiMenuSpecifier editorCreate() {
+    createMenu {                                    <2>
+        menu this.&createFromTemplate as MC
+        menuIcon
+            CollaboraIcons.WRITER,
+            this.&createFromTemplate as MC,
+            [collaboraApp: CollaboraApp.WRITER]
+    }
+}
+----
+
+<1> 静态导入
+<2> 静态调用 `createMenu`, 其为 `new UiMenuSpecifier().ui` 的缩略写法。 除此之外还有 `createModal` ，其为代替 `UiBlockSpecifier` 使用。
+
+video::wF323zHFa94[youtube, 480]
+
+== 0.6 版本
 
 * 等待动画的加载
 * 图表的缩放/滚动
@@ -18,7 +76,7 @@
 * 搜索功能的改进
 * 允许在表格中使用类型为 BigDecimal 的数据，以用户的区域设置来显示
 
-== 0.5.7 版
+== 0.5.7 版本
 
 * 清理 `show` DSL代码, 不再需要将对象参数传递给 `UiShowSpecifier().ui`
 * 初始Asciidoctor WYSIWYG编辑器
@@ -35,7 +93,7 @@
 
 WARNING: 使用 `fieldRaw <html code>`替换 `field <html code>`
 
-== 0.5.6 版（修复 0.5.5 版中的错误）
+== 0.5.6 版本（修复 0.5.5 版中的错误）
 
 * 显示表格可排序列和排序方向（参见 <<sorting-screenshot>>）
 * 菜单现在像块一样刷新

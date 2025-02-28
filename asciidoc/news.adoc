@@ -25,7 +25,7 @@ new UiDiagramSpecifier().ui {
     }
 }
 
-def clickDiagramShape() {
+def clickDiagram() {
     println(params)
     // [id: 123456, dataset: "Stuff1",
     // optionalParam: "value"                       <3>
