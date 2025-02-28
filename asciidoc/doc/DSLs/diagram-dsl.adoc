@@ -130,6 +130,168 @@ diagram new UiDiagramSpecifier().ui({
 image:diag-dsl-whiskers.webp[]
 ====
 
+== Bonus way to code
+
+=== Different types of xLabels
+
+The labels on X axis could be of 3 types:
+
+- String (Discrete)
+- Number (Continuous)
+- Date (Continuous)
+
+[source,groovy]
+----
+diagram new UiDiagramSpecifier().ui({
+    line { // X axis: String
+        labels "T1", "T2", "T3"
+        dataset "test", 10.0, 20.1, 30.0
+    }
+    line { // X axis: String
+        labels 1.5, 1.7, 3.5
+        dataset "test", 10.0, 20.1, 30.0
+    }
+    line { // X axis: Date
+        Date date1 = new Date() // now (2025-02-28 10:55)
+        Date date2 = new Date(date1.getTime() + 1000*60*60*2) // 2 hours later
+        Date date3 = new Date(date1.getTime() + 1000*60*60*10) // 10 hours later
+        labels DiagramXLabelDateFormat.HOUR, date1, date2, date3, <1>
+        dataset "test", 10.0, 20.1, 30.0
+    }
+})
+----
+
+<1> DiagramXLabelDateFormat: Define the date format to display, and also define the minimum gap unit (Because X axis is continuous)
+
+image:screenshot-dsl-diagram-xLabels-type.png[]
+
+=== Second way to give data coordinate
+
+Often used for continuous X axis on which datasets have different X coordinate.
+
+[source,groovy]
+----
+diagram new UiDiagramSpecifier().ui({
+    // Normal way: different datasets have same X coordinates
+    line {
+        labels 1.5, 1.7, 3.5
+
+        // 3 data: (1.5, 10.0), (1.7, 20.1), (3.5, 30.0)
+        dataset "test1", 10.0, 20.1, 30.0
+
+        // 3 data: (1.5, 1.0), (1.7, 2.0), (3.5, 3.0)
+        dataset "test2", 1.0, 2.0, 3.0
+    }
+
+    // Second way: different datasets have different X coordinates
+    line {
+        // 3 data: (1.5, 10.0), (1.7, 20.1), (3.5, 30.0)
+        dataset "test1", [1.5: 10.0, 1.7: 20.1, 3.5: 30.0]
+
+        // 2 data: (1.5, 1.0), (6.1, 2.0)
+        dataset "test2", [1.5: 1.0, 6.1: 2.0]
+    }
+})
+----
+
+image:screenshot-dsl-diagram-coordinate.png[]
+
+=== DSL to show data count at regular intervals
+
+We have a large number of objects, and we would like to have a diagram that shows the number of objects year-by-year (or month-by-month / day-by-day / hour-by-hour) depending on object's dateCreated.
+
+.DSL to use
+[source,groovy]
+----
+    /**
+     * Group the given dates according to DiagramXLabelDateFormat, then count every group and put the result as data to draw.
+     *
+     * For example:
+     *      Knowing DiagramXLabelDateFormat.MONTH (Defined by {@link #labels(DiagramXLabelDateFormat dateFormat)}),
+     *      and being given dates: 2025-01-01, 2025-01-10, 2025-01-20, 2025-02-01, 2025-02-10, 2025-03-01.
+     *
+     *      So they are divided to 3 groups with their own count: [2025-01: 3, 2025-02: 2, 2025-03: 1].
+     *      The groups will be used as data to draw:
+     *          - xLabels = ["2025-01", "2025-02", "2025-03"]
+     *          - yDataList = [3.0, 2.0, 1.0]
+     *
+     * @param key
+     * @param dates
+     */
+    void dataset(final String key, final Date... dates)
+----
+
+.Code how to use the DSL
+[source,groovy]
+----
+diagram new UiDiagramSpecifier().ui({
+    List<Claim> claims = Claim.findAll()
+    bar {
+        labels DiagramXLabelDateFormat.MONTH // show claim count month-by-month
+        dataset "Claim", claims.collect { it.dateCreated } as Date[]
+    }
+})
+----
+
+.Diagram
+image:screenshot-dsl-diagram-count-object.png[]
+
+== Dynamic parts (Only in HTML)
+
+=== Zoom (Horizontally)
+
+Put mouse on diagram, then scroll the mouse wheel.
+
+- Wheel-up for Zoom-up.
+- Wheel-down for Zoom-down.
+
+=== Scroll (Horizontally)
+
+Put mouse on diagram, press the left mouse button and keep pressing, then move mouse horizontally.
+
+WARNING: Scroll min and max are limited
+
+=== Tooltip
+
+The value of barchart/line/... will not be shown statically. Instead, we can put mouse on any shape, then a tooltip will appear dynamically that shows all information about the target shape.
+
+image:screenshot-dsl-diagram-tooltip.png[]
+
+=== Clickable legend
+
+Click on a dataset legend allows us to hide the showing of target dataset.
+
+=== Diagram action
+
+If a diagram action is defined, the shapes of diagram will be clickable to call target action, giving all information of clicked shape (*label*, *value*, *dataset name*)
+
+[[_diagram_action]]
+.How to define diagram action
+[source,groovy]
+----
+new UiDiagramSpecifier().ui {
+    bar {
+        labels 'date1', 'date2', 'date3'
+        dataset 'Stuff1', 3.0, 4.0, 5.0
+
+        diagramAction this.&clickDiagram as MC, id, <1>
+        [optionalParam: 'value']                    <2>
+    }
+}
+
+def clickDiagram() {
+    println(params)
+    // [id: 123456, dataset: "Stuff1",
+    // optionalParam: "value"                       <3>
+    // x: "date1", y: "3.0"]
+}
+
+----
+
+<1> Diagram Action
+<2> Can pass map
+<3> Action params contain *label*, *value*, *dataset name* and *map*
+
 == DSL Symbols Hierarchy
 
 [graphviz,format="svg",align=center]
