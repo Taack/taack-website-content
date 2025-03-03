@@ -37,7 +37,7 @@ def clickDiagram() {
 
 <1> 点击后所导向的目标Action
 <2> 允许传输额外参数
-<3> 目标Action中可获得相关参数: *label*, *value*, *dataset name* 和 *map*
+<3> 目标Action中可获得相关参数: *X坐标*，*Y坐标*，*数据源名称* 和 *额外参数*
 
 [[_static_helper]]
 .Static Helpers

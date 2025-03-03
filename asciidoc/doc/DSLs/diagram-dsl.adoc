@@ -12,8 +12,6 @@
 
 Diagram DSL allows quickly drawing barchart, area, pie, scatter and line diagram, either rasterized in PNG or in SVG format.
 
-WARNING: the following code sample will work for `taack-ui` 0.5.4 (the current version is 0.5.3).
-
 == Code Sample
 
 === Bar
