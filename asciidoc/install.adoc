@@ -1,70 +1,112 @@
-= Install
+= Installation Guide
 
 == Requirements
 
-First, install the following:
+To get started, make sure the following tools are installed on your machine:
 
-* *Java* (JDK-17 or JDK-19)
-* *git*
+* *Java* (JDK 17 or JDK 24)
+* *Git*
 
-Optionally, you can also install:
+=== Install prerequisites
 
-* *Solr-9.6.x* (Used for intranet-wide search bar)
-* *Postgresql*
+==== macOS (Homebrew)
 
-=== Java Version
-
-Type the following command:
-
-[sh]
+.Install JDK 24 and Git using Homebrew
+[source,bash]
 ----
-java -fullversion
-openjdk full version "17.0.5+1"
+$ brew install openjdk@24
+$ brew install git
 ----
 
-On Mac, you can install Jdk-17 using brew command:
+==== Windows (Winget)
 
-[sh]
+.Install JDK 24 and Git using Winget
+[source,bash]
 ----
-brew install openjdk@17
+winget install --id Microsoft.OpenJDK.24
+winget install --id Git.Git
 ----
 
 == Cloning the ready-to-dev Intranet
 
-[,bash]
+.Clone the starter repository:
+
+[source,bash]
 ----
-git clone https://github.com/Taack/intranet.git
+$ git clone https://github.com/Taack/intranet.git
 ----
 
-This repository includes a stripped-down version of an intranet on top of which you can build more applications. It includes "Crew", the user management system, and its security dependency: *Spring Security Plugin*.
+This repository includes a minimal intranet skeleton (Crew user management + *Spring Security plugin*) ready for development.
+
 
 == Start your intranet
 
-Navigate inside the newly cloned intranet folder and start the server by executing this command:
+.Navigate inside the newly cloned intranet folder and launch the server:
 
-[,bash]
+[source,bash]
 ----
-./gradlew server:bootRun
-----
-
-If you want Gradle to watch app module to hot restart the server at each modification, launch the server adding the `-Dgrails.run.active=true` option:
-
-[,bash]
-----
-./gradlew -Dgrails.run.active=true server:bootRun
+$ cd intranet
+$ ./gradlew server:bootRun
 ----
 
-After a while you should see in the console:
+[NOTE]
+====
+The `./gradlew` command uses the Gradle Wrapper, so you don’t need to install Gradle manually.
+====
 
-`Grails application running at http://localhost:9442`
+.Once the build completes, you should see:
+[source,bash]
+----
+Grails application running at http://localhost:9442
+----
 
-You can now access the intranet by going to that address in your browser. You can also log in with the default credentials (username: *admin*; password: *ChangeIt*). The password can be changed in `server/grails-app/conf/application.yml`.
+[sidebar]
+====
+**TODO:**
+Access the intranet by going to that address in your browser.
+Use the default login credentials:
 
-=== Configuring persistent Db
+* **Username**: `admin`
+* **Password**: `ChangeIt`
+====
 
-If you want data to be persistent, change the `server/grails-app/conf/application.yml` file to use a persistent database.
 
-Here we want H2 to persist data in a file in development mode:
+.Credentials
+image::first-app-screenshots/first-app-1-credentials.webp[Reload,width=520,align="left"]
+
+
+
+To change the default admin password, edit the following files:
+
+* `server/grails-app/conf/application.yml`
+* `server/grails-app/conf/application-MACOSX.yml`
+
+Look for the line:
+[source,yaml]
+taack.admin.password: ChangeIt
+
+After making the change, delete the file `intranetDb.mv.db` to apply the new password.
+
+
+[NOTE]
+====
+`application-MACOSX.yml` is only used when the app detects a macOS environment. If you're using Linux or Windows, it will be ignored.
+====
+
+[WARNING]
+====
+Deleting the `intranetDb.mv.db` file will permanently erase all previously stored data.
+====
+
+
+
+
+=== Configure a persistent database
+
+If you want data to be persistent, change the `server/grails-app/conf/application.yml` and
+`server/grails-app/conf/application-MACOSX.yml` file to use a persistent database.
+
+.Here we want H2 to persist data in a file in development mode:
 
 [source,yaml]
 ----
@@ -72,60 +114,68 @@ environments:
     development:
         dataSource:
             dbCreate: update        <1>
-            url: jdbc:h2:./prodDb;LOCK_TIMEOUT=10000;DB_CLOSE_ON_EXIT=FALSE <2>
+            url: jdbc:h2:./intranetDb;LOCK_TIMEOUT=10000;DB_CLOSE_ON_EXIT=FALSE <2>
 ----
 
 <1> Creation mode (see Grails GORM docs)
-<2> `prodDb`: root of the filename containing data
+<2> `intranetDb`: root of the filename containing data
 
 === Producing a Jar file for Tomcat
 
-Instead of `bootRun` task, use `assemble` task:
+.Use the assemble task instead of bootRun:
 
 [source,bash]
 ----
-./gradlew server:assemble
+$ ./gradlew server:assemble
 ----
+The assembled JAR (e.g., `server-0.6.jar`) will be located in `server/build/libs`.
 
-The server jar file is produced into `server/build/libs` folder. You can import it in your Tomcat production server or test it with:
+
+.You can deploy it to your production server or test it locally
 
 [source,bash]
 ----
 cd server/build/libs
-java -jar server-[version].jar
+java -jar server-[version].jar   <1>
 ----
+<1> The version number is located in `build.gradle`. The default value is 0.6
 
-It will be faster, assets will be compiled and merged.
+[TIP]
+====
+Make sure you are not already running the application when starting a new instance.
+====
 
-TIP: Make sure you're not already running the application
 
 == Set up your IDE
 
 
-We highly recommend using the latest version of *IntelliJ Ultimate Edition* for its comprehensive support of *Groovy* and *Grails*. We are also exploring support for other IDEs such as *Eclipse* and *Visual Studio Code*, as well as considering support for IntelliJ non-Ultimate Edition.
+We highly recommend using the latest version of *IntelliJ Ultimate Edition* for its comprehensive support of *Groovy* and *Grails*.
 
 === IntelliJ Ultimate Edition
 
-We recommend installing the *IntelliJ Taack Plugin* that you can install from the Intellij marketplace https://plugins.jetbrains.com/plugin/20792-taackuiastautocomplete[TaackUiASTAutocomplete] or directly from the https://github.com/Taack/infra/releases/tag/v0.1[source code repository].
+We recommend installing the *IntelliJ Taack Plugin* which you can install from the IntelliJ Marketplace https://plugins.jetbrains.com/plugin/20792-taackuiastautocomplete[TaackUiASTAutocomplete] or directly from the https://github.com/Taack/infra/releases/tag/v0.1[source code repository].
 
-To open the project, select menu:File[Open project]  and select `intranet/settings.gradle`.
+Open the project, go to File > Open... and select `intranet/settings.gradle`.
 
-Make sure that the JDK used with Gradle is at version 17 (or 19):
+Make sure that Gradle is using JDK 17 (or 24):
 
 .Open Gradle Settings
 image:open-settings-gradle-intellij.webp[]
 
-.Check Gradle Jdk Version
+.Check Gradle JDK Version
 image:settings-gradle-intellij.webp[]
 
 
 === Visual Studio Code
 
-If you really want to use Visual Studio Code, we recommend the following extensions to use this framework:
+If you prefer Visual Studio Code, we recommend the following extensions to use this framework:
 
 * https://marketplace.visualstudio.com/items?itemName=vscjava.vscode-java-pack[Extension Pack for Java]
 * https://marketplace.visualstudio.com/items?itemName=marlon407.code-groovy[code-groovy]
 * https://marketplace.visualstudio.com/items?itemName=vscjava.vscode-gradle[Gradle for Java]
 * https://marketplace.visualstudio.com/items?itemName=MellowMarshmallow.groovy[Groovy]
 
-Keep in mind that most of the Grails and Taack Framework features will not be recognized by VSCode but are still usable. In addition, VSCode will not help you with imports, code navigation, and many QoL features will be unavailable since groovy support is not as extensive as IntelliJ.
+[NOTE]
+====
+Most of the Grails and Taack Framework features will not be recognized by VS Code. Imports, navigation, and code assistance may be limited. IntelliJ remains the preferred IDE for full support.
+====
