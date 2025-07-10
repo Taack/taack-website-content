@@ -1,4 +1,8 @@
 = Graphs
+:doctype: book
+:taack-category: 4| Advance
+:toc:
+:source-highlighter: rouge
 
 This section explains how to generate data and implement different types of graphs in your library management application using Grails and the Taack UI framework.
 
