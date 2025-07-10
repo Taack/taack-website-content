@@ -148,7 +148,7 @@ You have now created all the necessary classes for this section!
 Go to `src/main/groovy/mylibrary`.
 
 .Have a look at the `NumberForInstances` class:
-[,Groovy]
+[,groovy]
 ----
 import grails.compiler.GrailsCompileStatic
 import grails.validation.Validateable
@@ -181,7 +181,7 @@ We want to display the authors in a table. For that we need to create a `UiTable
 Pro Mode: implement the Table by yourself [TODOS 2.1.1—2.1.6].
 
 .Implement the `buildAuthorTable`:
-[,Groovy]
+[,groovy]
 ----
 MyLibraryAuthor author = new MyLibraryAuthor()
 UiTableSpecifier authorTableSpecifier = new UiTableSpecifier()
@@ -231,7 +231,7 @@ Note: The name of the author will not be displayed until TODO 2.10 is done.
 Pro Mode: implement the Filter by yourself [TODO 2.2.1].
 
 .Implement the `buildIsActiveAuthorFilter`:
-[,Groovy]
+[,groovy]
 ----
 UiFilterSpecifier buildIsActiveAuthorFilter(MyLibraryAuthor author) {
     UiFilterSpecifier isActiveAuthorFilter = new UiFilterSpecifier()
@@ -260,7 +260,7 @@ We also want to add a filter that filters the authors by lastName let's implemen
 Pro Mode: implement the Filter by yourself [TODO 2.2.2].
 
 .Implement the `buildAuthorFilter`:
-[,Groovy]
+[,groovy]
 ----
 UiFilterSpecifier buildAuthorFilter() {
     MyLibraryAuthor author = new MyLibraryAuthor()
@@ -280,7 +280,7 @@ Your table is now complete; we just need to render it on the page. To render pre
 Pro Mode: implement `listAuthor` by yourself [TODO 2.3].
 
 .Implement the `listAuthor` method:
-[,Groovy]
+[,groovy]
 ----
 def listAuthor() {
     UiTableSpecifier tableAuthorSpecifier = myLibraryUiService.buildAuthorTable()
@@ -303,7 +303,7 @@ Let's go back to `MyLibraryUiService`.
 Pro Mode: implement `buildAuthorForm` by yourself [TODO 2.4].
 
 .Implement `buildAuthorForm`:
-[,Groovy]
+[,groovy]
 ----
 UiFormSpecifier buildAuthorForm(MyLibraryAuthor author) {
     author ?= new MyLibraryAuthor(params)
@@ -325,7 +325,7 @@ Let's go back to `MyLibraryController`. We will render this form in a modal.
 Pro Mode: implement `createAuthor` [TODO 2.5]
 
 .Implement createAuthor:
-[,Groovy]
+[,groovy]
 ----
 def createAuthor(MyLibraryAuthor author) {
     UiFormSpecifier formAuthorSpecifier = myLibraryUiService.buildAuthorForm(author)
@@ -341,7 +341,7 @@ def createAuthor(MyLibraryAuthor author) {
 We now need to save the author. Let's implement `saveAuthor`.
 
 Pro Mode: implement `saveAuthor` [TODO 2.6].
-[,Groovy]
+[,groovy]
 ----
 @Transactional
 def saveAuthor() {
@@ -358,7 +358,7 @@ Go to `myLibraryUiService` in `buildAuthorTable`.
 Pro Mode: add the buttons [TODO 2.7].
 
 .Add the delete and activate buttons. Replace the TODOS 2.7.1 & 2.7.2:
-[,Groovy]
+[,groovy]
 ----
 rowAction ActionIcon.DELETE * IconStyle.SCALE_DOWN, MyLibraryController.&deleteAuthor as MC, authorIterator.id
 rowAction ActionIcon.CREATE * IconStyle.SCALE_DOWN, MyLibraryController.&activateAuthor as MC, authorIterator.id
@@ -369,7 +369,7 @@ Navigate back to `MyLibraryController` to implement the methods `deleteAuthor` &
 Pro Mode: implement the methods [TODO 2.8 & 2.9]
 
 .Implement the `deleteAuthor`:
-[,Groovy]
+[,groovy]
 ----
 @Transactional
 def deleteAuthor(MyLibraryAuthor author) {
@@ -379,7 +379,7 @@ def deleteAuthor(MyLibraryAuthor author) {
 ----
 
 .Implement the `activateAuthor`:
-[,Groovy]
+[,groovy]
 ----
 @Transactional
 def activateAuthor(MyLibraryAuthor author) {
@@ -396,7 +396,7 @@ Let’s navigate to `MyLibraryUiService` in `buildAuthorTable`.
 Pro Mode: add the buttons [TODO 2.10].
 
 Add the show action. Replace the TODO 2.10:
-[,Groovy]
+[,groovy]
 ----
 rowAction authorIterator.firstName, MyLibraryController.&showAuthor as MC, authorIterator.id
 ----
@@ -405,7 +405,7 @@ Note: this time there is no ActionIcon. Instead, a link will be added to the `au
 Pro Mode: implement `buildAuthorShow` [TODO 2.11]
 
 .Implement the `buildAuthorShow`:
-[,Groovy]
+[,groovy]
 ----
 UiShowSpecifier buildAuthorShow(MyLibraryAuthor author) {
     UiShowSpecifier authorShowSpecifier = new UiShowSpecifier()
@@ -424,7 +424,7 @@ We will render the buildAuthorShow in a modal using `showAuthor`.
 Pro Mode: implement `showAuthor` [TODO 2.12]
 
 .Implement the `showAuthor`:
-[,Groovy]
+[,groovy]
 ----
 def showAuthor(MyLibraryAuthor author) {
     UiTableSpecifier tableBookSpecifier = myLibraryUiService.buildBookTable(author)
@@ -449,7 +449,7 @@ We now want to display books in a table. For that we need to create another `UiT
 Pro Mode: implement the Table by yourself [TODOS 3.1.1 - 3.1.6].
 
 .Implement the `buildBookTable`:
-[,Groovy]
+[,groovy]
 ----
 UiTableSpecifier buildBookTable(MyLibraryAuthor author = null) {
     MyLibraryBook book = new MyLibraryBook()
@@ -499,7 +499,7 @@ We want to add a filter to filter books by title. Let's implement it now.
 Pro Mode: implement the Filter by yourself [TODO 3.2].
 
 .Implement the `buildBookFilter`:
-[,Groovy]
+[,groovy]
 ----
 UiFilterSpecifier buildBookFilter() {
     MyLibraryBook book = new MyLibraryBook()
@@ -518,7 +518,7 @@ We have now a table and a filter; we can render a page containing them. Go to `a
 Pro Mode: implement `listBook` by yourself [TODO 3.3].
 
 .Implement the `listBook` method:
-[,Groovy]
+[,groovy]
 ----
 def listBook() {
     UiTableSpecifier tableBookSpecifier = myLibraryUiService.buildBookTable()
@@ -538,7 +538,7 @@ Let's go back to `MyLibraryUiService`.
 Pro Mode: implement `buildBookForm` by yourself [TODO 3.4].
 
 .Implement `buildBookForm`:
-[,Groovy]
+[,groovy]
 ----
 UiFormSpecifier buildBookForm(MyLibraryBook book) {
     book ?= new MyLibraryBook(params)
@@ -562,7 +562,7 @@ Pro Mode: implement `selectAuthor` by yourself, located in `Author Menu` [TODO 3
 
 
 .Implement `selectAuthor`:
-[,Groovy]
+[,groovy]
 ----
 def selectAuthor() {
     UiTableSpecifier tableAuthorSpecifier = myLibraryUiService.buildAuthorTable(true) //<1>
@@ -577,7 +577,7 @@ def selectAuthor() {
 <1> Note that buildAuthorTable takes a Boolean to display the isSelect version of the UiTableSpecifier.
 
 .Add this line instead of TODO 3.5.6 to save the user's selection:
-[,Groovy]
+[,groovy]
 ----
 rowAction tr('default.role.label'), ActionIcon.SELECT * IconStyle.SCALE_DOWN, authorIterator.id, authorIterator.toString()
 ----
@@ -585,7 +585,7 @@ rowAction tr('default.role.label'), ActionIcon.SELECT * IconStyle.SCALE_DOWN, au
 Pro Mode: implement `createBook` [TODO 3.6]
 
 
-[,Groovy]
+[,groovy]
 ----
 def createBook(MyLibraryBook book) {
     UiFormSpecifier tableFormSpecifier = myLibraryUiService.buildBookForm(book)
@@ -601,7 +601,7 @@ def createBook(MyLibraryBook book) {
 We now need to save the book let's implement `saveBook`.
 
 Pro Mode: implement `saveBook` [TODO 3.7].
-[,Groovy]
+[,groovy]
 ----
 @Transactional
 def saveBook() {
@@ -614,13 +614,13 @@ You have a fully functional table where we can display and add books. Let's impl
 Pro Mode: Implement the buttons and display the numberOfInstances [TODOS 3.8].
 
 .Implement the numberOfInstances. Replace the TODO 3.8.1
-[,Groovy]
+[,groovy]
 ----
 rowField bookIterator.numberOfInstances_
 ----
 
 .Add the purchase and select action. Replace the TODO 3.8.2
-[,Groovy]
+[,groovy]
 ----
 rowAction ActionIcon.DELETE * IconStyle.SCALE_DOWN, MyLibraryController.&selectBookInstance as MC, bookIterator.id
 rowAction ActionIcon.ADD * IconStyle.SCALE_DOWN, MyLibraryController.&purchaseBook as MC, bookIterator.id
@@ -631,7 +631,7 @@ We want the user to select how many `BookInstances` they want to purchase. There
 Pro Mode: implement the UiFormSpecifier [TODO 3.9]
 
 .Implement `buildBookPurchase`:
-[,Groovy]
+[,groovy]
 ----
 UiFormSpecifier buildBookPurchase(MyLibraryBook book) {
     NumberForInstances numberForInstances = new NumberForInstances()
@@ -652,7 +652,7 @@ Navigate back to `MyLibraryController` to implement the methods `purchaseBook` &
 Pro Mode: implement the methods [TODO 3.10–3.12]
 
 .Implement the `purchaseBook`:
-[,Groovy]
+[,groovy]
 ----
 def purchaseBook(MyLibraryBook book) {
     UiFormSpecifier tableAddBookInstanceSpecifier = myLibraryUiService.buildBookPurchase(book)
@@ -666,7 +666,7 @@ def purchaseBook(MyLibraryBook book) {
 ----
 
 .Implement the `purchaseAndSaveBook`:
-[,Groovy]
+[,groovy]
 ----
 @Transactional
 def purchaseAndSaveBook(NumberForInstances numberForInstances, MyLibraryBook book) {
@@ -680,7 +680,7 @@ def purchaseAndSaveBook(NumberForInstances numberForInstances, MyLibraryBook boo
 ----
 
 .Implement the `selectBookInstance`:
-[,Groovy]
+[,groovy]
 ----
 def selectBookInstance(MyLibraryBook book) {
     UiTableSpecifier bookInstanceTableSpecifier = myLibraryUiService.buildInstanceBookTable(book)
@@ -700,7 +700,7 @@ Let’s navigate to `MyLibraryUiService` in `buildBookTable`.
 Pro Mode: add the buttons [TODO 3.13].
 
 Add the show action. Replace the TODO 3.13:
-[,Groovy]
+[,groovy]
 ----
 rowAction ActionIcon.SHOW * IconStyle.SCALE_DOWN, MyLibraryController.&showBook as MC, bookIterator.id
 ----
@@ -708,7 +708,7 @@ rowAction ActionIcon.SHOW * IconStyle.SCALE_DOWN, MyLibraryController.&showBook 
 Pro Mode: implement `buildBookShow` [TODO 3.14]
 
 .Implement the `buildBookShow`:
-[,Groovy]
+[,groovy]
 ----
     UiShowSpecifier buildBookShow(MyLibraryBook book) {
         UiShowSpecifier bookShowSpecifier = new UiShowSpecifier()
@@ -726,7 +726,7 @@ Pro Mode: implement `buildBookShow` [TODO 3.14]
 Pro Mode: implement `showBook` [TODO 3.15]
 
 .Implement the `showBook`:
-[,Groovy]
+[,groovy]
 ----
 def showBook(MyLibraryBook book) {
     UiShowSpecifier showBookSpecifier = myLibraryUiService.buildBookShow(book)
@@ -746,7 +746,7 @@ Let's start by implementing the `buildIsActiveBookInstances` filter.
 Pro Mode: implement `buildIsActiveBookInstances` [TODO 3.16].
 
 .Implement `buildIsActiveBookInstances`.
-[,Groovy]
+[,groovy]
 ----
 UiFilterSpecifier buildIsActiveBookInstances(MyLibraryBook book) {
     MyLibraryBookInstance bookInstance = new MyLibraryBookInstance()
@@ -762,7 +762,7 @@ We can now implement the `buildBookInstanceTable`.
 Pro Mode: implement `buildBookInstanceTable` [TODO 3.17].
 
 .Implement `buildBookInstanceTable`.
-[,Groovy]
+[,groovy]
 ----
 UiTableSpecifier buildInstanceBookTable(MyLibraryBook book, MyLibraryBookInstance bookInstance = null) {
     UiTableSpecifier table = new UiTableSpecifier()
@@ -791,7 +791,7 @@ Let's now implement `deleteBookInstances`.
 Pro Mode: implement `deleteBookInstances` [TODO 3.18].
 
 .Implement `deleteBookInstances`:
-[,Groovy]
+[,groovy]
 ----
 @Transactional
 def deleteBookInstances(MyLibraryBookInstance bookInstance) {
