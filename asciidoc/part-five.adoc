@@ -1,0 +1,14 @@
+= PDFs
+
+== Set Up
+.To access the skeleton for this part, go to your terminal cd into the project (`myLibrary`) and copy the following line.
+[,bash]
+----
+git checkout part-1-skeleton
+----
+
+Or in IntelliJ you can select the wanted branch directly. Select in the top left corner main/myLibrary/remote, and you will see all the branches. Select a branch add checkout.
+
+== Creating PDFs
+
+In this section, you will learn how to create PDFs based on the data in your project.
