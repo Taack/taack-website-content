@@ -24,7 +24,7 @@ Edit: `app/library/src/main/groovy/myLibrary/domain/`
 
 
 .Updated class Diagram for your convenience
-[plantuml,]
+[plantuml]
 ----
 @startuml
 
@@ -168,7 +168,10 @@ buildUserBorrowsSpecifier.ui {
 
     TaackFilter.FilterBuilder filter = taackFilterService.getBuilder(MyLibraryBorrowed)
             .setMaxNumberOfLine(10)
-            .setSortOrder(TaackFilter.Order.ASC, borrowed.bookInstance_,bookInstance.book_,book.title_)
+            .setSortOrder(
+                TaackFilter.Order.ASC,
+                borrowed.bookInstance_,
+                bookInstance.book_,book.title_)
 
     if(isCurrently) {filter.addFilter(new FilterExpression(null, Operator.EQ, borrowed.returnDate_))} //<1>
     else {filter.addFilter(new FilterExpression(null, Operator.NE, borrowed.returnDate_))} //<1>

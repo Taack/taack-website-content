@@ -554,7 +554,7 @@ UiFormSpecifier buildBookForm(MyLibraryBook book) {
     }
 }
 ----
-<1>Here we use an `AjaxField` to retrieve the information from `selectAuthor`.
+<1> Here we use an `AjaxField` to retrieve the information from `selectAuthor`.
 
 Let's go back to `MyLibraryController`, and implement `selectAuthor` to clarify.
 
@@ -764,7 +764,9 @@ Pro Mode: implement `buildBookInstanceTable` [TODO 3.17].
 .Implement `buildBookInstanceTable`.
 [,groovy]
 ----
-UiTableSpecifier buildInstanceBookTable(MyLibraryBook book, MyLibraryBookInstance bookInstance = null) {
+UiTableSpecifier buildInstanceBookTable(
+    MyLibraryBook book,
+    MyLibraryBookInstance bookInstance = null) {
     UiTableSpecifier table = new UiTableSpecifier()
     table.ui {
         header {
@@ -772,14 +774,18 @@ UiTableSpecifier buildInstanceBookTable(MyLibraryBook book, MyLibraryBookInstanc
             column {label "Delete"}
         }
 
-        TaackFilter.FilterBuilder filter = taackFilterService.getBuilder(MyLibraryBookInstance).addRestrictedIds(book.listOfBookInstance*.id as Long[])
+        TaackFilter.FilterBuilder filter = taackFilterService
+            .getBuilder(MyLibraryBookInstance)
+            .addRestrictedIds(book.listOfBookInstance*.id as Long[])
+
         filter.addFilter(buildIsActiveBookInstances(book))
 
-        iterate(
-                filter.build()) { MyLibraryBookInstance bookInstanceIterator ->
+        iterate(filter.build()) { MyLibraryBookInstance bookInstanceIterator ->
             rowField bookInstanceIterator.serialNumber_
             rowColumn {
-                rowAction ActionIcon.DELETE * IconStyle.SCALE_DOWN, MyLibraryController.&deleteBookInstances as MC, bookInstanceIterator.id, [bookId:book.id]
+                rowAction ActionIcon.DELETE * IconStyle.SCALE_DOWN,
+                    MyLibraryController.&deleteBookInstances as MC,
+                    bookInstanceIterator.id, [bookId:book.id]
             }
         }
     }
