@@ -97,7 +97,7 @@ private static UiDiagramSpecifier pieDiagram(boolean hasSlice) {
 image:diag-dsl-pie.webp[]
 ====
 
-=== Wiskers
+=== Whiskers
 
 .Whiskers chart
 ====
