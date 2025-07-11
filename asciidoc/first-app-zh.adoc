@@ -37,8 +37,7 @@ NOTE: 事实上，这在长周期的软件开发项目中很常见，不应当�
 首先，让我们着眼于导航栏。
 第一步学习如何构建，基本代码如下：
 
-[,groovy]
-----
+[,Groovy]----
 static private UiMenuSpecifier buildMenu(String q = null) {
     new UiMenuSpecifier().ui {
         menu SomeController.&action as MC
