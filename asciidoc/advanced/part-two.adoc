@@ -89,7 +89,7 @@ int getNumberOfBooksBorrowable() {
         return MyLibraryBookInstance.countByIsAvailableBAndIsActiveAndBook(true, true, this) //<1>
     }
 ----
-<1> `countByIsAvailableBAndIsActiveAndBook` is a dynamic finder method in Grails/GORM that automatically counts the number of records in a domain class matching the given conditions for the fields `isAvailableB`, `isActive`, and `book`. For more information link:https://docs.grails.org/latest/ref/Domain%20Classes/countBy.html[Grails Documentation (countBy)].
+<1> `countByIsAvailableBAndIsActiveAndBook` is a dynamic finder method in Grails/GORM that automatically counts the number of records in a domain class matching the given conditions for the fields `isAvailableB`, `isActive`, and `book`. For more information, link:https://docs.grails.org/latest/ref/Domain%20Classes/countBy.html[Grails Documentation (countBy)].
 
 .Modify a `MyLibraryBookInstance` class and add the following variables and hasMany relationship (TODO 1.2):
 [,groovy]
