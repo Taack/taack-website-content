@@ -1,12 +1,10 @@
 = Introduction
 :doctype: book
-:taack-category: 0| Advance
+:taack-category: 0| Advanced
 :toc:
 :source-highlighter: rouge
 
 We strongly recommend doing the first-app project before as this is a continuation of that project.
-
-Description of the project:
 
 == Set up
 === Cloning the ready-to-dev Intranet

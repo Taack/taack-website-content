@@ -157,7 +157,7 @@ bookTableSpecifier.ui {
     // -- Header --
     header {
         column {
-            label book.title_
+            sortableFieldHeader book.title_ //<1>
         }
         column {
             label book.authorName_
@@ -171,7 +171,7 @@ bookTableSpecifier.ui {
     }
 }
 ----
-
+<1> Note here we use `sortableFieldHeader`, this makes the column sortable, you can sort the books in alphabetical order by clicking on the book.title header.
 Now we are going to populate our table, we'll iterate over Book instances in the database by using the `iterate` table DSL method.
 
 .Add the following code (initialize and import necessary classes):
@@ -560,10 +560,10 @@ UiTableSpecifier buildAuthorTable(Boolean isSelect = false ) {
     authorTableSpecifier.ui {
         header {
             column {
-                label author.firstName_
+                sortableFieldHeader author.firstName_
             }
             column {
-                label author.lastName_
+                sortableFieldHeader author.lastName_
             }
             column {
                 label author.dateOfBirth_

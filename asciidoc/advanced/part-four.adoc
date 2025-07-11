@@ -1,6 +1,6 @@
 = Graphs
 :doctype: book
-:taack-category: 4| Advance
+:taack-category: 4| Advanced
 :toc:
 :source-highlighter: rouge
 
@@ -30,7 +30,7 @@ To create the data, simply call `/myLibraryData/createDataUsers` in the address 
 
 === Example Code
 
-To create a graph, you will use a `UiDiagramSpecifier()`. There are a variety of different graph options (bar, line, pie, whiskers, area). To have a look at how to implement all of them, refer to link:doc/DSLs/diagram-dsl.adoc[Diagram DSL].
+To create a graph, you will use a `UiDiagramSpecifier()`. There are a variety of different graph options (bar, line, pie, whiskers, area). To have a look at how to implement all of them, refer to link:../doc/DSLs/diagram-dsl.adoc[Diagram DSL].
 
 In this example, we want to visualize the number of books per author for the top 10 authors with the most books in the library.
 
@@ -84,6 +84,9 @@ This code has already been implemented for you in `MyLibraryUiService`, along wi
 You can run the server and navigate to the Diagram menu to see the example pie diagram.
 Let's create our own diagrams.
 
+.Graph
+image::part-four-author-pie-screenshot.png[Reload,width=800,align="left"]
+
 === Pie Diagram
 We want to be able to visualize which books are the most popular among the borrowers. For that, we decided to create a pie graph displaying the top 10 books that are the most borrowed.
 
@@ -134,6 +137,11 @@ diagram diagramPieSpec, {label "Book Popularity Pie"} // TODO 1.2.2
 ----
 
 You now run the server again and navigate to the Diagram menu to see the newly created pie diagram.
+
+
+.Graph
+image::part-four-book-pie-screenshot.png[Reload,width=800,align="left"]
+
 
 === Bar Diagram
 We want to visualize the number of books requested by the borrowers. For that, we decided to create a bar graph displaying the number of requests (per year, month and day).
@@ -201,6 +209,8 @@ diagram(diagramBarSpec, {
 
 You now run the server again to see the newly created bar diagram.
 
+.Graph
+image::part-four-borrowed-bar-screenshot.png[Reload,width=800,align="left"]
 
 === Whiskers Diagram
 
@@ -294,3 +304,7 @@ diagram durationDiagramSpec // TODO 3.2.2
 ----
 
 You now run the server again to see the newly created whiskers diagram.
+
+
+.Graph
+image::part-four-borrowed-whiskers-screenshot.png[Reload,width=800,align="left"]

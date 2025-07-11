@@ -1,3 +1,0 @@
-= Advance
-:doctype: book
-:taack-category: 43|advance

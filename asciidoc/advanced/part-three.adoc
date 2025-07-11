@@ -1,6 +1,6 @@
 = Security and Constraints
 :doctype: book
-:taack-category: 3| Advance
+:taack-category: 3| Advanced
 :toc:
 :source-highlighter: rouge
 
@@ -31,6 +31,13 @@ Borrowers will be able to:
 - request a bookInstance in the Book menu.
 - return a bookInstance in the Borrowed menu.
 - see their past requests in the History menu.
+
+.Admins
+image::part-three-admin-screenshot.png[Reload,width=800,align="left"]
+
+.Borrowers
+image::part-three-borrower-screenshot.png[Reload,width=800,align="left"]
+
 
 == Constraints
 
@@ -108,7 +115,7 @@ static constraints = {
     user nullable:false
 }
 ----
-For more information, refer to the Grails documentation about constraints.
+For more information, refer to the link:https://docs.grails.org/latest/ref/Constraints/Usage.html[Grails documentation] about constraints.
 
 == Define menus
 
