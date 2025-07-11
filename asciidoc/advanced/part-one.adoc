@@ -22,7 +22,7 @@ git checkout part-1-skeleton
 
 Or in IntelliJ you can select the wanted branch directly. Select in the top left corner main/myLibrary/remote, and you will see all the branches. Select a branch add checkout.
 
-Note for each todo implementation a new branch has been implemented for your convenience. If anything happens, you can always checkout to that branch instead of starting over.
+Note for each todo implementation a new branch has been implemented for your convenience. If anything happens, you can always checkout to that branch instead of starting over. Note: for example, part-1-todo-4 will have todo for implemented for you.
 
 .For example, if you want to continue the project from part-1-todo-4 do the following.
 [,bash]
