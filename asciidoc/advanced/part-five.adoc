@@ -1,6 +1,6 @@
 = PDFs
 :doctype: book
-:taack-category: 5| Advanced
+:taack-category: 5|Advanced
 :toc:
 :source-highlighter: rouge
 

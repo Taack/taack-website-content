@@ -1,10 +1,11 @@
 = Security and Constraints
 :doctype: book
-:taack-category: 3| Advanced
+:taack-category: 3|Advanced
 :toc:
 :source-highlighter: rouge
 
 == Set Up
+
 .To access the skeleton for this part, go to your terminal cd into the project (`myLibrary`) and copy the following line.
 [,bash]
 ----

@@ -1,8 +1,10 @@
 = Part One
 :doctype: book
-:taack-category: 1| Advanced
+:taack-category: 1|Advanced
 :toc:
 :source-highlighter: rouge
+
+== Introduction
 
 We will start by creating a simple private library, where the user can create authors, books, and book instances (inspired by the previous project described in Usage).
 
