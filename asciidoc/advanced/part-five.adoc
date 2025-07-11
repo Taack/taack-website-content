@@ -38,7 +38,7 @@ There are three options to organize the display if the header.
 Inside the header, you draw the content using UiSpecifiers.
 
 .Example code:
-[,Groovy]
+[,groovy]
 ----
 printableHeaderRight('7.5cm') { //<1>
     show new UiShowSpecifier().ui {
@@ -55,7 +55,7 @@ Go to `MyLibraryUiService`.
 Pro Mode: implement the `printableHeader` of `buildLibraryPdf` [TODO 1.1].
 
 .Implement the `printableHeader` of `buildLibraryPdf`:
-[,Groovy]
+[,groovy]
 ----
 printableHeaderLeft('7.5cm') {
     show new UiShowSpecifier().ui {
@@ -86,7 +86,7 @@ Inside the body, you draw the content using UiSpecifiers, same as for the `print
 Pro Mode: implement the first part of `printableBody` of `buildLibraryPdf` [TODO 1.2.1].
 
 .Implement the first part of `printableBody` of `buildLibraryPdf`:
-[,Groovy]
+[,groovy]
 ----
 List<MyLibraryAuthor> authors = MyLibraryAuthor.list(sort: 'lastName')
 for (MyLibraryAuthor author : authors) {
@@ -100,7 +100,7 @@ for (MyLibraryAuthor author : authors) {
 Pro Mode: implement the second part of `printableBody` of `buildLibraryPdf` [TODO 1.2.2].
 
 .Implement the second part of `printableBody` of `buildLibraryPdf`:
-[,Groovy]
+[,groovy]
 ----
 anonymousBlock BlockSpec.Width.MAX, {
     diagram buildAuthorPieDiagram(true), BlockSpec.Width.MAX
@@ -113,7 +113,7 @@ anonymousBlock BlockSpec.Width.MAX, {
 Pro Mode: implement the third part of `printableBody` of `buildLibraryPdf` [TODO 1.2.3].
 
 .Implement the third part of `printableBody` of `buildLibraryPdf`:
-[,Groovy]
+[,groovy]
 ----
 if (currentUser?.authorities?.any { it.authority == 'ROLE_BORROWER' }) {
     table this.buildUserBorrowsTable(false, null, true), BlockSpec.Width.MAX
@@ -135,7 +135,7 @@ Go to `MyLibraryController`.
 Pro Mode: implement `downloadBinLibraryPdf` [TODO 2].
 
 .Implement `downloadBinLibraryPdf`:
-[,Groovy]
+[,groovy]
 ----
 def downloadBinLibraryPdf() {
     UiPrintableSpecifier pdf = myLibraryUiService.buildLibraryPdf()

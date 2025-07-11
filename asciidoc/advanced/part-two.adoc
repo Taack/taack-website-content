@@ -28,7 +28,7 @@ Edit: `app/library/src/main/groovy/myLibrary/domain/`
 
 
 .Updated class Diagram for your convenience
-[plantuml,]
+[plantuml]
 ----
 @startuml
 
@@ -135,7 +135,7 @@ Let's start by adding these menus to the `buildMenu`.
 Pro Mode: Add the menus in `buildMenu`. [TODO 2]
 
 .Add the following lines to `buildMenu`:
-[,Groovy]
+[,groovy]
 ----
 menu MyLibraryController.&listBooksBorrowed as MC
 menu MyLibraryController.&listBooksCurrentlyBorrowed as MC
@@ -152,7 +152,7 @@ Note: the only differences between the borrowed and history menus are the `retur
 Pro Mode: implement the Table by yourself [TODOS 3.1].
 
 .Implement the `buildBorrowedTable`:
-[,Groovy]
+[,groovy]
 ----
 MyLibraryBook book = new MyLibraryBook()
 MyLibraryBorrowed borrowed = new MyLibraryBorrowed()
@@ -173,7 +173,10 @@ buildUserBorrowsSpecifier.ui {
 
     TaackFilter.FilterBuilder filter = taackFilterService.getBuilder(MyLibraryBorrowed)
             .setMaxNumberOfLine(10)
-            .setSortOrder(TaackFilter.Order.ASC, borrowed.bookInstance_,bookInstance.book_,book.title_)
+            .setSortOrder(
+                TaackFilter.Order.ASC,
+                borrowed.bookInstance_,
+                bookInstance.book_,book.title_)
 
     if(isCurrently) {filter.addFilter(new FilterExpression(null, Operator.EQ, borrowed.returnDate_))} //<1>
     else {filter.addFilter(new FilterExpression(null, Operator.NE, borrowed.returnDate_))} //<1>
@@ -201,7 +204,7 @@ We also want to add a filter that filters the authors by last name. Let's implem
 Pro Mode: implement the Filter by yourself [TODO 3.2].
 
 .Implement the `buildUserBorrowsFilter`:
-[,Groovy]
+[,groovy]
 ----
 UiFilterSpecifier buildUserBorrowsFilter(User user = null) {
     MyLibraryBook book = new MyLibraryBook()
@@ -222,7 +225,7 @@ Your table is now complete; we just need to render it on the page. We will do th
 Pro Mode: implement `listBooksCurrentlyBorrowed` by yourself [TODO 3.3].
 
 .Implement the `listBooksCurrentlyBorrowed` method:
-[,Groovy]
+[,groovy]
 ----
 def listBooksCurrentlyBorrowed() {
     UiTableSpecifier tableUserBorrowsSpecifier = myLibraryUiService.buildUserBorrowsTable(true)
@@ -241,7 +244,7 @@ Let's go back to `MyLibraryUiService`.
 Pro Mode: implement `buildRequestBookForm` [TODO 3.4].
 
 .Implement `buildRequestBookForm`:
-[,Groovy]
+[,groovy]
 ----
 UiFormSpecifier buildRequestBookForm(MyLibraryBook book) {
     User user = springSecurityService.currentUser as User
@@ -267,7 +270,7 @@ Let's go back to `MyLibraryController`. We will render this form in a modal.
 Pro Mode: implement `requestBookInstance` [TODO 3.5]
 
 .Implement `requestBookInstance`:
-[,Groovy]
+[,groovy]
 ----
 def requestBookInstance(MyLibraryBook book){
     UiFormSpecifier requestBookInstanceForm = myLibraryUiService.buildRequestBookForm(book)
@@ -283,7 +286,7 @@ def requestBookInstance(MyLibraryBook book){
 We now need to save the borrowed record, so let's implement `saveBookForm`.
 
 Pro Mode: implement `saveBookForm` [TODO 3.6].
-[,Groovy]
+[,groovy]
 ----
 @Transactional
 def saveBookForm() {
@@ -298,7 +301,7 @@ We now need to implement `selectBookInstanceOne` which will use `buildInstanceBo
 Pro Mode: modify `buildInstanceBookTable` [TODO 3.7].
 
 .Replace TODO 3.7.1:
-[,Groovy]
+[,groovy]
 ----
 column {
     if (isOne) {
@@ -309,12 +312,12 @@ column {
 }
 ----
 .Replace TODO 3.7.2:
-[,Groovy]
+[,groovy]
 ----
 filter.addFilter(buildIsAvailableBookInstances(book))
 ----
 .Replace TODO 3.7.3:
-[,Groovy]
+[,groovy]
 ----
 rowColumn {
     if(isOne) {
@@ -330,7 +333,7 @@ We have used the `buildIsAvailableBookInstances` filter; let's implement it.
 Pro Mode: Implement `buildIsAvailableBookInstances` [TODO 3.8].
 
 .Implement `buildIsAvailableBookInstances`:
-[,Groovy]
+[,groovy]
 ----
 UiFilterSpecifier buildIsAvailableBookInstances(MyLibraryBook book) {
     MyLibraryBookInstance bookInstance = new MyLibraryBookInstance()
@@ -344,7 +347,7 @@ UiFilterSpecifier buildIsAvailableBookInstances(MyLibraryBook book) {
 Pro Mode: Implement `selectBookInstanceOne` [TODO 3.9].
 
 .Implement `selectBookInstanceOne`:
-[,Groovy]
+[,groovy]
 ----
 def selectBookInstanceOne(MyLibraryBook book) {
     UiTableSpecifier bookInstanceTable = myLibraryUiService.buildInstanceBookTable(book, true)
@@ -363,25 +366,25 @@ Let's now add the button to access the request form. We also want to know how ma
 Pro Mode: Modify `buildBookTable` [TODO 3.10]
 
 .Replace TODO 3.10.1:
-[,Groovy]
+[,groovy]
 ----
 label "Number of Available Book Instances"
 ----
 
 .Replace TODO 3.10.2:
-[,Groovy]
+[,groovy]
 ----
 label "Request Form"
 ----
 
 .Replace TODO 3.10.3:
-[,Groovy]
+[,groovy]
 ----
 rowField bookIterator.numberOfBooksBorrowable_
 ----
 
 .Replace TODO 3.10.4:
-[,Groovy]
+[,groovy]
 ----
 rowColumn {
     rowAction ActionIcon.CREATE * IconStyle.SCALE_DOWN, MyLibraryController.&requestBookInstance as MC, bookIterator.id
@@ -399,7 +402,7 @@ Go to `myLibraryUiService` in the `buildUserBorrowsTable`.
 Pro Mode: add the buttons [TODO 3.11].
 
 .Add the return buttons. Replace the TODOS 3.11.1 & 3.11.3:
-[,Groovy]
+[,groovy]
 ----
 if (isCurrently) column {label "Return Book"}
 
@@ -413,7 +416,7 @@ if (isCurrently) {
 ----
 
 .Add the approval buttons. Replace the TODOS 3.11.2 & 3.11.4:
-[,Groovy]
+[,groovy]
 ----
 if (isCurrently) {label "Approve Book"}
 
@@ -429,7 +432,7 @@ Let's now implement the forms for `approveBook` and `returnBook`.
 Pro Mode implement `buildApproveBookTable` [TODO 3.12]
 
 .Implement `buildApproveBookTable`:
-[,Groovy]
+[,groovy]
 ----
 UiFormSpecifier buildApproveBookTable(MyLibraryBorrowed borrowed) {
     UiFormSpecifier approveBookSpecifier = new UiFormSpecifier()
@@ -448,7 +451,7 @@ UiFormSpecifier buildApproveBookTable(MyLibraryBorrowed borrowed) {
 Pro Mode implement `buildRequestReturnBookForm` [TODO 3.13]
 
 .Implement `buildRequestReturnBookForm`:
-[,Groovy]
+[,groovy]
 ----
 UiFormSpecifier buildRequestReturnBookForm(MyLibraryBorrowed borrowed) {
     UiFormSpecifier requestBookFormSpecifier = new UiFormSpecifier()
@@ -467,7 +470,7 @@ Navigate back to `MyLibraryController` to implement the methods `approveBook` & 
 Pro Mode: implement the methods [TODO 3.14 & 3.15]
 
 .Implement the `approveBook`:
-[,Groovy]
+[,groovy]
 ----
 def approveBook(MyLibraryBorrowed borrowed) {
     UiFormSpecifier approveBookSpecifier = myLibraryUiService.buildApproveBookTable(borrowed)
@@ -481,7 +484,7 @@ def approveBook(MyLibraryBorrowed borrowed) {
 ----
 
 .Implement the `returnBook`:
-[,Groovy]
+[,groovy]
 ----
 def returnBook(MyLibraryBorrowed borrowed) {
     UiFormSpecifier requestReturnBookInstanceForm = myLibraryUiService.buildRequestReturnBookForm(borrowed)
@@ -499,7 +502,7 @@ Let's implement the saves, `saveApprovalBookForm` & `saveReturnBookForm`.
 Pro Mode: implement the methods  [TODO 3.16 & 3.17]
 
 .Implement `saveApprovalBookForm`:
-[,Groovy]
+[,groovy]
 ----
  @Transactional
 def saveApprovalBookForm() {
@@ -517,7 +520,7 @@ Note: The Calendar is set to a far future date (year 999999) to indicate rejecti
 
 
 .Implement `saveReturnBookForm`:
-[,Groovy]
+[,groovy]
 ----
 @Transactional
 def saveReturnBookForm() {
@@ -537,7 +540,7 @@ Let’s navigate to `MyLibraryUiService` in `buildUserBorrowsTable`.
 Pro Mode: add the buttons [TODO 3.18].
 
 Add the show action. Replace the TODO 3.18:
-[,Groovy]
+[,groovy]
 ----
 rowAction ActionIcon.SHOW * IconStyle.SCALE_DOWN, MyLibraryController.&showBorrowed as MC, borrowedIterator.id
 ----
@@ -545,7 +548,7 @@ rowAction ActionIcon.SHOW * IconStyle.SCALE_DOWN, MyLibraryController.&showBorro
 Pro Mode: implement `buildBorrowedShow` [TODO 3.19]
 
 .Implement the `buildBorrowedShow`:
-[,Groovy]
+[,groovy]
 ----
 UiShowSpecifier buildBorrowedShow(MyLibraryBorrowed borrowed) {
     UiShowSpecifier borrowedShowSpecifier = new UiShowSpecifier()
@@ -567,7 +570,7 @@ We will render the buildBorrowedShow in a modal using `showBorrowed`.
 Pro Mode: implement `showBorrowed` [TODO 3.20]
 
 .Implement the `showBorrowed`:
-[,Groovy]
+[,groovy]
 ----
 def showBorrowed(MyLibraryBorrowed borrowed) {
     UiShowSpecifier showSpec = myLibraryUiService.buildBorrowedShow(borrowed)
@@ -589,7 +592,7 @@ We now want to display the previous results in a table. As explained earlier, th
 Pro Mode: implement `listBooksBorrowed` [TODOS 4.1].
 
 .Implement the `listBooksBorrowed`:
-[,Groovy]
+[,groovy]
 ----
 def listBooksBorrowed() {
     UiTableSpecifier tableUserBorrowsSpecifier = myLibraryUiService.buildUserBorrowsTable()

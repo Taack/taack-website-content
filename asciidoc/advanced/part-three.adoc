@@ -98,7 +98,7 @@ MyLibraryBorrowed --> ApprovalStatus
 Pro Mode: modify the class [TODO 1]
 
 .Add the following constraints:
-[,Groovy]
+[,groovy]
 ----
 static constraints = {
     approvalDate nullable: true, validator: { Date val, MyLibraryBorrowed obj ->
@@ -124,7 +124,7 @@ As explained earlier, there will be two new menus only available to admins. Let'
 Pro Mode: Add the menus [TODO 2]
 
 .Add the following menus:
-[,Groovy]
+[,groovy]
 ----
 menu MyLibraryController.&listOfUsers as MC
 menu MyLibraryController.&listOfRequests as MC
@@ -137,7 +137,7 @@ First, we will create a method to determine what type of user is connected in `M
 Pro Mode: implement `isAdmin` [TODO 3.1].
 
 .Implement `isAdmin`:
-[,Groovy]
+[,groovy]
 ----
 boolean isAdmin() {
     User currentUser = springSecurityService.currentUser as User
@@ -150,7 +150,7 @@ Second, we will create a method that allows us to determine what type of user is
 Pro Mode: modify `index` [TODO 3.2].
 
 .Modify `index`:
-[,Groovy]
+[,groovy]
 ----
 def index() {
     currentUser = springSecurityService.currentUser as User
@@ -166,7 +166,7 @@ To accommodate the changes, we will have to modify the author, book and userBorr
 Pro Mode: modify `buildAuthorTable` [TODO 4.1]
 
 .Modify `buildAuthorTable` TODO 4.1.1–4.1.4:
-[,Groovy]
+[,groovy]
 ----
 boolean isAdmin = isAdmin() //TODO 4.1.1
 if(!isSelect && isAdmin) { // TODO 4.1.2 & TODO 4.1.4
@@ -176,7 +176,7 @@ if(!isAdmin) {filter.addFilter(buildIsActiveAuthorFilter(author))} //TODO 4.1.3
 Pro Mode: modify `buildBookTable` [TODO 4.2]
 
 .Modify `buildBookTable` TODO 4.2.1–4.2.8:
-[,Groovy]
+[,groovy]
 ----
 boolean isAdmin = isAdmin() //TODO 4.2.1
 if(isAdmin) column {label "Number of instances "} // TODO 4.2.2
@@ -210,7 +210,7 @@ Pro Mode: modify `buildUserBorrowedTable` [TODO 4.3 Part 1]
 Note we have added two variables that the builder takes. `showUser`, which allows showing borrow records for that specific user and `isUser`, which indicates if the viewer is a user (true) or admin (false).
 
 .Modify `buildUserBorrowsTable` TODO 4.3.1–4.3.7:
-[,Groovy]
+[,groovy]
 ----
 Boolean isAdmin = isAdmin() // TODO 4.3.1
 if (isCurrently  && !isAdmin) column {label "Return Book"} // TODO 4.3.2
@@ -253,7 +253,7 @@ Note that we have added the necessary elements to display all the requests of al
 Pro Mode: modify `listOfRequests` [TODO 4.3 Part 2]
 
 .Modify `listOfRequests` TODO 4.3.8–4.3.12:
-[,Groovy]
+[,groovy]
 ----
 def listOfRequests() {
     UiTableSpecifier tableUserBorrowsSpecifier = myLibraryUiService.buildUserBorrowsTable(true, null, true)
@@ -272,7 +272,7 @@ Let's start by implementing the `buildUsersTable`.
 Pro Mode: implement `buildUsersTable` [TODO 5.1]
 
 .Implement `buildUsersTable`:
-[,Groovy]
+[,groovy]
 ----
 UiTableSpecifier buildUsersTable() {
     UiTableSpecifier buildUsersSpecifier = new UiTableSpecifier()
@@ -304,7 +304,7 @@ Let's render it on a page. Go to `MyLibraryController`.
 Pro Mode: implement `listOfUsers` [TODO 5.2]
 
 .Implement `listOfUsers`:
-[,Groovy]
+[,groovy]
 ----
 def listOfUsers() {
     UiTableSpecifier tableUsersSpecifier = myLibraryUiService.buildUsersTable()
@@ -321,7 +321,7 @@ Go to `MyLibraryUiService`
 Pro Mode: implement `buildUserShow` [TODO 5.3]
 
 .Implement `buildUserShow`:
-[,Groovy]
+[,groovy]
 ----
 UiShowSpecifier buildUserShow(User user) {
     UiShowSpecifier userShowSpecifier = new UiShowSpecifier()
@@ -340,7 +340,7 @@ Go to `MyLibraryController`
 Pro Mode: implement `showUser` [TODO 5.4]
 
 .Implement `showUser`:
-[,Groovy]
+[,groovy]
 ----
 def showUser(User user) {
     UiShowSpecifier showSpec = myLibraryUiService.buildUserShow(user)
@@ -380,7 +380,7 @@ Pro Mode: implement `approvedSecurityClosure`  [TODO 6.2]
 
 
 .Implement the following method:
-[,Groovy]
+[,groovy]
 ----
 private static boolean approvedSecurityClosure(Long id, Map p) {
     MyLibraryBorrowed borrowed = MyLibraryBorrowed.get(id)
@@ -389,7 +389,7 @@ private static boolean approvedSecurityClosure(Long id, Map p) {
 ----
 
 .Add the following lines of code in `init`:
-[,Groovy]
+[,groovy]
 ----
 TaackUiEnablerService.securityClosure(
     this.&approvedSecurityClosure,

@@ -37,7 +37,7 @@ In this example, we want to visualize the number of books per author for the top
 First, we need to retrieve the information from MyLibraryBook.
 
 .Hql code (example code):
-[,Groovy]
+[,groovy]
 ----
 List<Object[]> results = MyLibraryBorrowed.executeQuery("""\
     select book.author, count(book)
@@ -49,7 +49,7 @@ Here we store each of the top 10 authors’ lastName with their associated numbe
 
 We now need to put this information in a readable format for the DiagramSpecifier.
 
-[,Groovy]
+[,groovy]
 .Example code:
 ----
 Map<String, BigDecimal> authorCounts = [:]
@@ -63,7 +63,7 @@ results.each { row ->
 We can now create the pie diagram.
 
 .Pie Diagram (example code):
-[,Groovy]
+[,groovy]
 ----
 new UiDiagramSpecifier().ui {
     pie(hasSlice, {
@@ -93,7 +93,7 @@ We want to be able to visualize which books are the most popular among the borro
 Pro Mode: Implement `buildBookPopularityPieDiagram` [TODO 1.1].
 
 .Implement `buildBookPopularityPieDiagram`:
-[,Groovy]
+[,groovy]
 ----
 UiDiagramSpecifier buildBookPopularityPieDiagram(boolean hasSlice) {
     Map<String, BigDecimal> bookCounts = [:]
@@ -129,7 +129,7 @@ UiDiagramSpecifier buildBookPopularityPieDiagram(boolean hasSlice) {
 Pro Mode: Render the diagram in `listDiagram` [TODO 1.2].
 
 .Modify `listDiagram`, replace [TODO 1.2.1 and 1.2.2]:
-[,Groovy]
+[,groovy]
 ----
 UiDiagramSpecifier diagramPieSpec = myLibraryUiService.buildBookPopularityPieDiagram(true) // TODO 1.2.1
 
@@ -148,7 +148,7 @@ We want to visualize the number of books requested by the borrowers. For that, w
 
 Pro Mode: Implement `buildBarDiagram` [TODO 2.1].
 .Pro Mode helper (example code):
-[,Groovy]
+[,groovy]
 ----
 UiDiagramSpecifier barDiagram(boolean isStacked) {
     new UiDiagramSpecifier().ui {
@@ -163,7 +163,7 @@ UiDiagramSpecifier barDiagram(boolean isStacked) {
 ----
 
 .Implement `buildBarDiagram`:
-[,Groovy]
+[,groovy]
 ----
 UiDiagramSpecifier buildBarDiagram(boolean isStacked, String labelDateFormat) {
     Map<Date, BigDecimal> borrowedCounts = [:]
@@ -195,7 +195,7 @@ UiDiagramSpecifier buildBarDiagram(boolean isStacked, String labelDateFormat) {
 Pro Mode: Render the diagram in `listDiagram` [TODO 2.2].
 
 .Modify `listDiagram`, replace [TODO 2.2.1 and 2.2.2]:
-[,Groovy]
+[,groovy]
 ----
 UiDiagramSpecifier diagramBarSpec = myLibraryUiService.buildBarDiagram(true, labelDateFormat) // TODO 2.2.1
 
@@ -218,7 +218,7 @@ We want to be able to visualize the number of days a book is rented for by the b
 
 Pro Mode: Implement `buildBorrowDurationWhiskersDiagram` [TODO 3.1].
 .Pro Mode helper (example code):
-[,Groovy]
+[,groovy]
 ----
 diagram new UiDiagramSpecifier().ui({
     whiskers {
@@ -236,7 +236,7 @@ diagram new UiDiagramSpecifier().ui({
 ----
 
 .Implement `buildBorrowDurationWhiskersDiagram`:
-[,Groovy]
+[,groovy]
 ----
 UiDiagramSpecifier buildBorrowDurationWhiskersDiagram() {
     Map<Integer, BigDecimal> borrowedDates = [:]
@@ -296,7 +296,7 @@ UiDiagramSpecifier buildBorrowDurationWhiskersDiagram() {
 Pro Mode: Render the diagram in `listDiagram` [TODO 3.2].
 
 .Modify `listDiagram`, replace [TODO 3.2.1 and 3.2.2]:
-[,Groovy]
+[,groovy]
 ----
 UiDiagramSpecifier durationDiagramSpec = myLibraryUiService.buildBorrowDurationWhiskersDiagram() // TODO 3.2.1
 
