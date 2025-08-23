@@ -34,7 +34,7 @@ git checkout part-1-todo-4
 Edit: `app/library/src/main/groovy/myLibrary/domain/`
 
 .Class Diagram for your convenience
-[plantuml,]
+[plantuml, format="svg", opts="inline"]
 ----
 @startuml
 

@@ -28,7 +28,7 @@ Edit: `app/library/src/main/groovy/myLibrary/domain/`
 
 
 .Updated class Diagram for your convenience
-[plantuml]
+[plantuml, format="svg", opts="inline"]
 ----
 @startuml
 
