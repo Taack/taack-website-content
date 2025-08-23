@@ -1,3 +1,2 @@
-= Advance
-:doctype: book
+= Advanced
 :taack-category: 43|advanced

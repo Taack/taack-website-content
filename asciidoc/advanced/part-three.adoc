@@ -1,6 +1,6 @@
 = Security and Constraints
 :doctype: book
-:taack-category: 3| Advanced
+:taack-category: 3|advanced
 :toc:
 :source-highlighter: rouge
 
@@ -33,10 +33,10 @@ Borrowers will be able to:
 - see their past requests in the History menu.
 
 .Admins
-image::part-three-admin-screenshot.png[Reload,width=800,align="left"]
+image::part-three-admin-screenshot.webp[Reload,width=800,align="left"]
 
 .Borrowers
-image::part-three-borrower-screenshot.png[Reload,width=800,align="left"]
+image::part-three-borrower-screenshot.webp[Reload,width=800,align="left"]
 
 
 == Constraints
