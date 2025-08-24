@@ -5,6 +5,37 @@
 :source-highlighter: rouge
 :icons: font
 
+== Version 0.7.0
+
+* Grails 7, Gradle 8.4, Java 24, Groovy 4.0.28 ...
+* Split `taack-ui` into `taack-ui`, `taack-ui-jdbc`, `taack-ui-pdf`, `taack-ui-ssh`, `taack-ui-search`. Minimal server using only `taack-ui` should be a Jar around 70 MB in size
+* Contextual Menus for fields and classes (See <<contextual-menu-code-sample>>)
+
+
+[[contextual-menu-code-sample]]
+.Contextual Menu Code Sample
+[source,groovy]
+----
+TaackUiService.registerContextualMenuClosure(   <1>
+    new Lead().leadStatus_,
+    new UiMenuSpecifier().ui { Long id ->       <2>
+        label 'Change Status'
+        Lead.read(id)?.leadStatus?.transitionsTo()?.each {
+            menu it.toString(),                 <3>
+                CrmController.&changeLeadStatus as MC,
+                [id: id, leadStatus: it.toString()]
+    }
+})
+----
+
+<1> Register a contextual menu for a field
+<2> Use Regular MenuSpecifier closure (as for any menus)
+
+.Result of a right click on Lead Status
+image::screenshot-contextual-menu-on-field.webp[]
+
+[[notification-code-sample]]
+
 == Version 0.6.1
 
 * Diagram Action (see <<_diagram_action>>)
