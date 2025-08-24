@@ -1,6 +1,6 @@
 = Graphs
 :doctype: book
-:taack-category: 4|Advanced
+:taack-category: 4|advanced
 :toc:
 :source-highlighter: rouge
 
@@ -87,7 +87,7 @@ You can run the server and navigate to the Diagram menu to see the example pie d
 Let's create our own diagrams.
 
 .Graph
-image::part-four-author-pie-screenshot.png[Reload,width=800,align="left"]
+image::part-four-author-pie-screenshot.webp[Reload,width=800,align="left"]
 
 === Pie Diagram
 We want to be able to visualize which books are the most popular among the borrowers. For that, we decided to create a pie graph displaying the top 10 books that are the most borrowed.
@@ -142,7 +142,7 @@ You now run the server again and navigate to the Diagram menu to see the newly c
 
 
 .Graph
-image::part-four-book-pie-screenshot.png[Reload,width=800,align="left"]
+image::part-four-book-pie-screenshot.webp[Reload,width=800,align="left"]
 
 
 === Bar Diagram
@@ -212,7 +212,7 @@ diagram(diagramBarSpec, {
 You now run the server again to see the newly created bar diagram.
 
 .Graph
-image::part-four-borrowed-bar-screenshot.png[Reload,width=800,align="left"]
+image::part-four-borrowed-bar-screenshot.webp[Reload,width=800,align="left"]
 
 === Whiskers Diagram
 
@@ -309,4 +309,4 @@ You now run the server again to see the newly created whiskers diagram.
 
 
 .Graph
-image::part-four-borrowed-whiskers-screenshot.png[Reload,width=800,align="left"]
+image::part-four-borrowed-whiskers-screenshot.webp[Reload,width=800,align="left"]

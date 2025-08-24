@@ -1,6 +1,6 @@
 = Part Two
 :doctype: book
-:taack-category: 2|Advanced
+:taack-category: 2|advanced
 :toc:
 :source-highlighter: rouge
 
@@ -21,7 +21,7 @@ You have now created a personal library, let's add some features. We want to add
 We have updated the code in `myLibrary`. Pull this version to have access to the new skeleton code.
 
 .Form
-image::part-two-screenshot.png[Reload,width=800,align="left"]
+image::part-two-screenshot.webp[Reload,width=800,align="left"]
 
 
 == Define and Update Domain Classes
@@ -29,7 +29,7 @@ Edit: `app/library/src/main/groovy/myLibrary/domain/`
 
 
 .Updated class Diagram for your convenience
-[plantuml]
+[plantuml, format="svg", opts="inline"]
 ----
 @startuml
 

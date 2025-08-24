@@ -1,6 +1,6 @@
 = Part One
 :doctype: book
-:taack-category: 1|Advanced
+:taack-category: 1|advanced
 :toc:
 :source-highlighter: rouge
 
@@ -9,7 +9,7 @@
 We will start by creating a simple private library, where the user can create authors, books, and book instances (inspired by the previous project described in Usage).
 
 .Book Table
-image::part-one-screenshot.png[Reload,width=800,align="left"]
+image::part-one-screenshot.webp[Reload,width=800,align="left"]
 
 We have already implemented some code for you in `myLibrary`. For this tutorial, you have two options: you can either follow the step-by-step implementation provided here, or attempt to implement each step by yourself first, then verify your implementation afterward. The explanation of each method is split between this documentation and `myLibrary`.
 
@@ -36,7 +36,7 @@ git checkout part-1-todo-4
 Edit: `app/library/src/main/groovy/myLibrary/domain/`
 
 .Class Diagram for your convenience
-[plantuml,]
+[plantuml, format="svg", opts="inline"]
 ----
 @startuml
 

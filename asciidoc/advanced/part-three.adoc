@@ -1,6 +1,6 @@
 = Security and Constraints
 :doctype: book
-:taack-category: 3|Advanced
+:taack-category: 3|advanced
 :toc:
 :source-highlighter: rouge
 
@@ -34,10 +34,10 @@ Borrowers will be able to:
 - see their past requests in the History menu.
 
 .Admins
-image::part-three-admin-screenshot.png[Reload,width=800,align="left"]
+image::part-three-admin-screenshot.webp[Reload,width=800,align="left"]
 
 .Borrowers
-image::part-three-borrower-screenshot.png[Reload,width=800,align="left"]
+image::part-three-borrower-screenshot.webp[Reload,width=800,align="left"]
 
 
 == Constraints
@@ -45,7 +45,7 @@ image::part-three-borrower-screenshot.png[Reload,width=800,align="left"]
 If an admin is approving a request, it would not make sense for them to be able to approve the book on a date before the request was made; they should not be allowed to do that. The same goes with the date the user returns the book, they should not be able to return it before the approval date. Let's implement this in `MyLibraryBorrowed`.
 
 .Class Diagram for your convenience
-[plantuml,]
+[plantuml, format="svg", opts="inline"]
 ----
 @startuml
 

@@ -1,3 +1,2 @@
 = Advanced
-:doctype: book
 :taack-category: 43|advanced
