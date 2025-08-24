@@ -4,10 +4,12 @@
 :toc:
 :source-highlighter: rouge
 
+== Introduction
+
 This section explains how to generate data and implement different types of graphs in your library management application using Grails and the Taack UI framework.
 
-
 == Set Up
+
 .To access the skeleton for this part, go to your terminal cd into the project (`myLibrary`) and copy the following line.
 [,bash]
 ----
