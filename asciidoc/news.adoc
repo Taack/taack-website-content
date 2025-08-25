@@ -11,7 +11,7 @@
 * Split `taack-ui` into `taack-ui`, `taack-ui-jdbc`, `taack-ui-pdf`, `taack-ui-ssh`, `taack-ui-search`. Minimal server using only `taack-ui` should be a Jar around 70 MB in size
 * Contextual Menus for fields and classes (See <<contextual-menu-code-sample>>)
 * Notification helper: allow to mark unread rows on a table via `setLastReadingDate` filter setter. (See <<notification-setLastReadingDate-sample>>)
-
+* #SolrSearch changes#: objects context have to be registered in a generic manner (See <<TaackGormClassRegisterService>>)
 
 [[contextual-menu-code-sample]]
 .Contextual Menu Code Sample
@@ -51,6 +51,30 @@ tf.setLastReadingDate(lastAccessDateFromUser)   <1>
 [[unread-notif]]
 .Unread rows where object `lastUpdated` > `lastAccessDateFromUser`
 image::screenshot-notif.webp[align=center]
+
+[[TaackGormClassRegisterService]]
+.Register how an object will be shown
+[source,groovy]
+----
+TaackGormClassRegisterService.register(
+        new TaackGormClass(ItemRange.class).builder
+                .setShowMethod(Bp2Controller.&showRange as MethodClosure)   <1>
+                .build(),
+        new TaackGormClass(Item.class).builder
+                .setShowMethod(Bp2Controller.&showItem as MethodClosure)    <1>
+                .setShowLabel({ Long id ->                                  <2>
+                    def i = Item.read(id)
+                    return "${i.name} ${i.ref ?: ''} ($id)"
+                })
+                .setTypeLabel({ Long id ->                                  <3>
+                    return TaackUiService.tr('default.item.label')
+                }).build()
+)
+----
+
+<1> How to Show the Object
+<2> Custom Label
+<3> Type for Faceting
 
 == Version 0.6.1
 
