@@ -4,7 +4,7 @@
 
 slide::[fn=slideshow]
 
-== DSL, Grails, Security, Validity
+== Build Your Own Intranet using DSL (no HTML or Javascript)
 
 https://github.com/Taack/infra[Taack-UI] is a https://grails.org/[Grails] plugin that extends the functionality of Grails by allowing the description of user interface and other features using the http://docs.groovy-lang.org/docs/latest/html/documentation/core-domain-specific-languages.html[Groovy DSL] (Domain Specific Language) with static typing.
 
@@ -12,16 +12,21 @@ https://github.com/Taack/infra[Taack-UI] is a https://grails.org/[Grails] plugin
 
 This extension adds the following functionalities to classical Grails Application:
 
-* Security:
-** Transforming and displaying objects by checking user rights to modify *each field*;
-** *links* and *form actions* are automatically hidden if the user is not allowed to process the  *action* with the given parameters;
-** Limiting object listing that the user is allowed to see (except for full-text search at the moment);
+=== Security
+
+* Transforming and displaying objects by checking user rights to modify *each field*;
+* *links* and *form actions* are automatically hidden if the user is not allowed to process the  *action* with the given parameters;
+* Limiting object listing that the user is allowed to see (except for full-text search at the moment);
+
+=== Outputs
 
 * *PDF*, *Mails*, *CSV* are rendered for free. The link:doc/DSLs/block-dsl.adoc[block DSL] can be used for rendering in any format;
 
 * Localization is provided for free as the DSL detects i18n translations automatically;
 
 * Reporting errors during Object validation for free (refer to link:doc/DSLs/form-dsl.adoc#_form_validation[*form validation*]);
+
+=== Search
 
 * Solr is used for link:/more/Search/Search.adoc[fulltext search] offering features such as:
 ** Indexing and fulltext Search of domain objects statically typed;
@@ -30,6 +35,9 @@ This extension adds the following functionalities to classical Grails Applicatio
 
 * link:/doc/DSLs/filter-table-dsl.adoc[Filtering, paginate and sorting] data without queries and session data;
 * File previews can be extended;
+
+=== Experts
+
 * *JDBC Driver* to query Domain Objects using #TQL# (Taack Query Language) from Intellij, link:more/JDBC/libreoffice-base.adoc#_open_query_as_a_pivot_table[LibreOffice Base] or DBeaver, as a classical datasource (See link:more/JDBC/taack-jdbc-driver.adoc[*Taack JDBC Driver*]);
 
 * File sharing via *SFTP* (Available soon) provides:
