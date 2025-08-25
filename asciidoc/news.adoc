@@ -10,7 +10,7 @@
 * Grails 7, Gradle 8.4, Java 24, Groovy 4.0.28 ...
 * Split `taack-ui` into `taack-ui`, `taack-ui-jdbc`, `taack-ui-pdf`, `taack-ui-ssh`, `taack-ui-search`. Minimal server using only `taack-ui` should be a Jar around 70 MB in size
 * Contextual Menus for fields and classes (See <<contextual-menu-code-sample>>)
-* Notification helper: allow to mark unread rows on a table via `setLastReadingDate` filter setter. (See <<notification-setLastReadingDate-sample)
+* Notification helper: allow to mark unread rows on a table via `setLastReadingDate` filter setter. (See <<notification-setLastReadingDate-sample>>)
 * SolrSearch changes, now you can register how an object is supposed to be shown (See <<TaackGormClassRegisterService>>)
 
 [[contextual-menu-code-sample]]
