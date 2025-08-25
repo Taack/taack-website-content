@@ -10,7 +10,7 @@
 * Grails 7, Gradle 8.4, Java 24, Groovy 4.0.28 ...
 * Split `taack-ui` into `taack-ui`, `taack-ui-jdbc`, `taack-ui-pdf`, `taack-ui-ssh`, `taack-ui-search`. Minimal server using only `taack-ui` should be a Jar around 70 MB in size
 * Contextual Menus for fields and classes (See <<contextual-menu-code-sample>>)
-* Notification helper: allow to mark unread rows on a table via `setLastReadingDate` filter setter. (See <<notification-setLastReadingDate-sample)
+* Notification helper: allow to mark unread rows on a table via `setLastReadingDate` filter setter. (See <<notification-setLastReadingDate-sample>>)
 
 
 [[contextual-menu-code-sample]]
@@ -33,7 +33,7 @@ TaackUiService.registerContextualMenuClosure(   <1>
 <2> Use Regular MenuSpecifier closure (as for any menus)
 
 .Result of a right click on Lead Status
-image::screenshot-contextual-menu-on-field.webp[]
+image::screenshot-contextual-menu-on-field.webp[align=center]
 
 [[notification-setLastReadingDate-sample]]
 .Create filter marking unread entries
@@ -50,7 +50,7 @@ tf.setLastReadingDate(lastAccessDateFromUser)   <1>
 
 [[unread-notif]]
 .Unread rows where object `lastUpdated` > `lastAccessDateFromUser`
-image::screenshot-notif.webp[]
+image::screenshot-notif.webp[align=center]
 
 == Version 0.6.1
 
