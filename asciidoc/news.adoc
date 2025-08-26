@@ -8,10 +8,12 @@
 == Version 0.7.0
 
 * Grails 7, Gradle 8.4, Java 24, Groovy 4.0.28 ...
+* Improve Performances, start transmitting page earlier and should consume less memory per page
 * Split `taack-ui` into `taack-ui`, `taack-ui-jdbc`, `taack-ui-pdf`, `taack-ui-ssh`, `taack-ui-search`, `taack-ui-asciidoc`. Minimal server using only `taack-ui` should be a Jar around 70 MB in size
 * Contextual Menus for fields and classes (See <<contextual-menu-code-sample>>)
 * Notification helper: allow to mark unread rows on a table via `setLastReadingDate` filter setter. (See <<notification-setLastReadingDate-sample>>)
 * #SolrSearch changes#: objects context have to be registered in a generic manner (See <<TaackGormClassRegisterService>>)
+* New Diagram personalisation through builders easing mail and pdf diagram integration (See <<diagram-builders>>)
 * Asciidoc Editor with copy/past capabilities (See <<asciidoc-editor>>)
 * Improve Mail and PDF Diagram output
 
@@ -77,6 +79,36 @@ TaackGormClassRegisterService.register(
 <1> How to Show the Object
 <2> Custom Label
 <3> Type for Faceting
+
+[[diagram-builders]]
+.Diagram Builder
+[source,groovy]
+----
+new UiDiagramSpecifier().ui {
+    bar {
+        labels 'xLabel1', 'xLabel2', 'xLabel3', 'xLabel4'
+        dataset 'dataset1', 1.0, 2.0, 3.0, 4.0
+        dataset 'dataset2', 6.0, 1.0, 2.0, 4.0
+
+        option DiagramOption.builder
+            .setClickAction(Rma2Controller.&editClaim as MethodClosure)
+            // "diagramAction" was moved to here
+            .showDataCount()
+            // The numbers are hidden by default. Use this option if need to show
+            .hideLegend()
+            // The legends are shown by default. Use this option if need to hide
+            .setResolution(DiagramOption.DiagramResolution.DEFAULT_4K)
+            // Default resolution is [SVG: 960x480, PNG: 2160x1080].
+            // Allow to set to 540p, 720p, 1080p, 2K, 1440p, 4K
+            .setKeyColors(Color.RED, Color.BLUE)
+            // Allow to self-define the colors for each dataset
+            // (If not set, there are by default 7 colors)
+            .setTitle("Test Chart") // Diagram title
+            .build()
+    }
+}
+----
+
 
 [[asciidoc-editor]]
 .Asciidoc Editor
