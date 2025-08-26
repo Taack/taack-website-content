@@ -13,9 +13,9 @@
 * Contextual Menus for fields and classes (See <<contextual-menu-code-sample>>)
 * Notification helper: allow to mark unread rows on a table via `setLastReadingDate` filter setter. (See <<notification-setLastReadingDate-sample>>)
 * #SolrSearch changes#: objects context have to be registered in a generic manner (See <<TaackGormClassRegisterService>>)
-* New Diagram personalisation through builders easing mail and pdf diagram integration (See <<diagram-builders>>)
-* Asciidoc Editor with copy/past capabilities (See <<asciidoc-editor>>)
-* Improve Mail and PDF Diagram output
+* New Diagram customisation through builders, easing mail and pdf diagram integration (See <<diagram-builders>>)
+* Asciidoc Editor with copy/past conversion capabilities (See <<asciidoc-editor>>)
+* Improve Mail and PDF Diagrams output
 
 [[contextual-menu-code-sample]]
 .Contextual Menu Code Sample
