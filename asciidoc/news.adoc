@@ -8,10 +8,12 @@
 == Version 0.7.0
 
 * Grails 7, Gradle 8.4, Java 24, Groovy 4.0.28 ...
-* Split `taack-ui` into `taack-ui`, `taack-ui-jdbc`, `taack-ui-pdf`, `taack-ui-ssh`, `taack-ui-search`. Minimal server using only `taack-ui` should be a Jar around 70 MB in size
+* Split `taack-ui` into `taack-ui`, `taack-ui-jdbc`, `taack-ui-pdf`, `taack-ui-ssh`, `taack-ui-search`, `taack-ui-asciidoc`. Minimal server using only `taack-ui` should be a Jar around 70 MB in size
 * Contextual Menus for fields and classes (See <<contextual-menu-code-sample>>)
 * Notification helper: allow to mark unread rows on a table via `setLastReadingDate` filter setter. (See <<notification-setLastReadingDate-sample>>)
 * #SolrSearch changes#: objects context have to be registered in a generic manner (See <<TaackGormClassRegisterService>>)
+* Asciidoc Editor with copy/past capabilities (See <<asciidoc-editor>>)
+* Improve Mail and PDF Diagram output
 
 [[contextual-menu-code-sample]]
 .Contextual Menu Code Sample
@@ -75,6 +77,55 @@ TaackGormClassRegisterService.register(
 <1> How to Show the Object
 <2> Custom Label
 <3> Type for Faceting
+
+[[asciidoc-editor]]
+.Asciidoc Editor
+[source,groovy]
+----
+//...
+EditorOption.EditorOptionBuilder editor = EditorOption.getBuilder()
+editor.addSpanRegexes(TaackBaseAsciidocSpans.spans)         <1>
+editor.addSpanRegexes(TaackAsciidocTable.spans)             <1>
+editor.addSpanRegexes(TaackAsciidocPlantUML.spans)          <1>
+editor.uploadFileAction(this.&dropEditor as MC, cmsPage.id) <2>
+fieldEditor cmsPage.bodyContent_, editor.build()            <3>
+innerFormAction this.&previewBody as MC                     <4>
+//...
+
+@Transactional
+def dropEditor() {                                          <2>
+    CmsPage page = CmsPage.get(params.long('cmsPage'))
+    params.remove('cmsPage')
+    String past = params.get('onpaste')
+    if (past) {                                             <5>
+        render taackAsciidocService.convertFromHtml(past)
+    } else {                                                <6>
+        final List<MultipartFile> mfl = (request as MultipartHttpServletRequest).getFiles('filePath')
+        final mf = mfl.first()
+
+        if ([AttachmentContentType.SHEET_ODS.mimeType,
+             AttachmentContentType.LO_TEXT.mimeType
+            ].contains(mf.contentType)) {                   <7>
+            render taackAsciidocService.convert(page, mf.inputStream)
+        } else {                                            <8>
+            CmsImage cmsImage = taackSaveService.save(CmsImage)
+            if (cmsImage && page) {
+                cmsImage.cmsPage = page
+            }
+            render "image::${cmsImage.originalName}[]"
+        }
+    }
+}
+----
+
+<1> Add syntax spans extensions (basically a regex and a class to colorise the code)
+<2> Callback when a file is drop, or a past from another page or application is done
+<3> The field in the form
+<4> Optional Preview Action
+<5> Past a html content. Content will be converted into Asciidoc
+<6> Drop file part
+<7> The file is an ODS or Writer file, it will be converted into Asciidoc, image will be imported
+<8> The file is an image, it will be saved into the CMS.
 
 == Version 0.6.1
 
