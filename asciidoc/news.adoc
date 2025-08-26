@@ -127,6 +127,8 @@ def dropEditor() {                                          <2>
 <7> The file is an ODS or Writer file, it will be converted into Asciidoc, image will be imported
 <8> The file is an image, it will be saved into the CMS.
 
+WARNING: taackAsciidocService uses `TaackEditorService` service from `taack-ui-asciidoc`, see link:doc/DSLs/form-dsl.adoc#_asciidoc[form DSL]
+
 == Version 0.6.1
 
 * Diagram Action (see <<_diagram_action>>)

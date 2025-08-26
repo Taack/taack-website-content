@@ -71,6 +71,77 @@ def userForm(User user) {
 .Form inside a modal Window.
 image::screenshot-dsl-user-form2.webp[]
 
+== Asciidoc
+
+You can add an asciidoc editor by creating an `EditorOption` object and pass it to `fieldEditorFromMap` or `fieldEditor`.
+
+This editor can import images dropped in the text area and import ODF files (image included).
+
+=== Create `EditorOption` object
+
+.Editor Options
+[source,groovy]
+----
+EditorOption.EditorOptionBuilder editor = EditorOption.getBuilder()
+editor.addSpanRegexes(TaackBaseAsciidocSpans.spans)
+editor.addSpanRegexes(TaackAsciidocTable.spans)
+editor.addSpanRegexes(TaackAsciidocPlantUML.spans)
+editor.uploadFileAction(this.&dropEditor as MC, [cmsPage: cmsPage.id])
+fieldEditor cmsPage.bodyContent_, editor.build()
+innerFormAction this.&previewBody as MC
+----
+
+=== Create `dropEditor` action
+
+[source,groovy]
+----
+@Transactional
+def dropEditor() {
+    CmsPage page = CmsPage.get(params.long('cmsPage'))
+    params.remove('cmsPage')
+    if (params.get('onpaste')) {
+        render "${convertersToAsciidocService.convertFromHtml(params.get('onpaste') as String)}"
+    } else {
+        final List<MultipartFile> mfl = (request as MultipartHttpServletRequest).getFiles('filePath')
+        final mf = mfl.first()
+
+        if ([AttachmentContentType.SHEET_ODS.mimeType, AttachmentContentType.LO_TEXT.mimeType].contains(mf.contentType)) {
+            render convertersToAsciidocService.convert(page, mf.inputStream)
+        } else {
+            CmsImage cmsImage = taackSaveService.save(CmsImage)
+            if (cmsImage && page) {
+                cmsImage.cmsPage = page
+            }
+            render "image::${cmsImage.originalName}[]"          <1>
+        }
+    }
+}
+----
+
+<1> Render asciidoc code that will be displayed in the editor
+
+=== Import images via a custom service
+
+Use `taackEditorService` to convert page, and save images in files dropped to your custom object.
+
+[source,groovy]
+----
+String convert(CmsPage page, InputStream inputStream) {
+    taackEditorService.convert(new TaackEditorService.ISaveImage() {
+        @Override
+        String saveImage(String imagePath, byte[] image) {
+            return saveImage(page, imagePath, image)            <1>
+        }
+    }, inputStream)
+}
+
+String convertFromHtml(String html) {
+    taackEditorService.convertFromHtml(html)
+}
+----
+
+<1> Images will be attached to the `page` object.
+
 == DSL Symbols Hierarchy
 
 [graphviz,format="svg",align=center]
@@ -83,7 +154,7 @@ digraph mygraph {
   "ui" -> "section" [label = "0:N"]
   "ui" -> "col" [label = "0:N"]
   "section" -> "col" [label = "0:N"]
-  "ui", "section", "col" -> "field", "ajaxField" [label = "0:N"]
+  "ui", "section", "col" -> "field", "ajaxField", fieldEditor, fieldEditorFromMap [label = "0:N"]
   "ui" -> "formAction" [label = "0:N"]
 }
 ----
