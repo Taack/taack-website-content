@@ -15,7 +15,8 @@
 * #SolrSearch changes#: objects context have to be registered in a generic manner (See <<TaackGormClassRegisterService>>)
 * New Diagram customisation through builders, easing mail and pdf diagram integration (See <<diagram-builders>>)
 * Asciidoc Editor with copy/past conversion capabilities (See <<asciidoc-editor>>)
-* Improve Mail and PDF Diagrams output
+* Improve Mail and PDF Diagrams outputs
+* `TaackUiConfiguration` is not initialized via `application.yml`, members are static and can be changed in `server/grails-app/init/.../Application.groovy` (See <<taack-ui-configuration>>)
 
 [[contextual-menu-code-sample]]
 .Contextual Menu Code Sample
@@ -109,7 +110,6 @@ new UiDiagramSpecifier().ui {
 }
 ----
 
-
 [[asciidoc-editor]]
 .Asciidoc Editor
 [source,groovy]
@@ -160,6 +160,49 @@ def dropEditor() {                                          <2>
 <8> The file is an image, it will be saved into the CMS.
 
 WARNING: taackAsciidocService uses `TaackEditorService` service from `taack-ui-asciidoc`, see link:doc/DSLs/form-dsl.adoc#_asciidoc[form DSL]
+
+[[taack-ui-configuration]]
+.TaackUiConfiguration
+[source,groovy]
+----
+@CompileStatic
+class TaackUiConfiguration {
+    static String defaultTitle = 'Taack'
+    static String logoFileName = 'logo-taack-web.svg'
+    static int logoWidth = 70
+    static int logoHeight = 60
+
+    static boolean fixedTop = false
+    static boolean hasMenuLogin = true
+    static boolean outlineContainer = false
+    static String bgColor = '#05294c'
+    static String fgColor = '#eeeeee'
+    static String bodyBgColor = '#fff'
+
+    static String home = System.getProperty('user.home')
+    static String root = home + '/intranetFiles'
+    static String taack = home + '/taack'
+    static String resources = taack + '/resources'
+    static String javaPath = '/usr/bin/java'
+    static String plantUmlPath = home + '/plantuml-1.2022.7.jar'
+    static String solrUrl = 'http://localhost:8983/solr/taack'
+    static Boolean disableSecurity = false
+}
+----
+
+.`Application.groovy`
+[source,groovy]
+----
+@CompileStatic
+class Application extends GrailsAutoConfiguration {
+    static void main(String[] args) {
+        TaackUiConfiguration.disableSecurity = true
+        TaackUiConfiguration.hasMenuLogin = false
+        GrailsApp.run(Application, args)
+    }
+}
+----
+
 
 == Version 0.6.1
 
