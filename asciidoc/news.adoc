@@ -38,7 +38,7 @@ TaackUiService.registerContextualMenuClosure(   <1>
 <2> Use Regular MenuSpecifier closure (as for any menus)
 
 .Result of a right click on Lead Status
-image::screenshot-contextual-menu-on-field.webp[align=center]
+image::news-contextual-menu-on-field.webp[align=center]
 
 [[notification-setLastReadingDate-sample]]
 .Create filter marking unread entries
@@ -55,7 +55,7 @@ tf.setLastReadingDate(lastAccessDateFromUser)   <1>
 
 [[unread-notif]]
 .Unread rows where object `lastUpdated` > `lastAccessDateFromUser`
-image::screenshot-notif.webp[align=center]
+image::news-notif.webp[align=center]
 
 [[TaackGormClassRegisterService]]
 .Register how an object will be shown
