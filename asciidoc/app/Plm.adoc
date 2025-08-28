@@ -80,6 +80,19 @@ java -DOption1=Value1 -DOption2=Value2 ... -jar server-0.3.jar
 * Freecad path: `-Dplm.freecadPath=/somePath...`
 * Dot exe path: `-Dexe.dot.path=/somePath...`
 
+.Current Configuration in `server/grails-app/conf/application.yml`
+[source,yaml]
+----
+plm:
+  freecadPath: ${HOME}/freecad-app-link
+  singleInstance: true
+  offscreen: false
+  xvfbRun: false
+  useWeston: true
+----
+
+You can create a symlink `ln -s /usr/bin/FreeCAD freecad-app-link` in your home directory, it should suffice most of the time.
+
 === Install from Source
 
 Clone the #plm# repository:
