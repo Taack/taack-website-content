@@ -119,7 +119,7 @@ EditorOption.EditorOptionBuilder editor = EditorOption.getBuilder()
 editor.addSpanRegexes(TaackBaseAsciidocSpans.spans)         <1>
 editor.addSpanRegexes(TaackAsciidocTable.spans)             <1>
 editor.addSpanRegexes(TaackAsciidocPlantUML.spans)          <1>
-editor.uploadFileAction(this.&dropEditor as MC, cmsPage.id) <2>
+editor.onDrop(this.&dropEditor as MC, cmsPage.id) <2>
 fieldEditor cmsPage.bodyContent_, editor.build()            <3>
 innerFormAction this.&previewBody as MC                     <4>
 //...
