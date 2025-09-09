@@ -17,17 +17,18 @@
 * Asciidoc Editor with copy/past conversion capabilities (See <<asciidoc-editor>>)
 * Improve Mail and PDF Diagrams outputs
 * `TaackUiConfiguration` is not initialized via `application.yml`, members are static and can be changed in `server/grails-app/init/.../Application.groovy` (See <<taack-ui-configuration>>)
+* It is now possible to be called back on drop event on a table or a table cell. (See <<drop-on-table>>, <<drop-on-cell>>)
 
 [[contextual-menu-code-sample]]
 .Contextual Menu Code Sample
 [source,groovy]
 ----
-TaackUiService.registerContextualMenuClosure(   <1>
+TaackUiService.registerContextualMenuClosure(                           <1>
     new Lead().leadStatus_,
-    new UiMenuSpecifier().ui { Long id ->       <2>
+    new UiMenuSpecifier().ui { Long id ->                               <2>
         label 'Change Status'
         Lead.read(id)?.leadStatus?.transitionsTo()?.each {
-            menu it.toString(),                 <3>
+            menu it.toString(),                                         <3>
                 CrmController.&changeLeadStatus as MC,
                 [id: id, leadStatus: it.toString()]
     }
@@ -116,30 +117,30 @@ new UiDiagramSpecifier().ui {
 ----
 //...
 EditorOption.EditorOptionBuilder editor = EditorOption.getBuilder()
-editor.addSpanRegexes(TaackBaseAsciidocSpans.spans)         <1>
-editor.addSpanRegexes(TaackAsciidocTable.spans)             <1>
-editor.addSpanRegexes(TaackAsciidocPlantUML.spans)          <1>
-editor.onDrop(this.&dropEditor as MC, cmsPage.id) <2>
-fieldEditor cmsPage.bodyContent_, editor.build()            <3>
-innerFormAction this.&previewBody as MC                     <4>
+editor.addSpanRegexes(TaackBaseAsciidocSpans.spans)                 <1>
+editor.addSpanRegexes(TaackAsciidocTable.spans)                     <1>
+editor.addSpanRegexes(TaackAsciidocPlantUML.spans)                  <1>
+editor.onDrop(this.&dropEditor as MC, cmsPage.id)                   <2>
+fieldEditor cmsPage.bodyContent_, editor.build()                    <3>
+innerFormAction this.&previewBody as MC                             <4>
 //...
 
 @Transactional
-def dropEditor() {                                          <2>
+def dropEditor() {                                                  <2>
     CmsPage page = CmsPage.get(params.long('cmsPage'))
     params.remove('cmsPage')
     String past = params.get('onpaste')
-    if (past) {                                             <5>
+    if (past) {                                                     <5>
         render taackAsciidocService.convertFromHtml(past)
-    } else {                                                <6>
+    } else {                                                        <6>
         final List<MultipartFile> mfl = (request as MultipartHttpServletRequest).getFiles('filePath')
         final mf = mfl.first()
 
         if ([AttachmentContentType.SHEET_ODS.mimeType,
              AttachmentContentType.LO_TEXT.mimeType
-            ].contains(mf.contentType)) {                   <7>
+            ].contains(mf.contentType)) {                           <7>
             render taackAsciidocService.convert(page, mf.inputStream)
-        } else {                                            <8>
+        } else {                                                    <8>
             CmsImage cmsImage = taackSaveService.save(CmsImage)
             if (cmsImage && page) {
                 cmsImage.cmsPage = page
@@ -202,6 +203,36 @@ class Application extends GrailsAutoConfiguration {
     }
 }
 ----
+
+[[drop-on-table]]
+.Drop on Table
+[source,groovy]
+----
+        TableOption tableOption = new TableOption.TableOptionBuilder()
+                .onDropAction(this.&testDrop as MC).build()             <1>
+
+        new UiTableSpecifier().ui tableOption, {
+            header {
+                sortableFieldHeader cb.position_
+                sortableFieldHeader cb.subsidiary_
+                label 'Page OR Menu Entry'
+            }
+----
+
+<1> Action called in case of drop somewhere on the table.
+
+[[drop-on-cell]]
+.Drop on Cells, the row column is a droppable area
+[source,groovy]
+----
+cellDropAction(CmsController.&testCellDrop as MC)                       <1>
+rowColumn {
+    rowField cp.title_
+    rowField 'test drop'
+}
+----
+
+<1> Action called in case of drop somewhere on the cell.
 
 
 == Version 0.6.1
