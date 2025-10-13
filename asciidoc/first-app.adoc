@@ -9,7 +9,7 @@ For a more in-depth explanation of how plugins are declared, see link:doc/plugin
 * The main server uses all the app plugins that are implemented in its `build.gradle` and displays them on the main intranet page.
 
 == Creating a new app plugin
-grails.plugin.springsecurity.csrf.ignore = ['/h2-console/**']
+
 
 To create a new app plugin (a Gradle module), make sure you pull the latest version of your intranet from our GitHub repository (see link:install.adoc[installation]).
 
