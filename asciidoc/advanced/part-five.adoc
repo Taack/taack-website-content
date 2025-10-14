@@ -5,6 +5,13 @@
 :source-highlighter: rouge
 
 == Set Up
+The solution and skeletons for this task are available to clone on this repository
+
+[,shell]
+----
+git clone git@github.com:Taack/myLibrary.git
+----
+
 .To access the skeleton for this part, go to your terminal cd into the project (`myLibrary`) and copy the following line.
 [,bash]
 ----

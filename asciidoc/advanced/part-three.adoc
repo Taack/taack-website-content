@@ -5,6 +5,12 @@
 :source-highlighter: rouge
 
 == Set Up
+The solution and skeletons for this task are available to clone on this repository
+
+[,shell]
+----
+git clone git@github.com:Taack/myLibrary.git
+----
 
 .To access the skeleton for this part, go to your terminal cd into the project (`myLibrary`) and copy the following line.
 [,bash]
@@ -96,8 +102,13 @@ MyLibraryBorrowed --> ApprovalStatus
 @enduml
 ----
 
-Pro Mode: modify the class [TODO 1]
+We need to implement constraints on our domain entities, to make sure we provide compliant and logical datas to our library.
 
+Try to add nullable constraint on dates for borrowed, with a validator (approval date needs to occur after the requestDate, and returnDate must be after borrow appproval date)
+
+.Solution
+[%collapsible]
+====
 .Add the following constraints:
 [,groovy]
 ----
@@ -116,6 +127,7 @@ static constraints = {
     user nullable:false
 }
 ----
+====
 For more information, refer to the link:https://docs.grails.org/latest/ref/Constraints/Usage.html[Grails documentation] about constraints.
 
 == Define menus
@@ -125,11 +137,14 @@ As explained earlier, there will be two new menus only available to admins. Let'
 Pro Mode: Add the menus [TODO 2]
 
 .Add the following menus:
+[%collapsible]
+====
 [,groovy]
 ----
 menu MyLibraryController.&listOfUsers as MC
 menu MyLibraryController.&listOfRequests as MC
 ----
+====
 
 == Set up the Users
 
@@ -138,6 +153,9 @@ First, we will create a method to determine what type of user is connected in `M
 Pro Mode: implement `isAdmin` [TODO 3.1].
 
 .Implement `isAdmin`:
+.Solution
+[%collapsible]
+====
 [,groovy]
 ----
 boolean isAdmin() {
@@ -145,12 +163,14 @@ boolean isAdmin() {
     return currentUser?.authorities?.any { it.authority == 'ROLE_ADMIN' }
 }
 ----
+====
 
-Second, we will create a method that allows us to determine what type of user is connected in `MyLibraryController`.
+Second, we will to modify the controller index to be able to determine what type of user is connected in `MyLibraryController`.
 
-Pro Mode: modify `index` [TODO 3.2].
-
-.Modify `index`:
+.Solution
+[%collapsible]
+====
+.Modify `index()`:
 [,groovy]
 ----
 def index() {
@@ -159,13 +179,15 @@ def index() {
     redirect action: 'listAuthor'
 }
 ----
+====
 
 == Modify the Builders
 
 To accommodate the changes, we will have to modify the author, book and userBorrowed table.
 
-Pro Mode: modify `buildAuthorTable` [TODO 4.1]
-
+.Solution
+[%collapsible]
+====
 .Modify `buildAuthorTable` TODO 4.1.1–4.1.4:
 [,groovy]
 ----
@@ -174,7 +196,6 @@ if(!isSelect && isAdmin) { // TODO 4.1.2 & TODO 4.1.4
 if(!isAdmin) {filter.addFilter(buildIsActiveAuthorFilter(author))} //TODO 4.1.3
 ----
 
-Pro Mode: modify `buildBookTable` [TODO 4.2]
 
 .Modify `buildBookTable` TODO 4.2.1–4.2.8:
 [,groovy]
@@ -204,19 +225,21 @@ if(isAdmin) {
     }
 }
 ----
+====
 
 
-Pro Mode: modify `buildUserBorrowedTable` [TODO 4.3 Part 1]
 
-Note we have added two variables that the builder takes. `showUser`, which allows showing borrow records for that specific user and `isUser`, which indicates if the viewer is a user (true) or admin (false).
+We need to add a `showUser` variable, which allows showing borrow records for that specific user.
 
+.Solution
+[%collapsible]
+====
 .Modify `buildUserBorrowsTable` TODO 4.3.1–4.3.7:
 [,groovy]
 ----
 Boolean isAdmin = isAdmin() // TODO 4.3.1
 if (isCurrently  && !isAdmin) column {label "Return Book"} // TODO 4.3.2
 
-// TODO 4.3.3
 if(isAdmin) {
     column { label borrowed.user_ }
     if (!showUser) {
@@ -224,20 +247,17 @@ if(isAdmin) {
     }
 }
 
-// TODO 4.3.4
 User currentUser = springSecurityService.currentUser as User
 if (showUser) {
     currentUser = showUser
 }
 
-// TODO 4.3.5
 if(!isUser || showUser) {
     filter.addFilter(new FilterExpression(currentUser, Operator.EQ, borrowed.user_))
 }
 
 if (isCurrently && !isAdmin) {  // TODO 4.3.6
 
-// TODO 4.3.7: Add condition isAdmin, to display borrowed user and Approve Book (if !showUser) rowColumns
 if(isAdmin) {
     rowColumn { rowField borrowedIterator.user.username_ }
     if (!showUser) {
@@ -247,13 +267,12 @@ if(isAdmin) {
     }
 }
 ----
+====
+Now that we have added the necessary elements to display all the requests of all the users. Let's render this table.
 
-Note that we have added the necessary elements to display all the requests of all the users. Let's render this table.
-
-
-Pro Mode: modify `listOfRequests` [TODO 4.3 Part 2]
-
-.Modify `listOfRequests` TODO 4.3.8–4.3.12:
+.Solution
+[%collapsible]
+====
 [,groovy]
 ----
 def listOfRequests() {
@@ -265,14 +284,14 @@ def listOfRequests() {
     }, myLibraryUiService.buildMenu())
 }
 ----
-
+====
 == User Menu
 As explained earlier, we also want to have a table displaying all the users for admins.
-Let's start by implementing the `buildUsersTable`.
+Let's start by implementing the `buildUsersTable` (you can use the author table as a base exemple to implement that.
 
-Pro Mode: implement `buildUsersTable` [TODO 5.1]
-
-.Implement `buildUsersTable`:
+.Solution
+[%collapsible]
+====
 [,groovy]
 ----
 UiTableSpecifier buildUsersTable() {
@@ -299,12 +318,13 @@ UiTableSpecifier buildUsersTable() {
     }
 }
 ----
+====
 
-Let's render it on a page. Go to `MyLibraryController`.
+We can then render and serve it on a page from your controller
 
-Pro Mode: implement `listOfUsers` [TODO 5.2]
-
-.Implement `listOfUsers`:
+.Solution
+[%collapsible]
+====
 [,groovy]
 ----
 def listOfUsers() {
@@ -315,13 +335,14 @@ def listOfUsers() {
     }, myLibraryUiService.buildMenu())
 }
 ----
+====
 
-Let's implement a `showUser`.
+Let's implement a `showUser` and `buildUserShow` methods in the controller and the UI service.
 Go to `MyLibraryUiService`
 
-Pro Mode: implement `buildUserShow` [TODO 5.3]
-
-.Implement `buildUserShow`:
+.UIService
+[%collapsible]
+====
 [,groovy]
 ----
 UiShowSpecifier buildUserShow(User user) {
@@ -335,12 +356,11 @@ UiShowSpecifier buildUserShow(User user) {
     })
 }
 ----
+====
 
-Go to `MyLibraryController`
-
-Pro Mode: implement `showUser` [TODO 5.4]
-
-.Implement `showUser`:
+.Controller
+[%collapsible]
+====
 [,groovy]
 ----
 def showUser(User user) {
@@ -359,6 +379,7 @@ def showUser(User user) {
 
 }
 ----
+====
 
 == Security Part 1
 Great, we now have everything we need. We just have to add the layer of security.
@@ -380,7 +401,9 @@ Using the same idea as `returnSecurityClosure` (which checks if the ApprovalStat
 Pro Mode: implement `approvedSecurityClosure`  [TODO 6.2]
 
 
-.Implement the following method:
+.SecurityService
+[%collapsible]
+====
 [,groovy]
 ----
 private static boolean approvedSecurityClosure(Long id, Map p) {
@@ -388,6 +411,7 @@ private static boolean approvedSecurityClosure(Long id, Map p) {
     return (borrowed.statusOfApproval != ApprovalStatus.APPROVED)
 }
 ----
+====
 
 .Add the following lines of code in `init`:
 [,groovy]

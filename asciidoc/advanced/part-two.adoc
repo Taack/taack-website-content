@@ -5,6 +5,12 @@
 :source-highlighter: rouge
 
 == Set Up
+The solution and skeletons for this task are available to clone on this repository
+
+[,shell]
+----
+git clone git@github.com:Taack/myLibrary.git
+----
 
 .To access the skeleton for this part, go to your terminal cd into the project (`myLibrary`) and copy the following line.
 [,bash]
@@ -148,10 +154,18 @@ menu MyLibraryController.&listBooksCurrentlyBorrowed as MC
 
 We want to display the borrowed (not yet returned) in a table. For that we need to create a `UiTableSpecifier`. Go to `app/library/services/myLibrary/MyLibraryUiService` in `Author Menu`.
 
-Note: the only differences between the borrowed and history menus are the `returnDate` and `StatusOfApproval`. The variable `isCurrently` will define this. Therefore, we will use the same TableSpecifier for both menus; this is one of the big advantages of using a separate file (`MyLibraryUiService`) to implement the Specifiers: they can be reused in different contexts with small modifications.
+Note: the only differences between the borrowed and history menus are the `returnDate` and `StatusOfApproval`.
+Therefore, we will use the same TableSpecifier for both menus; this is one of the big advantages of using a separate file (`MyLibraryUiService`) to implement the Specifiers: they can be reused in different contexts with small modifications.
 
+[NOTE]
+===============================
+You will need a boolean flag to check if a book is currently borrowed, we'll call it isCurrentlyBorrowed.
+===============================
 Pro Mode: implement the Table by yourself [TODOS 3.1].
 
+.Solution
+[%collapsible]
+====
 .Implement the `buildBorrowedTable`:
 [,groovy]
 ----
@@ -167,9 +181,7 @@ buildUserBorrowsSpecifier.ui {
         if (isCurrently) {label borrowed.statusOfApproval_}
         label borrowed.requestDate_
         label borrowed.approvalDate_
-        // TODO 3.11.1: If isCurrently is true, add column with label "Return Book".
         column {label borrowed.user_}
-        // TODO 3.11.2: If isCurrently is true, add label "Approve Book".
     }
 
     TaackFilter.FilterBuilder filter = taackFilterService.getBuilder(MyLibraryBorrowed)
@@ -185,19 +197,18 @@ buildUserBorrowsSpecifier.ui {
     iterate(
             filter.build()) { MyLibraryBorrowed borrowedIterator ->
         rowColumn {
-            // TODO 3.18: Add SHOW action with book title.
             rowField borrowedIterator.bookInstance.book.title
         }
         rowField borrowedIterator.bookInstance.book.author.toString()
         if(isCurrently) {rowField borrowedIterator.statusOfApproval_}
         rowField borrowedIterator.requestDate_
         rowField borrowedIterator.approvalDate_
-        // TODO 3.11.3: If isCurrently and statusOfApproval is APPROVED, add DELETE action linked to returnBook.
         rowColumn {rowField borrowedIterator.user.username_}
-        // TODO 3.11.4: If isCurrently is true, add DELETE action linked to approveBook.
     }
 }
 ----
+====
+
 <1> This is another way to create a filter if you are not planning on reusing it somewhere else.
 
 We also want to add a filter that filters the authors by last name. Let's implement this filter.
@@ -605,6 +616,15 @@ def listBooksBorrowed() {
 }
 ----
 
+.Testing borrowers
+[NOTE]
+===============================
+You can test the borrowers by either :
+
+-> Creating a ROLE_BORROWER in the ROLE table of the h2 database
+
+-> Logging in with a created user. Refer to xref:part-four.adoc[Section B] for more information.
+===============================
 Congratulations! You have completed the second part of this project.
 
 In the next part, we will dive into Security and Constraints.
