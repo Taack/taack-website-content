@@ -5,6 +5,15 @@
 :source-highlighter: rouge
 :icons: font
 
+
+== Version 0.7.1
+
+* Fix i18n with bootRun task when enabling hot-reload
+
+.What's new in 0.7.1
+video::ZLj-YqnxMew[youtube, 480]
+
+
 == Version 0.7.0
 
 * Grails 7, Gradle 8.4, Java 24, Groovy 4.0.28 ...

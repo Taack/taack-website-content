@@ -4,6 +4,10 @@
 :toc:
 :icons: font
 
+.Latest Version Presentation
+video::rtxK81OcM3o[youtube, 480]
+
+
 == Purpose
 
 Manage FreeCAD model sharing and linear versioning. This is a sample app, more to see framework capabilities than to use as a real PLM (Product Lifecycle Management).
