@@ -32,7 +32,7 @@ Under `intranet/app/myBooks/grails-app/domain`, replace the directory `myBooks` 
 
 
 .myBooks Content
-image::first-app-screenshots/first-app-4-content-app.webp[Reload,width=520,align="left"]
+image::first-app-4-content-app.webp[Reload,width=520,align="left"]
 
 To make your IDE recognize the newly created module, reload Gradle by clicking the icon shown below:
 
@@ -86,7 +86,7 @@ Create a Groovy Class called Author in `grails-app/domain/my/books`.
 
 
 .Create a class
-image::first-app-screenshots/first-app-5-create-class.webp[Reload,width=520,align="left"]
+image::first-app-5-create-class.webp[Reload,width=520,align="left"]
 
 
 
@@ -130,7 +130,7 @@ Always use `@GrailsCompileStatic` for performance and type safety. Use `@TaackFi
 
 == Creating a table
 
-Now let's display a table in our listBook page. Go to `grails-app/controllers/my/books/MyBooksUiService`.
+Now let's display a table in our listBook page. Go to `grails-app/services/my/books/MyBooksUiService`.
 
 .Create a new table Specifier called buildBookTable:
 [,groovy]
@@ -262,7 +262,7 @@ So let's proceed with creating a form and saving objects into the database.
 
 
 .Empty Books Table
-image::first-app-screenshots/first-app-7-creating-table.webp[Reload,width=1000,align="left"]
+image::first-app-7-creating-table.webp[Reload,width=1000,align="left"]
 
 
 == Adding buttons to a table block
@@ -288,7 +288,7 @@ Don't forget to use `import taack.ui.dsl.common.ActionIcon`
 Now start the server and navigate to your new app again, you will see a btn:[Create] button on the top-right of the table.
 
 .Button
-image::first-app-screenshots/first-app-8-adding-button.webp[Reload,width=1000,align="left"]
+image::first-app-8-adding-button.webp[Reload,width=1000,align="left"]
 
 The `menuIcon` method is composed of the following parameters:
 
@@ -359,7 +359,7 @@ def saveBook() {
     taackSaveService.saveThenReloadOrRenderErrors(Book)
 }
 ----
-Use `import taack.domain.TaackSaveService` and `import grails.gorm.transactions.Transactional`.
+Use `import taack.render.TaackSaveService` and `import grails.gorm.transactions.Transactional`.
 
 [NOTE]
 ====
@@ -370,10 +370,10 @@ See link:doc/DSLs/block-dsl.adoc#_modal_stack_code_sample[Close Modal and reload
 Start the server again, you should now be able to click on the button and fill out the form.
 
 .Form
-image::first-app-screenshots/first-app-10-creating-form.webp[Reload,width=800,align="left"]
+image::first-app-10-creating-form.webp[Reload,width=800,align="left"]
 
 .Books saved
-image::first-app-screenshots/first-app-11-adding-book.webp[Reload,width=800,align="left"]
+image::first-app-11-adding-book.webp[Reload,width=800,align="left"]
 
 [NOTE]
 ====
@@ -391,7 +391,7 @@ Once again we define the specifier, and we will render it inside a modal block u
 ----
 def showBook(Book book) {
     // Define the show displayed fields
-    UiShowSpecifier showSpec = new UiShowSpecifier().ui(book, {
+    UiShowSpecifier showSpec = new UiShowSpecifier().ui({
         fieldLabeled book.title_
         fieldLabeled book.authorName_
     })
@@ -432,7 +432,7 @@ This will create a _small_ icon button in the table cell that will open a modal 
 Note that `ActionIcon` was multiplied by an `IconStyle` to change its size in this case.
 
 .Showing object
-image::first-app-screenshots/first-app-13-view-books.webp[Reload,width=800,align="left"]
+image::first-app-13-view-books.webp[Reload,width=800,align="left"]
 Click on the eye icon to display the book.
 
 
@@ -459,7 +459,7 @@ In some cases, it is better to add a field `enable` to mask disabled objects ins
 We use Grails `delete` method to delete the book from the database and then redirect to the `index` action where the book table is.
 
 .Delete book
-video::first-app-screenshots/first-app-15-delete-book.mp4[Reload,width=800,align="left",options="autoplay,loop,muted"]
+video::first-app-15-delete-book.mp4[Reload,width=800,align="left",options="autoplay,loop,muted"]
 
 
 Note that the field names are not direct labels, but i18n keys like `book.numberOfPages.label,default.numberOfPages.label` (referring to the i18n keys in `messages.properties`). Let's change that!
@@ -524,7 +524,7 @@ def listBook() {
 Use `import taack.ui.dsl.UiFilterSpecifier`.
 
 .Filtering
-image::first-app-screenshots/first-app-20-using-filter.webp[Reload,width=800,align="left"]
+image::first-app-20-using-filter.webp[Reload,width=800,align="left"]
 
 
 
@@ -690,7 +690,7 @@ myBooks.listAuthor.label= Authors
 You now have separate menus for Books and Authors, but they currently operate independently. What if you could select an author directly from the list of registered authors when creating a book? Let's implement that feature.
 
 .Author Table
-image::first-app-screenshots/first-app-23-authors-filled.webp[Reload,width=800,align="left"]
+image::first-app-23-authors-filled.webp[Reload,width=800,align="left"]
 
 
 == Link Authors to Books
@@ -767,10 +767,10 @@ def selectAuthor() {
 This will render a compact version of the `Author` table and its filter when selecting an author for the book form.
 
 .Adding a book with an author from the Author table
-image::first-app-screenshots/first-app-24-book-form-with-author-class.webp[Reload,width=800,align="left"]
+image::first-app-24-book-form-with-author-class.webp[Reload,width=800,align="left"]
 
 .Selecting the author (click on the blue button)
-image::first-app-screenshots/first-app-25-book-from-ajaxfield.webp[Reload,width=800,align="left"]
+image::first-app-25-book-from-ajaxfield.webp[Reload,width=800,align="left"]
 
 
 You now have a fully functional CRUD interface for your `Book` and `Author` entities using the Taack DSL framework, without needing to write HTML or GSP views manually.
