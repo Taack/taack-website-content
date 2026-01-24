@@ -6,6 +6,83 @@
 :icons: font
 
 
+
+== Preview Version 0.7.2
+
+* Section support class for labeling (See <2> in <<section-labelling>>)
+* <<fileter72>>
+* <<rowCol>>
+
+[[fileter72]]
+.New Filter Serialisation
+====
+.Declare Filter
+[source,groovy]
+----
+UiFilterSpecifier createReminderFilter(FieldInfo... leftField) {
+    Reminder r = new Reminder()
+    User u = new User()
+    new UiFilterSpecifier(leftField).ui Reminder, {                 <1>
+        section Reminder, {                                         <2>
+            filterField r.assignee_, u.username_
+            filterField r.status_
+            filterField r.priority_
+            filterField r.title_
+        }
+    }
+}
+----
+
+[[section-labelling]]
+<1> `leftField` List fields that points to a reminder in the embedding object
+<2> New section with class argument to compute i18n automatically
+
+.Joining Filter
+[source,groovy]
+----
+UiFilterSpecifier createReminderLinkFilter(FieldInfo... leftField) {
+    ReminderLink rl = new ReminderLink()
+    new UiFilterSpecifier(leftField).ui(ReminderLink, {
+        section tr('reminderLink.label'), {
+            filterField rl.kind_
+        }
+    }).join(createReminderFilter(rl.reminder_))                     <1>
+}
+----
+
+<1> Field `reminder` is a `Reminder`, we reuse the filter for `Reminder` class.
+
+.Joined Filters
+image::screenshot-filter-join.webp[]
+
+====
+
+[[rowCol]]
+.New `rowCol` Layout Option
+====
+[source,groovy]
+----
+        taackUiService.show createModalForm(reminder, {
+            section {
+                field reminder.title_
+                rowCols 3, {                                        <1>
+                        field reminder.dueDate_
+                        field reminder.status_
+                        field reminder.priority_
+                }
+                ajaxField reminder.assignee_, CrewController.&selectUserM2O as MC
+                field reminder.body_
+            }
+----
+
+<1> Avoid `row`, then `col`, `col`, `col` ...
+
+.`rowCol` in Form
+image::screenshot-form-rowcol.webp[]
+
+
+====
+
 == Version 0.7.1
 
 * Fix i18n with bootRun task when enabling hot-reload
