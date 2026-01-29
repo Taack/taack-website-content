@@ -79,9 +79,40 @@ image::screenshot-filter-join.webp[]
 
 .`rowCol` in Form
 image::screenshot-form-rowcol.webp[]
+====
 
+
+[[poke]]
+.New `poke` Layout Refresh Instruction
+====
+[source,groovy]
+----
+taackUiService.show(new UiBlockSpecifier().ui {
+    table statsService.buildTable()                                 <1>
+
+    row {
+        poke p1, {                                                  <2>
+            col BlockSpec.Width.HALF, {
+                diagram(statsService.&buildChart1 as MethodClosure)
+            }
+        }
+        poke p2, {                                                  <2>
+            col BlockSpec.Width.HALF, {
+                diagram(statsService::buildChart2 as MethodClosure)
+            }
+        }
+    }
+}
+----
+
+<1> When clicking on a table, we can refresh other blocks
+<2> `poke` p1 and p2 are booleans. If true, inside blocks will be refreshed
 
 ====
+
+
+
+
 
 == Version 0.7.1
 
