@@ -12,6 +12,7 @@
 * Section support class for labeling (See <2> in <<section-labelling>>)
 * <<fileter72>>
 * <<rowCol>>
+* <<poke>>
 
 [[fileter72]]
 .New Filter Serialisation
@@ -83,7 +84,7 @@ image::screenshot-form-rowcol.webp[]
 
 
 [[poke]]
-.New `poke` Layout Refresh Instruction
+.New `poke` Layout Refresh Block Instruction
 ====
 [source,groovy]
 ----
@@ -106,7 +107,7 @@ taackUiService.show(new UiBlockSpecifier().ui {
 ----
 
 <1> When clicking on a table, we can refresh other blocks
-<2> `poke` p1 and p2 are booleans. If true, inside blocks will be refreshed
+<2> `poke` p1 and p2 are booleans. If true, blocks inside `poke` block will be refreshed
 
 ====
 
