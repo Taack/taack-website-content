@@ -14,6 +14,43 @@
 * <<rowCol>>
 * <<poke>>
 
+[[table-inline-edit]]
+.Edit Object in Tables
+====
+.Declare `rowQuickEdit` Block
+[source,groovy]
+----
+rowQuickEdit(CrmController.&applyLeadLine as MC, ll.id) {           <1>
+    rowColumn {
+        rowFieldEdit ll.salePrice_                                  <2>
+        rowFieldEdit ll.qty_                                        <2>
+        rowField nf.format(tot), style                              <3>
+    }
+}
+----
+
+<1> `rowQuickEdit` declares which action to call in case of inline editing
+<2> `rowFieldEdit` edit the value in an input field OR display the content if not allowed
+<3> Other field are recomputed among editions
+
+.`applyLeadLine` Definition
+[source,groovy]
+----
+@Transactional
+def applyLeadLine() {
+    LeadLine ll = new LeadLine()
+    taackSaveService.saveThenReloadOrRenderErrors
+                    LeadLine, ll.qty_, ll.salePrice_            <1>
+}
+----
+
+<1> When saving, list field that can be updated only in the `rowQuickEdit` block
+
+.Inline Edit with Localized Error Feedback
+image::screenshot-inline-edit.webp[]
+
+====
+
 [[fileter72]]
 .New Filter Serialisation
 ====
