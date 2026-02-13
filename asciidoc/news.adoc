@@ -8,13 +8,13 @@
 
 == Version 0.7.2
 
+* Grails 7.0.7, Java 25 for Runtime and Building
 * <<kan-ban>>
 * <<table-inline-edit>>
 * Section support class for labeling (See <2> in <<section-labelling>>)
 * <<fileter72>>
 * <<rowCol>>
 * <<poke>>
-*
 
 [[kan-ban]]
 .Kan-ban with Drag & Drops
