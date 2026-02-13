@@ -6,16 +6,57 @@
 :icons: font
 
 
+== Version 0.7.2
 
-== Preview Version 0.7.2
-
+* <<kan-ban>>
+* <<table-inline-edit>>
 * Section support class for labeling (See <2> in <<section-labelling>>)
 * <<fileter72>>
 * <<rowCol>>
 * <<poke>>
+*
+
+[[kan-ban]]
+.Kan-ban with Drag & Drops
+====
+
+.Kanban Specification Without Filter
+[source,groovy]
+----
+new UiKanbanSpecifier().ui {
+    ReminderStatus.values().each { ReminderStatus status ->             <1>
+        column(this.&changeStatus as MC, [newStatus: status.name()]) {  <2>
+            header status.name()                                        <3>
+            reminders.grep { Reminder t -> t.status == status }
+                     .sort { -it.lastUpdated.getTime() }
+                     .each { Reminder rIt ->
+                card(rIt.selfObject_) {                                 <4>
+                    cardField rIt.title_, null, Style.BOLD + Style.BLUE
+                    cardFieldRaw this.getReminderDoersHtml(rIt),
+                        new Style('', 'position: absolute; right: 3px; top: 12px;')
+                    cardAction ActionIcon.SHOW * IconStyle.SCALE_DOWN,
+                        ReminderController.&showReminder as MethodClosure, rIt.id
+                    cardField rIt.priority_
+                }
+            }
+        }
+    }
+}
+----
+
+<1> Iterate over columns
+<2> Define a Column
+<3> Header name of this column
+<4> Do the Card with `cardField`, `cardFieldRaw` and `cardAction`
+
+.Kan-Ban
+image::screenshot-kanban.webp[]
+
+
+====
 
 [[table-inline-edit]]
-.Edit Object in Tables
+.Edit Objects in Table
 ====
 .Declare `rowQuickEdit` Block
 [source,groovy]
@@ -148,9 +189,47 @@ taackUiService.show(new UiBlockSpecifier().ui {
 
 ====
 
+[[accordion]]
+.Accordion
+====
+[source,groovy]
+----
+accordion {
+    accordionItem('Filter') {
+        form CrmDashboardUiService.filterForm(filter)
+    }
+}
+----
 
+====
 
+[[scrollPanel]]
+.scrollPanel
+====
+[source,groovy]
+----
+scrollPanel('512px') {
+    UiTableSpecifier t
+    boolean seeSalesmen = params.boolean('seeSalesmen')
+    boolean seeTop = params.boolean('seeTop')
+    if (seeTop) {
+        t = crmDashboardUiService.topSalesmen(leads)
+    } else if (seeSalesmen) {
+        t = this.crmDashboardUiService.topCountries(leads)
+    } else {
+        t = crmDashboardUiService.topCustomer(leads)
+    }
+    table(t) {
+        menu 'Salesmen', this.&group as MC, [seeTop: true, seeSalesmen: false]
+        menu 'Customers', this.&group as MC, [seeTop: false, seeSalesmen: false]
+        menu 'Countries', this.&group as MC, [seeTop: false, seeSalesmen: true]
+    }
+}
+----
 
+image::screenshot-scrollpanel.webp[]
+
+====
 
 == Version 0.7.1
 
