@@ -1,0 +1,75 @@
+= 看板DSL
+:doctype: book
+:taack-category: 6|doc/DSLs
+:toc:
+:source-highlighter: rouge
+:icons: font
+:experimental: true
+
+* [*] 支持HTML
+* [ ] 支持Mails
+* [ ] 支持PDF
+* [ ] 支持CSV
+
+image:screenshot-dsl-kanban.webp[]
+
+== 代码示例
+[source,groovy]
+.看板代码示例1
+----
+UiKanbanSpecifier buildTodoKanban() {
+    new UiKanbanSpecifier().ui {                                                                   <1>
+        column Gantt2Controller.&changeTodoProgression as MethodClosure, [newProgression: 0], {    <2>
+            header "Title", Style.ALIGN_CENTER                                                     <3>
+            custom "Custom html code"                                                              <4>
+            todos.forEach { Todo todo ->
+                card todo, Gantt2Controller.&showTodo as MethodeClosure, todo.id, {                <5>
+                    cardField todo.what_                                                           <6>
+                    cardFieldRaw "Custom html code"                                                <7>
+                    cardAction ActionIcon.SHOW * IconStyle.SCALE_DOWN, Gantt2Controller.&doSomething as MethodClosure, todo.id   <8>
+                }
+            }
+        }
+    }
+}
+
+----
+
+[source,groovy]
+.写在一个service里面用来注册上下文菜单
+----
+@PostConstruct
+void init() {
+    TaackUiService.registerContextualMenuClosure(Todo, new UiMenuSpecifier().ui {               <9>
+        menu 'Show Gantt', Gantt2Controller.&showGanttByTodo as MethodClosure, [id: this.params['id']]    <10>
+    }
+}
+----
+
+<1> 创建看板
+<2> 构建列，可以传递一个方法和参数作为列的**拖拽放置事件**
+<3> 构建列标题，可以传递**样式**
+<4> 可以为列添加自定义HTML代码
+<5> 在列中构建卡片，可以传递一个方法和参数，作为卡片的**鼠标双击事件**
+<6> 在卡片中构建一个包含字段的行，注意字段名称末尾的**下划线**
+<7> 可以添加自定义HTML代码
+<8> 可以添加一个图标，并将其方法绑定到点击事件
+<9> 注册**鼠标右击事件**
+<10> 添加带有方法绑定的菜单项
+
+== DSL架构
+[graphviz,format="svg",align=center]
+.看板DSL的架构图
+----
+digraph kanbanDslGraph {
+  node [shape=box];
+  ui -> column [label = "0,N"]
+  column -> header [label = "0,1"]
+  column -> custom, card [label = "0,N"]
+  card -> cardField, cardFieldRaw, cardAction [label = "0,N"]
+}
+----
+
+
+
+

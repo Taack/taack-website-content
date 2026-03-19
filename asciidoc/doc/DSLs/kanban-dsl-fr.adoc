@@ -1,0 +1,75 @@
+= Kanban DSL
+:doctype: book
+:taack-category: 6|doc/DSLs
+:toc:
+:source-highlighter: rouge
+:icons: font
+:experimental: true
+
+* [*] Rendu en HTML
+* [ ] Rendu en Mails
+* [ ] Rendu en PDF
+* [ ] Rendu en CSV
+
+image:screenshot-dsl-kanban.webp[]
+
+== Exemple de code
+[source,groovy]
+.Exemple de code de kanban 1.
+----
+UiKanbanSpecifier buildTodoKanban(List<Todo> todos) {
+    new UiKanbanSpecifier().ui {                                                                   <1>
+        column Gantt2Controller.&changeTodoProgression as MethodClosure, [newProgression: 0], {    <2>
+            header "Title", Style.ALIGN_CENTER                                                     <3>
+            custom "Custom html code"                                                              <4>
+            todos.forEach { Todo todo ->
+                card todo, Gantt2Controller.&showTodo as MethodeClosure, todo.id, {                <5>
+                    cardField todo.what_                                                           <6>
+                    cardFieldRaw "Custom html code"                                                <7>
+                    cardAction ActionIcon.SHOW * IconStyle.SCALE_DOWN, Gantt2Controller.&doSomething as MethodClosure, todo.id   <8>
+                }
+            }
+        }
+    }
+}
+
+----
+
+[source,groovy]
+.Écrit sur un service pour enregistrer le menu contextuel
+----
+@PostConstruct
+void init() {
+    TaackUiService.registerContextualMenuClosure(Todo, new UiMenuSpecifier().ui {               <9>
+        menu 'Show Gantt', Gantt2Controller.&showGanttByTodo as MethodClosure, [id: this.params['id']]    <10>
+    }
+}
+----
+
+<1> Créer le kanban
+<2> Créer une colonne, permettre de passer une action et des paramètres comme kbd:[Drag+Drop] pour la colonne
+<3> Créer un en-tête de colonne, permettre de passer *Style*
+<4> Permettre d'ajouter le code HTML personnalisé pour le corps de la colonne
+<5> Créer des cartes dans la colonne, permettre de passer an action and params une action et des paramètres comme kbd:[MouseDoubleClic] pour la carte
+<6> Créer une ligne avec le champ dans la carte, noter le *tiret bas* à la fin du nom du champ
+<7> Permettre d'ajouter le code HTML personnalisé
+<8> Permettre d'ajouter une icône avec une action liée au clic
+<9> Enregistrer le menu contextuel comme kbd:[MouseRight] pour la carte
+<10> Créer un élément de menu avec une action
+
+== Hiérarchie des symboles DSL
+[graphviz,format="svg",align=center]
+.Diagramme de hiérarchie des symboles pour le kanban DSL
+----
+digraph kanbanDslGraph {
+  node [shape=box];
+  ui -> column [label = "0,N"]
+  column -> header [label = "0,1"]
+  column -> custom, card [label = "0,N"]
+  card -> cardField, cardFieldRaw, cardAction [label = "0,N"]
+}
+----
+
+
+
+
