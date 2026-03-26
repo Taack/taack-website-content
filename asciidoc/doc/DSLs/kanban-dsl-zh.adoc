@@ -19,14 +19,13 @@ image:screenshot-dsl-kanban.webp[]
 ----
 UiKanbanSpecifier buildTodoKanban() {
     new UiKanbanSpecifier().ui {                                                                   <1>
-        column Gantt2Controller.&changeTodoProgression as MethodClosure, [newProgression: 0], {    <2>
-            header "Title", Style.ALIGN_CENTER                                                     <3>
-            custom "Custom html code"                                                              <4>
+        column 'HeaderStr', Style.ALIGN_CENTER, Gantt2Controller.&changeTodoProgression as MethodClosure, [newProgression: 0], {    <2>
+            custom "Custom html code"                                                              <3>
             todos.forEach { Todo todo ->
-                card todo, Gantt2Controller.&showTodo as MethodeClosure, todo.id, {                <5>
-                    cardField todo.what_                                                           <6>
-                    cardFieldRaw "Custom html code"                                                <7>
-                    cardAction ActionIcon.SHOW * IconStyle.SCALE_DOWN, Gantt2Controller.&doSomething as MethodClosure, todo.id   <8>
+                card todo, Gantt2Controller.&showTodo as MethodeClosure, todo.id, {                <4>
+                    cardField todo.what_                                                           <5>
+                    cardFieldRaw "Custom html code"                                                <6>
+                    cardAction ActionIcon.SHOW * IconStyle.SCALE_DOWN, Gantt2Controller.&doSomething as MethodClosure, todo.id   <7>
                 }
             }
         }
@@ -40,22 +39,21 @@ UiKanbanSpecifier buildTodoKanban() {
 ----
 @PostConstruct
 void init() {
-    TaackUiService.registerContextualMenuClosure(Todo, new UiMenuSpecifier().ui {               <9>
-        menu 'Show Gantt', Gantt2Controller.&showGanttByTodo as MethodClosure, [id: this.params['id']]    <10>
+    TaackUiService.registerContextualMenuClosure(Todo, new UiMenuSpecifier().ui {               <8>
+        menu 'Show Gantt', Gantt2Controller.&showGanttByTodo as MethodClosure, [id: this.params['id']]    <9>
     }
 }
 ----
 
 <1> 创建看板
-<2> 构建列，可以传递一个方法和参数作为列的**拖拽放置事件**
-<3> 构建列标题，可以传递**样式**
-<4> 可以为列添加自定义HTML代码
-<5> 在列中构建卡片，可以传递一个方法和参数，作为卡片的**鼠标双击事件**
-<6> 在卡片中构建一个包含字段的行，注意字段名称末尾的**下划线**
-<7> 可以添加自定义HTML代码
-<8> 可以添加一个图标，并将其方法绑定到点击事件
-<9> 注册**鼠标右击事件**
-<10> 添加带有方法绑定的菜单项
+<2> 构建列和列标题，可以传递一个方法和参数作为列的**拖拽放置事件**
+<3> 可以为列添加自定义HTML代码
+<4> 在列中构建卡片，可以传递一个方法和参数，作为卡片的**鼠标双击事件**
+<5> 在卡片中构建一个包含字段的行，注意字段名称末尾的**下划线**
+<6> 可以添加自定义HTML代码
+<7> 可以添加一个图标，并将其方法绑定到点击事件
+<8> 注册**鼠标右击事件**
+<9> 添加带有方法绑定的菜单项
 
 == DSL架构
 [graphviz,format="svg",align=center]
@@ -64,7 +62,6 @@ void init() {
 digraph kanbanDslGraph {
   node [shape=box];
   ui -> column [label = "0,N"]
-  column -> header [label = "0,1"]
   column -> custom, card [label = "0,N"]
   card -> cardField, cardFieldRaw, cardAction [label = "0,N"]
 }
