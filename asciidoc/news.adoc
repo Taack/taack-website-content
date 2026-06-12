@@ -5,6 +5,35 @@
 :source-highlighter: rouge
 :icons: font
 
+== Version 0.7.4
+
+* <<table-sticky-columns>>
+
+[[table-sticky-columns]]
+.Table Sticky Columns
+====
+
+.Freeze leftmost columns via `TableOption`
+[source,groovy]
+----
+TableOption tableOption = new TableOption.TableOptionBuilder()
+        .stickyColumns(2).build() <1>
+
+new UiTableSpecifier().ui tableOption, {
+    header {
+        sortableFieldHeader p.ref_
+        sortableFieldHeader p.name_
+        // ... any number of columns ...
+    }
+}
+----
+
+<1> Number of leftmost columns to freeze. They stay visible while the table scrolls horizontally.
+
+Note that Tables using sticky columns will not be width constrained and instead use the `taack-sticky-table` css class that limits the max-width of each column to 12rem.
+
+====
+
 
 == Version 0.7.2
 
