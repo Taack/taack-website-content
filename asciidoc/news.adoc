@@ -38,6 +38,11 @@ Note that the grid auto-fits as many columns as the container width allows, each
 
 == Version 0.7.4
 
+* Use Flying Saucer to produce PDF, avoiding iText AGPL issues
+* Improve diagram user interaction
+* xref:doc/DSLs/diagram-dsl.adoc[Diagram DSL] :
+** Add new diagram type `timeline`
+** Provide `DiagramOption` to customize chart
 * <<table-sticky-columns>>
 
 [[table-sticky-columns]]

@@ -12,11 +12,11 @@
 
 Diagram DSL allows quickly drawing barchart, area, pie, scatter and line diagram, either rasterized in PNG or in SVG format.
 
-== Code Sample
+== Chart Sample
 
 === Bar
 
-.Non-Stacked Barchart
+.Bar chart
 ====
 .Barchart Code Sample
 [source,groovy]
@@ -39,7 +39,7 @@ image:diag-dsl-bar.webp[]
 
 === Line
 
-.Lines
+.Line chart
 ====
 .Lines Code Sample
 [source,groovy]
@@ -62,7 +62,7 @@ image:diag-dsl-line.webp[]
 
 .Pie chart
 ====
-.Code Sample
+.Pie Code Sample
 [source,groovy]
 ----
 private static UiDiagramSpecifier pieDiagram(boolean hasSlice) {
@@ -101,7 +101,7 @@ image:diag-dsl-pie.webp[]
 
 .Whiskers chart
 ====
-.Code Sample
+.Whiskers Code Sample
 [source,groovy]
 ----
 diagram new UiDiagramSpecifier().ui({
@@ -128,6 +128,61 @@ diagram new UiDiagramSpecifier().ui({
 image:diag-dsl-whiskers.webp[]
 ====
 
+=== Timeline
+
+.Timeline chart
+====
+.Timeline Code Sample
+[source,groovy]
+----
+diagram new UiDiagramSpecifier().ui({
+    timeline {
+        SimpleDateFormat format = new SimpleDateFormat('yyyy-MM-dd')
+        dataset 'Truc1', {
+            periodData format.parse('2025-06-12'), format.parse('2025-07-08'), "Period1"
+            periodData format.parse('2025-07-08'), format.parse('2025-07-21'), "Period2"
+            periodData format.parse('2025-07-21'), format.parse('2025-08-30'), "Period3"
+        }
+        dataset 'Truc2', {
+            periodData format.parse('2025-06-20'), format.parse('2025-06-25'), "Period1"
+            periodData format.parse('2025-07-01'), format.parse('2025-07-21'), "Period2"
+        }
+    }
+})
+----
+
+.Result
+image:diag-dsl-timeline.webp[]
+====
+
+== Customized Option
+
+We give various options to allow user to customize the chart, by using `DiagramOption`.
+
+.Barchart using DiagramOption
+[source,groovy]
+----
+private static UiDiagramSpecifier barDiagram(boolean isStacked) {
+    new UiDiagramSpecifier().ui {
+        bar(isStacked, {
+            labels "T1", "T2", "T3", "T4"
+            dataset 'Truc1', 1.0, 2.0, 1.0, 4.0
+            dataset 'Truc2', 2.0, 0.1, 1.0, 0.0
+            dataset 'Truc3', 2.0, 0.1, 1.0, 1.0
+
+            option DiagramOption.builder
+                    .setTitle("This is a Bar chart !")
+                    .hideLegend()
+                    .showDataCount()
+                    .setKeyColors(Color.RED, Color.ORANGE, Color.YELLOW, Color.GREEN)
+                    .setClickAction(Pr2Controller.&onclickBar as MethodClosure)
+                    .setResolution(DiagramResolution.DEFAULT_2K)
+                    .build()
+        })
+    }
+}
+----
+
 == Bonus way to code
 
 === Different types of xLabels
@@ -153,8 +208,11 @@ diagram new UiDiagramSpecifier().ui({
         Date date1 = new Date() // now (2025-02-28 10:55)
         Date date2 = new Date(date1.getTime() + 1000*60*60*2) // 2 hours later
         Date date3 = new Date(date1.getTime() + 1000*60*60*10) // 10 hours later
-        labels DiagramXLabelDateFormat.HOUR, date1, date2, date3, <1>
+        labels date1, date2, date3
         dataset "test", 10.0, 20.1, 30.0
+        option DiagramOption.builder
+                .setXLabelDateFormat(DiagramXLabelDateFormat.HOUR) <1>
+                .build()
     }
 })
 ----
@@ -225,8 +283,10 @@ We have a large number of objects, and we would like to have a diagram that show
 diagram new UiDiagramSpecifier().ui({
     List<Claim> claims = Claim.findAll()
     bar {
-        labels DiagramXLabelDateFormat.MONTH // show claim count month-by-month
         dataset "Claim", claims.collect { it.dateCreated } as Date[]
+        option DiagramOption.builder
+                .setXLabelDateFormat(DiagramXLabelDateFormat.MONTH) // show claim count month-by-month
+                .build()
     }
 })
 ----
@@ -238,10 +298,10 @@ image:screenshot-dsl-diagram-count-object.png[]
 
 === Zoom (Horizontally)
 
-Put mouse on diagram, then scroll the mouse wheel.
+Put mouse on diagram, then scroll the mouse wheel with CTRL pressed.
 
-- Wheel-up for Zoom-up.
-- Wheel-down for Zoom-down.
+- CTRL + Wheel-up for Zoom-up.
+- CTRL + Wheel-down for Zoom-down.
 
 === Scroll (Horizontally)
 
@@ -258,37 +318,6 @@ image:screenshot-dsl-diagram-tooltip.png[]
 === Clickable legend
 
 Click on a dataset legend allows us to hide the showing of target dataset.
-
-=== Diagram action
-
-If a diagram action is defined, the shapes of diagram will be clickable to call target action, giving all information of clicked shape (*label*, *value*, *dataset name*)
-
-[[_diagram_action]]
-.How to define diagram action
-[source,groovy]
-----
-new UiDiagramSpecifier().ui {
-    bar {
-        labels 'date1', 'date2', 'date3'
-        dataset 'Stuff1', 3.0, 4.0, 5.0
-
-        diagramAction this.&clickDiagram as MC, id, <1>
-        [optionalParam: 'value']                    <2>
-    }
-}
-
-def clickDiagram() {
-    println(params)
-    // [id: 123456, dataset: "Stuff1",
-    // optionalParam: "value"                       <3>
-    // x: "date1", y: "3.0"]
-}
-
-----
-
-<1> Diagram Action
-<2> Can pass map
-<3> Action params contain *label*, *value*, *dataset name* and *map*
 
 == DSL Symbols Hierarchy
 
