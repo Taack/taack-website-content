@@ -5,6 +5,51 @@
 :source-highlighter: rouge
 :icons: font
 
+== Version 0.7.5
+
+* <<replace-modal>>
+* <<save-or-close-and-refresh>>
+
+[[replace-modal]]
+.New Replace Modal Content
+====
+.Replace any content of an upper modal
+[source,groovy]
+----
+@Transactional
+def doComplexStuff() {
+    boolean isDone = false
+
+    // doComplexStuff
+
+    taackUiService.show(new UiBlockSpecifier().ui {
+        replaceModal {
+            custom("<h1> ${isDone ? 'Done.' : 'Not Done.'} </h1>")
+        }
+    })
+}
+----
+====
+
+[[save-or-close-and-refresh]]
+.New Save Or close modal and refresh
+====
+.Code
+[source,groovy]
+----
+@Transactional
+@Secured(['ROLE_ADMIN', 'ROLE_CONSOLATOR_ADMIN'])
+def saveLlmRag() {
+    taackSaveService.saveOrCloseModalAndRefresh(LlmRag)     <1>
+}
+----
+
+<1> If multiple modals are stacked, it is now possible to refresh the modal below the last one, which will be closed.
+
+====
+
+
+
 == Version 0.7.4
 
 * Use Flying Saucer to produce PDF, avoiding iText AGPL issues
