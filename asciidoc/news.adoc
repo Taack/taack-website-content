@@ -5,6 +5,37 @@
 :source-highlighter: rouge
 :icons: font
 
+== Version 0.7.5
+
+* <<show-grid-layout>>
+image:show-grid-layout.webp[]
+
+[[show-grid-layout]]
+.Show Grid Layout
+====
+
+.Lay a Show out on a responsive grid via `ShowLayout.GRID`
+[source,groovy]
+----
+new UiShowSpecifier().ui ShowLayout.GRID, { <1>
+    fieldLabeled item.ref_
+    fieldLabeled item.name_
+    fieldLabeled item.itemStatus_
+    fieldLabeled item.gtin_
+    fieldLabeled Style.SPAN_TWO, item.labeling_ <2>
+    fieldLabeled Style.BOLD + Style.SPAN_FULL, item.description_ <3>
+}
+----
+
+<1> Pass `ShowLayout.GRID` to lay the fields out on an auto-fitting grid instead of vertically in a column. The default is `ShowLayout.LIST`.
+<2> Each field takes one grid cell by default. `Style.SPAN_TWO` / `Style.SPAN_THREE` can be be used to let grid cells to span more columns.
+<3> `Style.SPAN_FULL` makes a field span the whole row. Spans combine with any other style through `+` (here with `Style.BOLD`).
+
+Note that the grid auto-fits as many columns as the container width allows, each at least `220px` wide (`grid-template-columns: repeat(auto-fit, minmax(220px, 1fr))` on the `taackShowGrid` class, the minimum can be overridden in your CSS).
+
+====
+
+
 == Version 0.7.4
 
 * <<table-sticky-columns>>
