@@ -6,9 +6,10 @@
 :icons: font
 
 == Version 0.7.5
+
+* <<show-grid-layout>>
 * <<replace-modal>>
 * <<save-or-close-and-refresh>>
-* <<show-grid-layout>>
 
 image:show-grid-layout.webp[]
 
