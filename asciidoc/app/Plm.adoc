@@ -5,7 +5,7 @@
 :icons: font
 
 .Latest Version Presentation
-video::rtxK81OcM3o[youtube, 480]
+video::hZOJ63zchaw[youtube, 480]
 
 
 == Purpose
@@ -95,8 +95,6 @@ plm:
   useWeston: true
 ----
 
-You can create a symlink `ln -s /usr/bin/FreeCAD freecad-app-link` in your home directory, it should suffice most of the time.
-
 === Install from Source
 
 Clone the #plm# repository:
@@ -110,6 +108,10 @@ git clone https://github.com/Taack/plm.git
 Then copy the content of the `plm` folder into your intranet `app` folder (see link:../installation.adoc[intranet installation])
 
 Set the FreeCAD path in the `server/conf/application.yml` file.
+
+In the `plm` folder, you have 2 scripts you can use : `freecad-app-link-distrib.sh` if you use your distribution version of FreeCAD or `freecad-app-link-flatpak.sh` if you choose to install FreeCAD using Flatpak
+
+Create a symlink in your home folder pointing to one of those scripts `ln -s <path-to-plm-folder>/freecad-app-link-distrib.sh freecad-app-link`.
 
 Start your intranet issuing under the `intranet` folder:
 
@@ -131,14 +133,6 @@ The server will be located under `server/build/libs`
 
 [[python-protobuf-install]]
 == FreeCAD Workbench Installation
-
-First, install `python-protobuf`. If you use FreeCAD <= 0.21, dependencies are not installed automatically when installing the workbench.
-
-[source,bash]
-.Install Protobuf for FreeCAD
-----
-pip install protobuf
-----
 
 Go into #Tools# > #Addon Manager# then refresh local cache and search for *Taack*.
 
@@ -172,7 +166,6 @@ video::rF_cL2C_EAU[youtube, width=640, height=480]
 
 * Add model graph icon
 * Update deps for a model (with Deep option)
-* Delete latest version
 * ...
 
 

@@ -5,6 +5,11 @@
 :source-highlighter: rouge
 :icons: font
 
+== Version 0.7.6
+
+* Improve Custom Editor
+* Grails 7.2.0
+
 == Version 0.7.5
 
 * <<show-grid-layout>>
