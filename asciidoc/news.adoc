@@ -5,6 +5,45 @@
 :source-highlighter: rouge
 :icons: font
 
+== Version 0.7.7
+
+* Grails 7.2.3
+* New `taack-ui-ext` maven artifact to add graphical components
+* <<calendar-component>>
+
+[[calendar-component]]
+.New calendar component
+====
+
+
+.Table display
+[source,groovy]
+----
+def calendarTable(TaackCalendarParams calendarParams) {
+    UiTableSpecifier t = taackCalendarUiService.calendarUiTable(calendarEvents.collect {    <1>
+        new TaackCalendarEventAdapter(it.key, it.value)
+    }.iterator() as Iterator<TaackCalendarEvent>, calendarParams)
+    taackUiService.show new UiBlockSpecifier().ui {
+        table t
+    }, RootController.buildMenu()
+}
+----
+<1> Create table from `TaackCalendarEvent` iterator. Using Adapter pattern to convert any object to `TaackCalendarEvent`.
+
+image::news-calendar-table-view.webp[]
+
+.Regular display
+[source,groovy]
+----
+def calendarEntries(TaackCalendarParams calendarParams) {
+    taackUiService.show taackCalendarUiService.calendarBlock(CalendarController.&fromCustom as MC, calendarEvents.collect {
+        new TaackCalendarEventAdapter(it.key, it.value)
+    }.iterator() as Iterator<TaackCalendarEvent>, calendarParams), RootController.buildMenu()}
+----
+image::news-calendar-regular-view.webp[]
+
+====
+
 == Version 0.7.6
 
 * Improve Custom Editor
@@ -25,12 +64,12 @@ image:show-grid-layout.webp[]
 .Lay a Show out on a responsive grid via `ShowLayout.GRID`
 [source,groovy]
 ----
-new UiShowSpecifier().ui ShowLayout.GRID, { <1>
+new UiShowSpecifier().ui ShowLayout.GRID, {                      <1>
     fieldLabeled item.ref_
     fieldLabeled item.name_
     fieldLabeled item.itemStatus_
     fieldLabeled item.gtin_
-    fieldLabeled Style.SPAN_TWO, item.labeling_ <2>
+    fieldLabeled Style.SPAN_TWO, item.labeling_                  <2>
     fieldLabeled Style.BOLD + Style.SPAN_FULL, item.description_ <3>
 }
 ----
