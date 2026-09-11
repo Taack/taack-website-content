@@ -4,13 +4,11 @@
 :toc:
 :icons: font
 
-.Latest Version Presentation
-video::hZOJ63zchaw[youtube, 480]
 
 
 == Purpose
 
-Manage FreeCAD model sharing and linear versioning. This is a sample app, more to see framework capabilities than to use as a real PLM (Product Lifecycle Management).
+Manage FreeCAD model sharing and linear versioning. This app shows the framework capabilities. Very few line of code describe the user interface and manage persistent data. We can view this application as a small PLM (Product Lifecycle Management) for FreeCAD.
 
 == Roles
 
@@ -42,7 +40,7 @@ sudo usermod -a -G plm <current user>
 . Eventually change right of `plm` to allow group `rxw`
 . Restart logout / login cycle or restart to apply group change to your user
 
-=== Launch FreeCAD on the server
+=== Prepare FreeCAD to be user by the server
 
 On a Linux server, it is better to install the following package from your distribution:
 
@@ -50,18 +48,65 @@ On a Linux server, it is better to install the following package from your distr
 * #FreeCAD >1.0#
 * #python-protobuf# package (See <<python-protobuf-install>>)
 
-Freecad and Weston allow similar features on Wayland than Xvfb-run under X11.
+Freecad must use Qt6 for Weston and Wayland. The PLM module will launch FreeCAD in a Weston desktop using the Framebuffer, so nothing is chown.
 
-=== Install from Server Binaries
 
-Download the latest server binaries from https://github.com/Taack/plm/releases[releases].
+=== Configure the PLM Server
 
-Launch the server app:
+Here are the step by step commands:
+
+.Clone the Intranet repository
+[source,bash]
+----
+git clone https://github.com/Taack/intranet.git
+OR
+git clone git@github.com:Taack/intranet.git
+----
+
+.Go to `app` folder
+[source,bash]
+----
+cd intranet/app
+----
+
+.Clone the PLM repository
+[source,bash]
+----
+git clone https://github.com/Taack/plm.git
+OR
+git clone git@github.com:Taack/plm.git
+----
+
+.Edit the `server/grails-app/conf/application.yml` adding the following variables:
+[source,yaml]
+----
+# PLM
+plm.freecadPath: ${HOME}/freecad-app-link
+----
+
+From here, you can build the server or run it. Change current directory to the intranet folder and either:
+
+.Build the server binaries (for production environment)
+[source,bash]
+----
+./gradlew bootJar
+----
+
+.Launch the server (for development environment)
+[source,bash]
+----
+./gradlew bootRun
+----
+
+
+=== Launch Server Binaries
+
+If you choose to build the server binaries, go to :
 
 [source,bash]
 .Launch the server
 ----
-java -jar server-0.6.jar
+java -jar server/build/libs/server-0.6.jar
 ----
 
 ==== Server Arguments
@@ -89,10 +134,6 @@ java -DOption1=Value1 -DOption2=Value2 ... -jar server-0.3.jar
 ----
 plm:
   freecadPath: ${HOME}/freecad-app-link
-  singleInstance: true
-  offscreen: false
-  xvfbRun: false
-  useWeston: true
 ----
 
 === Install from Source
@@ -138,7 +179,7 @@ Go into #Tools# > #Addon Manager# then refresh local cache and search for *Taack
 
 image::addon-screenshot.webp[]
 
-Click on install button.
+Click on installation button.
 
 == Usage
 
@@ -162,11 +203,8 @@ That's it; I will record some videos demonstrating this app capabilities.
 
 video::rF_cL2C_EAU[youtube, width=640, height=480]
 
-== Todo
-
-* Add model graph icon
-* Update deps for a model (with Deep option)
-* ...
+.Latest Version Presentation
+video::hZOJ63zchaw[youtube, width=640, height=480]
 
 
 // # [auo@auo-systemproductname FreeCAD]$ yay -S boost cmake coin curl desktop-file-utils eigen gcc-fortran git glew hicolor-icon-theme jsoncpp libspnav med nlohmann-json opencascade pyside6-tools pyside6 python-matplotlib python-netcdf4 python-packaging python-pivy qt6-svg qt6-tools qt6-webengine shared-mime-info shiboken6 swig utf8cpp xerces-c yaml-cpp
