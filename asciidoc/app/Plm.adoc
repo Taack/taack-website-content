@@ -42,16 +42,16 @@ sudo usermod -a -G plm <current user>
 
 === Prepare FreeCAD to be used by the server
 
-On a Linux server, it is better to install the following package from your distribution:
+On a Linux server, it is better to install the following packages from your distribution:
 
 * #Weston# Wayland server
 * #FreeCAD >1.0#
-* #python-protobuf# package (See <<python-protobuf-install>>)
 
 Freecad must use Qt6 for Weston and Wayland. The PLM module will launch FreeCAD in a Weston desktop using the Framebuffer, so nothing is chown.
 
-
 === Configure the PLM Server
+
+If you want just an overview, you can download the demo server, with default configuration, go directly in <<_launch_server_binaries>>.
 
 Here are the step by step commands:
 
@@ -107,6 +107,8 @@ From here, you can build the server or run it. Change current directory to the i
 
 
 === Launch Server Binaries
+
+Demo version is available here: https://github.com/Taack/plm/releases[Taack PLM releases], download `server-0.6.jar`
 
 If you choose to build the server binaries, go to :
 
