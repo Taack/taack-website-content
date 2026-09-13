@@ -201,10 +201,7 @@ WARNING: If you have many links, import them from the same computer. From other 
 
 That's it; I will record some videos demonstrating this app capabilities.
 
-video::rF_cL2C_EAU[youtube, width=640, height=480]
-
-.Latest Version Presentation
-video::hZOJ63zchaw[youtube, width=640, height=480]
+video::28JkqJMlMrM[youtube, width=820, height=480]
 
 
 // # [auo@auo-systemproductname FreeCAD]$ yay -S boost cmake coin curl desktop-file-utils eigen gcc-fortran git glew hicolor-icon-theme jsoncpp libspnav med nlohmann-json opencascade pyside6-tools pyside6 python-matplotlib python-netcdf4 python-packaging python-pivy qt6-svg qt6-tools qt6-webengine shared-mime-info shiboken6 swig utf8cpp xerces-c yaml-cpp
