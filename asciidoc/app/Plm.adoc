@@ -40,7 +40,7 @@ sudo usermod -a -G plm <current user>
 . Eventually change right of `plm` to allow group `rxw`
 . Restart logout / login cycle or restart to apply group change to your user
 
-=== Prepare FreeCAD to be user by the server
+=== Prepare FreeCAD to be used by the server
 
 On a Linux server, it is better to install the following package from your distribution:
 
