@@ -84,6 +84,13 @@ git clone git@github.com:Taack/plm.git
 plm.freecadPath: ${HOME}/freecad-app-link
 ----
 
+.Copy freecad launch script
+[source,bash]
+----
+cd
+cp plm/freecad-app-link-distrib.sh freecad-app-link
+----
+
 From here, you can build the server or run it. Change current directory to the intranet folder and either:
 
 .Build the server binaries (for production environment)
