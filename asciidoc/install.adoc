@@ -6,6 +6,7 @@ To get started, make sure the following tools are installed on your machine:
 
 * *Java* (JDK 17 or JDK 24)
 * *Git*
+* https://github.com/unoconv/unoserver[unoserver]
 
 === Install prerequisites
 
@@ -72,7 +73,7 @@ Use the default login credentials:
 
 
 .Credentials
-image::first-app-screenshots/first-app-1-credentials.webp[Reload,width=520,align="left"]
+image::first-app-1-credentials.webp[Reload,width=520,align="left"]
 
 
 
