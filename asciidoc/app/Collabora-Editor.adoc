@@ -23,10 +23,16 @@ Allow editing office document using https://www.collaboraonline.com/[Collabora O
 sudo systemctl restart docker
 ----
 
+.Install Collabora CODE
+[source,bash]
+----
+sudo docker pull collabora/code:latest
+----
+
 .Run Collabora CODE
 [source,bash]
 ----
-sudo docker run -t -e username test -e password test  -e "extra_params=--o:ssl.enable=false" -d -p 127.0.0.1:9980:9980 collabora/code   <1>
+udo docker run -t -e "username=test" -e "password=test"  -e "extra_params=--o:ssl.enable=false" -d -p 127.0.0.1:9980:9980 collabora/code   <1>
 ----
 
 <1> For testing purpose only, we deactivate SSL and choose simple user / passwd.
