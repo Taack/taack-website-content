@@ -32,10 +32,10 @@ sudo docker pull collabora/code:latest
 .Run Collabora CODE
 [source,bash]
 ----
-udo docker run -t -e "username=test" -e "password=test"  -e "extra_params=--o:ssl.enable=false" -d -p 127.0.0.1:9980:9980 collabora/code   <1>
+sudo docker run --privileged --network host -e "username=test" -e "password=test"  -e "extra_params=--o:ssl.enable=false" -p 9980:9980 collabora/code:latest   <1>
 ----
 
-<1> For testing purpose only, we deactivate SSL and choose simple user / passwd.
+<1> For testing purpose only, we deactivate SSL and choose simple user / passwd. You do not need `--network host` if Collabora runs onto a different server.
 
 .Test it is launched
 [source,bash]
@@ -56,6 +56,14 @@ HTTP request sent, awaiting response... 200 OK
 $ git clone https://github.com/Taack/collabora-editor.git
 ----
 
+== Intranet Configuration
+
+[source,yaml]
+----
+collabora.url: http://127.0.0.1:9980/     <1>
+----
+
+<1> Replace the IP address with the server dns name.
 
 == Screenshot
 
