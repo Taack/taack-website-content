@@ -186,25 +186,33 @@ The server will be located under `server/build/libs`
 
 Go into #Tools# > #Addon Manager# then refresh local cache and search for *Taack*.
 
-image::addon-screenshot.webp[]
+image::addon-screenshot2.webp[]
 
 Click on installation button.
 
 == Usage
 
 .Select Taack PLM Workbench
-image::plm1-screenshot.webp[]
+image::plm12-screenshot.webp[]
 
-.Click on Taack icon
-image::plm2-screenshot.webp[]
+<1> Taack PLM Workbench
+<2> Main Action
+<3> Enter server URL (with a trailing '/')
+<4> Enter User Credentials
+<5> Enter Password Credentials
+<6> Connect to the server
+<7> Choose Duplicate Mode
+<8> Duplicate History
 
-.Enter your credential into your server
-image::plm3-screenshot.webp[]
 
 Clicking on OK button will upload the file into your Intranet. The Intranet will create a preview, this process might take time.
 
-.The history of the part...
-image::plmweb1-screenshot.webp[]
+.Details View of Parts ...
+image::freecad-taack-plm-server-part-details.webp[]
+
+<1> File Preview
+<2> Links Hierarchy
+<3> Tags
 
 WARNING: If you have many links, import them from the same computer. From other computers, download the zip file from your intranet.
 
