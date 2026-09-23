@@ -3,7 +3,7 @@
 :taack-category: 4|App
 :toc:
 :source-highlighter: rouge
-
+:experimental: true
 
 == Purpose
 
@@ -69,6 +69,14 @@ collabora.url: http://127.0.0.1:9980/     <1>
 
 .Editing an ODP
 image::collabora-editor.webp[]
+
+Some basic commands:
+
+* Fullscreen => menu:Zoom[Fullscreen]
+* Compact View =>  menu:Display[Compact View], or click on image:lc_sidebar.svg[width=25]
+* Close Lateral Panel => menu:Display[Close Panel]
+* Save file to create a new version on the Intranet (click on image:lc_save.svg[width=25] or press btn:[CTRL + S])
+
 
 == Video
 

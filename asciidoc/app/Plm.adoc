@@ -49,6 +49,25 @@ On a Linux server, it is better to install the following packages from your dist
 
 Freecad must use Qt6 for Weston and Wayland. The PLM module will launch FreeCAD in a Weston desktop using the Framebuffer, so nothing is chown.
 
+.Check FreeCAD is linked against Qt6 on Linux / Mac
+[source,bash]
+----
+ldd /bin/freecad | grep Qt
+    libQt6Widgets.so.6 => /usr/lib/libQt6Widgets.so.6 (0x00007f5b0dc00000)
+    libQt6Gui.so.6 => /usr/lib/libQt6Gui.so.6 (0x00007f5b0d200000)
+    libQt6Core.so.6 => /usr/lib/libQt6Core.so.6 (0x00007f5b0ca00000)
+    libQt6PrintSupport.so.6 => /usr/lib/libQt6PrintSupport.so.6 (0x00007f5b12595000)
+    libQt6SvgWidgets.so.6 => /usr/lib/libQt6SvgWidgets.so.6 (0x00007f5b12589000)
+    libQt6Network.so.6 => /usr/lib/libQt6Network.so.6 (0x00007f5b0b609000)
+    libQt6UiTools.so.6 => /usr/lib/libQt6UiTools.so.6 (0x00007f5b0f96c000)
+    libQt6Xml.so.6 => /usr/lib/libQt6Xml.so.6 (0x00007f5b0efd8000)
+    libQt6Svg.so.6 => /usr/lib/libQt6Svg.so.6 (0x00007f5b0eb57000)
+    libQt6OpenGLWidgets.so.6 => /usr/lib/libQt6OpenGLWidgets.so.6 (0x00007f5b0efca000)
+    libQt6OpenGL.so.6 => /usr/lib/libQt6OpenGL.so.6 (0x00007f5b0d157000)
+    libQt6DBus.so.6 => /usr/lib/libQt6DBus.so.6 (0x00007f5b0c933000)
+----
+
+
 === Configure the PLM Server
 
 If you want just an overview, you can download the demo server, with default configuration, go directly in <<_launch_server_binaries>>.
