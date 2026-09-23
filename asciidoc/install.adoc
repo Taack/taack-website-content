@@ -4,7 +4,7 @@
 
 To get started, make sure the following tools are installed on your machine:
 
-* *Java* (JDK 17 or JDK 24)
+* *Java* (JDK 25 ...)
 * *Git*
 * https://github.com/unoconv/unoserver[unoserver]
 
@@ -15,16 +15,16 @@ To get started, make sure the following tools are installed on your machine:
 .Install JDK 24 and Git using Homebrew
 [source,bash]
 ----
-$ brew install openjdk@24
+$ brew install openjdk@25
 $ brew install git
 ----
 
 ==== Windows (Winget)
 
-.Install JDK 24 and Git using Winget
+.Install JDK 25 and Git using Winget
 [source,bash]
 ----
-winget install --id Microsoft.OpenJDK.24
+winget install --id Microsoft.OpenJDK.25
 winget install --id Git.Git
 ----
 
@@ -158,14 +158,13 @@ We recommend installing the *IntelliJ Taack Plugin* which you can install from t
 
 Open the project, go to File > Open... and select `intranet/settings.gradle`.
 
-Make sure that Gradle is using JDK 17 (or 24):
+Make sure that Gradle is using JDK 25:
 
-.Open Gradle Settings
-image:open-settings-gradle-intellij.webp[]
+.Open Gradle Settings and Check Gradle JDK Version
+image:install-java25-gradle-select.webp[]
 
-.Check Gradle JDK Version
-image:settings-gradle-intellij.webp[]
-
+<1> Open Gradle Settings
+<2> Check Gradle JVM version is 25 (The provider can be anything)
 
 === Visual Studio Code
 
