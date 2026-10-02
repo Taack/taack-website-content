@@ -5,6 +5,54 @@
 :source-highlighter: rouge
 :icons: font
 
+== Version 0.7.9
+
+* Allow IN or NOT IN over an HQL inner query, see <<filterFieldExpressionReverse>>
+* Grails 7.2.4
+* Improve Diagrams
+
+[[filterFieldExpressionReverse]]
+.New filter filterFieldExpressionReverse
+====
+.filterFieldExpressionReverse filter
+[source,groovy]
+----
+def parentParts() {
+    UiFilterSpecifier f = new UiFilterSpecifier().sec PlmFreeCadPart, {         <1>
+        PlmFreeCadLink link = new PlmFreeCadLink()
+        filterFieldExpressionReverse(link.part_,                                <2>
+                true,                                                           <3>
+                new FilterExpression(null as Object, Operator.NE, link.part_))  <4>
+    }
+    taackUiService.show(new UiBlockSpecifier().ui {
+        tableFilter(plmFreeCadUiService.buildPartFilter(), plmFreeCadUiService.buildPartTable(null, f), {
+            menuIcon ActionIcon.GRAPH, this.&model as MC
+        })
+    }, buildMenu())
+}
+----
+<1> We are building a filter for `PlmFreeCadPart`
+<2> We want to list parent assemblies, the one for which `PlmFreeCadLink part` field does not point to listed  `PlmFreeCadPart`
+<3> `true` stands for `notIn`
+<4> Literally: we want all *PlmFreeCadPart* that are not children
+
+.Generated HQL
+[source,hql]
+----
+select
+    distinct sc  ,sc.dateCreated
+from PlmFreeCadPart sc
+where
+    sc.id NOT IN (select auo.part.id from PlmFreeCadLink auo where auo.part IS NOT NULL)    <1>
+    and sc.nextVersion IS NULL
+order by sc.dateCreated DESC
+----
+
+<1> Added where closure by the `filterFieldExpressionReverse` expression
+
+====
+
+
 == Version 0.7.8
 
 * Maintenance Release
