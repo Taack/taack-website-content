@@ -19,54 +19,6 @@ See link:Crew.adoc#_purpose[configure roles in Crew] to add the role into your I
 
 == Server Installation
 
-=== Install everything in a new user (optional)
-
-It is better to isolate Freecad in a specific user, in order to not override your Freecad configuration for your user.
-
-To do so:
-
-. create a new user:
-+
-[source,bash]
-----
-sudo useradd plm --create-home
-----
-. Add current `plm` group to current user
-+
-[source,bash]
-----
-sudo usermod -a -G plm <current user>
-----
-. Eventually change right of `plm` to allow group `rxw`
-. Restart logout / login cycle or restart to apply group change to your user
-
-=== Prepare FreeCAD to be used by the server
-
-On a Linux server, it is better to install the following packages from your distribution:
-
-* #Weston# Wayland server
-* #FreeCAD >1.0#
-
-Freecad must use Qt6 for Weston and Wayland. The PLM module will launch FreeCAD in a Weston desktop using the Framebuffer, so nothing is chown.
-
-.Check FreeCAD is linked against Qt6 on Linux / Mac
-[source,bash]
-----
-ldd /bin/freecad | grep Qt
-    libQt6Widgets.so.6 => /usr/lib/libQt6Widgets.so.6 (0x00007f5b0dc00000)
-    libQt6Gui.so.6 => /usr/lib/libQt6Gui.so.6 (0x00007f5b0d200000)
-    libQt6Core.so.6 => /usr/lib/libQt6Core.so.6 (0x00007f5b0ca00000)
-    libQt6PrintSupport.so.6 => /usr/lib/libQt6PrintSupport.so.6 (0x00007f5b12595000)
-    libQt6SvgWidgets.so.6 => /usr/lib/libQt6SvgWidgets.so.6 (0x00007f5b12589000)
-    libQt6Network.so.6 => /usr/lib/libQt6Network.so.6 (0x00007f5b0b609000)
-    libQt6UiTools.so.6 => /usr/lib/libQt6UiTools.so.6 (0x00007f5b0f96c000)
-    libQt6Xml.so.6 => /usr/lib/libQt6Xml.so.6 (0x00007f5b0efd8000)
-    libQt6Svg.so.6 => /usr/lib/libQt6Svg.so.6 (0x00007f5b0eb57000)
-    libQt6OpenGLWidgets.so.6 => /usr/lib/libQt6OpenGLWidgets.so.6 (0x00007f5b0efca000)
-    libQt6OpenGL.so.6 => /usr/lib/libQt6OpenGL.so.6 (0x00007f5b0d157000)
-    libQt6DBus.so.6 => /usr/lib/libQt6DBus.so.6 (0x00007f5b0c933000)
-----
-
 
 === Configure the PLM Server
 
@@ -96,20 +48,6 @@ OR
 git clone git@github.com:Taack/plm.git
 ----
 
-.Edit the `server/grails-app/conf/application.yml` adding the following variables:
-[source,yaml]
-----
-# PLM
-plm.freecadPath: ${HOME}/freecad-app-link
-----
-
-.Copy freecad launch script
-[source,bash]
-----
-cd
-cp plm/freecad-app-link-distrib.sh freecad-app-link
-----
-
 From here, you can build the server or run it. Change current directory to the intranet folder and either:
 
 .Build the server binaries (for production environment)
@@ -123,7 +61,6 @@ From here, you can build the server or run it. Change current directory to the i
 ----
 ./gradlew bootRun
 ----
-
 
 === Launch Server Binaries
 
@@ -154,51 +91,8 @@ java -DOption1=Value1 -DOption2=Value2 ... -jar server-0.3.jar
 * Path the Intranet store its files: `-Dintranet.root=/home/test/someDir`
 * Server port: `-Dserver.port=9444`
 * Database url: `-DdataSource.url='jdbc:h2./prodDb2;LOCK_TIMEOUT=10000;DB_CLOSE_ON_EXIT=FALSE'`
-* Freecad path: `-Dplm.freecadPath=/somePath...`
 * Dot exe path: `-Dexe.dot.path=/somePath...`
 
-.Current Configuration in `server/grails-app/conf/application.yml`
-[source,yaml]
-----
-plm:
-  freecadPath: ${HOME}/freecad-app-link
-----
-
-=== Install from Source
-
-Clone the #plm# repository:
-
-[source,bash]
-.Clone PLM repository
-----
-git clone https://github.com/Taack/plm.git
-----
-
-Then copy the content of the `plm` folder into your intranet `app` folder (see link:../installation.adoc[intranet installation])
-
-Set the FreeCAD path in the `server/conf/application.yml` file.
-
-In the `plm` folder, you have 2 scripts you can use : `freecad-app-link-distrib.sh` if you use your distribution version of FreeCAD or `freecad-app-link-flatpak.sh` if you choose to install FreeCAD using Flatpak
-
-Create a symlink in your home folder pointing to one of those scripts `ln -s <path-to-plm-folder>/freecad-app-link-distrib.sh freecad-app-link`.
-
-Start your intranet issuing under the `intranet` folder:
-
-[source,bash]
-.Run Server from Source
-----
-./gradlew server:bootRun
-----
-
-You can produce a Jar file:
-
-[source,bash]
-.Build Server Binary from Source
-----
-./gradlew server:assemble
-----
-
-The server will be located under `server/build/libs`
 
 [[python-protobuf-install]]
 == FreeCAD Workbench Installation
