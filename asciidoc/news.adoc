@@ -5,6 +5,11 @@
 :source-highlighter: rouge
 :icons: font
 
+== Version 0.7.10 and 0.7.11
+
+* New Themes (click on image:https://taack.org/assets/taack/icons/actions/config.svg[] and select theme)
+* Rework save to avoid bind
+
 == Version 0.7.9
 
 * Allow IN or NOT IN over an HQL inner query, see <<filterFieldExpressionReverse>>

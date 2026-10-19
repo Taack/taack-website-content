@@ -1,3 +1,0 @@
-= Groovy 文档
-:doctype: book
-:taack-category: X|more
