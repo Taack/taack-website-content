@@ -56,15 +56,13 @@ def editSlideshow(CmsPage slideshow) {
 
 <1> 1 row 2 columns
 <2> Declare 2 tabs inside, the first one is displayed when the page appear
-<3> Send the bloc along with the menu description to the browser.
+<3> Send the block along with the menu description to the browser.
 
 == Modal Stack Code Sample
 
 After processing a form, you can refresh the content of the page, or another modal below the current one. You also can reload the page, or display another page. Reloading the page allows the code to be reusable, since it does not depend on the current URL (remember the `redirectAction` *params* you see in link:../../first-app.adoc#_adding_buttons_to_a_table_block[First App (Adding buttons to a table block)] .
 
 Usually a modal is closed after processing a form. Either it is not valid, and errors are shown into the browser directly into the form, either we save the object and refresh the content.
-
-See
 
 === Close Modal and reload the page
 
@@ -93,28 +91,159 @@ def saveCmsPage() {
 ----
 <1> The method closure in this controller will be loaded (respecting URL Mappings)
 
+=== Close Modal and refresh the modal below
+
+[source,groovy]
+----
+@Transactional
+@Secured(['ROLE_ADMIN'])
+def saveLlmRag() {
+    taackSaveService.saveOrCloseModalAndRefresh(LlmRag)  <1>
+}
+----
+<1> If no error is detected, the last modal is closed and the content below (page or previous modal) is refreshed
+
 === Close Modal and refresh page ajax blocks
 
 .Complex Use Case: close the modal window and refresh ajaxBlock present in the page
 [source,groovy]
 ----
-taackSaveService.saveThenDisplayBlockOrRenderErrors(
-    EngineeringChangeRequest,                                   <1>
-    new UiBlockSpecifier().ui {                                 <2>
-        closeModalAndUpdateBlock {                              <3>
-            show buildShowProjects(ecr), {
-                    menuIcon
-                        ActionIcon.ADD,
-                        Ecr2Controller.&projectsForm as MC, ecr.id
+@Transactional
+def saveProjects() {
+    EngineeringChangeRequest ecr = taackSaveService.save(EngineeringChangeRequest) <1>
+    taackSaveService.displayBlockOrRenderErrors(ecr,
+        new UiBlockSpecifier().ui {                                             <2>
+            closeModalAndUpdateBlock {                                          <3>
+                show buildShowProjects(ecr), {
+                    menuIcon ActionIcon.ADD, Ecr2Controller.&projectsForm as MC, ecr.id
+                }
+            }
+        }
+    )
+}
+----
+
+<1> Bind the parameters and save the object
+<2> `displayBlockOrRenderErrors` takes a `UiBlockSpecifier` as parameter, rendered only if the object has no error
+<3> `closeModalAndUpdateBlock` will first close the last opened modal and then apply the modification
+
+=== Replace the content of a modal
+
+[source,groovy]
+----
+taackUiService.show(new UiBlockSpecifier().ui {
+    replaceModal {                                      <1>
+        custom "<h1>Done.</h1>"
+    }
+})
+----
+<1> The content of the current modal is replaced, without opening a new one
+
+== Layout Elements
+
+[source,groovy]
+.Rows, Columns, Accordion, Card and ScrollPanel
+----
+new UiBlockSpecifier().ui {
+    row {
+        col BlockSpec.Width.TWO_THIRD, {                <1>
+            card 'Customers', {                         <2>
+                menu 'Export', this.&export as MC
+            }, {
+                scrollPanel '512px', {                  <3>
+                    table buildCustomerTable()
+                }
+            }
+        }
+        col BlockSpec.Width.THIRD, {
+            accordion {                                 <4>
+                accordionItem 'Filter', true, {
+                    form buildFilterForm()
+                }
             }
         }
     }
-)
+}
 ----
+<1> `col` width, from `BlockSpec.Width`: `MAX`, `THREE_QUARTER`, `TWO_THIRD`, `HALF` (default), `THIRD`, `QUARTER` or `FLEX`
+<2> `card` with an optional title, an optional menu closure and its content
+<3> `scrollPanel` limits the height of its content, adding a scrollbar if needed
+<4> `accordion` contains `accordionItem`, the second parameter tells if the item is opened by default
 
-<1> After an action implying to save an object is called into a modal, you can close the modal and refresh page elements in one action
-<2> `saveThenDisplayBlockOrRenderErrors` take a `UiBlockSpecifier` as parameter
-<3> `closeModalAndUpdateBlock` will first close the last opened modal and then apply the modification
+[source,groovy]
+.Refresh only some blocks with `poke`
+----
+def topCustomerSalesCard(StatsParams statsParams) {
+    boolean p0 = statsParams.v == 0
+    boolean p1 = statsParams.v == 1
+    boolean p2 = statsParams.v == 2
+
+    taackUiService.show(new UiBlockSpecifier().ui {
+        poke p0, {
+            table statsService.buildTable()                         <1>
+        }
+        row {
+            poke p1, {                                              <2>
+                col BlockSpec.Width.HALF, {
+                    card({                                          <3>
+                        label 'Sales1'
+                        menu 'Yearly', StatsController.&topCustomerSalesCard as MC,
+                            new StatsParams(showMonthlyGraph1: false, v: 1)
+                        menu 'Monthly', StatsController.&topCustomerSalesCard as MC,
+                            new StatsParams(groupPerMonth1: false, v: 1)
+                    }, {
+                        diagram statsService.&buildChart1 as MC     <4>
+                    })
+                }
+            }
+            poke p2, {
+                col BlockSpec.Width.HALF, {
+                    diagram(statsService.&buildChart2 as MC) {      <5>
+                        label 'Sales2'
+                        menu 'Yearly', StatsController.&topCustomerSalesCard as MC,
+                            new StatsParams(showMonthlyGraph2: false, v: 2)
+                    }
+                }
+            }
+        }
+    }, RootController.buildMenu(), statsParams)                     <6>
+}
+----
+<1> Table rows link to this action with `v: 1` or `v: 2`, refreshing only one of the diagrams
+<2> `p1` and `p2` are booleans. If true, blocks inside the `poke` block are refreshed
+<3> `card` with a menu closure and a content closure
+<4> `diagram` can take a `MethodClosure` returning an `UiDiagramSpecifier`
+<5> Any leaf can take a menu closure, displayed in its header
+<6> `StatsParams` is a `Validateable`, its values are kept when clicking on links
+
+.Cards, Diagrams and `poke`
+image::screenshot-dsl-block-poke.webp[]
+
+== Block DSL Elements
+
+=== Containers
+* `modal`: open a modal window, `modal(true) {}` reloads the page when the modal is closed
+* `replaceModal`: replace the content of the current modal
+* `closeModalAndUpdateBlock`: close the last modal and update blocks of the page (or of the previous modal)
+* `closeModal`: close the modal and transmit an id and a value to the form that opened it (used by `ajaxField` selections)
+* `ajaxBlock`: surround other elements and allows to update only a portion of the page
+* `row`, `col`: arrange elements horizontally, see `BlockSpec.Width`
+* `tabs`, `tab`: tabs, the first one is displayed by default
+* `accordion`, `accordionItem`: collapsible elements
+* `card`: card with a title and a menu
+* `scrollPanel`: element with a maximum height
+* `poke`: refresh the content only if the condition is true
+
+=== Leaves
+All leaves can take an optional closure describing a menu (see link:menu-dsl.adoc[Menu DSL]) displayed in the block header.
+
+* `form`: see link:form-dsl.adoc[Form DSL]
+* `show`: see link:show-dsl.adoc[Show DSL]
+* `table`, `tableFilter`: see link:filter-table-dsl.adoc[FilterTable DSL]
+* `diagram`, `diagramFilter`: see link:diagram-dsl.adoc[Diagram DSL]
+* `kanban`, `kanbanFilter`: see link:kanban-dsl.adoc[Kanban DSL]
+* `custom`: custom HTML code
+* `iframe`: display an URL into an iframe
 
 == Block DSL Symbols Hierarchy
 
@@ -123,12 +252,12 @@ taackSaveService.saveThenDisplayBlockOrRenderErrors(
 ----
 digraph mygraph {
   node [shape=box];
-  ui -> modal, closeModalAndUpdateBlock [label = "0,1"]
-  closeModalAndUpdateBlock -> tabs [label = "1,N"]
-  ui, modal -> row, tabs [label = "0,1"]
+  ui -> modal, replaceModal, closeModalAndUpdateBlock [label = "0,1"]
+  ui, modal, replaceModal, closeModalAndUpdateBlock -> row, tabs, accordion, card, scrollPanel, poke [label = "0,N"]
   row -> col [label = "1,N"]
   tabs -> tab [label = "1,N"]
-  ui, modal, tab, col -> form, show, tableFilter, table, diagram, custom [label = "1,N"]
+  accordion -> accordionItem [label = "1,N"]
+  ui, modal, tab, col, accordionItem, card, scrollPanel, poke -> form, show, table, tableFilter, diagram, diagramFilter, kanban, kanbanFilter, custom, iframe [label = "0,N"]
 }
 ----
 

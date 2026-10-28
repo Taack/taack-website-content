@@ -15,7 +15,7 @@
 .Filter applied to a table, from <<filter-sample1>>
 image::screenshot-dsl-filter.webp[width=250,align=center]
 
-Filter DSL is always associated with a Table or a Chart. A bloc cannot contain only a filter.
+Filter DSL is always associated with a Table, a Diagram or a Kanban. A block cannot contain only a filter.
 
 [[filter-code-sample]]
 === Code Sample
@@ -32,14 +32,18 @@ f.ui User, {                                            <2>
         filterField u.lastName_
         filterField u.firstName_
         filterField u.manager_, u.manager.username_     <5>
-        filterField u.mainSubsidiary_
-        filterField u.allowedSubsidiaries_
+        filterField u.subsidiary_
+        filterField u.businessUnit_
         filterField u.enabled_
-        filterFieldExpressionBool "My Team",            <6>
-            new FilterExpression(u.selfObject_,
+        filterFieldExpressionBool "My Team", true,      <6>
+            new FilterExpression(cu.allManagedUsers*.id,
                     Operator.IN,
-                    cu.allManagedUsers_),
-            true
+                    u.selfObject_)
+    }
+    section "Role", {
+        UserRole ur = new UserRole(role: new Role())
+        filterFieldInverse "Role", UserRole,            <7>
+            ur.user_, ur.role_, ur.role.authority_
     }
 }
 ----
@@ -49,7 +53,8 @@ f.ui User, {                                            <2>
 <3> Create a section labeled "User"
 <4> Add field to the filter, note the *underscore* at the end of the field name
 <5> if the field is an object, pass an array with all steps necessary to target the field you want to filter on
-<6> `filterFieldExpressionBool` allow more complex filter
+<6> `filterFieldExpressionBool` allows more complex filters, displayed as a checkbox; `true` is the default value
+<7> `filterFieldInverse` filters users pointed by a `UserRole` whose role authority matches
 
 [source,groovy]
 [[sample2]]
@@ -77,18 +82,67 @@ f
 
 <1> We can pass optional parameters to the action
 
+[source,groovy]
+[[filter-sample-join]]
+.Reusing Filters
+----
+UiFilterSpecifier createReminderFilter(FieldInfo... leftField) {
+    Reminder r = new Reminder()
+    User u = new User()
+    new UiFilterSpecifier(leftField).ui Reminder, {     <1>
+        section Reminder, {                             <2>
+            filterField r.assignee_, u.username_
+            filterField r.status_
+            filterField r.title_
+        }
+    }
+}
+
+UiFilterSpecifier createReminderLinkFilter(FieldInfo... leftField) {
+    ReminderLink rl = new ReminderLink()
+    new UiFilterSpecifier(leftField).ui(ReminderLink, {
+        section 'Link', {
+            filterField rl.kind_
+        }
+    }).join(createReminderFilter(rl.reminder_))         <3>
+}
+----
+
+<1> `leftField` lists the fields pointing to a `Reminder` from the embedding object
+<2> The section label is computed from the class (i18n)
+<3> The `reminder` field is a `Reminder`, we reuse the filter for the `Reminder` class
+
+.Joined Filters
+image::screenshot-dsl-filter-join.webp[]
+
+[source,groovy]
+[[filter-sample-reverse]]
+.Filter on objects pointing to the filtered ones
+----
+UiFilterSpecifier f = new UiFilterSpecifier().sec PlmFreeCadPart, {  <1>
+    PlmFreeCadLink link = new PlmFreeCadLink()
+    filterFieldExpressionReverse link.part_, true,                  <2>
+        new FilterExpression(null as Object, Operator.NE, link.part_)
+}
+----
+
+<1> `sec` creates a filter without graphical part, always applied (for example for security purposes)
+<2> List only parts that are not referenced by a `PlmFreeCadLink` (`true` stands for `NOT IN`). It generates `sc.id NOT IN (select l.part.id from PlmFreeCadLink l where l.part IS NOT NULL)`
+
 === DSL Symbols Hierarchy
 
 [graphviz,format="svg",align=center]
-.Symbols hierachy diagram for Filter DSL
+.Symbols hierarchy diagram for Filter DSL
 ----
 digraph mygraph {
   node [shape=box];
   "ui"
   "ui" -> hiddenId [label = "0,1"]
   "ui" -> "section" [label = "1,N"]
+  "ui" -> "filterAction" [label = "0,1"]
   "section" -> "section"
-  "section" -> "filterField", "filterFieldExpressionBool", "filterFieldInverse" [label = "0,N"]
+  "section" -> "filterField", "filterFieldInverse" [label = "0,N"]
+  "ui", "section" -> "filterFieldExpressionBool", "filterFieldExpressionReverse", "orOp", "andOp", "innerFilter" [label = "0,N"]
 }
 ----
 
@@ -96,14 +150,20 @@ digraph mygraph {
 
 === Root
 * `ui`: one version allows passing additional parameters to the filter action (see <<sample2>>)
+* `sec`: filter without graphical part, applied in addition to the displayed filter
+* `join`: add the filter of a related class (see <<filter-sample-join>>)
 
 === Inputs
 * `filterField`: add object field to be transmitted to the filter action
 * `filterFieldInverse`: filter objects if another object points to it.
-* `filterFieldExpressionBool`: allows changing where clause in the filter action by using FilterExpression, last parameter is the default value.
+* `filterFieldExpressionBool`: allows changing where clause in the filter action by using `FilterExpression`, displayed as a checkbox, the second parameter is the default value.
+* `filterFieldExpressionReverse`: `IN` or `NOT IN` over an inner query (see <<filter-sample-reverse>>)
+* `orOp`, `andOp`: combine expressions
+* `innerFilter`: reuse another filter on a field
 
 === Structure
-* `section`: add a graphical filter section
+* `section`: add a graphical filter section, labeled by a string or a class, optionally collapsed
+* `filterAction`: custom filter button
 
 == Table
 
@@ -111,32 +171,29 @@ digraph mygraph {
 * [*] Rendered into PDF
 * [*] Rendered into CSV
 
-image::screenshot-dsl-table.webp[width=250,align=center]
+image::screenshot-dsl-table.webp[width=720,align=center]
 === Code Sample
 
 The right part of the preview corresponds to the DSL sample below.
-The filter is on the left of the image, see <<DslDescriptions/FilterDSL.adoc#filter-sample1>> for the corresponding code.
+The filter is on the left of the image, see <<filter-sample1>> for the corresponding code.
 
 The table has *pagination*, it is sorted by default against *Date Created* column, all columns are *sortable* except Picture and Roles.
 One column can contain multiple cells.
-Date Created is empty for old users, and manager cells are also empty for some users.
+Only the users of the current user team are listed, since "My Team" is checked by default in the filter.
 
 
 [source,groovy]
 [[table-sample1]]
-.Table Sample: Header, Rows, multi selection and a default sorting
+.Table Sample: Header, Rows and a default sorting
 ----
 new UiTableSpecifier().ui {
     User u = new User(manager: new User(), enabled: true)
     header {                                                <1>
-        columnSelect "selectedUsers", {                     <2>
-            columnSelectButton tr("action.label"), CrewController.&doSomethingForSelectedUsers as MC
+        column {
+            label tr('picture.header.label')                <2>
         }
         column {
-            label tr('picture.header.label')                <3>
-        }
-        column {
-            sortableFieldHeader u.username_                 <4>
+            sortableFieldHeader u.username_                 <3>
             sortableFieldHeader u.dateCreated_
         }
         column {
@@ -147,23 +204,26 @@ new UiTableSpecifier().ui {
             sortableFieldHeader u.lastName_
             sortableFieldHeader u.firstName_
         }
-        label tr('default.roles.label')                     <5>
+        label tr('default.roles.label')                     <4>
     }
 
     TaackFilter tf = taackFilterService.getBuilder(User)
             .setSortOrder(TaackFilter.Order.DESC, u.dateCreated_)
             .setMaxNumberOfLine(20).addFilter(f).build()
 
-    iterate(tf) { User ru ->                                <6>
-        rowSelect ru.id.toString(), true                    <7>
-        rowField attachmentUiService.preview(ru.mainPicture?.id)
+    iterate(tf) { User ru ->                                <5>
+        rowFieldRaw attachmentUiService.preview(ru.mainPicture?.id)
         rowColumn {
+            rowAction ActionIcon.SHOW * IconStyle.SCALE_DOWN,   <6>
+                CrewController.&showUser as MC, ru.id
+            rowAction ActionIcon.EDIT * IconStyle.SCALE_DOWN,
+                CrewController.&editUser as MC, ru.id
             rowField ru.username_
             rowField ru.dateCreated_
         }
         rowColumn {
             rowField ru.subsidiary_
-            rowField ru.manager_
+            rowField ru.manager?.username
         }
         rowColumn {
             rowField ru.lastName_
@@ -174,16 +234,99 @@ new UiTableSpecifier().ui {
 }
 ----
 <1> Header part of the table specifications
-<2> Multiple selection part of the table
-<3> Non-sortable field header
-<4> Sortable field header
-<5> It could be wrapped *without* `column` if only one field
-<6> `iterate`, specifying sort, paginate and filtering
-<7> Checkbox in the column corresponding to the `columnSelect` in header
+<2> Non-sortable field header
+<3> Sortable field header
+<4> It could be wrapped *without* `column` if only one field
+<5> `iterate`, specifying sort, paginate and filtering
+<6> Icons calling actions, displayed before the field values
 
-`ActionIcon` can be modified by `ActionIconModifier`
+[source,groovy]
+[[table-sample-select]]
+.Multiple selection
+----
+header {
+    columnSelect "selectedUsers", {                         <1>
+        columnSelectButton "Disable", CrewController.&disableUsers as MC
+    }
+    // ...
+}
+iterate(tf) { User ru ->
+    rowSelect ru.id.toString(), true                        <2>
+    // ...
+}
+----
+<1> Multiple selection column, with the buttons calling actions on selected rows
+<2> Checkbox in the column corresponding to the `columnSelect` in header
 
-Table style is specified by `Style` an optional parameter on `row` or `rowField` element.
+`ActionIcon` can be modified by `IconStyle` (e.g. `ActionIcon.EDIT * IconStyle.SCALE_DOWN`).
+
+Table style is specified by `Style`, an optional parameter on `row`, `rowColumn` or `rowField` elements.
+
+[[table-filter-layout]]
+=== Filter Layout
+
+[source,groovy]
+----
+new UiBlockSpecifier().ui {
+    tableFilter FilterLayout.TOOLBAR, buildFilter(), buildTable(), {  <1>
+        menuIcon ActionIcon.ADD, this.&editUser as MC                 <2>
+    }
+}
+----
+
+<1> `FilterLayout.TOOLBAR` displays the filter as a bar above the table, `FilterLayout.SIDE` in a column beside the table (default)
+<2> Menu displayed in the block header
+
+[[table-option]]
+=== Table Options
+
+[source,groovy]
+----
+TableOption tableOption = TableOption.builder
+        .stickyColumns(2)                           <1>
+        .onDropAction(this.&dropOnTable as MC)      <2>
+        .headerTheme(Style.BLUE)                    <3>
+        .build()
+
+new UiTableSpecifier().ui tableOption, {
+    // ...
+}
+----
+
+<1> Number of leftmost columns that stay visible while the table scrolls horizontally
+<2> Action called when files are dropped on the table (`cellDropAction` does the same on a cell)
+<3> Header color
+
+[[table-inline-edit]]
+=== Inline Edition
+
+[source,groovy]
+----
+iterate(tf) { LeadLine ll ->
+    rowQuickEdit(CrmController.&applyLeadLine as MC, ll.id) {   <1>
+        rowColumn {
+            rowFieldEdit ll.salePrice_                          <2>
+            rowFieldEdit ll.qty_
+            rowField ll.total, nf                               <3>
+        }
+    }
+}
+
+@Transactional
+def applyLeadLine() {
+    LeadLine ll = new LeadLine()
+    taackSaveService.saveThenReloadOrRenderErrors(LeadLine,
+            [ll.qty_, ll.salePrice_] as FieldInfo[])            <4>
+}
+----
+
+<1> `rowQuickEdit` declares which action to call when a value is edited
+<2> `rowFieldEdit` edits the value in an input field, or displays it if the user cannot call the action
+<3> Other fields are recomputed after edition
+<4> Fields that are not editable in the table (`lockedFields`)
+
+.Inline Edit with Localized Error Feedback
+image::screenshot-dsl-inline-edit.webp[]
 
 === DSL Symbols Hierarchy
 
@@ -195,10 +338,12 @@ digraph mygraph {
   ui
   ui -> header, iterate [label = "0,1"]
   ui -> row,rowIndent [label = "0,N"]
-  header -> column [label = "0,N"]
+  header -> column, columnSelect [label = "0,N"]
+  columnSelect -> columnSelectButton [label = "1,N"]
   column, header -> label, sortableFieldHeader [label = "1,N"]
-  row, iterate, rowTree -> rowColumn [label = "0,N"]
-  rowColumn, row, rowTree, iterate -> rowAction, rowField, rowFieldRaw, rowSelect [label = "0,N"]
+  row, iterate, rowTree -> rowColumn, innerRow, rowQuickEdit [label = "0,N"]
+  rowQuickEdit -> rowColumn [label = "0,N"]
+  rowColumn, row, rowTree, iterate -> rowAction, rowField, rowFieldEdit, rowFieldRaw, rowSelect, cellDropAction [label = "0,N"]
   rowIndent -> rowTree [label = "0,N"]
   rowIndent -> rowIndent [label = "0,N"]
 }

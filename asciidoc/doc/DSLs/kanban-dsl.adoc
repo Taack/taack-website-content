@@ -19,10 +19,12 @@ image:screenshot-dsl-kanban.webp[]
 ----
 UiKanbanSpecifier buildTodoKanban() {
     new UiKanbanSpecifier().ui {                                                                   <1>
-        column 'HeaderStr', Style.ALIGN_CENTER, Gantt2Controller.&changeTodoProgression as MethodClosure, [newProgression: 0], {    <2>
+        column 'To Do', Style.ALIGN_CENTER, {                                                      <2>
+            custom "Custom header html code"
+        }, Gantt2Controller.&changeTodoProgression as MethodClosure, [newProgression: 0], {
             custom "Custom html code"                                                              <3>
             todos.forEach { Todo todo ->
-                card todo, Gantt2Controller.&showTodo as MethodeClosure, todo.id, {                <4>
+                card todo, Gantt2Controller.&showTodo as MethodClosure, todo.id, {                 <4>
                     cardField todo.what_                                                           <5>
                     cardFieldRaw "Custom html code"                                                <6>
                     cardAction ActionIcon.SHOW * IconStyle.SCALE_DOWN, Gantt2Controller.&doSomething as MethodClosure, todo.id   <7>
@@ -31,7 +33,17 @@ UiKanbanSpecifier buildTodoKanban() {
         }
     }
 }
+----
 
+[source,groovy]
+.Drop action
+----
+@Transactional
+def changeTodoProgression(Integer newProgression) {
+    Todo todo = Todo.get(params.long('cardId'))                                                    <10>
+    todo.progression = newProgression
+    render status: 200
+}
 ----
 
 [source,groovy]
@@ -39,14 +51,14 @@ UiKanbanSpecifier buildTodoKanban() {
 ----
 @PostConstruct
 void init() {
-    TaackUiService.registerContextualMenuClosure(Todo, new UiMenuSpecifier().ui {               <8>
-        menu 'Show Gantt', Gantt2Controller.&showGanttByTodo as MethodClosure, [id: this.params['id']]    <9>
-    }
+    TaackUiService.registerContextualMenuClosure(Todo, new UiMenuSpecifier().ui { Long id ->    <8>
+        menu 'Show Gantt', Gantt2Controller.&showGanttByTodo as MethodClosure, id                 <9>
+    })
 }
 ----
 
 <1> Create the kanban specifier
-<2> Build kanban column and column header, could pass an action and params as kbd:[Drag+Drop] for the column
+<2> Build kanban column with its label, style and an optional header closure (`custom` only), could pass an action and params called on kbd:[Drag+Drop] into the column
 <3> Could add custom html code for the column body
 <4> Build cards in the column, could pass an action and params as kbd:[MouseDoubleClic] for the card
 <5> Build a line with field in the card, note the *underscore* at the end of the field name
@@ -54,6 +66,16 @@ void init() {
 <7> Could add an icon with action bind to clic
 <8> Register contextmenu as kbd:[MouseRight] for the card
 <9> Add a menu item with action bind
+<10> The dropped card id is transmitted via the `cardId` parameter, along with the column params
+
+To display the Kanban in a block, use `kanban` or `kanbanFilter` to associate a filter:
+
+[source,groovy]
+----
+taackUiService.show(new UiBlockSpecifier().ui {
+    kanbanFilter buildTodoFilter(), buildTodoKanban()
+}, buildMenu())
+----
 
 == DSL Symbols Hierarchy
 [graphviz,format="svg",align=center]
@@ -62,6 +84,8 @@ void init() {
 digraph kanbanDslGraph {
   node [shape=box];
   ui -> column [label = "0,N"]
+  column -> header [label = "0,1"]
+  header -> custom [label = "0,N"]
   column -> custom, card [label = "0,N"]
   card -> cardField, cardFieldRaw, cardAction [label = "0,N"]
 }
