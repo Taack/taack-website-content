@@ -112,10 +112,11 @@ digraph mygraph {
 * [*] Rendered into CSV
 
 image::screenshot-dsl-table.webp[width=250,align=center]
+
 === Code Sample
 
 The right part of the preview corresponds to the DSL sample below.
-The filter is on the left of the image, see <<DslDescriptions/FilterDSL.adoc#filter-sample1>> for the corresponding code.
+The filter is on the left of the image, see <<filter-sample1>> for the corresponding code.
 
 The table has *pagination*, it is sorted by default against *Date Created* column, all columns are *sortable* except Picture and Roles.
 One column can contain multiple cells.
