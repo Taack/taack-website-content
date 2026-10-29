@@ -8,25 +8,22 @@ include::_settings_reveal.adoc[]
 :customcss: custom.css
 :taack-height: 512
 
-= French Slides
+= Taack UI
 
-== User Interface https://en.wikipedia.org/wiki/Domain-specific_language[*DSL*]
+[.hero,transition=zoom]
+== Build your intranet in [.accent]#Groovy#
 
-DSL (#Domain Specific Language#)
+[.lead]
+Typed DSLs for Grails: no HTML, no JavaScript
 
-[transition=zoom]
-=== Advantages
+[.chips]
+[.chip]#HTML# [.chip]#PDF# [.chip]#CSV# [.chip]#Mail#
 
-** More expressive
-** Static check at compile time
-** No JavaScript / HTML Needed
+[.columns.split,transition=slide]
+== Describe, don't template
 
-[transition=concave,transition-speed=fast,transition-background=zoom]
-== Forms
-
-[%notitle,transition=zoom]
-=== Form Sample
-
+[.column]
+--
 [source,groovy]
 ----
 new UiFormSpecifier().ui user, {
@@ -34,44 +31,101 @@ new UiFormSpecifier().ui user, {
         field user.username_
         field user.firstName_
         field user.lastName_
-        ajaxField user.manager_, this.&selectUser
-        field user.password_
+        ajaxField user.manager_,
+            this.&selectUser
     }
-// [ . . . ]
+    formAction this.&saveUser
 }
 ----
-
-[%notitle]
-=== Forms
-
-image::screenshot-form-user-en.webp[background, size=contain]
-
-[transition=convex,transition-speed=fast,transition-background=zoom]
-== Forms Validation
-
-[%notitle]
-=== Forms Validation
-
-image::screenshot-form-user-validation-en.webp[background, size=contain]
-
-
-[.columns]
-== Graphical Components
+--
 
 [.column]
 --
-** Table
-** Filter
-** Form
+image::slideshow-crew-form.webp[]
 --
+
+[.columns.split,transition=slide]
+== Checked at compile time
+
+[.column.points]
+--
+* [.accent]#field_# symbols generated from your classes
+* Rename a field, the compiler finds every screen
+* Validation errors localized, for free
+--
+
 [.column]
 --
-** Show
-** Charts
+image::slideshow-crew-form-validation.webp[]
 --
 
-== Extend components
+[.shot,transition=slide]
+== Tables, filters, pagination
 
-** File Previews
-** Full-Text Search
-** JDBC driver to Query Model
+image::slideshow-crew-users.webp[]
+
+[.charts,transition=slide]
+== Charts in a few lines
+
+image:diag-dsl-bar.webp[] image:diag-dsl-line.webp[] image:diag-dsl-pie.webp[] image:diag-dsl-whiskers.webp[]
+
+[.columns.split,transition=slide]
+== Same DSL, printed to PDF
+
+[.column]
+--
+[source,groovy]
+----
+new UiPrintableSpecifier().ui {
+    printableHeader '2.5cm', {
+        show userHeader, Width.THIRD
+    }
+    printableBody {
+        show userShow, Width.MAX
+        table userTable, Width.MAX
+        diagram barChart, Width.MAX
+    }
+}
+----
+--
+
+[.column]
+--
+image::slideshow-pdf-sample.webp[]
+--
+
+[.cards,transition=slide]
+== Batteries included
+
+[.card]
+--
+icon:search[] +
+Full-text search
+--
+
+[.card]
+--
+icon:eye[] +
+File previews
+--
+
+[.card]
+--
+icon:database[] +
+JDBC on your model
+--
+
+[.card]
+--
+icon:terminal[] +
+SSH & SFTP
+--
+
+[.hero,transition=zoom]
+== Try it live
+
+[.lead]
+Every DSL page of the documentation opens its samples in a modal
+
+[.chips]
+[.chip]#Docs › DSLs# [.chip]#▶ Try it live#

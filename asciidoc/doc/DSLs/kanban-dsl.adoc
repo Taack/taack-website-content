@@ -62,7 +62,7 @@ void init() {
 <3> Could add custom html code for the column body
 <4> Build cards in the column, could pass an action and params as kbd:[MouseDoubleClic] for the card
 <5> Build a line with field in the card, note the *underscore* at the end of the field name
-<6> Could add custom html code
+<6> Custom HTML code, rendered as is. `cardField` with a `String` is sanitized (only basic formatting and links are kept); use `cardFieldRaw` for HTML built by the application, never for data typed by users
 <7> Could add an icon with action bind to clic
 <8> Register contextmenu as kbd:[MouseRight] for the card
 <9> Add a menu item with action bind

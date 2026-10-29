@@ -1,53 +1,283 @@
 = DSL for Grails
 :taack-category: 1
 :source-highlighter: rouge
+:icons: font
 
 slide::[fn=slideshow]
 
+[.home-intro]
 == Build Your Own Intranet using DSL (no HTML or JavaScript)
 
-https://github.com/Taack/infra[Taack-UI] is a https://grails.org/[Grails] plugin that extends the functionality of Grails by allowing the description of user interface and other features using the http://docs.groovy-lang.org/docs/latest/html/documentation/core-domain-specific-languages.html[Groovy DSL] (Domain Specific Language) with static typing.
+https://github.com/Taack/infra[Taack-UI] is a https://grails.org/[Grails] plugin that extends Grails by describing user interfaces with a http://docs.groovy-lang.org/docs/latest/html/documentation/core-domain-specific-languages.html[Groovy DSL] (Domain Specific Language), statically typed.
+
+[.home-grid.home-start]
+--
+[.home-card]
+====
+icon:rocket[]
+
+*Install*
+
+Set up Java, Grails and your first Taack server.
+
+link:usage.adoc#_installation_guide[Installation guide →]
+====
+
+[.home-card]
+====
+icon:graduation-cap[]
+
+*First app*
+
+Step by step: a table, a form, a filter, a menu.
+
+link:usage.adoc#_first_app[Build your first app →]
+====
+
+[.home-card]
+====
+icon:play-circle[]
+
+*Try the DSLs*
+
+Every DSL page opens its samples live, in a modal.
+
+link:doc/DSLs/form-dsl.adoc[Explore the DSLs →]
+====
+--
+
+[.home-news]
+****
+*Latest: version 0.7.11* (with 0.7.10): new themes, selectable from the settings menu, and a reworked save that avoids binding.
+link:news.adoc[All news →]
+****
+
+== From Code to Screen
+
+A form is a few lines of Groovy. Fields are symbols generated from your class (`username_`), so the compiler checks them; constraints become localized error messages.
+
+[.home-split]
+--
+[source,groovy]
+----
+def form() {
+    DslSampleUser u = new DslSampleUser()
+    taackUiService.show(new UiBlockSpecifier().ui {
+        modal {
+            form createForm(u, {
+                row {
+                    col {
+                        section 'User', {
+                            field u.username_
+                            field u.firstName_
+                            field u.lastName_
+                        }
+                    }
+                    col {
+                        section 'Details', {
+                            field u.age_
+                            field u.birthday_
+                            field u.city_
+                            field u.status_
+                            field u.enabled_
+                        }
+                    }
+                }
+                formAction this.&saveForm as MC
+            })
+        }
+    })
+}
+----
+
+image::home-form-sample.webp[Form with validation errors]
+--
+
+pass:[<a class="taackMenu" ajaxAction="/dslSample/form" href="/dslSample/form">&#9654; Try it live</a>]
 
 == Features
 
-This extension adds the following functionalities to classical Grails Application:
+[.home-grid]
+--
+[.home-card]
+====
+icon:shield[]
 
-=== Security
+*Security per field*
 
-* Transforming and displaying objects by checking user rights to modify *each field*;
-* *links* and *form actions* are automatically hidden if the user is not allowed to process the  *action* with the given parameters;
-* Limiting object listing that the user is allowed to see (except for full-text search at the moment);
+Objects are displayed and edited according to user rights on *each field*. Links and form actions the user cannot run are hidden automatically.
 
-=== Outputs
+link:doc/UserGuide/Security.adoc[Security →]
+====
 
-* Common DSL rendering for *HTML*, *PDF*, *Mails*, *CSV*.
+[.home-card]
+====
+icon:file-pdf-o[]
 
-* Localization is provided by the DSL. TaackUi selects i18n translations automatically;
+*One DSL, every output*
 
-* Validation errors are also reported, localized (refer to link:doc/DSLs/form-dsl.adoc#_form_validation[*form validation*]);
+The same description renders to *HTML*, *PDF*, *Mails* and *CSV*.
 
-=== Search
+link:doc/DSLs/block-printable-dsl.adoc[Printable DSL →]
+====
 
-* Solr is used for link:/more/Search/Search.adoc[fulltext search] offering features such as:
-** Indexing and fulltext Search of domain objects statically typed;
-** Faceting;
-** Ranking;
+[.home-card]
+====
+icon:language[]
 
-* link:/doc/DSLs/filter-table-dsl.adoc[Filtering, paginate and sorting] data without queries and session data;
-* File previews can be extended;
+*Localized, validated*
 
-=== Extensions
+Labels come from i18n files, validation errors are localized with no extra code.
 
-* *JDBC Driver* to query Domain Objects using #TQL# (Taack Query Language) from Intellij, link:more/JDBC/libreoffice-base.adoc#_open_query_as_a_pivot_table[LibreOffice Base] or DBeaver, as a classical datasource (See link:more/JDBC/taack-jdbc-driver.adoc[*Taack JDBC Driver*]);
+link:doc/DSLs/form-dsl.adoc#_form_validation[Form validation →]
+====
 
-* File sharing via *SFTP* (Available soon) provides:
-** Virtual File System for each user along with an SFTP file browser (see <<sftp_screenshot>>);
-** Direct access to parts of the server storage for fast and efficient sharing while ensuring user credentials are checked;
+[.home-card]
+====
+icon:table[]
 
-* *Git server* to manage user documentation (Available soon)
+*Filter, sort, paginate*
 
-* *Ssh* support will be accessible, running shell UI directly within the server process (Coming soon; see <<ssh_screenshot>>);
+Tables and filters without writing queries nor keeping session data.
 
+link:doc/DSLs/filter-table-dsl.adoc[Filter and Table DSL →]
+====
+
+[.home-card]
+====
+icon:search[]
+
+*Full-text search*
+
+Solr indexing of statically typed domain objects, with faceting and ranking. File previews can be extended.
+
+link:more/Search/Search.adoc[Search →]
+====
+
+[.home-card]
+====
+icon:database[]
+
+*JDBC on your model*
+
+Query domain objects with TQL (Taack Query Language) from IntelliJ, DBeaver or LibreOffice Base.
+
+link:more/JDBC/taack-jdbc-driver.adoc[Taack JDBC Driver →]
+====
+
+[.home-card]
+====
+icon:terminal[]
+
+*SSH & SFTP*
+
+A shell UI running inside the server process, and a virtual file system per user, with credentials checked (`taack-ui-ssh` module).
+
+<<ssh_sftp,Screenshots ↓>>
+====
+
+[.home-card]
+====
+icon:code-fork[]
+
+*Git server*
+
+The Intercom app serves Git over SSH: documentation written in Asciidoc is pushed, then rendered.
+
+link:app/Intercom.adoc[Intercom →]
+====
+--
+
+== Why Taack?
+
+[.home-compare,cols="2,3,3,3",options="header"]
+|===
+|
+|Taack
+|Grails with GSP
+|JavaScript front-end
+
+|UI written in
+|Groovy DSL, statically typed
+|GSP templates, HTML, CSS
+|JavaScript or TypeScript, plus a REST API
+
+|Field names checked
+|At compile time
+|At runtime
+|Depends on the API contract
+
+|Rights per field and action
+|Built in, links hidden automatically
+|Hand written
+|Hand written, on both sides
+
+|PDF, CSV, Mails
+|Same DSL as the screen
+|Separate code
+|Separate code
+
+|Languages to know
+|Groovy
+|Groovy, HTML, CSS, JavaScript
+|Groovy or Java, JavaScript, HTML, CSS
+|===
+
+== Built with Taack
+
+[.home-grid.home-apps]
+--
+[.home-card]
+====
+image::screenshot-dsl-table.webp[Crew]
+
+*Crew*: users, roles and hierarchy.
+
+link:app/Crew.adoc[Crew →]
+====
+
+[.home-card]
+====
+image::plm12-screenshot.webp[FreeCAD PLM]
+
+*FreeCAD PLM*: FreeCAD model sharing and linear versioning.
+
+link:app/Plm.adoc[FreeCAD PLM →]
+====
+
+[.home-card]
+====
+image::news-table2.webp[Intercom]
+
+*Intercom*: SSH and Git server, Asciidoc documentation pushed via Git.
+
+link:app/Intercom.adoc[Intercom →]
+====
+
+[.home-card]
+====
+image::step-preview1.webp[Viewers]
+
+*Viewers*: convert and preview files, such as STEP models.
+
+link:app/Viewers.adoc[Viewers →]
+====
+
+[.home-card]
+====
+image::collabora-editor.webp[Collabora Editor]
+
+*Collabora Editor*: edit office attachments online with Collabora.
+
+link:app/Collabora-Editor.adoc[Collabora Editor →]
+====
+--
+
+[[ssh_sftp]]
+== SSH & SFTP
+
+[.home-split]
+--
 [[ssh_screenshot]]
 .Ssh server session
 image::screenshot-ssh.webp[]
@@ -55,3 +285,4 @@ image::screenshot-ssh.webp[]
 [[sftp_screenshot]]
 .Sftp file browser
 image::screenshot-sftp.webp[]
+--

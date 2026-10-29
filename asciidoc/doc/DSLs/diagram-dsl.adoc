@@ -37,6 +37,8 @@ private static UiDiagramSpecifier barDiagram(boolean isStacked) {
 
 .Result
 image:diag-dsl-bar.webp[]
+
+pass:[<a class="taackMenu" ajaxAction="/dslSample/bar" href="/dslSample/bar">&#9654; Try it live</a>]
 ====
 
 === Line
@@ -58,6 +60,8 @@ diagram new UiDiagramSpecifier().ui({
 
 .Result
 image:diag-dsl-line.webp[]
+
+pass:[<a class="taackMenu" ajaxAction="/dslSample/line" href="/dslSample/line">&#9654; Try it live</a>]
 ====
 
 === Pie
@@ -97,6 +101,8 @@ private static UiDiagramSpecifier pieDiagram(boolean hasSlice) {
 
 .Result
 image:diag-dsl-pie.webp[]
+
+pass:[<a class="taackMenu" ajaxAction="/dslSample/pie" href="/dslSample/pie">&#9654; Try it live</a>]
 ====
 
 === Whiskers
@@ -128,6 +134,8 @@ diagram new UiDiagramSpecifier().ui({
 
 .Result
 image:diag-dsl-whiskers.webp[]
+
+pass:[<a class="taackMenu" ajaxAction="/dslSample/whiskers" href="/dslSample/whiskers">&#9654; Try it live</a>]
 ====
 
 === Timeline
