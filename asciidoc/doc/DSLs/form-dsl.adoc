@@ -81,6 +81,61 @@ def editUser(User user) {
 .Form inside a modal Window.
 image::screenshot-dsl-user-form2.webp[]
 
+pass:[<a class="taackMenu" ajaxAction="/dslSample/form" href="/dslSample/form">&#9654; Try it live</a>]
+
+== Without a Domain Class
+
+DSLs do not need a GORM domain class. Any class implementing `grails.validation.Validateable` and annotated with `@TaackFieldEnum` can be used in Form, Show and Table DSLs: field symbols (`username_`, `age_` ...) are generated the same way, and constraints are checked by `validate()`.
+
+This is useful for parameter objects, wizards, or data that is not persisted (computed, coming from another service ...).
+
+[source,groovy]
+.Validateable class, no database involved
+----
+@TaackFieldEnum                                             <1>
+@GrailsCompileStatic
+class DslSampleUser implements Validateable {               <2>
+    String username
+    Integer age
+    Date birthday
+    DslSampleStatus status = DslSampleStatus.NEW
+
+    static constraints = {                                  <3>
+        username blank: false
+        age nullable: true, min: 18, max: 68
+        birthday nullable: true
+    }
+}
+----
+<1> Generates the field symbols used by the DSLs
+<2> `Validateable` instead of a domain class
+<3> Constraints are applied when calling `validate()`, errors are localized like for domain classes
+
+The form is built as usual, and the action receiving it binds and validates the object itself, since there is nothing to save:
+
+[source,groovy]
+.Binding and validating a Validateable object
+----
+def saveForm() {
+    DslSampleUser u = new DslSampleUser()
+    taackSaveService.bindObject(u, params)                  <1>
+    if (!u.validate()) {
+        taackSaveService.renderErrors(u.errors)             <2>
+        return
+    }
+    taackUiService.show(new UiBlockSpecifier().ui {
+        replaceModal {                                      <3>
+            show buildUserShow(u)
+        }
+    })
+}
+----
+<1> Bind request parameters to the object
+<2> Errors are displayed into the form, the modal stays open
+<3> Otherwise, replace the form by the submitted values
+
+NOTE: The Filter DSL builds database queries, so it still requires a domain class.
+
 == Asciidoc
 
 You can add an asciidoc editor by creating an `EditorOption` object and pass it to `fieldEditorFromMap` or `fieldEditor`. The editor services come from the `taack-ui-asciidoc` artifact.

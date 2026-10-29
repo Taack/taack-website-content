@@ -58,6 +58,8 @@ def editSlideshow(CmsPage slideshow) {
 <2> Declare 2 tabs inside, the first one is displayed when the page appear
 <3> Send the block along with the menu description to the browser.
 
+pass:[<a class="taackMenu" ajaxAction="/dslSample/block" href="/dslSample/block">&#9654; Try it live</a>]
+
 == Modal Stack Code Sample
 
 After processing a form, you can refresh the content of the page, or another modal below the current one. You also can reload the page, or display another page. Reloading the page allows the code to be reusable, since it does not depend on the current URL (remember the `redirectAction` *params* you see in link:../../first-app.adoc#_adding_buttons_to_a_table_block[First App (Adding buttons to a table block)] .

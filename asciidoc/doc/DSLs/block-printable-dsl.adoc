@@ -73,6 +73,8 @@ def p = new UiPrintableSpecifier().ui {
 
 image:screenshot-pdf.webp[width=640px]
 
+pass:[<a class="taackMenu" ajaxAction="/dslSample/pdf" href="/dslSample/pdf">&#9654; Try it live</a>]
+
 == Printable Block DSL Symbols Hierarchy
 
 [graphviz,format="svg",align=center]

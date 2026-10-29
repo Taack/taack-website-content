@@ -35,6 +35,8 @@ UiShowSpecifier buildUserShow(User u) {
 .Corresponding Rendering, inside a modal
 image::screenshot-dsl-show.webp[]
 
+pass:[<a class="taackMenu" ajaxAction="/dslSample/show" href="/dslSample/show">&#9654; Try it live</a>]
+
 == Sections, Actions and Styles
 
 [source,groovy]
@@ -73,6 +75,34 @@ new UiShowSpecifier().ui ShowLayout.GRID, {                      <1>
 The grid auto-fits as many columns as the container width allows, each at least `220px` wide (the minimum can be overridden in your CSS via the `taackShowGrid` class).
 
 image::screenshot-dsl-show-grid.webp[]
+
+== HTML Content
+
+Some elements write their `String` value as is, others *sanitize* it (only basic formatting tags and links are kept, `<img>`, `<div>` or scripts are removed):
+
+[cols="2,1",options="header"]
+|===
+|Element |HTML
+|`fieldLabeled field_`, `fieldUnlabeled field_` |Sanitized
+|`field style, html` (no label) |Sanitized
+|`field label, html` |Written as is
+|`field html` (one argument) |Written as is
+|`inlineHtml html, cssClass` |Written as is, in a `div` with the given CSS class
+|===
+
+[source,groovy]
+----
+new UiShowSpecifier().ui {
+    field 'Picture', attachmentUiService.previewFull(u.mainPicture?.id) <1>
+    field Style.BOLD, '<b>Summary</b><img src="...">'                   <2>
+    fieldLabeled u.username_                                            <3>
+}
+----
+<1> Labeled field: the picture HTML is displayed as is
+<2> No label: sanitized, the bold text is kept, the `<img>` tag is removed
+<3> Value of a domain field: sanitized
+
+WARNING: Elements written as is are not escaped: only give them HTML built by the application, never data typed by users.
 
 == DSL Elements
 
