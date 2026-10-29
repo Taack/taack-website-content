@@ -1,0 +1,127 @@
+= Show DSL
+:doctype: book
+:taack-category: 4|doc/DSLs
+:toc:
+:source-highlighter: rouge
+:icons: font
+
+* [*] Rendu en HTML
+* [*] Rendu en PDF
+* [ ] Rendu en CSV
+
+Ce DSL est utilisé pour afficher des informations avec des capacités d'édition limitées. Les champs peuvent être stylisés.
+
+== Exemple de code
+
+[source,groovy]
+----
+UiShowSpecifier buildUserShow(User u) {
+    new UiShowSpecifier().ui {
+        field 'Picture',                                <1>
+            attachmentUiService.previewFull(u.mainPicture?.id)
+        fieldLabeled u.username_                        <2>
+        fieldLabeled u.firstName_
+        fieldLabeled u.lastName_
+        fieldLabeled u.businessUnit_
+        fieldLabeled u.subsidiary_
+        fieldLabeled u.mail_
+        fieldLabeled u.manager_
+    }
+}
+----
+<1> Libellé et valeur explicites (ici du code HTML)
+<2> Le libellé est déduit du champ, notez le *tiret bas* (`_`) à la fin du nom du champ
+
+.Rendu correspondant, dans une fenêtre modale
+image::screenshot-dsl-show.webp[]
+
+pass:[<a class="taackMenu" ajaxAction="/dslSample/show" href="/dslSample/show">&#9654; Try it live</a>]
+
+== Sections, actions et styles
+
+[source,groovy]
+----
+new UiShowSpecifier().ui {
+    section "Partner", {
+        showAction ActionIcon.SHOW * IconStyle.SCALE_DOWN,  <1>
+            this.&showContact as MC, partner.id
+        fieldLabeled Style.EMPHASIS + Style.BLUE,           <2>
+            partner.name_
+        fieldLabeled partner.branding_
+    }
+}
+----
+<1> L'icône est affichée à la fin de la valeur du champ suivant ; elle doit être réduite afin de s'intégrer à côté du champ
+<2> Les styles sont placés en premier et peuvent être combinés à l'aide de `+`
+
+== Disposition en grille (Grid Layout)
+
+[source,groovy]
+----
+new UiShowSpecifier().ui ShowLayout.GRID, {                      <1>
+    fieldLabeled item.ref_
+    fieldLabeled item.name_
+    fieldLabeled item.itemStatus_
+    fieldLabeled item.gtin_
+    fieldLabeled Style.SPAN_TWO, item.labeling_                  <2>
+    fieldLabeled Style.BOLD + Style.SPAN_FULL, item.description_ <3>
+}
+----
+
+<1> `ShowLayout.GRID` dispose les champs sur une grille auto-adaptative au lieu de les empiler verticalement dans une colonne. La valeur par défaut est `ShowLayout.LIST`.
+<2> Chaque champ occupe une cellule de grille par défaut. `Style.SPAN_TWO` / `Style.SPAN_THREE` permettent à un champ de s'étendre sur plusieurs colonnes.
+<3> `Style.SPAN_FULL` fait s'étendre un champ sur toute la ligne.
+
+La grille ajuste automatiquement autant de colonnes que la largeur du conteneur le permet, chacune ayant une largeur minimale de `220px` (ce minimum peut être surchargé dans votre CSS via la classe `taackShowGrid`).
+
+image::screenshot-dsl-show-grid.webp[]
+
+== Contenu HTML
+
+Certains éléments écrivent leur valeur `String` telle quelle, d'autres l'*assainissent* (seuls les balises de formatage de base et les liens sont conservés, `<img>`, `<div>` ou les scripts sont supprimés) :
+
+[cols="2,1",options="header"]
+|===
+|Élément |HTML
+|`fieldLabeled field_`, `fieldUnlabeled field_` |Assaini
+|`field style, html` (sans libellé) |Assaini
+|`field label, html` |Écrit tel quel
+|`field html` (un seul argument) |Écrit tel quel
+|`inlineHtml html, cssClass` |Écrit tel quel, dans une `div` avec la classe CSS donnée
+|===
+
+[source,groovy]
+----
+new UiShowSpecifier().ui {
+    field 'Picture', attachmentUiService.previewFull(u.mainPicture?.id) <1>
+    field Style.BOLD, '<b>Summary</b><img src="...">'                   <2>
+    fieldLabeled u.username_                                            <3>
+}
+----
+<1> Champ avec libellé : le HTML de l'image est affiché tel quel
+<2> Sans libellé : assaini, le texte en gras est conservé, la balise `<img>` est supprimée
+<3> Valeur d'un champ du domaine : assainie
+
+WARNING: Les éléments écrits tels quels ne sont pas échappés : ne leur passez que du HTML généré par l'application, jamais des données saisies par les utilisateurs.
+
+== Éléments du DSL
+
+* `section` : groupe de champs avec libellé
+* `fieldLabeled` : valeur de champ avec un libellé déduit du champ (i18n)
+* `fieldUnlabeled` : valeur de champ sans libellé
+* `field` : champ avec un libellé explicite (`field 'Print Date', new Date().toString()`), ou du code HTML (`field Style.ALIGN_CENTER, '<h1>Title</h1>'`)
+* `inlineHtml` : code HTML brut, avec une classe CSS optionnelle
+* `showAction` : icône ou lien appelant une action, affiché à la fin du champ suivant
+
+== Hiérarchie des symboles DSL
+
+[graphviz,format="svg",align=center]
+.Diagramme de hiérarchie des symboles pour Show DSL
+----
+digraph mygraph {
+  node [shape=box];
+  ui
+  ui -> section [label = "0,N"]
+  ui, section -> showAction, field, fieldLabeled, fieldUnlabeled, inlineHtml [label = "0,N"]
+}
+----

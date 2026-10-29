@@ -1,0 +1,845 @@
+= Teil Eins
+:doctype: book
+:taack-category: 1|advanced
+:toc:
+:source-highlighter: rouge
+
+== Einführung
+
+Wir beginnen mit der Erstellung einer einfachen privaten Bibliothek, in der der Benutzer Autoren, Bücher und Buchexemplare anlegen kann (inspiriert von dem zuvor unter „Nutzung“ beschriebenen Projekt).
+
+.Büchertabelle
+image::part-one-screenshot.webp[Reload,width=800,align="left"]
+
+Wir haben in `myLibrary` bereits einigen Code für Sie implementiert. Für dieses Tutorial haben Sie zwei Möglichkeiten: Sie können entweder der hier bereitgestellten Schritt-für-Schritt-Implementierung folgen oder versuchen, jeden Schritt zuerst selbst zu implementieren und Ihre Implementierung anschließend zu überprüfen. Die Erklärung jeder Methode ist zwischen dieser Dokumentation und `myLibrary` aufgeteilt.
+
+*Pro-Modus:* Ein anspruchsvollerer Modus für erfahrene Benutzer. Sie werden ermutigt, die Implementierungen selbstständig zu versuchen und nur bei Bedarf auf die bereitgestellten Beispiele zurückzugreifen.
+
+== Einrichtung
+
+
+Die Lösung und die Grundgerüste für diese Aufgabe können aus diesem Repository geklont werden:
+
+[,shell]
+----
+git clone git@github.com:Taack/myLibrary.git
+----
+
+
+.Um auf das Grundgerüst für diesen Teil zuzugreifen, öffnen Sie Ihr Terminal, wechseln Sie mit `cd` in das Projekt (`myLibrary`) und kopieren Sie die folgende Zeile.
+[,bash]
+----
+git checkout part-1-skeleton
+----
+
+Oder Sie wählen in IntelliJ direkt den gewünschten Branch aus. Wählen Sie oben links `main/myLibrary/remote`, um alle Branches anzuzeigen. Wählen Sie einen Branch aus und führen Sie „Checkout“ aus.
+
+Hinweis: Für jede TODO-Implementierung wurde zu Ihrer Erleichterung ein neuer Branch angelegt. Falls etwas schiefgeht, können Sie jederzeit zu diesem Branch wechseln, anstatt von vorne zu beginnen. Hinweis: Beispielsweise ist in `part-1-todo-4` das TODO 4 bereits für Sie implementiert.
+
+.Wenn Sie das Projekt beispielsweise ab `part-1-todo-4` fortsetzen möchten, gehen Sie wie folgt vor.
+[,bash]
+----
+git checkout part-1-todo-4
+----
+
+== Domänenklassen definieren
+Bearbeiten: `app/library/src/main/groovy/myLibrary/domain/`
+
+.Klassendiagramm zur Übersicht
+[plantuml, format="svg", opts="inline"]
+----
+@startuml
+
+class MyLibraryAuthor {
+    String firstName
+    String lastName
+    Date dateOfBirth
+    Boolean isActive = true
+    String toString()
+}
+
+class MyLibraryBook {
+    String title
+    String description
+    int numberOfPages
+    int count = 0
+    int getNumberOfInstances()
+}
+
+class MyLibraryBookInstance {
+    Boolean isActive = true
+    Integer serialNumber
+}
+
+MyLibraryAuthor "1" --> "*" MyLibraryBook : listOfBooks
+MyLibraryBook "1" --> "*" MyLibraryBookInstance : listOfBookInstance
+MyLibraryBookInstance "*" --> "1" MyLibraryBook : belongsTo
+
+@enduml
+----
+
+Pro-Modus: Implementieren Sie jede Klasse selbst. Alle erforderlichen Informationen befinden sich in der Datei. Überprüfen Sie nach der Implementierung von `MyLibraryAuthor`, `MyLibraryBook` und `MyLibraryBookInstance` Ihre Lösung hier. [TODO 1.1, 1.2 & 1.3]
+
+.Implementieren Sie eine Klasse `MyLibraryAuthor` (TODO 1.1):
+[,groovy]
+----
+import grails.compiler.GrailsCompileStatic
+import taack.ast.annotation.TaackFieldEnum
+
+@GrailsCompileStatic
+@TaackFieldEnum
+class MyLibraryAuthor {
+    String firstName
+    String lastName
+    Date dateOfBirth
+    List<MyLibraryBook> listOfBooks //<1>
+    Boolean isActive = true //<2>
+
+    static constraints = {}
+
+    static hasMany = [listOfBooks: MyLibraryBook] //<3>
+
+    String toString() {
+        return firstName + ' ' + lastName
+    }
+}
+----
+<1> `Books`, die von diesem `Author` geschrieben wurden, werden in `listOfBooks` gespeichert.
+<2> `isActive` ermöglicht das logische Löschen (Soft Delete).
+<3> `hasMany` ist ein GORM-Assoziationsschlüsselwort, mit dem wir eine Eins-zu-viele-Beziehung zwischen Domänenklassen definieren können. Es wird verwendet, um zugehörige Sammlungen (wie eine Liste von Büchern, die zu einem Autor gehören) automatisch zu verwalten. Weitere Informationen finden Sie in der GORM-Dokumentation.
+
+.Implementieren Sie eine Klasse `MyLibraryBook` (TODO 1.2):
+[,groovy]
+----
+import grails.compiler.GrailsCompileStatic
+import taack.ast.annotation.TaackFieldEnum
+
+@GrailsCompileStatic
+@TaackFieldEnum
+class MyLibraryBook {
+    String title
+    MyLibraryAuthor author
+    String description
+    int numberOfPages
+    List<MyLibraryBookInstance> listOfBookInstance //<1>
+    int count = 0
+
+    static constraints = {}
+
+    static hasMany = [listOfBookInstance: MyLibraryBookInstance]
+
+    int getNumberOfInstances() {
+        if (!listOfBookInstance) { return 0}
+        count = listOfBookInstance.count {it.isActive} as int
+        return count
+    }
+}
+----
+<1> `BookInstances` dieses `Book` werden in `listOfBookInstance` gespeichert.
+
+.Implementieren Sie eine Klasse `MyLibraryBookInstance` (TODO 1.3):
+[,groovy]
+----
+import grails.compiler.GrailsCompileStatic
+import taack.ast.annotation.TaackFieldEnum
+
+@GrailsCompileStatic
+@TaackFieldEnum
+class MyLibraryBookInstance {
+    MyLibraryBook book
+    Boolean isActive = true
+    Integer serialNumber = new Random().nextInt(100000) //<1>
+
+    static constraints = {}
+
+    static belongsTo = [book: MyLibraryBook] //<2>
+}
+----
+<1> `Random().nextInt(100000)` erzeugt eine Zufallszahl zwischen 0 und 100 000.
+<2> `belongsTo` ist ein GORM-Assoziationsschlüsselwort, das die besitzende Seite einer Viele-zu-eins-Beziehung zwischen Domänenklassen definiert. Es verwaltet automatisch die Fremdschlüsselverknüpfung und das Kaskadierungsverhalten (z. B. gehört jedes Buch zu einem einzelnen Autor). Weitere Informationen finden Sie in der GORM-Dokumentation.
+
+Sie haben nun alle erforderlichen Klassen für diesen Abschnitt erstellt!
+
+Wechseln Sie zu `src/main/groovy/mylibrary`.
+
+.Werfen Sie einen Blick auf die Klasse `NumberForInstances`:
+[,groovy]
+----
+import grails.compiler.GrailsCompileStatic
+import grails.validation.Validateable
+import taack.ast.annotation.TaackFieldEnum
+
+@TaackFieldEnum
+@GrailsCompileStatic
+class NumberForInstances implements Validateable {
+    Integer numberOfInstances
+}
+----
+Hier gibt es nichts zu implementieren. Diese Klasse wird später zum Erfassen von Benutzereingaben verwendet.
+
+== Autorenmenü definieren
+
+In diesem Abschnitt wiederholen wir hauptsächlich das, was unter link:usage.adoc[Nutzung] behandelt wurde. Nach diesem Abschnitt beherrschen Sie den Umgang mit `UiTableSpecifier`, `UiFormSpecifier`, `UiShowSpecifier` und `UiFilterSpecifier`.
+
+Wir erstellen:
+
+- eine Tabelle, die alle Autoren anzeigt,
+- eine Schaltfläche zum Erstellen neuer Autoren über ein Formular,
+- eine Schaltfläche zum Löschen von Autoren,
+- eine Schaltfläche zum Reaktivieren von Autoren,
+- einen Filter für Autoren.
+
+=== Autorentabelle
+
+Wir möchten die Autoren in einer Tabelle anzeigen. Dafür müssen wir einen `UiTableSpecifier` erstellen. Wechseln Sie zu `app/library/services/myLibrary/MyLibraryUiService` im Bereich `Author Menu`.
+
+Pro-Modus: Implementieren Sie die Tabelle selbst [TODOS 2.1.1—2.1.6].
+
+.Implementieren Sie `buildAuthorTable`:
+[,groovy]
+----
+MyLibraryAuthor author = new MyLibraryAuthor()
+UiTableSpecifier authorTableSpecifier = new UiTableSpecifier()
+
+authorTableSpecifier.ui {
+    header {
+        column {label author.firstName_}
+        label author.lastName_
+        if(!isSelect) {
+            label author.isActive_
+            label "Delete Author"
+        }
+    }
+
+    TaackFilter.FilterBuilder filter = taackFilterService.getBuilder(MyLibraryAuthor)
+            .setMaxNumberOfLine(10)
+            .setSortOrder(TaackFilter.Order.ASC, author.lastName_)
+
+    if(isSelect) {
+        filter.addFilter(buildIsActiveAuthorFilter(author))
+    }
+    iterate(
+            filter.build()) { MyLibraryAuthor authorIterator ->
+        rowColumn {
+             // TODO 2.10: Add rowAction to showAuthor with author's first name as label
+            if (isSelect) {
+                // TODO 3.5.6: Add SELECT action icon to select author with their id and string representation
+            }
+        }
+        rowField authorIterator.lastName_
+        if(!isSelect) {
+            rowField authorIterator.isActive_
+            rowColumn {
+                // TODO 2.7.1: Add DELETE action icon linked to deleteAuthor controller action
+                // TODO 2.7.2: Add ACTIVATE action icon linked to activateAuthor controller action
+            }
+        }
+    }
+}
+
+----
+Falls Sie Schwierigkeiten haben, diesen Code zu verstehen, lesen Sie bitte unter link:usage.adoc[Nutzung] nach.
+Beachten Sie, dass wir `buildIsActiveAuthorFilter` hinzugefügt haben, was noch nicht implementiert wurde. Implementieren wir es jetzt.
+
+Hinweis: Der Name des Autors wird erst angezeigt, wenn TODO 2.10 erledigt ist.
+
+Pro-Modus: Implementieren Sie den Filter selbst [TODO 2.2.1].
+
+.Implementieren Sie `buildIsActiveAuthorFilter`:
+[,groovy]
+----
+UiFilterSpecifier buildIsActiveAuthorFilter(MyLibraryAuthor author) {
+    UiFilterSpecifier isActiveAuthorFilter = new UiFilterSpecifier()
+    isActiveAuthorFilter.ui MyLibraryAuthor, {
+        section "Filter", {
+            filterFieldExpressionBool "Is Active", new FilterExpression(true, Operator.EQ, author.isActive_) //<1>
+        }
+    }
+}
+----
+<1> Wir erstellen eine `FilterExpression`, die einen Wert, einen Operator und ein `FieldInfo` entgegennimmt.
+
+Es stehen verschiedene Operatoren zur Verfügung:
+
+- IN: in einer Liste von Werten,
+- NI: nicht in einer Liste von Werten,
+- EQ: gleich einem anderen Wert,
+- NE: ungleich einem anderen Wert,
+- LT: kleiner als ein anderer Wert,
+- IL: ähnlich wie ein anderer Wert (is like),
+- GT: größer als ein anderer Wert,
+- IS_EMPTY: ist leer
+
+Wir möchten außerdem einen Filter hinzufügen, der die Autoren nach `lastName` filtert. Implementieren wir diesen Filter.
+
+Pro-Modus: Implementieren Sie den Filter selbst [TODO 2.2.2].
+
+.Implementieren Sie `buildAuthorFilter`:
+[,groovy]
+----
+UiFilterSpecifier buildAuthorFilter() {
+    MyLibraryAuthor author = new MyLibraryAuthor()
+    UiFilterSpecifier authorFilterSpecifier = new UiFilterSpecifier()
+
+    authorFilterSpecifier.ui MyLibraryAuthor, {
+        section "Author Filter", {
+            filterField author.lastName_
+        }
+    }
+}
+----
+Falls Sie Schwierigkeiten haben, diesen Code zu verstehen, lesen Sie bitte unter link:usage.adoc[Nutzung] nach.
+
+Ihre Tabelle ist nun vollständig; wir müssen sie nur noch auf der Seite rendern. Um zuvor erstellte `UiSpecifier` zu rendern, müssen wir `taackUiService` verwenden. Wir tun dies in einer Methode namens `listAuthor`. Wechseln Sie zu `app/library/controller/myLibrary/MyLibraryController` im Bereich `Author Menu`.
+
+Pro-Modus: Implementieren Sie `listAuthor` selbst [TODO 2.3].
+
+.Implementieren Sie die Methode `listAuthor`:
+[,groovy]
+----
+def listAuthor() {
+    UiTableSpecifier tableAuthorSpecifier = myLibraryUiService.buildAuthorTable()
+    UiFilterSpecifier filterAuthorSpecifier = myLibraryUiService.buildAuthorFilter()
+
+    taackUiService.show(new UiBlockSpecifier().ui {
+        tableFilter filterAuthorSpecifier, tableAuthorSpecifier, {
+            menuIcon ActionIcon.CREATE, this.&createAuthor as MethodClosure
+        }
+    }, myLibraryUiService.buildMenu())
+}
+----
+
+Hinweis: `ActionIcon` verfügt über mehrere Icons. Die wichtigsten, die wir verwenden werden, sind: CREATE, EDIT, SAVE, DELETE, SHOW, IMPORT, EXPORT.
+
+Sie können nun den Server starten und zu Ihrer neuen Anwendung (`myLibrary.app`) navigieren. Die Tabelle sollte funktionsfähig sein, aber derzeit sehen Sie nur die Tabellenköpfe, da sich noch keine Autoren in Ihrer Datenbank befinden. Fahren wir also damit fort, ein Formular zu erstellen und Objekte in der Datenbank zu speichern. Wir müssen nun `createAuthor` implementieren, wofür ein `UiFormSpecifier` erstellt werden muss.
+Kehren wir zurück zu `MyLibraryUiService`.
+
+==== Autorenformular
+Pro-Modus: Implementieren Sie `buildAuthorForm` selbst [TODO 2.4].
+
+.Implementieren Sie `buildAuthorForm`:
+[,groovy]
+----
+UiFormSpecifier buildAuthorForm(MyLibraryAuthor author) {
+    author ?= new MyLibraryAuthor(params)
+    UiFormSpecifier createAuthorSpecifier = new UiFormSpecifier()
+    createAuthorSpecifier.ui author, {
+        section "Author details", {
+            field author.firstName_
+            field author.lastName_
+            field author.dateOfBirth_
+            field author.isActive_
+        }
+        formAction MyLibraryController.&saveAuthor as MC
+    }
+}
+----
+
+Kehren wir zurück zu `MyLibraryController`. Wir werden dieses Formular in einem Modal-Dialog rendern.
+
+Pro-Modus: Implementieren Sie `createAuthor` [TODO 2.5]
+
+.Implementieren Sie `createAuthor`:
+[,groovy]
+----
+def createAuthor(MyLibraryAuthor author) {
+    UiFormSpecifier formAuthorSpecifier = myLibraryUiService.buildAuthorForm(author)
+
+    taackUiService.show(new UiBlockSpecifier().ui {
+        modal {
+            form formAuthorSpecifier
+        }
+    })
+}
+----
+
+Jetzt müssen wir den Autor speichern. Implementieren wir `saveAuthor`.
+
+Pro-Modus: Implementieren Sie `saveAuthor` [TODO 2.6].
+[,groovy]
+----
+@Transactional
+def saveAuthor() {
+    taackSaveService.saveThenReloadOrRenderErrors(MyLibraryAuthor)
+}
+----
+
+Wir haben nun eine voll funktionsfähige Tabelle, in der wir Autoren anzeigen und hinzufügen können. Starten Sie den Server erneut. Sie sollten nun auf die Schaltfläche klicken und das Formular ausfüllen können. Als Nächstes möchten wir Autoren löschen und reaktivieren können. Implementieren wir die Methoden `deleteAuthor` und `reactivateAuthor`. Navigieren wir zu `MyLibraryUiService` in `buildAuthorTable`.
+
+==== Autor löschen und reaktivieren
+
+Wechseln Sie zu `myLibraryUiService` in `buildAuthorTable`.
+
+Pro-Modus: Fügen Sie die Schaltflächen hinzu [TODO 2.7].
+
+.Fügen Sie die Schaltflächen zum Löschen und Aktivieren hinzu. Ersetzen Sie die TODOS 2.7.1 & 2.7.2:
+[,groovy]
+----
+rowAction ActionIcon.DELETE * IconStyle.SCALE_DOWN, MyLibraryController.&deleteAuthor as MC, authorIterator.id
+rowAction ActionIcon.CREATE * IconStyle.SCALE_DOWN, MyLibraryController.&activateAuthor as MC, authorIterator.id
+----
+
+Navigieren Sie zurück zu `MyLibraryController`, um die Methoden `deleteAuthor` & `activateAuthor` zu implementieren.
+
+Pro-Modus: Implementieren Sie die Methoden [TODO 2.8 & 2.9]
+
+.Implementieren Sie `deleteAuthor`:
+[,groovy]
+----
+@Transactional
+def deleteAuthor(MyLibraryAuthor author) {
+    author.isActive = false
+    redirect action: 'listAuthor'
+}
+----
+
+.Implementieren Sie `activateAuthor`:
+[,groovy]
+----
+@Transactional
+def activateAuthor(MyLibraryAuthor author) {
+    author.isActive = true
+    redirect action: 'listAuthor'
+}
+----
+
+Wir möchten weitere Informationen über den Autor in einem Modal-Dialog anzeigen können.
+Implementieren wir nun die Methode `showAuthor`. Zuerst müssen wir einen Link zu dieser Methode und einen `UiShowSpecifier` in `myLibraryUiService` erstellen.
+
+Navigieren wir zu `MyLibraryUiService` in `buildAuthorTable`.
+
+Pro-Modus: Fügen Sie die Schaltflächen hinzu [TODO 2.10].
+
+Fügen Sie die Show-Aktion hinzu. Ersetzen Sie TODO 2.10:
+[,groovy]
+----
+rowAction authorIterator.firstName, MyLibraryController.&showAuthor as MC, authorIterator.id
+----
+Hinweis: Diesmal gibt es kein `ActionIcon`. Stattdessen wird ein Link zum `authorName` hinzugefügt, der zu `showAuthor` weiterleitet.
+
+Pro-Modus: Implementieren Sie `buildAuthorShow` [TODO 2.11]
+
+.Implementieren Sie `buildAuthorShow`:
+[,groovy]
+----
+UiShowSpecifier buildAuthorShow(MyLibraryAuthor author) {
+    UiShowSpecifier authorShowSpecifier = new UiShowSpecifier()
+
+    authorShowSpecifier.ui(author, {
+        fieldLabeled author.firstName_
+        fieldLabeled author.lastName_
+        fieldLabeled author.dateOfBirth_
+        fieldLabeled author.isActive_
+    })
+}
+----
+
+Wir rendern `buildAuthorShow` in einem Modal-Dialog mithilfe von `showAuthor`.
+
+Pro-Modus: Implementieren Sie `showAuthor` [TODO 2.12]
+
+.Implementieren Sie `showAuthor`:
+[,groovy]
+----
+def showAuthor(MyLibraryAuthor author) {
+    UiTableSpecifier tableBookSpecifier = myLibraryUiService.buildBookTable(author)
+    UiFilterSpecifier filterBookSpecifier = myLibraryUiService.buildBookFilter()
+    UiShowSpecifier showAuthorSpecifier = myLibraryUiService.buildAuthorShow(author)
+
+    taackUiService.show(new UiBlockSpecifier().ui {
+        modal {
+            show showAuthorSpecifier
+            tableFilter filterBookSpecifier, tableBookSpecifier
+        }
+    })
+}
+----
+
+Herzlichen Glückwunsch! Sie haben nun alles implementiert, was Sie zum Anzeigen, Hinzufügen, Löschen, Reaktivieren und Betrachten von Autoren benötigen. Starten Sie den Server erneut und testen Sie alle neuen Implementierungen.
+
+== Büchermenü definieren
+
+Wir möchten nun Bücher in einer Tabelle anzeigen. Dafür müssen wir einen weiteren `UiTableSpecifier` erstellen. Wechseln Sie zu `app/library/services/myLibrary/MyLibraryUiService` im Bereich `Book Menu`.
+
+Pro-Modus: Implementieren Sie die Tabelle selbst [TODOS 3.1.1 - 3.1.6].
+
+.Implementieren Sie `buildBookTable`:
+[,groovy]
+----
+UiTableSpecifier buildBookTable(MyLibraryAuthor author = null) {
+    MyLibraryBook book = new MyLibraryBook()
+    UiTableSpecifier bookTableSpecifier = new UiTableSpecifier()
+    bookTableSpecifier.ui {
+        header {
+            column {label book.title_}
+            if (!author) {sortableFieldHeader book.author_}
+            column {
+                label "Number of instances "//book.numberOfInstances
+            }
+            if (!author) {
+                column {
+                    label "Modify number of Book Instances"
+                }
+            }
+        }
+        TaackFilter.FilterBuilder filter =  taackFilterService.getBuilder(MyLibraryBook)
+                .setMaxNumberOfLine(10)
+                .setSortOrder(TaackFilter.Order.ASC, book.title_)
+        if(author) {
+            filter.addRestrictedIds(author.listOfBooks*.id as Long[])
+        }
+        iterate(
+                filter.build()) { MyLibraryBook bookIterator ->
+            rowColumn {
+                // TODO 3.13: Add SHOW (showBook) action above title field in the rowColumn, this will be used to modify a book.
+                rowAction ActionIcon.EDIT * IconStyle.SCALE_DOWN, MyLibraryController.&createBook as MC, bookIterator.id
+                rowField bookIterator.title_
+            }
+            if (!author) {rowField bookIterator.author_}
+            rowColumn {
+                // TODO 3.8.1: Display number of instances (call getNumberOfInstances) and show as rowField.
+            }
+            if (!author) {
+                rowColumn {
+                    // TODO 3.9: If author is null, add purchase and select actions for managing book instances.
+                }
+            }
+        }
+    }
+}
+----
+
+Wir möchten einen Filter hinzufügen, um Bücher nach Titel zu filtern. Implementieren wir ihn jetzt.
+
+Pro-Modus: Implementieren Sie den Filter selbst [TODO 3.2].
+
+.Implementieren Sie `buildBookFilter`:
+[,groovy]
+----
+UiFilterSpecifier buildBookFilter() {
+    MyLibraryBook book = new MyLibraryBook()
+    UiFilterSpecifier bookFilterSpecifier = new UiFilterSpecifier()
+
+    bookFilterSpecifier.ui MyLibraryBook, {
+        section "Book Filter", {
+            filterField book.title_
+        }
+    }
+}
+----
+
+Wir haben nun eine Tabelle und einen Filter; damit können wir eine Seite rendern, die beide enthält. Wechseln Sie zu `app/library/controller/myLibrary/MyLibraryController` im Bereich `Book Menu`.
+
+Pro-Modus: Implementieren Sie `listBook` selbst [TODO 3.3].
+
+.Implementieren Sie die Methode `listBook`:
+[,groovy]
+----
+def listBook() {
+    UiTableSpecifier tableBookSpecifier = myLibraryUiService.buildBookTable()
+    UiFilterSpecifier filterBookSpecifier = myLibraryUiService.buildBookFilter()
+
+    taackUiService.show(new UiBlockSpecifier().ui {
+        tableFilter filterBookSpecifier, tableBookSpecifier, {
+            menuIcon ActionIcon.CREATE, this.&createBook as MethodClosure
+        }
+    }, myLibraryUiService.buildMenu())
+}
+----
+
+Sie können nun den Server starten. Die Büchertabelle sollte funktionsfähig sein, aber derzeit sehen Sie nur die Tabellenköpfe, da sich noch keine Bücher in Ihrer Datenbank befinden. Fahren wir also damit fort, ein Formular zu erstellen und Objekte in der Datenbank zu speichern. Wir müssen nun `createBook` implementieren, wofür ein `UiFormSpecifier` erstellt werden muss.
+Kehren wir zurück zu `MyLibraryUiService`.
+
+Pro-Modus: Implementieren Sie `buildBookForm` selbst [TODO 3.4].
+
+.Implementieren Sie `buildBookForm`:
+[,groovy]
+----
+UiFormSpecifier buildBookForm(MyLibraryBook book) {
+    book ?= new MyLibraryBook(params)
+    UiFormSpecifier bookFormSpecifier = new UiFormSpecifier()
+    bookFormSpecifier.ui book, {
+        section "Book details", {
+            field book.title_
+            ajaxField book.author_, MyLibraryController.&selectAuthor as MC //<1>
+            field book.numberOfPages_
+            field book.description_
+        }
+        formAction MyLibraryController.&saveBook as MC
+    }
+}
+----
+<1> Hier verwenden wir ein `AjaxField`, um die Informationen von `selectAuthor` abzurufen.
+
+Kehren wir zurück zu `MyLibraryController` und implementieren `selectAuthor` zur Verdeutlichung.
+
+Pro-Modus: Implementieren Sie `selectAuthor` selbst im Bereich `Author Menu` [TODO 3.5]. Hinweis: 3.5.6 befindet sich in `buildAuthorTable`.
+
+
+.Implementieren Sie `selectAuthor`:
+[,groovy]
+----
+def selectAuthor() {
+    UiTableSpecifier tableAuthorSpecifier = myLibraryUiService.buildAuthorTable(true) //<1>
+    UiFilterSpecifier filterAuthorSpecifier = myLibraryUiService.buildAuthorFilter()
+    taackUiService.show(new UiBlockSpecifier().ui {
+        modal {
+            tableFilter filterAuthorSpecifier, tableAuthorSpecifier
+        }
+    })
+}
+----
+<1> Beachten Sie, dass `buildAuthorTable` einen `Boolean`-Wert entgegennimmt, um die `isSelect`-Version des `UiTableSpecifier` anzuzeigen.
+
+.Fügen Sie diese Zeile anstelle von TODO 3.5.6 ein, um die Auswahl des Benutzers zu speichern:
+[,groovy]
+----
+rowAction tr('default.role.label'), ActionIcon.SELECT * IconStyle.SCALE_DOWN, authorIterator.id, authorIterator.toString()
+----
+
+Pro-Modus: Implementieren Sie `createBook` [TODO 3.6]
+
+
+[,groovy]
+----
+def createBook(MyLibraryBook book) {
+    UiFormSpecifier tableFormSpecifier = myLibraryUiService.buildBookForm(book)
+
+    taackUiService.show new UiBlockSpecifier().ui {
+        modal {
+            form tableFormSpecifier
+        }
+    }
+}
+----
+
+Jetzt müssen wir das Buch speichern; implementieren wir `saveBook`.
+
+Pro-Modus: Implementieren Sie `saveBook` [TODO 3.7].
+[,groovy]
+----
+@Transactional
+def saveBook() {
+    taackSaveService.saveThenReloadOrRenderErrors(MyLibraryBook)
+}
+----
+
+Sie haben nun eine voll funktionsfähige Tabelle, in der wir Bücher anzeigen und hinzufügen können. Implementieren wir als Nächstes `purchaseBook` und `selectBookInstance`, da wir `bookInstances` eines bestimmten Buches erwerben und löschen können möchten. Navigieren wir zu `MyLibraryUiService` in `buildBookTable`.
+
+Pro-Modus: Implementieren Sie die Schaltflächen und zeigen Sie `numberOfInstances` an [TODOS 3.8].
+
+.Implementieren Sie `numberOfInstances`. Ersetzen Sie TODO 3.8.1
+[,groovy]
+----
+rowField bookIterator.numberOfInstances_
+----
+
+.Fügen Sie die Aktionen zum Erwerben und Auswählen hinzu. Ersetzen Sie TODO 3.8.2
+[,groovy]
+----
+rowAction ActionIcon.DELETE * IconStyle.SCALE_DOWN, MyLibraryController.&selectBookInstance as MC, bookIterator.id
+rowAction ActionIcon.ADD * IconStyle.SCALE_DOWN, MyLibraryController.&purchaseBook as MC, bookIterator.id
+----
+
+Wir möchten, dass der Benutzer auswählt, wie viele `BookInstances` er erwerben möchte. Daher müssen wir einen `UiFormSpecifier` namens `buildBookPurchase` implementieren.
+
+Pro-Modus: Implementieren Sie den `UiFormSpecifier` [TODO 3.9]
+
+.Implementieren Sie `buildBookPurchase`:
+[,groovy]
+----
+UiFormSpecifier buildBookPurchase(MyLibraryBook book) {
+    NumberForInstances numberForInstances = new NumberForInstances()
+    book ?= new MyLibraryBook(params)
+    UiFormSpecifier bookPurchaseSpecifier = new UiFormSpecifier()
+    bookPurchaseSpecifier.ui book, {
+        section "Purchase Number", {
+            field numberForInstances.numberOfInstances_ //<1>
+        }
+        formAction MyLibraryController.&purchaseAndSaveBook as MC
+    }
+}
+----
+<1> Beachten Sie, dass wir eine Klasse verwenden, um die `numberOfInstances` abzurufen, die der Benutzer erwerben möchte. Diese Zahl dient nur zur Eingabe und wird im Gegensatz zu anderen Klasseninstanzen nicht in der Datenbank gespeichert.
+
+Navigieren Sie zurück zu `MyLibraryController`, um die Methoden `purchaseBook` & `selectBookInstance` zu implementieren.
+
+Pro-Modus: Implementieren Sie die Methoden [TODO 3.10–3.12]
+
+.Implementieren Sie `purchaseBook`:
+[,groovy]
+----
+def purchaseBook(MyLibraryBook book) {
+    UiFormSpecifier tableAddBookInstanceSpecifier = myLibraryUiService.buildBookPurchase(book)
+
+    taackUiService.show new UiBlockSpecifier().ui {
+        modal {
+            form tableAddBookInstanceSpecifier
+        }
+    }
+}
+----
+
+.Implementieren Sie `purchaseAndSaveBook`:
+[,groovy]
+----
+@Transactional
+def purchaseAndSaveBook(NumberForInstances numberForInstances, MyLibraryBook book) {
+    for (int i = 0; i < (numberForInstances.numberOfInstances) as Integer; i++) {
+        MyLibraryBookInstance newBookInstance = new MyLibraryBookInstance()
+        newBookInstance.book = book
+        book.addToListOfBookInstance(newBookInstance)
+    }
+    taackUiService.ajaxReload()
+}
+----
+
+.Implementieren Sie `selectBookInstance`:
+[,groovy]
+----
+def selectBookInstance(MyLibraryBook book) {
+    UiTableSpecifier bookInstanceTableSpecifier = myLibraryUiService.buildInstanceBookTable(book)
+
+    taackUiService.show new UiBlockSpecifier().ui {
+        modal true, {
+            table bookInstanceTableSpecifier
+        }
+    }
+}
+----
+
+Implementieren wir nun die Methode `showBook`. Zuerst müssen wir einen `UiShowSpecifier` in `myLibraryUiService` erstellen.
+
+Navigieren wir zu `MyLibraryUiService` in `buildBookTable`.
+
+Pro-Modus: Fügen Sie die Schaltflächen hinzu [TODO 3.13].
+
+Fügen Sie die Show-Aktion hinzu. Ersetzen Sie TODO 3.13:
+[,groovy]
+----
+rowAction ActionIcon.SHOW * IconStyle.SCALE_DOWN, MyLibraryController.&showBook as MC, bookIterator.id
+----
+
+Pro-Modus: Implementieren Sie `buildBookShow` [TODO 3.14]
+
+.Implementieren Sie `buildBookShow`:
+[,groovy]
+----
+    UiShowSpecifier buildBookShow(MyLibraryBook book) {
+        UiShowSpecifier bookShowSpecifier = new UiShowSpecifier()
+
+        bookShowSpecifier.ui(book, {
+            fieldLabeled book.title_
+            fieldLabeled book.author_
+            fieldLabeled book.numberOfPages_
+            fieldLabeled book.description_
+            fieldLabeled book.numberOfInstances_
+        })
+    }
+----
+
+Pro-Modus: Implementieren Sie `showBook` [TODO 3.15]
+
+.Implementieren Sie `showBook`:
+[,groovy]
+----
+def showBook(MyLibraryBook book) {
+    UiShowSpecifier showBookSpecifier = myLibraryUiService.buildBookShow(book)
+
+    taackUiService.show(new UiBlockSpecifier().ui {
+        modal {
+            show showBookSpecifier
+        }
+    })
+}
+----
+
+Wir implementieren nun `deleteBookInstance`. Wir möchten das spezifische Buchexemplar auswählen, das wir löschen möchten. Daher müssen wir eine `buildBookInstanceTable` mit einer `isSelect`-Option erstellen. Außerdem benötigen wir einen Filter `buildIsActiveBookInstances`, da es sich um ein logisches Löschen (Soft Delete) handelt (wir filtern inaktive `BookInstances` heraus).
+
+Beginnen wir mit der Implementierung des Filters `buildIsActiveBookInstances`.
+
+Pro-Modus: Implementieren Sie `buildIsActiveBookInstances` [TODO 3.16].
+
+.Implementieren Sie `buildIsActiveBookInstances`.
+[,groovy]
+----
+UiFilterSpecifier buildIsActiveBookInstances(MyLibraryBook book) {
+    MyLibraryBookInstance bookInstance = new MyLibraryBookInstance()
+    UiFilterSpecifier bookInstanceFilterSpecifier = new UiFilterSpecifier()
+    bookInstanceFilterSpecifier.sec MyLibraryBookInstance, {
+        filterFieldExpressionBool new FilterExpression(true, Operator.EQ, bookInstance.isActive_)
+    }
+}
+----
+
+Nun können wir `buildBookInstanceTable` implementieren.
+
+Pro-Modus: Implementieren Sie `buildBookInstanceTable` [TODO 3.17].
+
+.Implementieren Sie `buildBookInstanceTable`.
+[,groovy]
+----
+UiTableSpecifier buildInstanceBookTable(
+    MyLibraryBook book,
+    MyLibraryBookInstance bookInstance = null) {
+    UiTableSpecifier table = new UiTableSpecifier()
+    table.ui {
+        header {
+            label "Serial Number"
+            column {label "Delete"}
+        }
+
+        TaackFilter.FilterBuilder filter = taackFilterService
+            .getBuilder(MyLibraryBookInstance)
+            .addRestrictedIds(book.listOfBookInstance*.id as Long[])
+
+        filter.addFilter(buildIsActiveBookInstances(book))
+
+        iterate(filter.build()) { MyLibraryBookInstance bookInstanceIterator ->
+            rowField bookInstanceIterator.serialNumber_
+            rowColumn {
+                rowAction ActionIcon.DELETE * IconStyle.SCALE_DOWN,
+                    MyLibraryController.&deleteBookInstances as MC,
+                    bookInstanceIterator.id, [bookId:book.id]
+            }
+        }
+    }
+}
+----
+
+Implementieren wir nun `deleteBookInstances`.
+
+Pro-Modus: Implementieren Sie `deleteBookInstances` [TODO 3.18].
+
+.Implementieren Sie `deleteBookInstances`:
+[,groovy]
+----
+@Transactional
+def deleteBookInstances(MyLibraryBookInstance bookInstance) {
+    MyLibraryBook book = MyLibraryBook.get(params.long('bookId'))
+    UiTableSpecifier bookInstanceTable = myLibraryUiService.buildInstanceBookTable(book)
+
+    bookInstance.isActive = false
+    bookInstance.save(flush: true, validate: false)
+
+    taackUiService.show new UiBlockSpecifier().ui {
+        closeModalAndUpdateBlock { //<1>
+            tableFilter(
+                    myLibraryUiService.buildBookFilter(), //<2>
+                    myLibraryUiService.buildBookTable(), //<2>
+            ) {
+                menuIcon ActionIcon.CREATE, this.&createBook as MethodClosure //<2>
+            }
+            modal {
+                table bookInstanceTable //<3>
+            }
+        }
+    }
+}
+----
+<1> Die Verwendung von `closeModalAndUpdateBlock` ermöglicht es dem Benutzer, den aktualisierten Status der gelöschten `BookInstance` sofort zu sehen. Es schließt den Modal-Dialog unmittelbar nachdem der Benutzer eine `BookInstance` ausgewählt hat.
+<2> Wir rufen die Builder auf, die zum Anzeigen der Bücher verwendet werden, damit `numberOfInstances` in der Büchertabelle aktualisiert wird, wenn wir den Modal-Dialog schließen.
+<3> Wir öffnen erneut einen Modal-Dialog. Wenn der Benutzer eine `BookInstance` auswählt, wird der Modal-Dialog geschlossen und anschließend wieder geöffnet, sodass die ausgewählte `BookInstance` nicht mehr angezeigt wird.
+
+
+Herzlichen Glückwunsch! Sie haben den ersten Teil dieses Projekts abgeschlossen.

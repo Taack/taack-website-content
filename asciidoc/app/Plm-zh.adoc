@@ -1,0 +1,226 @@
+= FreeCAD PLM
+:doctype: book
+:taack-category: 2|App
+:toc:
+:icons: font
+
+
+
+== 用途
+
+管理 FreeCAD 模型共享与线性版本控制。此应用展示了框架的强大能力：仅需极少的代码即可描述用户界面并管理持久化数据。我们可以将该应用视为面向 FreeCAD 的轻量级 PLM（产品生命周期管理）系统。
+
+== 角色
+
+* `ROLE_ADMIN`
+* `ROLE_PLM_USER`
+
+请参阅 link:Crew.adoc#_purpose[在 Crew 中配置角色] 以将该角色添加到您的内网（Intranet）中。
+
+== 服务器安装
+
+
+=== 配置 PLM 服务器
+
+如果您只想快速了解概览，可以直接下载带有默认配置的演示服务器，请直接跳转到 <<_launch_server_binaries>>。
+
+以下是分步命令：
+
+.克隆 Intranet 仓库
+[source,bash]
+----
+git clone https://github.com/Taack/intranet.git
+OR
+git clone git@github.com:Taack/intranet.git
+----
+
+.进入 `app` 目录
+[source,bash]
+----
+cd intranet/app
+----
+
+.克隆 PLM 仓库
+[source,bash]
+----
+git clone https://github.com/Taack/plm.git
+OR
+git clone git@github.com:Taack/plm.git
+----
+
+在此之后，您可以构建或直接运行服务器。将当前目录切换到 `intranet` 文件夹，然后选择以下任一操作：
+
+.构建服务器二进制文件（适用于生产环境）
+[source,bash]
+----
+./gradlew bootJar
+----
+
+.启动服务器（适用于开发环境）
+[source,bash]
+----
+./gradlew bootRun
+----
+
+[[_launch_server_binaries]]
+=== 启动服务器二进制文件
+
+演示版本可在此处下载：https://github.com/Taack/plm/releases[Taack PLM 发布页]，请下载 `server-0.6.jar`。
+
+如果您选择自行构建服务器二进制文件，请执行：
+
+[source,bash]
+.启动服务器
+----
+java -jar server/build/libs/server-0.6.jar
+----
+
+==== 服务器参数
+
+可用选项列表请参阅 `server/grails-app/conf/application.yml`。
+
+可以通过以下方式向服务器传递选项：
+
+[source,bash]
+.组合多个选项
+----
+java -DOption1=Value1 -DOption2=Value2 ... -jar server-0.3.jar
+----
+
+===== 常用选项
+
+* Intranet 存储文件的路径：`-Dintranet.root=/home/test/someDir`
+* 服务器端口：`-Dserver.port=9444`
+* 数据库 URL：`-DdataSource.url='jdbc:h2./prodDb2;LOCK_TIMEOUT=10000;DB_CLOSE_ON_EXIT=FALSE'`
+* `dot` 可执行文件路径：`-Dexe.dot.path=/somePath...`
+
+
+[[python-protobuf-install]]
+== FreeCAD 工作台安装
+
+进入 #Tools# > #Addon Manager#，刷新本地缓存并搜索 *Taack*。
+
+image::addon-screenshot2.webp[]
+
+点击安装按钮。
+
+== 使用方法
+
+=== 连接到 PLM
+
+.连接到 PLM
+image::fc-connect-plm.webp[]
+
+<1> 服务器 URL（以 `/` 结尾）
+<2> 用户名
+<3> 密码
+<4> 下载零件的存放目录（请确保该目录专用于存放来自 PLM 的零件）
+<5> 点击 `Connect`，等待显示 `Connected`
+
+=== 上传零件
+
+在 `Check-in` 标签页中点击 `Upload`（或 `Ok`）按钮会将文件上传到您的内网中。内网会生成预览图，此过程可能需要一些时间。
+
+.上传到 PLM
+image::freecad-plm.webp[]
+
+=== 搜索零件
+
+随后您可以搜索零件：
+
+.搜索零件
+image::fc-search-plm.webp[]
+
+<1> 点击 `Search Part` 标签页
+<2> 搜索零件
+<3> 仅限顶层装配体（不属于其他零件的零件）
+<4> 点击打开包含详细信息的对话框
+<5> 零件预览图
+<6> `Checkin`（检入）：将模型下载到本地并在服务器上锁定该文件，以便在您上传新版本之前其他人无法上传新版本
+<7> 以只读模式将模型下载到本地
+<8> 关闭窗口
+
+=== 管理已上传的零件
+
+.管理已上传的零件
+image::freecad-plm-2.webp[]
+
+<1> 点击 `Checkin` 会为您锁定该零件以供编辑，并将其加载到 FreeCAD 中。之后当您上传该零件时，您的新更改将添加到零件历史记录中，同时零件将被解锁。
+<2> 点击 `Download Read-Only` 会将零件下载到您的计算机并在 FreeCAD 中打开。除非您复制（派生）该零件，否则无法对其上传任何更改。
+
+=== 只读下载（Download Read-Only）
+
+请注意主零件 ID 字段中的 `READ_ONLY` 字样。如果您尝试通过 `Check-in` 标签页上传它，错误提示会提醒您该零件为只读状态。您必须先复制该零件才能上传新版本。
+
+.只读下载
+image::fc-download-only-plm.webp[]
+
+<1> 模型层级结构
+<2> 注意 `READ_ONLY` 关键字
+<3> 3D 模型
+
+=== 复制零件
+
+若要上传只读零件，必须先将其复制。如果您希望派生（fork）模型，也可以复制您已检入（`Checkin`）的零件。
+
+.复制零件
+image::fc-duplicate-plm.webp[]
+
+<1> 选择复制模型的方式，然后点击 `Duplicate History` 复制模型
+
+这将在服务器上创建一个新零件，并在两个零件之间保持关联链接：
+
+.服务器上的已复制零件
+image::freecad-taack-plm-server-part-details-duplicated.webp[]
+
+<1> 已复制零件（`Duplicated Parts`）标签页
+<2> 克隆出的零件
+<3> 查看此零件的层级关系图
+
+=== 服务器视图
+
+==== 零件列表
+
+.零件列表
+image::freecad-taack-plm-server-part-list2.webp[]
+
+<1> 上下文帮助
+<2> 用于查找零件的筛选器
+<3> 结果列表
+<4> 点击显示装配体的依赖关系图
+<5> 已锁定的零件（已检入的零件）
+
+==== 零件详情
+
+.零件详情视图
+image::freecad-taack-plm-server-part-details.webp[]
+
+<1> 当前版本的预览图
+<2> 子零件（含预览图，并链接到子零件的特定版本）
+<3> 版本信息
+<4> 将模型及其子零件打包下载为 ZIP 文件
+<5> 在 3D 线框查看器中预览模型
+<6> 更改零件状态，或者在您锁定了该零件或拥有相应权限时解锁零件
+<7> 为零件添加标签（Tag）以便于搜索
+
+==== 零件历史记录
+
+.零件历史记录
+image::freecad-taack-plm-server-part-details-history.webp[]
+
+<1> 初始版本
+<2> 零件已解锁，其他人可以将其检入（`Check-in`）
+<3> 状态从 `CREATED` 更改为 `FREE`
+<4> 零件的新上传版本，您可以查看旧模型的 3D 线框图以直观地追踪更改
+
+WARNING: 如果存在大量链接，请在同一台计算机上导入它们。在其他计算机上，请从内网下载 ZIP 文件。
+
+就是这些；稍后我会录制一些演示此应用功能的视频。
+
+video::YNbKiaUQY94[youtube, width=820, height=480]
+
+// # [auo@auo-systemproductname FreeCAD]$ yay -S boost cmake coin curl desktop-file-utils eigen gcc-fortran git glew hicolor-icon-theme jsoncpp libspnav med nlohmann-json opencascade pyside6-tools pyside6 python-matplotlib python-netcdf4 python-packaging python-pivy qt6-svg qt6-tools qt6-webengine shared-mime-info shiboken6 swig utf8cpp xerces-c yaml-cpp
+// git submodule update --init
+// ccmake -DFREECAD_QT_VERSION=6 ..
+// cmake .
+// make -j$(nproc --ignore=2)

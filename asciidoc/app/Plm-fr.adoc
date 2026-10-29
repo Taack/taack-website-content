@@ -1,0 +1,226 @@
+= FreeCAD PLM
+:doctype: book
+:taack-category: 2|App
+:toc:
+:icons: font
+
+
+
+== Objectif
+
+Gérer le partage de modèles FreeCAD et le versionnement linéaire. Cette application illustre les capacités du framework. Très peu de lignes de code suffisent à décrire l'interface utilisateur et à gérer les données persistantes. On peut voir cette application comme un petit PLM (Product Lifecycle Management) pour FreeCAD.
+
+== Rôles
+
+* `ROLE_ADMIN`
+* `ROLE_PLM_USER`
+
+Voir link:Crew.adoc#_purpose[configurer les rôles dans Crew] pour ajouter le rôle dans votre Intranet.
+
+== Installation du serveur
+
+
+=== Configurer le serveur PLM
+
+Si vous souhaitez simplement un aperçu, vous pouvez télécharger le serveur de démonstration avec sa configuration par défaut ; rendez-vous directement à la section <<_launch_server_binaries>>.
+
+Voici les commandes étape par étape :
+
+.Cloner le dépôt Intranet
+[source,bash]
+----
+git clone https://github.com/Taack/intranet.git
+OR
+git clone git@github.com:Taack/intranet.git
+----
+
+.Aller dans le dossier `app`
+[source,bash]
+----
+cd intranet/app
+----
+
+.Cloner le dépôt PLM
+[source,bash]
+----
+git clone https://github.com/Taack/plm.git
+OR
+git clone git@github.com:Taack/plm.git
+----
+
+À partir de là, vous pouvez compiler le serveur ou l'exécuter. Placez-vous dans le dossier `intranet` et choisissez l'une des options suivantes :
+
+.Compiler les binaires du serveur (pour un environnement de production)
+[source,bash]
+----
+./gradlew bootJar
+----
+
+.Lancer le serveur (pour un environnement de développement)
+[source,bash]
+----
+./gradlew bootRun
+----
+
+[[_launch_server_binaries]]
+=== Lancer les binaires du serveur
+
+Une version de démonstration est disponible ici : https://github.com/Taack/plm/releases[versions de Taack PLM], téléchargez `server-0.6.jar`.
+
+Si vous choisissez de compiler les binaires du serveur, exécutez :
+
+[source,bash]
+.Lancer le serveur
+----
+java -jar server/build/libs/server-0.6.jar
+----
+
+==== Arguments du serveur
+
+Consultez `server/grails-app/conf/application.yml` pour obtenir la liste des options disponibles.
+
+Les options peuvent être passées au serveur de la manière suivante :
+
+[source,bash]
+.Combiner des options
+----
+java -DOption1=Value1 -DOption2=Value2 ... -jar server-0.3.jar
+----
+
+===== Options
+
+* Chemin où l'Intranet stocke ses fichiers : `-Dintranet.root=/home/test/someDir`
+* Port du serveur : `-Dserver.port=9444`
+* URL de la base de données : `-DdataSource.url='jdbc:h2./prodDb2;LOCK_TIMEOUT=10000;DB_CLOSE_ON_EXIT=FALSE'`
+* Chemin de l'exécutable `dot` : `-Dexe.dot.path=/somePath...`
+
+
+[[python-protobuf-install]]
+== Installation de l'atelier FreeCAD
+
+Allez dans #Tools# > #Addon Manager#, rafraîchissez le cache local puis recherchez *Taack*.
+
+image::addon-screenshot2.webp[]
+
+Cliquez sur le bouton d'installation.
+
+== Utilisation
+
+=== Se connecter au PLM
+
+.Se connecter au PLM
+image::fc-connect-plm.webp[]
+
+<1> URL du serveur (avec un `/` final)
+<2> Nom d'utilisateur
+<3> Mot de passe
+<4> Répertoire où seront stockées les pièces téléchargées (assurez-vous qu'il soit exclusivement réservé aux pièces provenant du PLM)
+<5> Cliquez sur `Connect` et attendez que `Connected` apparaisse
+
+=== Envoyer des pièces
+
+Cliquer sur le bouton `Upload` (ou `Ok`) dans l'onglet `Check-in` enverra le fichier sur votre Intranet. L'Intranet générera un aperçu, ce processus peut prendre un certain temps.
+
+.Envoi vers le PLM
+image::freecad-plm.webp[]
+
+=== Rechercher des pièces
+
+Vous pouvez ensuite rechercher des pièces :
+
+.Rechercher des pièces
+image::fc-search-plm.webp[]
+
+<1> Cliquez sur l'onglet `Search Part`
+<2> Rechercher une pièce
+<3> Assemblages principaux uniquement (pièces qui n'appartiennent à aucune autre pièce)
+<4> Cliquez pour ouvrir une boîte de dialogue contenant les détails
+<5> Aperçu de la pièce
+<6> `Checkin` : télécharge le modèle localement et verrouille le fichier sur le serveur afin que personne ne puisse envoyer de nouvelle version tant que vous n'avez pas envoyé la vôtre
+<7> Télécharge le modèle localement, en mode lecture seule
+<8> Ferme la fenêtre
+
+=== Gérer les pièces envoyées
+
+.Gérer les pièces envoyées
+image::freecad-plm-2.webp[]
+
+<1> Cliquer sur `Checkin` verrouillera la pièce pour que vous puissiez la modifier et la chargera dans FreeCAD. Ensuite, lorsque vous enverrez la pièce, vos nouvelles modifications seront ajoutées à l'historique de la pièce et celle-ci sera déverrouillée.
+<2> Cliquer sur `Download Read-Only` téléchargera la pièce sur votre ordinateur et l'ouvrira dans FreeCAD. Vous ne pourrez pas envoyer de modifications sur cette pièce, à moins de la dupliquer.
+
+=== Téléchargement en lecture seule
+
+Remarquez la mention `READ_ONLY` dans le champ principal de l'identifiant de la pièce. Si vous tentez de l'envoyer via l'onglet `Check-in`, un message d'erreur vous rappellera que la pièce est en lecture seule. Vous devrez dupliquer la pièce pour pouvoir envoyer une nouvelle version.
+
+.Téléchargement en lecture seule
+image::fc-download-only-plm.webp[]
+
+<1> Hiérarchie du modèle
+<2> Remarquez le mot-clé `READ_ONLY`
+<3> Le modèle 3D
+
+=== Dupliquer des pièces
+
+Pour envoyer une pièce ouverte en lecture seule, vous devez la dupliquer. Vous pouvez également dupliquer une pièce que vous avez réservée (`Checkin`) si vous souhaitez créer une branche dérivée (fork) du modèle.
+
+.Duplication de pièces
+image::fc-duplicate-plm.webp[]
+
+<1> Choisissez le mode de duplication souhaité, puis cliquez sur `Duplicate History` pour dupliquer le modèle
+
+Cela créera une nouvelle pièce sur le serveur, tout en conservant un lien entre les deux pièces :
+
+.Pièces dupliquées sur le serveur
+image::freecad-taack-plm-server-part-details-duplicated.webp[]
+
+<1> Onglet des pièces dupliquées (`Duplicated Parts`)
+<2> La pièce clonée
+<3> Afficher le graphe hiérarchique de cette pièce
+
+=== Vues serveur
+
+==== Liste des pièces
+
+.Liste des pièces
+image::freecad-taack-plm-server-part-list2.webp[]
+
+<1> Aide contextuelle
+<2> Filtre pour rechercher une pièce
+<3> Liste des résultats
+<4> Cliquez pour afficher le graphe de dépendances de l'assemblage
+<5> Pièces verrouillées (pièces réservées en `Check-in`)
+
+==== Détails d'une pièce
+
+.Vue détaillée des pièces
+image::freecad-taack-plm-server-part-details.webp[]
+
+<1> Aperçu de la version actuelle
+<2> Sous-pièces, avec aperçu et liens vers la version spécifique de chaque sous-pièce
+<3> Informations de version
+<4> Télécharger le modèle et ses sous-pièces dans une archive ZIP
+<5> Aperçu du modèle dans une visionneuse 3D filaire (wireframe)
+<6> Changer le statut de la pièce ou déverrouiller la pièce si vous l'avez verrouillée ou si vous disposez des permissions nécessaires
+<7> Ajouter des étiquettes (tags) à la pièce pour faciliter sa recherche
+
+==== Historique d'une pièce
+
+.Historique de la pièce
+image::freecad-taack-plm-server-part-details-history.webp[]
+
+<1> Version initiale
+<2> La pièce est déverrouillée, quelqu'un peut la réserver (`Check-in`)
+<3> Statut passé de `CREATED` à `FREE`
+<4> Nouvel envoi de la pièce ; vous pouvez visualiser le modèle 3D filaire de l'ancienne version pour suivre visuellement les modifications
+
+WARNING: Si vous avez de nombreux liens, importez-les depuis le même ordinateur. Depuis d'autres ordinateurs, téléchargez l'archive ZIP depuis votre intranet.
+
+C'est tout ; j'enregistrerai quelques vidéos démontrant les capacités de cette application.
+
+video::YNbKiaUQY94[youtube, width=820, height=480]
+
+// # [auo@auo-systemproductname FreeCAD]$ yay -S boost cmake coin curl desktop-file-utils eigen gcc-fortran git glew hicolor-icon-theme jsoncpp libspnav med nlohmann-json opencascade pyside6-tools pyside6 python-matplotlib python-netcdf4 python-packaging python-pivy qt6-svg qt6-tools qt6-webengine shared-mime-info shiboken6 swig utf8cpp xerces-c yaml-cpp
+// git submodule update --init
+// ccmake -DFREECAD_QT_VERSION=6 ..
+// cmake .
+// make -j$(nproc --ignore=2)

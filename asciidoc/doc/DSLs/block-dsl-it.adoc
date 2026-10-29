@@ -1,0 +1,266 @@
+= Block DSL
+:doctype: book
+:taack-category: 10|doc/DSLs
+:toc:
+:source-highlighter: rouge
+:icons: font
+
+[%interactive]
+* [*] Renderizzato in HTML
+* [*] Renderizzato in PDF
+* [ ] Renderizzato in CSV
+
+DSL di primo livello responsabile della disposizione degli elementi grafici della pagina e dell'aggiornamento congiunto degli `ajaxBlock`. Nel caso in cui si stia renderizzando una pagina completa, è necessario specificare anche la descrizione del menu della pagina tramite il link:menu-dsl.adoc[Menu DSL].
+
+Questo DSL è inoltre responsabile della gestione dello stack delle finestre modali. Aprire una modale usando `modal` o chiuderla usando `closeModalAndUpdateBlock` (e altre varianti).
+
+== Esempio di codice per la costruzione di blocchi
+
+[[block-preview]]
+.Esempio di blocco con schede (vedi <<block-sample1>>).
+image::screenshot-dsl-block.webp[]
+
+[source,groovy]
+[[block-sample1]]
+.Esempio di blocco con schede
+----
+def editSlideshow(CmsPage slideshow) {
+
+    Boolean createNew = slideshow == null
+    if (!slideshow)
+        slideshow = new CmsPage(pageType: CmsPageType.SLIDESHOW)
+
+    UiBlockSpecifier b = new UiBlockSpecifier().ui {
+        if (createNew)
+            modal {
+                form buildCmsSlideshowForm(slideshow)
+            }
+        else {
+            row {                                               <1>
+                col {
+                    form buildCmsSlideshowForm(slideshow)
+                }
+                col {
+                    tabs {
+                        tab "Images", buildImagesTab(slideshow) <2>
+                        tab "Videos", buildVideosTab(slideshow)
+                    }
+                }
+            }
+
+        }
+    }
+    taackUiService.show(b, buildMenu())                     <3>
+}
+----
+
+<1> 1 riga, 2 colonne
+<2> Dichiarare 2 schede all'interno; la prima viene visualizzata all'apertura della pagina
+<3> Inviare il blocco insieme alla descrizione del menu al browser.
+
+pass:[<a class="taackMenu" ajaxAction="/dslSample/block" href="/dslSample/block">&#9654; Try it live</a>]
+
+== Esempio di codice per lo stack modale
+
+Dopo aver elaborato un modulo, è possibile aggiornare il contenuto della pagina o di un'altra finestra modale sottostante a quella corrente. È anche possibile ricaricare la pagina o visualizzare un'altra pagina. Ricaricare la pagina consente al codice di essere riutilizzabile, poiché non dipende dall'URL corrente (ricordate i *parametri* `redirectAction` visti in link:../../first-app.adoc#_adding_buttons_to_a_table_block[Prima applicazione (Aggiungere pulsanti a un blocco tabella)]).
+
+Di solito una finestra modale viene chiusa dopo l'elaborazione di un modulo. O non è valido, e gli errori vengono mostrati nel browser direttamente nel modulo, oppure salviamo l'oggetto e aggiorniamo il contenuto.
+
+=== Chiudere la modale e ricaricare la pagina
+
+[source,groovy]
+----
+@Transactional
+@Secured(["ROLE_CMS_MANAGER", "ROLE_CMS_DIRECTOR"])
+def saveCmsInsert() {
+    taackSaveService.saveThenReloadOrRenderErrors(CmsInsert)
+}
+----
+
+Se non viene rilevato alcun errore durante il salvataggio di `CmsInsert`, la pagina viene semplicemente ricaricata.
+
+=== Chiudere la modale e caricare una pagina
+
+[source,groovy]
+----
+@Transactional
+@Secured(["ROLE_ADMIN", "ROLE_CMS_MANAGER", "ROLE_CMS_DIRECTOR"])
+def saveCmsPage() {
+    taackSaveService.saveThenRedirectOrRenderErrors(  <1>
+        CmsPage, this.&pages as MethodClosure
+    )
+}
+----
+<1> Verrà caricata la closure del metodo in questo controller (rispettando gli URL Mappings)
+
+=== Chiudere la modale e aggiornare la modale sottostante
+
+[source,groovy]
+----
+@Transactional
+@Secured(['ROLE_ADMIN'])
+def saveLlmRag() {
+    taackSaveService.saveOrCloseModalAndRefresh(LlmRag)  <1>
+}
+----
+<1> Se non viene rilevato alcun errore, l'ultima modale viene chiusa e il contenuto sottostante (pagina o modale precedente) viene aggiornato
+
+=== Chiudere la modale e aggiornare i blocchi Ajax della pagina
+
+.Caso d'uso complesso: chiudere la finestra modale e aggiornare gli `ajaxBlock` presenti nella pagina
+[source,groovy]
+----
+@Transactional
+def saveProjects() {
+    EngineeringChangeRequest ecr = taackSaveService.save(EngineeringChangeRequest) <1>
+    taackSaveService.displayBlockOrRenderErrors(ecr,
+        new UiBlockSpecifier().ui {                                             <2>
+            closeModalAndUpdateBlock {                                          <3>
+                show buildShowProjects(ecr), {
+                    menuIcon ActionIcon.ADD, Ecr2Controller.&projectsForm as MC, ecr.id
+                }
+            }
+        }
+    )
+}
+----
+
+<1> Associare i parametri e salvare l'oggetto
+<2> `displayBlockOrRenderErrors` accetta un `UiBlockSpecifier` come parametro, renderizzato solo se l'oggetto non presenta errori
+<3> `closeModalAndUpdateBlock` chiuderà prima l'ultima modale aperta e poi applicherà la modifica
+
+=== Sostituire il contenuto di una modale
+
+[source,groovy]
+----
+taackUiService.show(new UiBlockSpecifier().ui {
+    replaceModal {                                      <1>
+        custom "<h1>Done.</h1>"
+    }
+})
+----
+<1> Il contenuto della modale corrente viene sostituito, senza aprirne una nuova
+
+== Elementi di layout
+
+[source,groovy]
+.Righe, colonne, fisarmonica (Accordion), scheda (Card) e ScrollPanel
+----
+new UiBlockSpecifier().ui {
+    row {
+        col BlockSpec.Width.TWO_THIRD, {                <1>
+            card 'Customers', {                         <2>
+                menu 'Export', this.&export as MC
+            }, {
+                scrollPanel '512px', {                  <3>
+                    table buildCustomerTable()
+                }
+            }
+        }
+        col BlockSpec.Width.THIRD, {
+            accordion {                                 <4>
+                accordionItem 'Filter', true, {
+                    form buildFilterForm()
+                }
+            }
+        }
+    }
+}
+----
+<1> Larghezza di `col`, da `BlockSpec.Width`: `MAX`, `THREE_QUARTER`, `TWO_THIRD`, `HALF` (predefinito), `THIRD`, `QUARTER` o `FLEX`
+<2> `card` con titolo opzionale, closure di menu opzionale e il suo contenuto
+<3> `scrollPanel` limita l'altezza del suo contenuto, aggiungendo una barra di scorrimento se necessario
+<4> `accordion` contiene `accordionItem`; il secondo parametro indica se l'elemento è aperto per impostazione predefinita
+
+[source,groovy]
+.Aggiornare solo alcuni blocchi con `poke`
+----
+def topCustomerSalesCard(StatsParams statsParams) {
+    boolean p0 = statsParams.v == 0
+    boolean p1 = statsParams.v == 1
+    boolean p2 = statsParams.v == 2
+
+    taackUiService.show(new UiBlockSpecifier().ui {
+        poke p0, {
+            table statsService.buildTable()                         <1>
+        }
+        row {
+            poke p1, {                                              <2>
+                col BlockSpec.Width.HALF, {
+                    card({                                          <3>
+                        label 'Sales1'
+                        menu 'Yearly', StatsController.&topCustomerSalesCard as MC,
+                            new StatsParams(showMonthlyGraph1: false, v: 1)
+                        menu 'Monthly', StatsController.&topCustomerSalesCard as MC,
+                            new StatsParams(groupPerMonth1: false, v: 1)
+                    }, {
+                        diagram statsService.&buildChart1 as MC     <4>
+                    })
+                }
+            }
+            poke p2, {
+                col BlockSpec.Width.HALF, {
+                    diagram(statsService.&buildChart2 as MC) {      <5>
+                        label 'Sales2'
+                        menu 'Yearly', StatsController.&topCustomerSalesCard as MC,
+                            new StatsParams(showMonthlyGraph2: false, v: 2)
+                    }
+                }
+            }
+        }
+    }, RootController.buildMenu(), statsParams)                     <6>
+}
+----
+<1> Le righe della tabella puntano a questa azione con `v: 1` o `v: 2`, aggiornando solo uno dei diagrammi
+<2> `p1` e `p2` sono booleani. Se `true`, i blocchi all'interno del blocco `poke` vengono aggiornati
+<3> `card` con una closure di menu e una closure di contenuto
+<4> `diagram` può accettare una `MethodClosure` che restituisce un `UiDiagramSpecifier`
+<5> Qualsiasi elemento foglia può accettare una closure di menu, visualizzata nella sua intestazione
+<6> `StatsParams` è un `Validateable`; i suoi valori vengono mantenuti quando si fa clic sui link
+
+.Schede, diagrammi e `poke`
+image::screenshot-dsl-block-poke.webp[]
+
+== Elementi del Block DSL
+
+=== Contenitori
+* `modal`: apre una finestra modale; `modal(true) {}` ricarica la pagina quando la modale viene chiusa
+* `replaceModal`: sostituisce il contenuto della modale corrente
+* `closeModalAndUpdateBlock`: chiude l'ultima modale e aggiorna i blocchi della pagina (o della modale precedente)
+* `closeModal`: chiude la modale e trasmette un id e un valore al modulo che l'ha aperta (utilizzato dalle selezioni `ajaxField`)
+* `ajaxBlock`: racchiude altri elementi e consente di aggiornare solo una porzione della pagina
+* `row`, `col`: dispone gli elementi orizzontalmente, vedi `BlockSpec.Width`
+* `tabs`, `tab`: schede, la prima viene visualizzata per impostazione predefinita
+* `accordion`, `accordionItem`: elementi comprimibili
+* `card`: scheda con un titolo e un menu
+* `scrollPanel`: elemento con un'altezza massima
+* `poke`: aggiorna il contenuto solo se la condizione è vera
+
+=== Foglie (Leaves)
+Tutte le foglie possono accettare una closure opzionale che descrive un menu (vedi link:menu-dsl.adoc[Menu DSL]) visualizzato nell'intestazione del blocco.
+
+* `form`: vedi link:form-dsl.adoc[Form DSL]
+* `show`: vedi link:show-dsl.adoc[Show DSL]
+* `table`, `tableFilter`: vedi link:filter-table-dsl.adoc[FilterTable DSL]
+* `diagram`, `diagramFilter`: vedi link:diagram-dsl.adoc[Diagram DSL]
+* `kanban`, `kanbanFilter`: vedi link:kanban-dsl.adoc[Kanban DSL]
+* `custom`: codice HTML personalizzato
+* `iframe`: visualizza un URL in un iframe
+
+== Gerarchia dei simboli di Block DSL
+
+[graphviz,format="svg",align=center]
+.Diagramma della gerarchia dei simboli per Block DSL (senza ajaxBlock)
+----
+digraph mygraph {
+  node [shape=box];
+  ui -> modal, replaceModal, closeModalAndUpdateBlock [label = "0,1"]
+  ui, modal, replaceModal, closeModalAndUpdateBlock -> row, tabs, accordion, card, scrollPanel, poke [label = "0,N"]
+  row -> col [label = "1,N"]
+  tabs -> tab [label = "1,N"]
+  accordion -> accordionItem [label = "1,N"]
+  ui, modal, tab, col, accordionItem, card, scrollPanel, poke -> form, show, table, tableFilter, diagram, diagramFilter, kanban, kanbanFilter, custom, iframe [label = "0,N"]
+}
+----
+
+`ajaxBlock` può racchiudere altri elementi e consente di aggiornare solo una porzione della pagina.

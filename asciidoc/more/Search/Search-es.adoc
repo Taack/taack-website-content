@@ -1,0 +1,140 @@
+= Búsqueda con Solr
+:doctype: book
+:taack-category: 10|more/Search
+:source-highlighter: rouge
+:toc:
+:icons: font
+
+== Instalar Solr
+
+Descargue y extraiga la última versión binaria (consulte la https://solr.apache.org/downloads.html[página de descargas de Solr])
+
+=== Iniciar y crear el core `taack`
+
+[bash]
+----
+cd solr-<version>
+bin/solr start
+bin/solr create_core -c taack
+bin/solr config -c taack -p 8983 -action set-user-property -property update.autoCreateFields -value false
+----
+
+WARNING: En un servidor de producción, el puerto `8983` no debe ser accesible desde el exterior.
+
+==== Copiar el archivo `mapping-ISOLatin1Accent.txt` en el directorio de configuración de Solr
+
+El archivo `mapping-ISOLatin1Accent.txt` se encuentra en la carpeta `intranet`:
+
+[bash]
+----
+cp intranet/mapping-ISOLatin1Accent.txt solr-9.6.1/server/solr/taack/conf/mapping-ISOLatin1Accent.txt
+----
+
+El resto de la configuración debe realizarse en tiempo de ejecución. Solo este archivo es obligatorio.
+
+[[add-obsjects-to-solr-index]]
+== Añadir objetos al índice de Solr
+
+=== Indexar una clase de dominio
+
+En el proyecto `intranet`, observe https://github.com/Taack/intranet/blob/main/app/crew/grails-app/services/crew/CrewSearchService.groovy[`CrewSearchService.groovy`]
+
+[,groovy]
+----
+@PostConstruct
+private void init() {
+    taackSearchService.registerSolrSpecifier(
+        this,
+        new SolrSpecifier(User,
+            CrewController.&showUserFromSearch as MethodClosure,    <1>
+            this.&labeling as MethodClosure, { User u ->            <2>
+        u ?= new User()
+        indexField "User Name (without Accents)",
+            SolrFieldType.TXT_NO_ACCENT, u.username_
+        indexField SolrFieldType.TXT_GENERAL, u.username_
+        indexField SolrFieldType.TXT_NO_ACCENT, u.firstName_
+        indexField SolrFieldType.TXT_NO_ACCENT, u.lastName_
+        indexField SolrFieldType.POINT_STRING, "mainSubsidiary", true, u.subsidiary?.toString()
+        indexField SolrFieldType.POINT_STRING, "businessUnit", true, u.businessUnit?.toString()
+        indexField SolrFieldType.DATE, 0.5f, true,  <3>
+            u.dateCreated_
+        indexField SolrFieldType.POINT_STRING,      <3>
+            "userCreated",  // Faceting String
+            0.5f,           // Boost factor
+            true, u.userCreated?.username
+    }))
+}
+----
+<1> Consulte <<add-obsjects-to-solr-index>>
+<1> Consulte <<display-selected-object>>
+<3> `true` habilita las facetas (faceting)
+
+Tiene diferentes opciones para procesar el texto:
+
+* `POINT_STRING` no modificará la cadena al indexar
+* `TXT_NO_ACCENT` eliminará los acentos
+* ...
+
+Puede indexar el mismo campo más de una vez.
+
+=== Etiquetar los objetos encontrados
+
+[,groovy]
+----
+String labeling(Long id) {
+    def u = User.read(id)
+    "User: ${u.firstName} ${u.lastName} ($id)"
+}
+----
+
+[[display-selected-object]]
+=== Mostrar el objeto seleccionado
+
+Aquí se utiliza `CrewController.&showUserFromSearch` al hacer clic en el objeto encontrado:
+
+[,groovy]
+----
+def showUserFromSearch(User u) {
+    taackUiService.show(new UiBlockSpecifier().ui {
+        show u.username, crewUiService.buildUserShow(u), BlockSpec.Width.MAX
+    }, buildMenu())
+}
+----
+
+=== Añadir barra de búsqueda
+
+[,groovy]
+----
+private UiMenuSpecifier buildMenu(String q = null) {
+    new UiMenuSpecifier().ui {
+        menu CrewController.&index as MC
+        menu CrewController.&listRoles as MC
+        menu CrewController.&hierarchy as MC
+        menuIcon ActionIcon.CONFIG_USER, this.&editUser as MC
+        menuIcon ActionIcon.EXPORT_CSV, this.&downloadBinPdf as MC
+        menuIcon ActionIcon.EXPORT_PDF, this.&downloadBinPdf2 as MC
+        menuSearch this.&search as MethodClosure, q     <1>
+        menuOptions(SupportedLanguage.fromContext())
+    }
+}
+----
+<1> Añadir entrada `menuSearch`
+
+=== Acción de búsqueda
+
+[,groovy]
+----
+def search(String q) {
+    taackUiService.show(crewSearchService.buildSearchBlock(q), buildMenu(q))
+}
+----
+
+[,groovy]
+----
+UiBlockSpecifier buildSearchBlock(String q) {
+    taackSearchService.search(q, CrewController.&search as MethodClosure, User) <1>
+}
+----
+<1> el último parámetro es una lista de clases a las que queremos apuntar en este bloque de búsqueda
+
+Podemos tener más de 1 bloque de resultados de búsqueda en una página.

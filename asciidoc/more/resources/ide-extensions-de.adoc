@@ -1,0 +1,16 @@
+= IDE-Erweiterung
+:doctype: book
+:taack-category: 0|more/resources
+:source-highlighter: rouge
+
+== Intellij
+
+Darüber hinaus können Sie auch die Taack-UI Live Templates importieren, um Boilerplate-Code ganz einfach wie folgt zu generieren:
+
+video::6ADI8FrnIzg[youtube,title=IntelliJ Live Templates, opts="autoplay,loop", width=640, height=480]
+
+Laden Sie dazu `taack-intellij-templates.zip` auf der https://github.com/Taack/taack-autocomplete/releases/tag/v1.6[Release-Seite] herunter.
+Gehen Sie anschließend in IntelliJ auf `File > Manage IDE Settings > Import Settings`. Nachdem Sie die Datei ausgewählt haben, klicken Sie auf „OK“, wenn IntelliJ Sie fragt, was Sie importieren möchten – und schon sind Sie startklar.
+
+
+== Visual Studio Code

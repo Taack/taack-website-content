@@ -1,0 +1,238 @@
+= Taack JDBC 驱动程序
+:doctype: book
+:taack-category: 0|more/JDBC
+:toc:
+:source-highlighter: rouge
+:icons: font
+
+== 它是什么？
+
+JDBC 代表 *Java Database Connectivity*（Java 数据库连接）。它是一个历史悠久、重要且被广泛使用的 Java 组件，简化了不同程序之间的数据查询与编辑。
+
+我们当前的 JDBC 实现仅允许从 Intranet 查询数据。
+
+通过这种方式更新数据是一个复杂的课题。我们必须处理用户权限和数据验证，而这些并没有在数据库层面描述，而是直接写在 Intranet 的代码中。为了避免代码重复，我们需要在自己的体系中采用新的方法。
+
+.无错误执行查询时的时序图
+[plantuml,format="svg",opts="online"]
+----
+@startuml
+group Querying Object using TQL
+        You -> Program : Type the Query
+        activate Program
+        Program -> Driver : Transmit the Query
+        Driver -> Intranet : Transmit the Query
+        Intranet -> Intranet : Validate TQL Grammar
+        Intranet -> Intranet : Validate Tables and fields
+        Intranet -> Intranet : Translate TQL to HQL
+        Intranet -> Intranet : Translate HQL to SQL
+        note right
+            **SQL** is the Database
+            Native Language
+        end note
+        Intranet -> Database : transmit the SQL
+        activate Database #000055
+        Database -> Intranet : retreive Results
+        deactivate Database
+        Intranet -> Intranet : Pack Results
+        Intranet -> Driver : Transmit the Pack
+        Driver -> Driver : Unpack
+        Driver -> Program : Transmit Results
+        Program -> You : Show Results
+        deactivate Program
+        You -> Program : You scroll on \nthe results
+        note right
+            **Program** will request for
+            more data if needed,
+            using an **offset**
+        end note
+end
+
+box "Your Computer" #LightBlue
+    participant Program
+    participant Driver
+end box
+box "The Intranet Server" #Yellow
+    participant Intranet
+    participant Database
+end box
+
+@enduml
+----
+
+== 可以在哪些软件中使用此驱动程序查询数据？
+
+目前仅有 *3 款软件* 与此驱动程序进行了测试：
+|===
+|程序               |自省（Introspection）？|查询？    |更新？     | 插入？
+
+|LibreOffice 7.3    |仅表列表               |是        |否         | 否
+|dBeaver            |是                     |是        |暂不支持   | 暂不支持
+|Intellij           |是                     |是        |暂不支持   | 暂不支持
+|===
+
+#自省（Introspection）# 可以通过 *自动补全* 帮助您编写查询。在输入查询语句的过程中，程序会提示您可用的表和字段。
+
+分析数据通常有 2 种工作模式：
+
+* 在支持 *自省（Introspection）* 的软件中编写并测试查询；
+* 然后，您可以选择：
+** 直接在 *LibreOffice* 中使用所编写的查询
+** 或者使用 *CSV 导出* 并将其导入任何软件（包括 *Office*）
+
+WARNING: 我稍后会制作关于如何在这些程序中配置该驱动的视频。
+
+[[_tql_queries]]
+== TQL 查询
+
+常规 JDBC 驱动程序与我们的驱动程序之间的主要区别在于查询语言。
+
+我们开发了 *TQL*（Taack Query Language，Taack 查询语言），它具有以下优势：
+
+* 安全：在将输入的查询发送到实际数据库之前，我们会对其进行检查
+* 语法简单：
+** 减少对连接（Join）的需求
+** 引用字段访问（参见 <<easy-syntax>> 第 (2) 点）
+* 与具体数据库无关（Database agnostic）
+
+=== 基本查询的结构
+
+[source,sql]
+[[easy-syntax]]
+.TQL 基础示例
+----
+select                              <1>
+    l.client.firstName,             <2>
+    l.rep.username                  <2>
+from Lead l                         <3>
+where l.dateCreated > '2022-01-01'  <4>
+----
+<1> #Select 子句#，允许选择 *列*；
+<2> #解引用字段#，如果列本身是一个对象，您可以递归访问该对象的字段。此处的 `rep` 是一个 `User` 对象，其自身包含字段（例如 `username`）；
+<3> #From 子句#，允许选择 *表*，此处我们使用了 _别名_ `l`
+<4> #Where 子句#，允许过滤数据。
+
+=== 带公式的基本查询
+
+可以在 select 子句中添加算术公式。
+
+[source,sql]
+[[basic-query-with-formulas]]
+.带公式的 TQL 基础示例
+----
+select
+    ll.lead.name,
+    ll.qty * ll.salePrice as totalWoTaxes   <1>
+from LeadLine ll
+where ll.qty * ll.salePrice > 100           <2>
+----
+<1> #Select 子句#，同时支持 `列别名` 和算术运算
+<2> #Where 子句# 也支持算术运算
+
+WARNING: 列别名必须以小写字母开头，且只能包含 ASCII7 字符集中的字符。
+
+.带公式的基础示例结果
+|===
+|lead.name |totalWoTaxes
+
+|Balisage pylône SFR site 240087 (Hivory)
+|250.00000000
+
+|Balisage pylône SFR site 240087 (Hivory)
+|340.00000000
+
+|Balisage pylône SFR site 240087 (Hivory)
+|3410.00000000
+
+|EL BJORN low intensity IR AWL system
+|2700.00000000
+|===
+
+=== 带分组的查询
+
+分组子句增加了聚合数据的能力。
+<<basic-query-with-formulas>> 并不是每个报价一行，而是每个报价行一行。
+可以使用分组来让每个报价只显示一行，如下例所示：
+
+[source,sql]
+.带分组和公式的 TQL 示例
+----
+select
+    ll.lead.rep.mainSubsidiary as salesmanSubsidiary,   <1>
+    count(ll.id),                                       <2>
+    sum(ll.qty * ll.salePrice)                          <2>
+from LeadLine ll
+group by ll.lead.rep.mainSubsidiary                     <1>
+----
+<1> 标准字段，必须列在 #Group by 子句# 中；
+<2> 您可以使用 #count# 或 #sum# 聚合函数。
+
+WARNING: 聚合列不支持列别名
+
+|===
+|salesmanSubsidiary|count(ll.id)    |sum(ll.qty * ll.salePrice)
+
+|CITEL_2CP         |118605|212619001943.17760000
+|CITEL_GMBH        |37336 |261342488.98760000
+|CITEL_INC         |25172 |319681146.49190000
+|CITEL_INDIA       |24868 |1122541659.94000000
+|CITEL_OOO         |10382 |3990221200.80740000
+|CITEL_SH          |269   |552810.59000000
+|OBSTA             |46151 |2762758463.12580000
+|===
+
+=== 内连接查询（Inner Joins）
+
+有时一列会指向多行数据。
+
+这被称为 *多对多（many-to-many）* 关系。我们不能直接使用引用字段，而必须使用所谓的 *连接（joins）*……（听起来很有 70 年代的感觉，但这可不怪我）
+
+在下一个示例中，*Items* 包含多个 *Values*，而 *Values* 也可以被多个 *Item* 使用。如果我们想在同一张表中列出 Items 和 Values，就需要对两个数据集求某种笛卡尔积（cross-product）。
+
+WARNING: 两个集合的笛卡尔积基数为 #M x N#，您必须使用 *Where 子句* 来减少结果数量。
+
+[source,sql]
+.TQL 简单连接
+----
+select
+    i.name,
+    i.ref,
+    v.valueString,
+    v.associatedProperty.valueKind as kind,
+    v.associatedProperty.kindOfCharacteristic as typeOfChar,
+    v.associatedProperty.nameAlias as nameAlias
+from Item i, Value v                                    <1>
+where v in elements(i.values) and i.range.name = 'DVM'  <2>
+
+----
+<1> 我们独立地列出 2 张表
+<2> 我们 *必须* 使用表达式 `v in elements(i.values)` 限制结果数量
+
+.结果
+|====
+| name | ref | valueString | kind | typeOfChar | nameAlias
+
+| DVM-230-16A | 3589015 | NULL | dico | BULLET_POINTS | bulletPoints
+| DVM-230-16A | 3589015 | IP20 | string | MECA | NULL
+| DVM-230-16A | 3589015 | -40/+85°C | string | MECA | NULL
+| DVM-230-16A | 3589015 | NULL | dico | NULL | description
+| DVM-230-16A | 3589015 | NULL | dico | NULL | subFamily
+| DVM-230-16A | 3589015 | NULL | dico | MECA | NULL
+| DVM-230-16A | 3589015 | NULL | dico | NORMES | NULL
+| DVM-230-16A | 3589015 | voir schéma | dico | MECA | NULL
+| DVM-230-16A | 3589015 | NULL | dico | MECA | NULL
+| DVM-230-16A | 3589015 | NULL | dico | MECA | NULL
+| DVM-230-16A | 3589015 | NULL | dico | MECA | NULL
+| DVM-230-16A | 3589015 | 16 A | string | ELEC | NULL
+| DVM-230-16A | 3589015 | NULL | dico | ELEC | NULL
+| DVM-230-16A | 3589015 | 0.0305 kg | string | MECA | NULL
+| DVM-230-16A | 3589015 | NULL | dico | NULL | family
+| DVM-230-16A | 3589015 | 230 V monophasé | dico | ELEC | NULL
+| DVM-230-16A | 3589015 | PTFE | string | MECA | NULL
+| DVM-230-16A | 3589015 | NULL | bool | NULL | NULL
+|====
+
+== 当前驱动程序的限制
+
+* 无法 *解引用* 多语言字段（`v.valueMap['fr']` 会失败，`v.valueMap` 也是如此）。
+* 我们目前仅支持内连接（Inner join），不支持外连接（Outer join）。我们当前的连接实现较慢，虽然可以改进，但实现起来更加复杂。

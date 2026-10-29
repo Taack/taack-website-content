@@ -1,0 +1,51 @@
+= Taack UI DSLs
+:doctype: book
+:taack-category: 2|doc/Concepts
+:toc:
+:source-highlighter: rouge
+:icons: font
+
+== Premessa su Block DSL
+
+Il Block DSL consente di specificare il layout della pagina definendo blocchi che contengono elementi grafici. Un blocco può essere aggiornato tramite azioni. I `blocchi AJAX` possono essere indirizzati utilizzando il loro ID. I blocchi possono anche essere annidati.
+
+Per ulteriori informazioni, fare riferimento alla pagina dedicata a link:../DSLs/block-dsl.adoc[Block DSL]. I PDF dispongono di una propria gestione dei blocchi tramite i link:../DSLs/block-printable-dsl.adoc[Blocchi stampabili], in cui sono applicabili anche i DSL show, table e diagram.
+
+[source,groovy]
+----
+UiBlockSpecifier b = new UiBlockSpecifier() <1>
+b.ui {
+    modal {                                 <2>
+        form f                              <3>
+    }
+}
+----
+
+<1> Crea il blocco, costruito tramite il metodo `ui`
+<2> Questo blocco conterrà una finestra modale, che è anch'essa un blocco
+<3> La finestra modale contiene un modulo
+
+[[form-html-output]]
+.Modulo all'interno di una finestra modale.
+image::screenshot-dsl-user-form-800h.webp[]
+
+== DSL degli elementi di blocco
+
+* link:../DSLs/form-dsl.adoc[*Form DSL*]: Consente di definire un modulo da includere in un blocco
+
+* link:../DSLs/show-dsl.adoc[*Show DSL*]: Consente di mostrare il riepilogo di un oggetto. Supporta la modifica limitata dei campi
+
+* link:../DSLs/filter-table-dsl.adoc[*DSL di tabella e filtro di tabella*]: Una tabella è associata a uno o zero filtri. I filtri non possono essere visualizzati senza una tabella.
+** Il Table DSL consente di raggruppare e ordinare le colonne
+** La paginazione è inclusa
+** La tabella può anche rappresentare un albero
+** Le righe possono essere modificate in linea (`rowQuickEdit`)
+** Il filtro può essere visualizzato accanto alla tabella o come barra degli strumenti sopra di essa (`FilterLayout`)
+* link:../DSLs/diagram-dsl.adoc[*Diagram DSL*]: Consente di disegnare diagrammi (a barre, a linee, ad area, a dispersione, a torta, box-plot, timeline) in un blocco, in un PDF o in un'e-mail
+* link:../DSLs/kanban-dsl.adoc[*Kanban DSL*]: Consente di disegnare una bacheca Kanban con trascinamento (drag & drop) tra le colonne
+* `custom`: Consente di inserire codice HTML personalizzato in un blocco.
+
+== DSL a livello di pagina
+
+* link:../DSLs/menu-dsl.adoc[*Menu DSL*]: Descrive il menu della pagina (voci, sottomenu, icone, casella di ricerca, opzioni)
+* link:../DSLs/block-printable-dsl.adoc[*Printable Block DSL*]: Descrive il layout di un documento PDF

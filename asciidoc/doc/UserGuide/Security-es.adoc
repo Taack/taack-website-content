@@ -1,0 +1,38 @@
+= Seguridad
+:taack-category: 11|doc/UserGuide
+:toc:
+:source-highlighter: rouge
+:icons: font
+
+== Spring Security
+
+El framework *Taack-ui* comprueba la anotación `@Secured` en las acciones para mostrar enlaces e iconos de acceso. Las entradas de menú, enlaces y botones de acción desaparecen cuando el usuario no tiene los permisos necesarios.
+
+== Enfoque más detallado
+
+Un punto central puede gestionar casos más complejos permitiendo o denegando el acceso a una acción.
+
+.Código de gestión de acceso a acciones
+[source,groovy]
+----
+SpringSecurityService springSecurityService
+
+private securityClosure(Long id, Map p) {   <1>
+    if (!id && !p) return true
+    if (!id) return true
+    canEdit(User.read(id))
+}
+
+@PostConstruct
+void init() {
+    TaackUiEnablerService.securityClosure(
+            this.&securityClosure,          <2>
+            CrewController.&editUser as MC, <3>
+            CrewController.&saveUser as MC)
+}
+
+----
+
+<1> Los parámetros incluyen el `id` del usuario y los parámetros de la acción
+<2> Registra una restricción de acceso (`access constraints`)
+<3> Acciones afectadas por esta restricción de acceso

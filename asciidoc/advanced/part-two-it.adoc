@@ -1,0 +1,630 @@
+= Parte Due
+:doctype: book
+:taack-category: 2|advanced
+:toc:
+:source-highlighter: rouge
+
+== Configurazione
+La soluzione e gli scheletri per questa attività sono disponibili per la clonazione in questo repository:
+
+[,shell]
+----
+git clone git@github.com:Taack/myLibrary.git
+----
+
+.Per accedere allo scheletro di questa parte, aprite il terminale, entrate con `cd` nel progetto (`myLibrary`) e copiate la riga seguente.
+[,bash]
+----
+git checkout part-2-skeleton
+----
+
+Oppure in IntelliJ potete selezionare direttamente il branch desiderato. Selezionate nell'angolo in alto a sinistra `main/myLibrary/remote` e vedrete tutti i branch. Selezionate un branch ed eseguite «Checkout».
+
+== Introduzione
+
+Ora avete creato una biblioteca personale; aggiungiamo alcune funzionalità. Vogliamo aggiungere un sistema di prestito. Dopo questa parte, potrete prendere in prestito libri dalla vostra biblioteca, approvare la richiesta e restituire i libri, e avrete anche accesso alla cronologia delle vostre richieste di prestito.
+
+Abbiamo aggiornato il codice in `myLibrary`. Eseguite un `pull` di questa versione per avere accesso al nuovo codice scheletro.
+
+.Modulo
+image::part-two-screenshot.webp[Reload,width=800,align="left"]
+
+
+== Definire e aggiornare le classi di dominio
+Modifica: `app/library/src/main/groovy/myLibrary/domain/`
+
+
+.Diagramma delle classi aggiornato per vostra comodità
+[plantuml, format="svg", opts="inline"]
+----
+@startuml
+
+enum ApprovalStatus {
+    PENDING
+    APPROVED
+    REJECTED
+}
+
+class MyLibraryAuthor {
+    String firstName
+    String lastName
+    Date dateOfBirth
+    Boolean isActive = true
+    String toString()
+}
+
+class MyLibraryBook {
+    String title
+    String description
+    int numberOfPages
+    int count = 0
+    int getNumberOfInstances()
+    int getNumberOfBooksBorrowable()
+}
+
+class MyLibraryBookInstance {
+    Boolean isActive = true
+    Integer serialNumber
+    Boolean isAvailableB = true
+}
+
+class MyLibraryBorrowed {
+    Date requestDate
+    Date approvalDate
+    Date returnDate
+    ApprovalStatus statusOfApproval = PENDING
+}
+
+class User
+
+MyLibraryAuthor "1" --> "*" MyLibraryBook : listOfBooks
+MyLibraryBook "1" --> "*" MyLibraryBookInstance : listOfBookInstance
+MyLibraryBookInstance "*" --> "1" MyLibraryBook : belongsTo
+MyLibraryBookInstance "1" --> "*" MyLibraryBorrowed : borrowHistoryOfBook
+MyLibraryBorrowed "*" --> "1" MyLibraryBookInstance : bookInstance
+MyLibraryBorrowed "*" --> "1" User : user
+
+@enduml
+----
+
+Modalità Pro: [TODO 1.1, 1.2 & 1.3]
+
+.Modificate la classe `MyLibraryBook` e aggiungete il seguente metodo (TODO 1.1):
+[,groovy]
+----
+int getNumberOfBooksBorrowable() {
+        return MyLibraryBookInstance.countByIsAvailableBAndIsActiveAndBook(true, true, this) //<1>
+    }
+----
+<1> `countByIsAvailableBAndIsActiveAndBook` è un metodo di ricerca dinamica (dynamic finder) in Grails/GORM che conta automaticamente il numero di record in una classe di dominio che soddisfano le condizioni indicate per i campi `isAvailableB`, `isActive` e `book`. Per ulteriori informazioni, consultate la link:https://docs.grails.org/latest/ref/Domain%20Classes/countBy.html[documentazione di Grails (countBy)].
+
+.Modificate la classe `MyLibraryBookInstance` e aggiungete le seguenti variabili e la relazione `hasMany` (TODO 1.2):
+[,groovy]
+----
+List<MyLibraryBorrowed> borrowHistoryOfBook
+Boolean isAvailableB = true
+
+static hasMany = [borrowHistoryOfBook: MyLibraryBorrowed]
+----
+
+.Implementate una classe `MyLibraryBorrowed` (TODO 1.3):
+[,groovy]
+----
+enum ApprovalStatus {
+    PENDING, APPROVED, REJECTED
+}
+
+@GrailsCompileStatic
+@TaackFieldEnum
+class MyLibraryBorrowed {
+    MyLibraryBookInstance bookInstance
+    User user
+    Date requestDate
+    Date approvalDate
+    Date returnDate
+    ApprovalStatus statusOfApproval= ApprovalStatus.PENDING
+
+    static constraints = {
+        approvalDate nullable: true
+        returnDate nullable: true
+    }
+}
+----
+
+Ora avete implementato tutte le classi necessarie per questa sezione!
+
+== Definire i menu
+
+Per questa sezione dobbiamo creare due nuovi menu. L'utente richiederà di prendere in prestito una `bookInstance` nel menu dei libri. Le `bookInstances` che sono state richieste e non ancora restituite (sia richieste in sospeso che richieste approvate) si troveranno nel menu dei prestiti. Le `bookInstances` che sono state restituite si troveranno nel menu della cronologia.
+
+Iniziamo aggiungendo questi menu a `buildMenu`.
+
+Modalità Pro: Aggiungete i menu in `buildMenu`. [TODO 2]
+
+.Aggiungete le righe seguenti a `buildMenu`:
+[,groovy]
+----
+menu MyLibraryController.&listBooksBorrowed as MC
+menu MyLibraryController.&listBooksCurrentlyBorrowed as MC
+----
+
+== Definire il menu dei prestiti
+
+=== Tabella dei prestiti
+
+Vogliamo visualizzare i libri presi in prestito (non ancora restituiti) in una tabella. Per farlo dobbiamo creare un `UiTableSpecifier`. Andate in `app/library/services/myLibrary/MyLibraryUiService` nella sezione `Author Menu`.
+
+Nota: le uniche differenze tra il menu dei prestiti e quello della cronologia sono `returnDate` e `StatusOfApproval`.
+Pertanto, utilizzeremo lo stesso `TableSpecifier` per entrambi i menu; questo è uno dei grandi vantaggi dell'utilizzo di un file separato (`MyLibraryUiService`) per implementare gli Specifier: possono essere riutilizzati in contesti diversi con piccole modifiche.
+
+[NOTE]
+===============================
+Avrete bisogno di un flag booleano per verificare se un libro è attualmente in prestito; lo chiameremo `isCurrentlyBorrowed`.
+===============================
+Modalità Pro: implementate la tabella da soli [TODOS 3.1].
+
+.Soluzione
+[%collapsible]
+====
+.Implementate `buildBorrowedTable`:
+[,groovy]
+----
+MyLibraryBook book = new MyLibraryBook()
+MyLibraryBorrowed borrowed = new MyLibraryBorrowed()
+UiTableSpecifier buildUserBorrowsSpecifier = new UiTableSpecifier()
+MyLibraryBookInstance bookInstance = new MyLibraryBookInstance()
+
+buildUserBorrowsSpecifier.ui {
+    header {
+        sortableFieldHeader borrowed.bookInstance_,bookInstance.book_,book.title_
+        sortableFieldHeader borrowed.bookInstance_,bookInstance.book_,book.author_
+        if (isCurrently) {label borrowed.statusOfApproval_}
+        label borrowed.requestDate_
+        label borrowed.approvalDate_
+        column {label borrowed.user_}
+    }
+
+    TaackFilter.FilterBuilder filter = taackFilterService.getBuilder(MyLibraryBorrowed)
+            .setMaxNumberOfLine(10)
+            .setSortOrder(
+                TaackFilter.Order.ASC,
+                borrowed.bookInstance_,
+                bookInstance.book_,book.title_)
+
+    if(isCurrently) {filter.addFilter(new FilterExpression(null, Operator.EQ, borrowed.returnDate_))} //<1>
+    else {filter.addFilter(new FilterExpression(null, Operator.NE, borrowed.returnDate_))} //<1>
+
+    iterate(
+            filter.build()) { MyLibraryBorrowed borrowedIterator ->
+        rowColumn {
+            rowField borrowedIterator.bookInstance.book.title
+        }
+        rowField borrowedIterator.bookInstance.book.author.toString()
+        if(isCurrently) {rowField borrowedIterator.statusOfApproval_}
+        rowField borrowedIterator.requestDate_
+        rowField borrowedIterator.approvalDate_
+        rowColumn {rowField borrowedIterator.user.username_}
+    }
+}
+----
+====
+
+<1> Questo è un altro modo per creare un filtro se non avete intenzione di riutilizzarlo altrove.
+
+Vogliamo anche aggiungere un filtro per filtrare i prestiti. Implementiamo questo filtro.
+
+Modalità Pro: implementate il filtro da soli [TODO 3.2].
+
+.Implementate `buildUserBorrowsFilter`:
+[,groovy]
+----
+UiFilterSpecifier buildUserBorrowsFilter(User user = null) {
+    MyLibraryBook book = new MyLibraryBook()
+    UiFilterSpecifier UserBorrowsFilterSpecifier = new UiFilterSpecifier()
+    MyLibraryBorrowed borrowed = new MyLibraryBorrowed()
+    MyLibraryBookInstance bookInstance = new MyLibraryBookInstance()
+
+    UserBorrowsFilterSpecifier.ui MyLibraryBorrowed, {
+        if (user) hiddenId(user.id)
+        section "Borrows Filter", {
+            filterField borrowed.bookInstance_,bookInstance.book_,book.title_
+        }
+    }
+}
+----
+La vostra tabella è ora completa; dobbiamo solo renderizzarla sulla pagina. Lo faremo in un metodo chiamato `listBooksCurrentlyBorrowed`. Andate in `app/library/controller/myLibrary/MyLibraryController` nella sezione `Borrowed Menu`.
+
+Modalità Pro: implementate `listBooksCurrentlyBorrowed` da soli [TODO 3.3].
+
+.Implementate il metodo `listBooksCurrentlyBorrowed`:
+[,groovy]
+----
+def listBooksCurrentlyBorrowed() {
+    UiTableSpecifier tableUserBorrowsSpecifier = myLibraryUiService.buildUserBorrowsTable(true)
+    UiFilterSpecifier filterUserBorrowsSpecifier = myLibraryUiService.buildUserBorrowsFilter()
+
+    taackUiService.show(new UiBlockSpecifier().ui {
+        tableFilter filterUserBorrowsSpecifier, tableUserBorrowsSpecifier
+    }, myLibraryUiService.buildMenu())
+}
+----
+
+Ora potete avviare il server. La tabella dei prestiti dovrebbe essere funzionante, ma al momento vedrete solo le intestazioni della tabella poiché non ci sono prestiti nel database. Procediamo quindi con la creazione di un modulo e il salvataggio degli oggetti nel database. Ora dobbiamo implementare `requestBookInstance`, che richiede la creazione di un `UiFormSpecifier`.
+Torniamo in `MyLibraryUiService`.
+
+==== Modulo di prestito
+Modalità Pro: implementate `buildRequestBookForm` [TODO 3.4].
+
+.Implementate `buildRequestBookForm`:
+[,groovy]
+----
+UiFormSpecifier buildRequestBookForm(MyLibraryBook book) {
+    User user = springSecurityService.currentUser as User
+    MyLibraryBorrowed borrowed = new MyLibraryBorrowed()
+    borrowed.user = user
+    book ?= new MyLibraryBook(params)
+    UiFormSpecifier requestBookFormSpecifier = new UiFormSpecifier()
+
+    requestBookFormSpecifier.ui borrowed, {
+        section "Request Book Form", {
+            hiddenField borrowed.user_ //<1>
+            field borrowed.requestDate_
+            ajaxField borrowed.bookInstance_, MyLibraryController.&selectBookInstanceOne as MC, book.id
+        }
+        formAction MyLibraryController.&saveBookForm as MC
+    }
+}
+----
+<1> Passa i parametri nel modulo senza che l'utente li veda.
+
+Torniamo in `MyLibraryController`. Renderizzeremo questo modulo in una finestra modale.
+
+Modalità Pro: implementate `requestBookInstance` [TODO 3.5]
+
+.Implementate `requestBookInstance`:
+[,groovy]
+----
+def requestBookInstance(MyLibraryBook book){
+    UiFormSpecifier requestBookInstanceForm = myLibraryUiService.buildRequestBookForm(book)
+
+    taackUiService.show new UiBlockSpecifier().ui {
+        modal {
+            form requestBookInstanceForm
+        }
+    }
+}
+----
+
+Ora dobbiamo salvare il record del prestito, quindi implementiamo `saveBookForm`.
+
+Modalità Pro: implementate `saveBookForm` [TODO 3.6].
+[,groovy]
+----
+@Transactional
+def saveBookForm() {
+    MyLibraryBorrowed borrowed = taackSaveService.save(MyLibraryBorrowed)
+    borrowed.bookInstance?.isAvailableB = false
+    taackSaveService.redirectOrRenderErrors(borrowed)
+}
+----
+
+Ora dobbiamo implementare `selectBookInstanceOne` che utilizzerà `buildInstanceBookTable`; dobbiamo prima modificare questo Specifier.
+
+Modalità Pro: modificate `buildInstanceBookTable` [TODO 3.7].
+
+.Sostituite il TODO 3.7.1:
+[,groovy]
+----
+column {
+    if (isOne) {
+        label "Select Book Instance"
+    } else {
+        label "Delete"
+    }
+}
+----
+.Sostituite il TODO 3.7.2:
+[,groovy]
+----
+filter.addFilter(buildIsAvailableBookInstances(book))
+----
+.Sostituite il TODO 3.7.3:
+[,groovy]
+----
+rowColumn {
+    if(isOne) {
+        rowAction tr('default.serialNumber.label'), ActionIcon.SELECT * IconStyle.SCALE_DOWN, bookInstanceIterator.id, bookInstanceIterator.serialNumber.toString()
+    } else {
+        rowAction ActionIcon.DELETE * IconStyle.SCALE_DOWN, MyLibraryController.&deleteBookInstances as MC, bookInstanceIterator.id, [bookId:book.id]
+    }
+}
+----
+
+Abbiamo utilizzato il filtro `buildIsAvailableBookInstances`; implementiamolo.
+
+Modalità Pro: Implementate `buildIsAvailableBookInstances` [TODO 3.8].
+
+.Implementate `buildIsAvailableBookInstances`:
+[,groovy]
+----
+UiFilterSpecifier buildIsAvailableBookInstances(MyLibraryBook book) {
+    MyLibraryBookInstance bookInstance = new MyLibraryBookInstance()
+    UiFilterSpecifier bookInstanceFilterSpecifier = new UiFilterSpecifier()
+    bookInstanceFilterSpecifier.sec MyLibraryBookInstance, {
+        filterFieldExpressionBool new FilterExpression(true, Operator.EQ, bookInstance.isAvailableB_)
+    }
+}
+----
+
+Modalità Pro: Implementate `selectBookInstanceOne` [TODO 3.9].
+
+.Implementate `selectBookInstanceOne`:
+[,groovy]
+----
+def selectBookInstanceOne(MyLibraryBook book) {
+    UiTableSpecifier bookInstanceTable = myLibraryUiService.buildInstanceBookTable(book, true)
+
+    taackUiService.show new UiBlockSpecifier().ui {
+        modal {
+            table bookInstanceTable
+        }
+    }
+}
+----
+
+
+Aggiungiamo ora il pulsante per accedere al modulo di richiesta. Vogliamo anche sapere quanti libri sono disponibili (possono essere presi in prestito); implementeremo questo in `buildBookTable`.
+
+Modalità Pro: Modificate `buildBookTable` [TODO 3.10]
+
+.Sostituite il TODO 3.10.1:
+[,groovy]
+----
+label "Number of Available Book Instances"
+----
+
+.Sostituite il TODO 3.10.2:
+[,groovy]
+----
+label "Request Form"
+----
+
+.Sostituite il TODO 3.10.3:
+[,groovy]
+----
+rowField bookIterator.numberOfBooksBorrowable_
+----
+
+.Sostituite il TODO 3.10.4:
+[,groovy]
+----
+rowColumn {
+    rowAction ActionIcon.CREATE * IconStyle.SCALE_DOWN, MyLibraryController.&requestBookInstance as MC, bookIterator.id
+}
+----
+
+Avete una tabella completamente funzionante in cui possiamo visualizzare e creare richieste di prestito. Riavviate il server, ora dovreste essere in grado di fare clic sul pulsante e compilare il modulo.
+
+Ora vogliamo poter approvare le richieste e restituire le `bookInstances` prese in prestito. Implementiamo i metodi `approveBook` e `returnBook`. Andiamo in `MyLibraryUiService` nel metodo `buildUserBorrowsTable`.
+
+==== Approvare le richieste e restituire le BookInstances
+
+Andate in `myLibraryUiService` all'interno di `buildUserBorrowsTable`.
+
+Modalità Pro: aggiungete i pulsanti [TODO 3.11].
+
+.Aggiungete i pulsanti di restituzione. Sostituite i TODOS 3.11.1 & 3.11.3:
+[,groovy]
+----
+if (isCurrently) column {label "Return Book"}
+
+if (isCurrently) {
+    rowColumn {
+        if (borrowedIterator.statusOfApproval == ApprovalStatus.APPROVED) {
+            rowAction ActionIcon.DELETE * IconStyle.SCALE_DOWN, MyLibraryController.&returnBook as MC, borrowedIterator.id
+        }
+    }
+}
+----
+
+.Aggiungete i pulsanti di approvazione. Sostituite i TODOS 3.11.2 & 3.11.4:
+[,groovy]
+----
+if (isCurrently) {label "Approve Book"}
+
+if (isCurrently) {
+    rowColumn {
+        rowAction ActionIcon.DELETE * IconStyle.SCALE_DOWN, MyLibraryController.&approveBook as MC, borrowedIterator.id
+    }
+}
+----
+
+Implementiamo ora i moduli per `approveBook` e `returnBook`.
+
+Modalità Pro: implementate `buildApproveBookTable` [TODO 3.12]
+
+.Implementate `buildApproveBookTable`:
+[,groovy]
+----
+UiFormSpecifier buildApproveBookTable(MyLibraryBorrowed borrowed) {
+    UiFormSpecifier approveBookSpecifier = new UiFormSpecifier()
+
+    approveBookSpecifier.ui borrowed, {
+        section "Approve Book Form", {
+            field borrowed.approvalDate_
+            field borrowed.statusOfApproval_
+        }
+        formAction MyLibraryController.&saveApprovalBookForm as MC
+    }
+}
+----
+
+
+Modalità Pro: implementate `buildRequestReturnBookForm` [TODO 3.13]
+
+.Implementate `buildRequestReturnBookForm`:
+[,groovy]
+----
+UiFormSpecifier buildRequestReturnBookForm(MyLibraryBorrowed borrowed) {
+    UiFormSpecifier requestBookFormSpecifier = new UiFormSpecifier()
+
+    requestBookFormSpecifier.ui borrowed, {
+        section "Request Return Book Form", {
+            field borrowed.returnDate_
+        }
+        formAction MyLibraryController.&saveReturnBookForm as MC
+    }
+}
+----
+
+Tornate in `MyLibraryController` per implementare i metodi `approveBook` & `returnBook`.
+
+Modalità Pro: implementate i metodi [TODO 3.14 & 3.15]
+
+.Implementate `approveBook`:
+[,groovy]
+----
+def approveBook(MyLibraryBorrowed borrowed) {
+    UiFormSpecifier approveBookSpecifier = myLibraryUiService.buildApproveBookTable(borrowed)
+
+    taackUiService.show(new UiBlockSpecifier().ui {
+        modal {
+            form approveBookSpecifier
+        }
+    })
+}
+----
+
+.Implementate `returnBook`:
+[,groovy]
+----
+def returnBook(MyLibraryBorrowed borrowed) {
+    UiFormSpecifier requestReturnBookInstanceForm = myLibraryUiService.buildRequestReturnBookForm(borrowed)
+
+    taackUiService.show new UiBlockSpecifier().ui {
+        modal {
+            form requestReturnBookInstanceForm
+        }
+    }
+}
+----
+
+Implementiamo i salvataggi, `saveApprovalBookForm` & `saveReturnBookForm`.
+
+Modalità Pro: implementate i metodi [TODO 3.16 & 3.17]
+
+.Implementate `saveApprovalBookForm`:
+[,groovy]
+----
+ @Transactional
+def saveApprovalBookForm() {
+    Calendar cal = Calendar.getInstance()
+    cal.set(999999, Calendar.DECEMBER, 31)
+    Date date = cal.time
+    MyLibraryBorrowed borrowed = taackSaveService.save(MyLibraryBorrowed)
+    if(borrowed.statusOfApproval == ApprovalStatus.REJECTED) {
+        borrowed.returnDate = date
+    }
+    taackSaveService.redirectOrRenderErrors(borrowed)
+}
+----
+Nota: Il calendario è impostato su una data molto lontana nel futuro (anno 999999) per indicare che il rifiuto è permanente.
+
+
+.Implementate `saveReturnBookForm`:
+[,groovy]
+----
+@Transactional
+def saveReturnBookForm() {
+    MyLibraryBorrowed borrowed = taackSaveService.save(MyLibraryBorrowed)
+    borrowed.bookInstance?.isAvailableB = true
+    taackSaveService.redirectOrRenderErrors(borrowed)
+}
+----
+
+Ora dovreste essere in grado di approvare e restituire i libri. Avviate il server e provate!
+
+Vogliamo poter visualizzare maggiori informazioni sulla richiesta in una finestra modale.
+Implementiamo ora il metodo `showBorrowed`. Per prima cosa dobbiamo creare un collegamento a questo metodo e un `UiShowSpecifier` in `myLibraryUiService`.
+
+Andiamo in `MyLibraryUiService` all'interno di `buildUserBorrowsTable`.
+
+Modalità Pro: aggiungete i pulsanti [TODO 3.18].
+
+Aggiungete l'azione di visualizzazione. Sostituite il TODO 3.18:
+[,groovy]
+----
+rowAction ActionIcon.SHOW * IconStyle.SCALE_DOWN, MyLibraryController.&showBorrowed as MC, borrowedIterator.id
+----
+
+Modalità Pro: implementate `buildBorrowedShow` [TODO 3.19]
+
+.Implementate `buildBorrowedShow`:
+[,groovy]
+----
+UiShowSpecifier buildBorrowedShow(MyLibraryBorrowed borrowed) {
+    UiShowSpecifier borrowedShowSpecifier = new UiShowSpecifier()
+
+    borrowedShowSpecifier.ui(borrowed, {
+        fieldLabeled borrowed.bookInstance.book.title_
+        fieldLabeled borrowed.bookInstance.book.author_
+        fieldLabeled borrowed.user.username_
+        fieldLabeled borrowed.statusOfApproval_
+        fieldLabeled borrowed.requestDate_
+        fieldLabeled borrowed.approvalDate_
+        fieldLabeled borrowed.returnDate_
+    })
+}
+----
+
+Renderizzeremo `buildBorrowedShow` in una finestra modale utilizzando `showBorrowed`.
+
+Modalità Pro: implementate `showBorrowed` [TODO 3.20]
+
+.Implementate `showBorrowed`:
+[,groovy]
+----
+def showBorrowed(MyLibraryBorrowed borrowed) {
+    UiShowSpecifier showSpec = myLibraryUiService.buildBorrowedShow(borrowed)
+
+    taackUiService.show(new UiBlockSpecifier().ui {
+        modal {
+            show showSpec
+        }
+    })
+}
+----
+
+Congratulazioni! Ora avete implementato tutto il necessario per richiedere, approvare e restituire libri, nonché per visualizzare tutte le richieste in corso. Riavviate il server e testate tutte le nuove implementazioni.
+
+== Definire il menu della cronologia
+
+Ora vogliamo visualizzare i risultati precedenti in una tabella. Come spiegato in precedenza, questo è semplice e veloce poiché abbiamo già il nostro builder e abbiamo implementato `isCurrently`. Andiamo in `MyLibraryController` e renderizziamo le richieste passate.
+
+Modalità Pro: implementate `listBooksBorrowed` [TODOS 4.1].
+
+.Implementate `listBooksBorrowed`:
+[,groovy]
+----
+def listBooksBorrowed() {
+    UiTableSpecifier tableUserBorrowsSpecifier = myLibraryUiService.buildUserBorrowsTable()
+    UiFilterSpecifier filterUserBorrowsSpecifier = myLibraryUiService.buildUserBorrowsFilter()
+
+    taackUiService.show(new UiBlockSpecifier().ui {
+        tableFilter filterUserBorrowsSpecifier, tableUserBorrowsSpecifier
+    }, myLibraryUiService.buildMenu())
+}
+----
+
+.Testare i richiedenti
+[NOTE]
+===============================
+Potete testare i richiedenti in uno dei due modi seguenti:
+
+-> Creando un ruolo `ROLE_BORROWER` nella tabella `ROLE` del database H2
+
+-> Effettuando l'accesso con un utente creato. Fate riferimento alla xref:part-four.adoc[Sezione B] per ulteriori informazioni.
+===============================
+Congratulazioni! Avete completato la seconda parte di questo progetto.
+
+Nella prossima parte approfondiremo la sicurezza e i vincoli (Security and Constraints).

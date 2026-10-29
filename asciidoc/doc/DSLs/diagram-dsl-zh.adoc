@@ -1,0 +1,466 @@
+= 图表 DSL (Diagram DSL)
+:doctype: book
+:taack-category: 3|doc/DSLs
+:toc:
+:source-highlighter: rouge
+:icons: font
+
+* [*] 支持渲染为 HTML
+* [*] 支持渲染为 PDF
+* [*] 支持渲染为邮件 (Mails)
+* [ ] 支持渲染为 CSV
+
+图表 DSL (Diagram DSL) 允许快速绘制柱状图 (bar)、面积图 (area)、饼图 (pie)、散点图 (scatter)、折线图 (line)、箱线图 (whiskers) 和时间轴图 (timeline)，并支持组合图表 (mixed)，可光栅化输出为 PNG 格式或输出为 SVG 矢量格式。
+
+在块中，可通过 `diagram` 添加图表（接收 `UiDiagramSpecifier` 或返回它的 `MethodClosure`），也可通过 `diagramFilter` 将图表与筛选器关联。
+
+== 图表示例
+
+=== 柱状图 (Bar)
+
+.柱状图
+====
+.柱状图代码示例
+[source,groovy]
+----
+private static UiDiagramSpecifier barDiagram(boolean isStacked) {
+    new UiDiagramSpecifier().ui {
+        bar(isStacked, {
+            labels "T1", "T2", "T3", "T4"
+            dataset 'Truc1', 1.0, 2.0, 1.0, 4.0
+            dataset 'Truc2', 2.0, 0.1, 1.0, 0.0
+            dataset 'Truc3', 2.0, 0.1, 1.0, 1.0
+        })
+    }
+}
+----
+
+.结果
+image:diag-dsl-bar.webp[]
+
+pass:[<a class="taackMenu" ajaxAction="/dslSample/bar" href="/dslSample/bar">&#9654; Try it live</a>]
+====
+
+=== 折线图 (Line)
+
+.折线图
+====
+.折线图代码示例
+[source,groovy]
+----
+diagram new UiDiagramSpecifier().ui({
+    line {
+        labels 1.5, 3, 4.4, 5, 7.8, 8
+        dataset "client", 10.0, 20.1, 30.0
+        dataset "admin", 5.0, 7.0
+        dataset "other", 1.0, 2.0, 3.0, 4.0, 5.0, 6.0
+    }
+})
+----
+
+.结果
+image:diag-dsl-line.webp[]
+
+pass:[<a class="taackMenu" ajaxAction="/dslSample/line" href="/dslSample/line">&#9654; Try it live</a>]
+====
+
+=== 饼图 (Pie)
+
+.饼图
+====
+.饼图代码示例
+[source,groovy]
+----
+private static UiDiagramSpecifier pieDiagram(boolean hasSlice) {
+    new UiDiagramSpecifier().ui({
+        pie(hasSlice, {
+            labels "Pie"
+            dataset("cli", 1.47)
+            dataset("client", 0.28)
+            dataset("client1", 0.1)
+            dataset("client2", 1.45)
+            dataset("client3", 0.05)
+            dataset("client31", 0.05)
+            dataset("client32", 0.05)
+            dataset("c33", 0.05)
+            dataset("client311", 0.05)
+            dataset("client312", 0.05)
+            dataset("client313", 0.05)
+            dataset("client4", 0.8)
+            dataset("client5", 2.1)
+            dataset("client55", 0.1)
+            dataset("client555", 0.2)
+            dataset("client5555", 0.3)
+            dataset("client55555", 0.3)
+            dataset("admin", 1.6)
+            dataset("test1", 0.05)
+        })
+    })
+}
+----
+
+.结果
+image:diag-dsl-pie.webp[]
+
+pass:[<a class="taackMenu" ajaxAction="/dslSample/pie" href="/dslSample/pie">&#9654; Try it live</a>]
+====
+
+=== 箱线图 (Whiskers)
+
+.箱线图
+====
+.箱线图代码示例
+[source,groovy]
+----
+diagram new UiDiagramSpecifier().ui({
+    whiskers {
+        labels "T1", "T2", "T3", "T4"
+
+        dataset 'Truc1', {
+            boxData 1.0, 2.0, 3.0, 3.5, 4.0, 4.5, 5.0
+            boxData 1.5, 2.5, 3.5, 6.0, 7.0, 8.0, 9.0
+            boxData 2.0, 2.0, 2.1, 2.5, 5.5, 5.6, 6.7
+            boxData 1.7, 1.8, 1.9, 2.0, 2.1, 2.2, 2.3
+        }
+        dataset 'Truc2', {
+            boxData 0.5, 1.0, 1.1, 1.2, 1.3, 2.0, 5.5
+            boxData 0.5, 1.0, 1.1, 1.2, 1.3, 2.0, 5.5
+            boxData 0.5, 1.0, 1.1, 1.2, 1.3, 2.0, 5.5
+            boxData 0.5, 1.0, 1.1, 1.2, 1.3, 2.0, 5.5
+        }
+    }
+})
+----
+
+.结果
+image:diag-dsl-whiskers.webp[]
+
+pass:[<a class="taackMenu" ajaxAction="/dslSample/whiskers" href="/dslSample/whiskers">&#9654; Try it live</a>]
+====
+
+=== 时间轴图 (Timeline)
+
+.时间轴图
+====
+.时间轴图代码示例
+[source,groovy]
+----
+diagram new UiDiagramSpecifier().ui({
+    timeline {
+        SimpleDateFormat format = new SimpleDateFormat('yyyy-MM-dd')
+        dataset 'Truc1', {
+            periodData format.parse('2025-06-12'), format.parse('2025-07-08'), "Period1"
+            periodData format.parse('2025-07-08'), format.parse('2025-07-21'), "Period2"
+            periodData format.parse('2025-07-21'), format.parse('2025-08-30'), "Period3"
+        }
+        dataset 'Truc2', {
+            periodData format.parse('2025-06-20'), format.parse('2025-06-25'), "Period1"
+            periodData format.parse('2025-07-01'), format.parse('2025-07-21'), "Period2"
+        }
+    }
+})
+----
+
+.结果
+image:diag-dsl-timeline.webp[]
+====
+
+=== 组合图 (Mixed)
+
+其他图表类型可以嵌套在图表闭包中。它们共享 X 轴标签和图例，每个嵌套图表类型拥有各自独立的 Y 轴，且颜色与其数据集保持一致。
+
+.组合图
+====
+.组合图代码示例
+[source,groovy]
+----
+diagram new UiDiagramSpecifier().ui {
+    bar {                                                           <1>
+        labels 'W1', 'W2', 'W3', 'W4', 'W5', 'W6', 'W7', 'W8'
+        dataset 'Line A', 55.0, 62.0, 58.0, 70.0, 74.0, 61.0, 80.0, 77.0
+        dataset 'Line B', 40.0, 48.0, 44.0, 58.0, 61.0, 57.0, 70.0, 65.0
+        line {                                                      <2>
+            dataset 'Scrap rate (%)', 2.1, 1.8, 2.5, 1.6, 1.4, 2.9, 1.2, 1.5
+        }
+        scatter {                                                   <3>
+            dataset 'Downtime (h)', 4.0, 6.0, 3.0, 8.0, 5.0, 2.0, 7.0, 4.0
+        }
+        option DiagramOption.builder
+                .setTitle('Weekly production')
+                .build()
+    }
+}
+----
+<1> 主图表，定义 X 轴标签（此处为堆叠柱状图）
+<2> 嵌套折线图，绘制在柱状图上方，并在右侧拥有独立的 Y 轴
+<3> 嵌套散点图，在左侧拥有独立的 Y 轴
+
+.结果
+image:diag-dsl-mixed.webp[]
+====
+
+== 自定义选项 (Customized Option)
+
+我们提供了多种选项，允许用户通过 `DiagramOption` 自定义图表。
+
+.使用 DiagramOption 的柱状图
+[source,groovy]
+----
+private static UiDiagramSpecifier barDiagram(boolean isStacked) {
+    new UiDiagramSpecifier().ui {
+        bar(isStacked, {
+            labels "T1", "T2", "T3", "T4"
+            dataset 'Truc1', 1.0, 2.0, 1.0, 4.0
+            dataset 'Truc2', 2.0, 0.1, 1.0, 0.0
+            dataset 'Truc3', 2.0, 0.1, 1.0, 1.0
+
+            option DiagramOption.builder
+                    .setTitle("This is a Bar chart !")
+                    .hideLegend()
+                    .showDataCount()
+                    .setKeyColors(Color.RED, Color.ORANGE, Color.YELLOW, Color.GREEN)
+                    .setClickAction(Pr2Controller.&onclickBar as MethodClosure)
+                    .setResolution(DiagramResolution.DEFAULT_2K)
+                    .build()
+        })
+    }
+}
+----
+
+.结果
+image:diag-dsl-bar-option.webp[]
+
+可用选项：
+
+* `setTitle`：图表标题
+* `hideLegend`：默认显示图例，调用此项可隐藏
+* `showDataCount`：在图表上显示数值（默认隐藏）
+* `setKeyColors`：各数据集的颜色（默认提供 7 种颜色）
+* `setClickAction`：点击图形时调用的操作，它会接收 `key`（数据集名称）、`x` 和 `y` 参数，以及传入的 id 和附加参数（参见 <<clickable-diagram>>）
+* `setResolution`：默认分辨率为 SVG：960x540，支持从 `DEFAULT_540P` 到 `DEFAULT_4K`
+* `setXLabelDateFormat`：参见 <<_different_types_of_xlabels>>
+* `setMaxDataNumberToShowByDefault`：限制缩放前默认显示的最大数据量
+* `showTodayLine`：仅适用于时间轴图，在当前日期处绘制一条竖线
+
+[[clickable-diagram]]
+== 可点击图表 (Clickable Diagram)
+
+设置点击操作后，点击图表中的图形（柱条、数据点、扇区、箱体、时间段等）会通过 Ajax 调用该操作。该操作可以返回一个块（通常是模态窗口），或者返回将在新标签页中打开的完整页面。
+
+.点击柱条时打开模态窗口
+[source,groovy]
+----
+def salesPerMonth() {
+    taackUiService.show(new UiBlockSpecifier().ui {
+        diagram new UiDiagramSpecifier().ui {
+            bar false, {
+                labels 'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'
+                dataset 'Bikes', 12.0, 18.0, 9.0, 21.0, 25.0, 30.0
+                dataset 'Scooters', 7.0, 5.0, 11.0, 8.0, 14.0, 12.0
+                option DiagramOption.builder
+                        .setTitle('Units sold per month')
+                        .setClickAction(SalesController.&salesDetail as MC,  <1>
+                                [year: 2026])
+                        .build()
+            }
+        }
+    }, buildMenu())
+}
+
+def salesDetail(String key, String x, String y, Integer year) {         <2>
+    int units = new BigDecimal(y).intValue()
+    Map<String, Integer> orders = [                                     <3>
+            'Acme Corp': units.intdiv(2) as Integer,
+            'Globex'   : units.intdiv(3) as Integer,
+            'Initech'  : units - units.intdiv(2) - units.intdiv(3)
+    ]
+    taackUiService.show(new UiBlockSpecifier().ui {
+        modal {                                                         <4>
+            show new UiShowSpecifier().ui {
+                field 'Product', key
+                field 'Month', "$x $year".toString()
+                field 'Units sold', y
+            }
+            table new UiTableSpecifier().ui {
+                header {
+                    label 'Order'
+                    label 'Customer'
+                    label 'Units'
+                }
+                orders.eachWithIndex { Map.Entry<String, Integer> o, int i ->
+                    row {
+                        rowField "SO-$year-$x-${i + 1}".toString()
+                        rowField o.key
+                        rowField o.value
+                    }
+                }
+            }
+        }
+    })
+}
+----
+
+<1> 点击时调用的操作，带有可选参数（或 id）
+<2> `key` 为数据集名称，`x` 为 X 轴标签，`y` 为数值，`year` 来自传给 `setClickAction` 的参数
+<3> 示例虚拟数据，实际应用中通常是对域对象的查询
+<4> 该操作返回一个显示在图表上方的模态窗口
+
+.点击五月 "Bikes" 柱条的效果
+image::diag-dsl-click-modal.webp[]
+
+== 进阶编码方式
+
+[[_different_types_of_xlabels]]
+=== 不同类型的 X 轴标签 (xLabels)
+
+X 轴上的标签支持 3 种类型：
+
+- 字符串 (`String`，离散型)
+- 数字 (`Number`，连续型)
+- 日期 (`Date`，连续型)
+
+[source,groovy]
+----
+diagram new UiDiagramSpecifier().ui({
+    line { // X axis: String
+        labels "T1", "T2", "T3"
+        dataset "test", 10.0, 20.1, 30.0
+    }
+    line { // X axis: Number
+        labels 1.5, 1.7, 3.5
+        dataset "test", 10.0, 20.1, 30.0
+    }
+    line { // X axis: Date
+        Date date1 = new Date() // now (2025-02-28 10:55)
+        Date date2 = new Date(date1.getTime() + 1000*60*60*2) // 2 hours later
+        Date date3 = new Date(date1.getTime() + 1000*60*60*10) // 10 hours later
+        labels date1, date2, date3
+        dataset "test", 10.0, 20.1, 30.0
+        option DiagramOption.builder
+                .setXLabelDateFormat(DiagramXLabelDateFormat.HOUR) <1>
+                .build()
+    }
+})
+----
+
+<1> `DiagramXLabelDateFormat`：定义要显示的日期格式，同时定义最小间隔单位（因为 X 轴是连续的）
+
+image:screenshot-dsl-diagram-xLabels-type.png[]
+
+=== 提供数据坐标的第二种方式
+
+常用于连续型 X 轴上不同数据集具有不同 X 坐标的场景。
+
+[source,groovy]
+----
+diagram new UiDiagramSpecifier().ui({
+    // Normal way: different datasets have same X coordinates
+    line {
+        labels 1.5, 1.7, 3.5
+
+        // 3 data: (1.5, 10.0), (1.7, 20.1), (3.5, 30.0)
+        dataset "test1", 10.0, 20.1, 30.0
+
+        // 3 data: (1.5, 1.0), (1.7, 2.0), (3.5, 3.0)
+        dataset "test2", 1.0, 2.0, 3.0
+    }
+
+    // Second way: different datasets have different X coordinates
+    line {
+        // 3 data: (1.5, 10.0), (1.7, 20.1), (3.5, 30.0)
+        dataset "test1", [1.5: 10.0, 1.7: 20.1, 3.5: 30.0]
+
+        // 2 data: (1.5, 1.0), (6.1, 2.0)
+        dataset "test2", [1.5: 1.0, 6.1: 2.0]
+    }
+})
+----
+
+image:screenshot-dsl-diagram-coordinate.png[]
+
+=== 按固定时间间隔统计数据数量的 DSL
+
+当我们有大量对象，并希望根据对象的 `dateCreated` 按年（或按月 / 按日 / 按小时）展示对象数量图表时，可以使用此方法。
+
+.要使用的 DSL
+[source,groovy]
+----
+    /**
+     * Group the given dates according to DiagramXLabelDateFormat, then count every group and put the result as data to draw.
+     *
+     * For example:
+     *      Knowing DiagramXLabelDateFormat.MONTH (Defined by {@link #labels(DiagramXLabelDateFormat dateFormat)}),
+     *      and being given dates: 2025-01-01, 2025-01-10, 2025-01-20, 2025-02-01, 2025-02-10, 2025-03-01.
+     *
+     *      So they are divided to 3 groups with their own count: [2025-01: 3, 2025-02: 2, 2025-03: 1].
+     *      The groups will be used as data to draw:
+     *          - xLabels = ["2025-01", "2025-02", "2025-03"]
+     *          - yDataList = [3.0, 2.0, 1.0]
+     *
+     * @param key
+     * @param dates
+     */
+    void dataset(final String key, final Date... dates)
+----
+
+.使用该 DSL 的代码示例
+[source,groovy]
+----
+diagram new UiDiagramSpecifier().ui({
+    List<Claim> claims = Claim.findAll()
+    bar {
+        dataset "Claim", claims.collect { it.dateCreated } as Date[]
+        option DiagramOption.builder
+                .setXLabelDateFormat(DiagramXLabelDateFormat.MONTH) // show claim count month-by-month
+                .build()
+    }
+})
+----
+
+.图表
+image:screenshot-dsl-diagram-count-object.png[]
+
+== 动态交互功能（仅限 HTML）
+
+=== 缩放（水平方向）
+
+将鼠标放在图表上，按住 CTRL 键并滚动鼠标滚轮。
+
+- CTRL + 向上滚动滚轮：放大。
+- CTRL + 向下滚动滚轮：缩小。
+
+=== 滚动平移（水平方向）
+
+将鼠标放在图表上，按住鼠标左键不放并水平移动鼠标。
+
+WARNING: 滚动的最小值和最大值存在范围限制
+
+=== 悬浮提示框 (Tooltip)
+
+柱状图/折线图等的数值默认不会静态显示。您可以将鼠标悬停在任意图形上，此时会动态出现提示框，显示目标图形的所有信息。
+
+image:screenshot-dsl-diagram-tooltip.png[]
+
+=== 可点击图例
+
+点击数据集图例可以隐藏或显示目标数据集。
+
+== DSL 符号层级结构
+
+[graphviz,format="svg",align=center]
+.图表 DSL 的符号层级图
+----
+digraph mygraph {
+  node [shape=box];
+  ui
+  ui -> bar, scatter, line, area, pie, whiskers, timeline, custom
+  bar, scatter, line, area -> "bar, scatter, line, area (mixed)" [label = "0:N"]
+  bar, scatter, line, area, pie, whiskers -> labels [label = "0:1"]
+  bar, scatter, line, area, pie, whiskers, timeline -> option [label = "0:1"]
+  bar, scatter, line, area, pie -> dataset [label = "1:N"]
+  whiskers -> wdataset [label = "1:N"]
+  wdataset -> boxData [label = "1:N"]
+  timeline -> tdataset [label = "1:N"]
+  tdataset -> periodData [label = "1:N"]
+}
+----

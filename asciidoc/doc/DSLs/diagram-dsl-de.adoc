@@ -1,0 +1,466 @@
+= Diagram DSL
+:doctype: book
+:taack-category: 3|doc/DSLs
+:toc:
+:source-highlighter: rouge
+:icons: font
+
+* [*] Gerendert in HTML
+* [*] Gerendert in PDF
+* [*] Gerendert in Mails
+* [ ] Gerendert in CSV
+
+Mit der Diagram DSL lassen sich schnell Balken- (bar), Flächen- (area), Kreis- (pie), Streu- (scatter), Linien- (line), Boxplot- (whiskers) und Zeitachsen-Diagramme (timeline) zeichnen – auf Wunsch auch kombiniert (mixed) –, entweder gerastert im PNG-Format oder im SVG-Format.
+
+In einem Block wird ein Diagramm über `diagram` hinzugefügt, das entweder einen `UiDiagramSpecifier` oder eine `MethodClosure` entgegennimmt, die einen solchen zurückgibt, oder über `diagramFilter`, um es mit einem Filter zu verknüpfen.
+
+== Diagrammbeispiele
+
+=== Balken (Bar)
+
+.Balkendiagramm
+====
+.Codebeispiel für ein Balkendiagramm
+[source,groovy]
+----
+private static UiDiagramSpecifier barDiagram(boolean isStacked) {
+    new UiDiagramSpecifier().ui {
+        bar(isStacked, {
+            labels "T1", "T2", "T3", "T4"
+            dataset 'Truc1', 1.0, 2.0, 1.0, 4.0
+            dataset 'Truc2', 2.0, 0.1, 1.0, 0.0
+            dataset 'Truc3', 2.0, 0.1, 1.0, 1.0
+        })
+    }
+}
+----
+
+.Ergebnis
+image:diag-dsl-bar.webp[]
+
+pass:[<a class="taackMenu" ajaxAction="/dslSample/bar" href="/dslSample/bar">&#9654; Try it live</a>]
+====
+
+=== Linien (Line)
+
+.Liniendiagramm
+====
+.Codebeispiel für ein Liniendiagramm
+[source,groovy]
+----
+diagram new UiDiagramSpecifier().ui({
+    line {
+        labels 1.5, 3, 4.4, 5, 7.8, 8
+        dataset "client", 10.0, 20.1, 30.0
+        dataset "admin", 5.0, 7.0
+        dataset "other", 1.0, 2.0, 3.0, 4.0, 5.0, 6.0
+    }
+})
+----
+
+.Ergebnis
+image:diag-dsl-line.webp[]
+
+pass:[<a class="taackMenu" ajaxAction="/dslSample/line" href="/dslSample/line">&#9654; Try it live</a>]
+====
+
+=== Kreis (Pie)
+
+.Kreisdiagramm
+====
+.Codebeispiel für ein Kreisdiagramm
+[source,groovy]
+----
+private static UiDiagramSpecifier pieDiagram(boolean hasSlice) {
+    new UiDiagramSpecifier().ui({
+        pie(hasSlice, {
+            labels "Pie"
+            dataset("cli", 1.47)
+            dataset("client", 0.28)
+            dataset("client1", 0.1)
+            dataset("client2", 1.45)
+            dataset("client3", 0.05)
+            dataset("client31", 0.05)
+            dataset("client32", 0.05)
+            dataset("c33", 0.05)
+            dataset("client311", 0.05)
+            dataset("client312", 0.05)
+            dataset("client313", 0.05)
+            dataset("client4", 0.8)
+            dataset("client5", 2.1)
+            dataset("client55", 0.1)
+            dataset("client555", 0.2)
+            dataset("client5555", 0.3)
+            dataset("client55555", 0.3)
+            dataset("admin", 1.6)
+            dataset("test1", 0.05)
+        })
+    })
+}
+----
+
+.Ergebnis
+image:diag-dsl-pie.webp[]
+
+pass:[<a class="taackMenu" ajaxAction="/dslSample/pie" href="/dslSample/pie">&#9654; Try it live</a>]
+====
+
+=== Boxplot (Whiskers)
+
+.Boxplot-Diagramm
+====
+.Codebeispiel für ein Boxplot-Diagramm
+[source,groovy]
+----
+diagram new UiDiagramSpecifier().ui({
+    whiskers {
+        labels "T1", "T2", "T3", "T4"
+
+        dataset 'Truc1', {
+            boxData 1.0, 2.0, 3.0, 3.5, 4.0, 4.5, 5.0
+            boxData 1.5, 2.5, 3.5, 6.0, 7.0, 8.0, 9.0
+            boxData 2.0, 2.0, 2.1, 2.5, 5.5, 5.6, 6.7
+            boxData 1.7, 1.8, 1.9, 2.0, 2.1, 2.2, 2.3
+        }
+        dataset 'Truc2', {
+            boxData 0.5, 1.0, 1.1, 1.2, 1.3, 2.0, 5.5
+            boxData 0.5, 1.0, 1.1, 1.2, 1.3, 2.0, 5.5
+            boxData 0.5, 1.0, 1.1, 1.2, 1.3, 2.0, 5.5
+            boxData 0.5, 1.0, 1.1, 1.2, 1.3, 2.0, 5.5
+        }
+    }
+})
+----
+
+.Ergebnis
+image:diag-dsl-whiskers.webp[]
+
+pass:[<a class="taackMenu" ajaxAction="/dslSample/whiskers" href="/dslSample/whiskers">&#9654; Try it live</a>]
+====
+
+=== Zeitachse (Timeline)
+
+.Zeitachsendiagramm
+====
+.Codebeispiel für ein Zeitachsendiagramm
+[source,groovy]
+----
+diagram new UiDiagramSpecifier().ui({
+    timeline {
+        SimpleDateFormat format = new SimpleDateFormat('yyyy-MM-dd')
+        dataset 'Truc1', {
+            periodData format.parse('2025-06-12'), format.parse('2025-07-08'), "Period1"
+            periodData format.parse('2025-07-08'), format.parse('2025-07-21'), "Period2"
+            periodData format.parse('2025-07-21'), format.parse('2025-08-30'), "Period3"
+        }
+        dataset 'Truc2', {
+            periodData format.parse('2025-06-20'), format.parse('2025-06-25'), "Period1"
+            periodData format.parse('2025-07-01'), format.parse('2025-07-21'), "Period2"
+        }
+    }
+})
+----
+
+.Ergebnis
+image:diag-dsl-timeline.webp[]
+====
+
+=== Kombiniert (Mixed)
+
+Andere Diagrammtypen können in eine Diagramm-Closure verschachtelt werden. Sie teilen sich die Beschriftungen der X-Achse und die Legende, wobei jeder verschachtelte Typ seine eigene Y-Achse hat, die wie seine Datensätze (`dataset`) eingefärbt ist.
+
+.Kombiniertes Diagramm
+====
+.Codebeispiel für ein kombiniertes Diagramm
+[source,groovy]
+----
+diagram new UiDiagramSpecifier().ui {
+    bar {                                                           <1>
+        labels 'W1', 'W2', 'W3', 'W4', 'W5', 'W6', 'W7', 'W8'
+        dataset 'Line A', 55.0, 62.0, 58.0, 70.0, 74.0, 61.0, 80.0, 77.0
+        dataset 'Line B', 40.0, 48.0, 44.0, 58.0, 61.0, 57.0, 70.0, 65.0
+        line {                                                      <2>
+            dataset 'Scrap rate (%)', 2.1, 1.8, 2.5, 1.6, 1.4, 2.9, 1.2, 1.5
+        }
+        scatter {                                                   <3>
+            dataset 'Downtime (h)', 4.0, 6.0, 3.0, 8.0, 5.0, 2.0, 7.0, 4.0
+        }
+        option DiagramOption.builder
+                .setTitle('Weekly production')
+                .build()
+    }
+}
+----
+<1> Hauptdiagramm, das die Beschriftungen auf der X-Achse definiert (hier ein gestapeltes Balkendiagramm)
+<2> Verschachtelte Linie, die über den Balken mit eigener Y-Achse rechts gezeichnet wird
+<3> Verschachteltes Streudiagramm mit eigener Y-Achse links
+
+.Ergebnis
+image:diag-dsl-mixed.webp[]
+====
+
+== Benutzerdefinierte Optionen
+
+Mithilfe von `DiagramOption` stehen verschiedene Optionen zur Anpassung des Diagramms zur Verfügung.
+
+.Balkendiagramm mit DiagramOption
+[source,groovy]
+----
+private static UiDiagramSpecifier barDiagram(boolean isStacked) {
+    new UiDiagramSpecifier().ui {
+        bar(isStacked, {
+            labels "T1", "T2", "T3", "T4"
+            dataset 'Truc1', 1.0, 2.0, 1.0, 4.0
+            dataset 'Truc2', 2.0, 0.1, 1.0, 0.0
+            dataset 'Truc3', 2.0, 0.1, 1.0, 1.0
+
+            option DiagramOption.builder
+                    .setTitle("This is a Bar chart !")
+                    .hideLegend()
+                    .showDataCount()
+                    .setKeyColors(Color.RED, Color.ORANGE, Color.YELLOW, Color.GREEN)
+                    .setClickAction(Pr2Controller.&onclickBar as MethodClosure)
+                    .setResolution(DiagramResolution.DEFAULT_2K)
+                    .build()
+        })
+    }
+}
+----
+
+.Ergebnis
+image:diag-dsl-bar-option.webp[]
+
+Verfügbare Optionen:
+
+* `setTitle`: Diagrammtitel
+* `hideLegend`: Legenden werden standardmäßig angezeigt
+* `showDataCount`: zeigt die Werte im Diagramm an (standardmäßig ausgeblendet)
+* `setKeyColors`: Farben der einzelnen Datensätze (standardmäßig 7 Farben)
+* `setClickAction`: Aktion, die beim Klicken auf eine Form aufgerufen wird; sie erhält die Parameter `key` (Datensatzname), `x` und `y` sowie die angegebene ID und Parameter (siehe <<clickable-diagram>>)
+* `setResolution`: Standardauflösung ist SVG: 960x540, von `DEFAULT_540P` bis `DEFAULT_4K`
+* `setXLabelDateFormat`: siehe <<_different_types_of_xlabels>>
+* `setMaxDataNumberToShowByDefault`: begrenzt die Anzahl der vor dem Zoomen angezeigten Datenpunkte
+* `showTodayLine`: nur für Zeitachsen (timeline), zeichnet eine Linie am aktuellen Datum
+
+[[clickable-diagram]]
+== Klickbares Diagramm
+
+Wenn eine Klick-Aktion festgelegt ist, ruft das Klicken auf eine Form (Balken, Punkt, Kreissegment, Box, Zeitraum ...) die Aktion über Ajax auf. Die Aktion kann einen Block zurückgeben, typischerweise ein modales Fenster, oder eine vollständige Seite, die in einem neuen Tab geöffnet wird.
+
+.Öffnen eines modalen Fensters beim Klicken auf einen Balken
+[source,groovy]
+----
+def salesPerMonth() {
+    taackUiService.show(new UiBlockSpecifier().ui {
+        diagram new UiDiagramSpecifier().ui {
+            bar false, {
+                labels 'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'
+                dataset 'Bikes', 12.0, 18.0, 9.0, 21.0, 25.0, 30.0
+                dataset 'Scooters', 7.0, 5.0, 11.0, 8.0, 14.0, 12.0
+                option DiagramOption.builder
+                        .setTitle('Units sold per month')
+                        .setClickAction(SalesController.&salesDetail as MC,  <1>
+                                [year: 2026])
+                        .build()
+            }
+        }
+    }, buildMenu())
+}
+
+def salesDetail(String key, String x, String y, Integer year) {         <2>
+    int units = new BigDecimal(y).intValue()
+    Map<String, Integer> orders = [                                     <3>
+            'Acme Corp': units.intdiv(2) as Integer,
+            'Globex'   : units.intdiv(3) as Integer,
+            'Initech'  : units - units.intdiv(2) - units.intdiv(3)
+    ]
+    taackUiService.show(new UiBlockSpecifier().ui {
+        modal {                                                         <4>
+            show new UiShowSpecifier().ui {
+                field 'Product', key
+                field 'Month', "$x $year".toString()
+                field 'Units sold', y
+            }
+            table new UiTableSpecifier().ui {
+                header {
+                    label 'Order'
+                    label 'Customer'
+                    label 'Units'
+                }
+                orders.eachWithIndex { Map.Entry<String, Integer> o, int i ->
+                    row {
+                        rowField "SO-$year-$x-${i + 1}".toString()
+                        rowField o.key
+                        rowField o.value
+                    }
+                }
+            }
+        }
+    })
+}
+----
+
+<1> Beim Klicken aufgerufene Aktion mit optionalen Parametern (oder einer ID)
+<2> `key` ist der Datensatzname, `x` die Beschriftung auf der X-Achse und `y` der Wert; `year` stammt aus den an `setClickAction` übergebenen Parametern
+<3> Fiktive Daten, normalerweise eine Abfrage Ihrer Domänenobjekte
+<4> Die Aktion antwortet mit einem modalen Fenster, das über dem Diagramm angezeigt wird
+
+.Klick auf den Balken "Bikes" im Mai
+image::diag-dsl-click-modal.webp[]
+
+== Weitere Programmiermöglichkeiten
+
+[[_different_types_of_xlabels]]
+=== Verschiedene Typen von xLabels
+
+Die Beschriftungen auf der X-Achse können 3 Typen haben:
+
+- String (diskret)
+- Number (kontinuierlich)
+- Date (kontinuierlich)
+
+[source,groovy]
+----
+diagram new UiDiagramSpecifier().ui({
+    line { // X axis: String
+        labels "T1", "T2", "T3"
+        dataset "test", 10.0, 20.1, 30.0
+    }
+    line { // X axis: Number
+        labels 1.5, 1.7, 3.5
+        dataset "test", 10.0, 20.1, 30.0
+    }
+    line { // X axis: Date
+        Date date1 = new Date() // now (2025-02-28 10:55)
+        Date date2 = new Date(date1.getTime() + 1000*60*60*2) // 2 hours later
+        Date date3 = new Date(date1.getTime() + 1000*60*60*10) // 10 hours later
+        labels date1, date2, date3
+        dataset "test", 10.0, 20.1, 30.0
+        option DiagramOption.builder
+                .setXLabelDateFormat(DiagramXLabelDateFormat.HOUR) <1>
+                .build()
+    }
+})
+----
+
+<1> `DiagramXLabelDateFormat`: Definiert das anzuzeigende Datumsformat sowie die minimale Abstandseinheit (da die X-Achse kontinuierlich ist)
+
+image:screenshot-dsl-diagram-xLabels-type.png[]
+
+=== Zweite Möglichkeit zur Angabe von Datenkoordinaten
+
+Häufig verwendet bei einer kontinuierlichen X-Achse, auf der verschiedene Datensätze unterschiedliche X-Koordinaten aufweisen.
+
+[source,groovy]
+----
+diagram new UiDiagramSpecifier().ui({
+    // Normal way: different datasets have same X coordinates
+    line {
+        labels 1.5, 1.7, 3.5
+
+        // 3 data: (1.5, 10.0), (1.7, 20.1), (3.5, 30.0)
+        dataset "test1", 10.0, 20.1, 30.0
+
+        // 3 data: (1.5, 1.0), (1.7, 2.0), (3.5, 3.0)
+        dataset "test2", 1.0, 2.0, 3.0
+    }
+
+    // Second way: different datasets have different X coordinates
+    line {
+        // 3 data: (1.5, 10.0), (1.7, 20.1), (3.5, 30.0)
+        dataset "test1", [1.5: 10.0, 1.7: 20.1, 3.5: 30.0]
+
+        // 2 data: (1.5, 1.0), (6.1, 2.0)
+        dataset "test2", [1.5: 1.0, 6.1: 2.0]
+    }
+})
+----
+
+image:screenshot-dsl-diagram-coordinate.png[]
+
+=== DSL zur Anzeige der Datenanzahl in regelmäßigen Intervallen
+
+Wir haben eine große Anzahl von Objekten und möchten ein Diagramm erstellen, das die Anzahl der Objekte Jahr für Jahr (oder Monat für Monat / Tag für Tag / Stunde für Stunde) basierend auf `dateCreated` des Objekts anzeigt.
+
+.Zu verwendende DSL
+[source,groovy]
+----
+    /**
+     * Group the given dates according to DiagramXLabelDateFormat, then count every group and put the result as data to draw.
+     *
+     * For example:
+     *      Knowing DiagramXLabelDateFormat.MONTH (Defined by {@link #labels(DiagramXLabelDateFormat dateFormat)}),
+     *      and being given dates: 2025-01-01, 2025-01-10, 2025-01-20, 2025-02-01, 2025-02-10, 2025-03-01.
+     *
+     *      So they are divided to 3 groups with their own count: [2025-01: 3, 2025-02: 2, 2025-03: 1].
+     *      The groups will be used as data to draw:
+     *          - xLabels = ["2025-01", "2025-02", "2025-03"]
+     *          - yDataList = [3.0, 2.0, 1.0]
+     *
+     * @param key
+     * @param dates
+     */
+    void dataset(final String key, final Date... dates)
+----
+
+.Code zur Verwendung der DSL
+[source,groovy]
+----
+diagram new UiDiagramSpecifier().ui({
+    List<Claim> claims = Claim.findAll()
+    bar {
+        dataset "Claim", claims.collect { it.dateCreated } as Date[]
+        option DiagramOption.builder
+                .setXLabelDateFormat(DiagramXLabelDateFormat.MONTH) // show claim count month-by-month
+                .build()
+    }
+})
+----
+
+.Diagramm
+image:screenshot-dsl-diagram-count-object.png[]
+
+== Dynamische Funktionen (nur in HTML)
+
+=== Zoomen (horizontal)
+
+Positionieren Sie den Mauszeiger auf dem Diagramm und drehen Sie das Mausrad bei gedrückter STRG-Taste.
+
+- STRG + Mausrad nach oben zum Vergrößern.
+- STRG + Mausrad nach unten zum Verkleinern.
+
+=== Scrollen (horizontal)
+
+Positionieren Sie den Mauszeiger auf dem Diagramm, halten Sie die linke Maustaste gedrückt und bewegen Sie die Maus horizontal.
+
+WARNING: Das Minimum und Maximum beim Scrollen sind begrenzt
+
+=== Tooltip
+
+Der Wert eines Balken-/Liniendiagramms/... wird standardmäßig nicht statisch angezeigt. Stattdessen können Sie den Mauszeiger über eine beliebige Form bewegen, woraufhin dynamisch ein Tooltip mit allen Informationen zur Zielform eingeblendet wird.
+
+image:screenshot-dsl-diagram-tooltip.png[]
+
+=== Klickbare Legende
+
+Durch Klicken auf die Legende eines Datensatzes kann die Anzeige des betreffenden Datensatzes ein- oder ausgeblendet werden.
+
+== DSL-Symbolhierarchie
+
+[graphviz,format="svg",align=center]
+.Symbolhierarchiediagramm für Diagram DSL
+----
+digraph mygraph {
+  node [shape=box];
+  ui
+  ui -> bar, scatter, line, area, pie, whiskers, timeline, custom
+  bar, scatter, line, area -> "bar, scatter, line, area (mixed)" [label = "0:N"]
+  bar, scatter, line, area, pie, whiskers -> labels [label = "0:1"]
+  bar, scatter, line, area, pie, whiskers, timeline -> option [label = "0:1"]
+  bar, scatter, line, area, pie -> dataset [label = "1:N"]
+  whiskers -> wdataset [label = "1:N"]
+  wdataset -> boxData [label = "1:N"]
+  timeline -> tdataset [label = "1:N"]
+  tdataset -> periodData [label = "1:N"]
+}
+----

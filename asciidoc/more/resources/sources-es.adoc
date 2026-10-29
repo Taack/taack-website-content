@@ -1,0 +1,35 @@
+= Código fuente
+:doctype: book
+:taack-category: 2|more/resources
+:source-highlighter: rouge
+
+== Github
+
+=== Contenido de este sitio web
+
+https://github.com/Taack/taack-website-content
+
+Utilizamos el formato AsciiDoc para escribir la documentación; para la localización, añadimos como sufijo el idioma al nombre del archivo. El idioma predeterminado es el inglés. `WhyDSL-fr.doc` será la versión en francés y `WhyDSL.adoc` la versión en inglés (la predeterminada).
+
+=== Código fuente del autocompletado de IntelliJ
+
+https://github.com/Taack/taack-autocomplete
+
+Publicaremos los binarios del plugin de IntelliJ en este repositorio para cada versión de IntelliJ.
+
+=== Código fuente de Infra
+
+https://github.com/Taack/infra
+
+Infra contiene 3 subproyectos (siendo `taack-jdbc-common` compartido):
+
+* `client`: conjunto de archivos Kotlin transpilados a JavaScript. Este proyecto evita escribir código JavaScript complejo; el ensamblado de este proyecto se copia directamente en los recursos (assets) de `taack-ui`.
+* `taack-jdbc-client`: código fuente del controlador JDBC
+* `taack-ui`: código fuente del plugin de Grails
+
+
+=== Aplicación de ejemplo de Intranet
+
+https://github.com/Taack/intranet
+
+Esta aplicación se puede utilizar como esqueleto para sus futuros desarrollos.

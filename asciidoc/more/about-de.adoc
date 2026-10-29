@@ -1,0 +1,17 @@
+= Über uns
+:doctype: book
+:taack-category: ZZZZZZZ|more
+
+Dieses Anwendungs-Framework schließt die Lücke zwischen Backend-Entwicklern und dem Frontend.
+
+GSP/JSP stehen für komplexe Anwendungsfälle jederzeit zur Verfügung.
+
+Vielen Dank an die Entwickler des Grails-Frameworks, die dies möglich gemacht haben.
+
+
+== Entwickler
+
+.Projektleiter
+image::ag.webp[width=480]
+
+Viele weitere folgen später ...

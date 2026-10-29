@@ -1,0 +1,6 @@
+= *Prefacio*
+:doctype: whitepaper
+:taack-category: 0|App
+:toc:
+
+Algunas aplicaciones pueden mejorar el framework ampliándolo con nuevas funcionalidades. Esta sección documentará esas funcionalidades adicionales.

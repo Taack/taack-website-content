@@ -1,0 +1,427 @@
+= 安全与约束
+:doctype: book
+:taack-category: 3|advanced
+:toc:
+:source-highlighter: rouge
+
+== 环境准备
+本任务的完整解答与骨架代码可从以下仓库克隆：
+
+[,shell]
+----
+git clone git@github.com:Taack/myLibrary.git
+----
+
+.要获取本部分的骨架代码，请打开终端并 `cd` 进入项目目录（`myLibrary`），然后复制并执行以下命令。
+[,bash]
+----
+git checkout part-3-skeleton
+----
+
+或者在 IntelliJ 中直接选择所需的分支。点击左上角的 `main/myLibrary/remote` 即可查看所有分支，选择对应分支并执行 checkout。
+== 简介
+
+在本节中，我们将学习安全（Security）与约束（Constraints）。首先，我们将学习如何实现这些约束，从而限制用户的输入。接着，我们将通过创建两类用户来深入了解安全机制：管理员（Admins）和借阅者（Borrowers），每类用户都可以访问不同的功能。
+
+管理员可以：
+
+- 在 Author 菜单中添加、删除和重新激活作者。
+- 在 Book 菜单中添加图书。
+- 在 Book 菜单中采购和删除图书副本（`bookInstances`）。
+- 在 User 菜单中访问用户列表及每位用户的详细信息。
+- 在 Borrowed 菜单中审批图书借阅请求。
+
+借阅者可以：
+
+- 在 Author 菜单中查看作者。
+- 在 Book 菜单中查看图书。
+- 在 Book 菜单中申请借阅图书副本（`bookInstance`）。
+- 在 Borrowed 菜单中归还图书副本（`bookInstance`）。
+- 在 History 菜单中查看历史借阅申请。
+
+.管理员界面
+image::part-three-admin-screenshot.webp[Reload,width=800,align="left"]
+
+.借阅者界面
+image::part-three-borrower-screenshot.webp[Reload,width=800,align="left"]
+
+
+== 约束（Constraints）
+
+如果管理员正在审批一条借阅申请，那么允许他们在申请日期之前的日期批准借阅显然是不合理的，应当禁止这种操作。同样，用户归还图书的日期也不应早于审批通过的日期。让我们在 `MyLibraryBorrowed` 中实现这些约束。
+
+.供参考的类图
+[plantuml, format="svg", opts="inline"]
+----
+@startuml
+
+enum ApprovalStatus {
+    PENDING
+    APPROVED
+    REJECTED
+}
+
+class MyLibraryAuthor {
+    String firstName
+    String lastName
+    Date dateOfBirth
+    Boolean isActive = true
+    String toString()
+}
+
+class MyLibraryBook {
+    String title
+    String description
+    int numberOfPages
+    int count = 0
+    int getNumberOfInstances()
+    int getNumberOfBooksBorrowable()
+}
+
+class MyLibraryBookInstance {
+    Boolean isActive = true
+    Integer serialNumber
+    Boolean isAvailableB = true
+}
+
+class MyLibraryBorrowed {
+    Date requestDate
+    Date approvalDate
+    Date returnDate
+    ApprovalStatus statusOfApproval = ApprovalStatus.PENDING
+}
+
+MyLibraryAuthor "1" --> "*" MyLibraryBook : listOfBooks
+MyLibraryBook "1" --> "*" MyLibraryBookInstance : listOfBookInstance
+MyLibraryBookInstance "*" --> "1" MyLibraryBook : belongsTo
+MyLibraryBookInstance "1" --> "*" MyLibraryBorrowed : borrowHistoryOfBook
+MyLibraryBorrowed "*" --> "1" MyLibraryBookInstance : bookInstance
+MyLibraryBorrowed "*" --> "1" User : user
+MyLibraryBorrowed --> ApprovalStatus
+
+@enduml
+----
+
+我们需要在领域实体上实现约束，以确保为图书馆提供合规且符合逻辑的数据。
+
+尝试为借阅记录的日期字段添加 `nullable` 约束以及自定义校验器（审批日期不能早于 `requestDate`，且 `returnDate` 不能早于借阅审批日期）。
+
+.参考解答
+[%collapsible]
+====
+.添加以下约束：
+[,groovy]
+----
+static constraints = {
+    approvalDate nullable: true, validator: { Date val, MyLibraryBorrowed obj ->
+        if (val == null) return true
+        return val >= obj.requestDate
+    }
+
+    returnDate nullable: true, validator: { Date val, MyLibraryBorrowed obj ->
+        if (val == null) return true
+        return val >= obj.approvalDate
+    }
+
+    bookInstance nullable:false
+    user nullable:false
+}
+----
+====
+如需了解更多信息，请参阅有关约束的 link:https://docs.grails.org/latest/ref/Constraints/Usage.html[Grails 官方文档]。
+
+== 定义菜单
+
+如前所述，将有两个仅对管理员开放的新菜单。让我们在 `MyLibraryUiService` 的 `buildMenu` 中添加它们。
+
+专业模式：添加菜单 [TODO 2]
+
+.添加以下菜单：
+[%collapsible]
+====
+[,groovy]
+----
+menu MyLibraryController.&listOfUsers as MC
+menu MyLibraryController.&listOfRequests as MC
+----
+====
+
+== 配置用户
+
+首先，我们将在 `MyLibraryUiService` 中创建一个方法，用于判断当前登录的用户类型。
+
+专业模式：实现 `isAdmin` [TODO 3.1]。
+
+.实现 `isAdmin`：
+.参考解答
+[%collapsible]
+====
+[,groovy]
+----
+boolean isAdmin() {
+    User currentUser = springSecurityService.currentUser as User
+    return currentUser?.authorities?.any { it.authority == 'ROLE_ADMIN' }
+}
+----
+====
+
+其次，我们需要修改 `MyLibraryController` 中的控制器 `index` 方法，以便判断当前登录的用户类型。
+
+.参考解答
+[%collapsible]
+====
+.修改 `index()`：
+[,groovy]
+----
+def index() {
+    currentUser = springSecurityService.currentUser as User
+    isAdmin = currentUser?.authorities?.any { it.authority == 'ROLE_ADMIN' }
+    redirect action: 'listAuthor'
+}
+----
+====
+
+== 修改构建器（Builders）
+
+为了适配这些变更，我们需要修改作者、图书以及用户借阅（`userBorrowed`）表格。
+
+.参考解答
+[%collapsible]
+====
+.修改 `buildAuthorTable` TODO 4.1.1–4.1.4：
+[,groovy]
+----
+boolean isAdmin = isAdmin() //TODO 4.1.1
+if(!isSelect && isAdmin) { // TODO 4.1.2 & TODO 4.1.4
+if(!isAdmin) {filter.addFilter(buildIsActiveAuthorFilter(author))} //TODO 4.1.3
+----
+
+
+.修改 `buildBookTable` TODO 4.2.1–4.2.8：
+[,groovy]
+----
+boolean isAdmin = isAdmin() //TODO 4.2.1
+if(isAdmin) column {label "Number of instances "} // TODO 4.2.2
+if(isAdmin) column {label "Modify number of Book Instances"} // TODO 4.2.3
+if (!isAdmin) label "Request Form" // TODO 4.2.4
+
+// TODO 4.2.5
+if(!isAdmin) {
+    MyLibraryBookInstance bookInstance = new MyLibraryBookInstance()
+    filter.addFilter(new FilterExpression(true, Operator.EQ, book.listOfBookInstance_,bookInstance.isAvailableB_))
+}
+
+if (isAdmin) {rowColumn {rowField bookIterator.numberOfInstances_}} // TODO 4.2.6
+
+// TODO 4.2.7 & 4.2.8
+if(isAdmin) {
+    rowColumn {
+        rowAction ActionIcon.DELETE * IconStyle.SCALE_DOWN, MyLibraryController.&selectBookInstance as MC, bookIterator.id
+        rowAction ActionIcon.ADD * IconStyle.SCALE_DOWN, MyLibraryController.&purchaseBook as MC, bookIterator.id
+    }
+} else {
+    rowColumn {
+        rowAction ActionIcon.CREATE * IconStyle.SCALE_DOWN, MyLibraryController.&requestBookInstance as MC, bookIterator.id
+    }
+}
+----
+====
+
+
+
+我们需要添加一个 `showUser` 变量，用于显示特定用户的借阅记录。
+
+.参考解答
+[%collapsible]
+====
+.修改 `buildUserBorrowsTable` TODO 4.3.1–4.3.7：
+[,groovy]
+----
+Boolean isAdmin = isAdmin() // TODO 4.3.1
+if (isCurrently  && !isAdmin) column {label "Return Book"} // TODO 4.3.2
+
+if(isAdmin) {
+    column { label borrowed.user_ }
+    if (!showUser) {
+        label "Approve Book"
+    }
+}
+
+User currentUser = springSecurityService.currentUser as User
+if (showUser) {
+    currentUser = showUser
+}
+
+if(!isUser || showUser) {
+    filter.addFilter(new FilterExpression(currentUser, Operator.EQ, borrowed.user_))
+}
+
+if (isCurrently && !isAdmin) {  // TODO 4.3.6
+
+if(isAdmin) {
+    rowColumn { rowField borrowedIterator.user.username_ }
+    if (!showUser) {
+        rowColumn {
+            rowAction ActionIcon.DELETE * IconStyle.SCALE_DOWN, MyLibraryController.&approveBook as MC, borrowedIterator.id
+        }
+    }
+}
+----
+====
+现在我们已经添加了显示所有用户全部申请所需的要素，接下来让我们渲染这个表格。
+
+.参考解答
+[%collapsible]
+====
+[,groovy]
+----
+def listOfRequests() {
+    UiTableSpecifier tableUserBorrowsSpecifier = myLibraryUiService.buildUserBorrowsTable(true, null, true)
+    UiFilterSpecifier filterUserBorrowsSpecifier = myLibraryUiService.buildUserBorrowsFilter()
+
+    taackUiService.show(new UiBlockSpecifier().ui {
+        tableFilter filterUserBorrowsSpecifier, tableUserBorrowsSpecifier
+    }, myLibraryUiService.buildMenu())
+}
+----
+====
+== 用户菜单（User Menu）
+如前所述，我们还希望为管理员提供一个显示所有用户的表格。
+让我们先从实现 `buildUsersTable` 开始（您可以参考作者表格作为基础示例来实现它）。
+
+.参考解答
+[%collapsible]
+====
+[,groovy]
+----
+UiTableSpecifier buildUsersTable() {
+    UiTableSpecifier buildUsersSpecifier = new UiTableSpecifier()
+    User user = new User()
+
+    buildUsersSpecifier.ui {
+        header {
+            label user.username_
+            label "Authorities"
+        }
+
+        TaackFilter taackFilter = taackFilterService.getBuilder(User)
+                .setSortOrder(TaackFilter.Order.ASC, user.username_)
+                .setMaxNumberOfLine(10).build()
+
+        iterate taackFilter, {User userIterator ->
+            rowColumn {
+                rowAction ActionIcon.SHOW * IconStyle.SCALE_DOWN, MyLibraryController.&showUser as MC, userIterator.id
+                rowField userIterator.username_
+            }
+            rowField userIterator.authorities_
+        }
+    }
+}
+----
+====
+
+然后我们可以在控制器中将其渲染并展示在页面上。
+
+.参考解答
+[%collapsible]
+====
+[,groovy]
+----
+def listOfUsers() {
+    UiTableSpecifier tableUsersSpecifier = myLibraryUiService.buildUsersTable()
+
+    taackUiService.show(new UiBlockSpecifier().ui {
+        table tableUsersSpecifier
+    }, myLibraryUiService.buildMenu())
+}
+----
+====
+
+接下来，让我们在控制器和 UI 服务中实现 `showUser` 和 `buildUserShow` 方法。
+打开 `MyLibraryUiService`。
+
+.UIService
+[%collapsible]
+====
+[,groovy]
+----
+UiShowSpecifier buildUserShow(User user) {
+    UiShowSpecifier userShowSpecifier = new UiShowSpecifier()
+
+    userShowSpecifier.ui(user, {
+        fieldLabeled user.username_
+        fieldLabeled user.firstName_
+        fieldLabeled user.lastName_
+        fieldLabeled user.authorities_
+    })
+}
+----
+====
+
+.控制器（Controller）
+[%collapsible]
+====
+[,groovy]
+----
+def showUser(User user) {
+    UiShowSpecifier showSpec = myLibraryUiService.buildUserShow(user)
+    UiTableSpecifier userBorrowsSpecifier = myLibraryUiService.buildUserBorrowsTable(false, user)
+    UiFilterSpecifier userBorrowsFilterSpecifier = myLibraryUiService.buildUserBorrowsFilter(user)
+    UiTableSpecifier userBorrowsCurrentlySpecifier = myLibraryUiService.buildUserBorrowsTable(true, user)
+
+    taackUiService.show(new UiBlockSpecifier().ui {
+        modal {
+            show showSpec
+            tableFilter userBorrowsFilterSpecifier, userBorrowsSpecifier
+            tableFilter userBorrowsFilterSpecifier, userBorrowsCurrentlySpecifier
+        }
+    })
+
+}
+----
+====
+
+== 安全第一部分
+太棒了，现在我们已经准备好了所需的一切，只需再添加安全层即可。
+Taack 的一大优势就在于实现安全控制非常简单。只需在方法上方添加 `@Secured(['ROLE_ADMIN'])`，即可保护该方法不被任何没有 `ROLE_ADMIN` 角色的用户访问。`@Secured(['ROLE_ADMIN'])` 不仅会隐藏对应图标，还会使该方法无法通过直接链接访问。
+
+让我们继续为相关方法添加 `@Secured(['ROLE_ADMIN'])` 和 `@Secured(['ROLE_BORROWER'])`。[TODO 6.1] 提示：在 `MyLibraryController` 中总共需要添加 11 处 `@Secured` 注解。
+
+在较大型的项目中，通过添加条件语句来隐藏按钮或列可能会变得非常复杂。因此，我们建议对于使用同一个构建器（builder）的所有页面或模态框，尽量保持相同的显示列数/行数。在这种情况下，如果需要隐藏按钮，可以使用另一种技术。
+
+== 安全第二部分
+您可以创建一个文件，在其中指定需要受保护的方法以及某些方法需要受保护的具体条件。
+
+导航到已为您创建好的 `intranet/app/myLibrary/grails-app/services/my/library/MyLibrarySecurityService.groovy`。
+
+其中的大部分方法已经为您实现好了。请阅读文件中的文档注释以了解更多信息。
+
+按照与 `returnSecurityClosure`（它检查 `ApprovalStatus` 是否为 `APPROVED`，从而决定是否允许用户看到归还图书按钮）相同的思路，您将实现 `approvedSecurityClosure`。
+
+专业模式：实现 `approvedSecurityClosure` [TODO 6.2]
+
+
+.SecurityService
+[%collapsible]
+====
+[,groovy]
+----
+private static boolean approvedSecurityClosure(Long id, Map p) {
+    MyLibraryBorrowed borrowed = MyLibraryBorrowed.get(id)
+    return (borrowed.statusOfApproval != ApprovalStatus.APPROVED)
+}
+----
+====
+
+.在 `init` 中添加以下代码行：
+[,groovy]
+----
+TaackUiEnablerService.securityClosure(
+    this.&approvedSecurityClosure,
+    MyLibraryController.&approveBook as MethodClosure)
+----
+
+
+恭喜！您已经完成了本项目的实现。
+
+在下一部分中，您将学习如何创建图表。

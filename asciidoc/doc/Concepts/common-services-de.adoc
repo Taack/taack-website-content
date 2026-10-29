@@ -1,0 +1,21 @@
+= Allgemeine Dienste
+:doctype: book
+:taack-category: 3|doc/Concepts
+:toc:
+:source-highlighter: rouge
+
+In einer zukünftigen Version werden alle Dienste direkt in das *Taack UI* Grails-Plugin integriert sein, das unabhängig von den Anwendungsmodulen ist.
+
+== Dienste des Taack-UI-Moduls
+
+* `TaackUiService`: Dienst, der für die Anzeige von Blöcken zuständig ist, entweder mithilfe von #ajax#, um einen Teil der Seite zu aktualisieren, oder um eine neue Seite anzuzeigen.
+
+* `TaackSaveService`: Ermöglicht das Speichern von Objekten in der Datenbank und das Initialisieren bestimmter Felder. Meldet Fehler, wenn das Objekt ungültig ist, und zeigt dem Endbenutzer lokalisierte Fehlermeldungen an.
+
+* `TaackFilterService`: Ermöglicht das Auflisten von Objekten bei der Anzeige einer Tabelle. Gruppierung und Sortierung werden unterstützt.
+
+== Zusätzliche Dienste
+
+* `TaackJdbcService` Dienst zur Kommunikation mit externen JDBC-Clients
+
+* `TaackSearchService` Dienst zur Unterstützung der Volltextsuche

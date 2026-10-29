@@ -1,0 +1,160 @@
+= PDF
+:doctype: book
+:taack-category: 5|advanced
+:toc:
+:source-highlighter: rouge
+
+== Configuration
+La solution et les squelettes pour cette tâche peuvent être clonés depuis ce dépôt :
+
+[,shell]
+----
+git clone git@github.com:Taack/myLibrary.git
+----
+
+.Pour accéder au squelette de cette partie, ouvrez votre terminal, placez-vous dans le projet (`myLibrary`) avec `cd` et copiez la ligne suivante.
+[,bash]
+----
+git checkout part-5-skeleton
+----
+
+Ou dans IntelliJ, vous pouvez sélectionner directement la branche souhaitée. Sélectionnez en haut à gauche `main/myLibrary/remote` pour voir toutes les branches. Sélectionnez une branche puis cliquez sur checkout.
+
+== Création de PDF
+
+Dans cette section, vous allez apprendre à créer des fichiers PDF à partir des données de votre projet.
+
+Pour créer un PDF, vous utiliserez un `UiPrintableSpecifier()`, composé de :
+
+- `printableHeader` qui permet de définir un en-tête qui sera répété sur toutes les pages.
+- `printableBody` qui permet de définir le contenu du PDF sur plusieurs pages.
+- `printableFooter` qui permet de définir le pied de page qui sera répété sur toutes les pages (la taille ne doit pas dépasser 2 cm).
+
+Si vous souhaitez voir un exemple, consultez link:doc/DSLs/block-printable-dsl.adoc[DSL de blocs imprimables (Printable Block DSL)].
+
+=== En-tête imprimable (Printable Header)
+
+Le paramètre de hauteur est obligatoire si vous avez besoin d'une hauteur différente de 2 cm.
+
+Il existe trois options pour organiser l'affichage de l'en-tête :
+
+- `printableHeaderLeft` : dessinera de gauche à droite
+- `printableHeader` : vous devrez spécifier l'emplacement (centre, gauche, droite)
+- `printableHeaderRight` : dessinera de droite à gauche
+
+À l'intérieur de l'en-tête, vous dessinez le contenu à l'aide de `UiSpecifier`.
+
+.Exemple de code :
+[,groovy]
+----
+printableHeaderRight('7.5cm') { //<1>
+    show new UiShowSpecifier().ui {
+        field'Content'
+    }, BlockSpec.Width.MAX
+}
+----
+<1> dessine l'en-tête en partant de la droite avec une hauteur de 7,5 cm.
+
+Nous allons implémenter notre propre `printableHeader`, dans lequel nous afficherons le nom de l'utilisateur demandant le PDF, le logo Taack et la date à laquelle le PDF est demandé.
+
+Rendez-vous dans `MyLibraryUiService`.
+
+Mode Pro : implémentez le `printableHeader` de `buildLibraryPdf` [TODO 1.1].
+
+.Implémentez le `printableHeader` de `buildLibraryPdf` :
+[,groovy]
+----
+printableHeaderLeft('7.5cm') {
+    show new UiShowSpecifier().ui {
+        field Style.BOLD, 'Printed for'
+        field """${currentUser.firstName} ${currentUser.lastName}"""
+    }, BlockSpec.Width.THIRD
+    show new UiShowSpecifier().ui {
+        field """
+            <div style='height: 2cm; text-align: center; width: 75%;'>
+                ${this.taackUiService.dumpAsset('logo-taack-web.svg')}
+            </div>
+        """
+    }, BlockSpec.Width.THIRD
+    show new UiShowSpecifier().ui {
+        field Style.ALIGN_RIGHT, """${new Date()}"""
+    }, BlockSpec.Width.THIRD
+}
+----
+
+=== Corps imprimable (Printable Body)
+
+À l'intérieur du corps, vous dessinez le contenu à l'aide de `UiSpecifier`, tout comme pour le `printableHeader`.
+
+1. Nous voulons afficher tous les noms d'auteurs avec une table en dessous présentant les livres écrits par chacun de ces auteurs.
+2. Nous voulons également afficher les graphiques que nous avons implémentés précédemment.
+3. Enfin, si l'utilisateur demandant le PDF est un emprunteur, nous voulons afficher la liste des demandes d'emprunt de livres qui ont été rendus dans une table.
+
+Mode Pro : implémentez la première partie de `printableBody` de `buildLibraryPdf` [TODO 1.2.1].
+
+.Implémentez la première partie de `printableBody` de `buildLibraryPdf` :
+[,groovy]
+----
+List<MyLibraryAuthor> authors = MyLibraryAuthor.list(sort: 'lastName')
+for (MyLibraryAuthor author : authors) {
+    show new UiShowSpecifier().ui {
+        field """<h2>${author.firstName} ${author.lastName}</h2>"""
+    }, BlockSpec.Width.MAX
+    table this.buildAuthorTablePdf(author), BlockSpec.Width.MAX
+}
+----
+
+Mode Pro : implémentez la deuxième partie de `printableBody` de `buildLibraryPdf` [TODO 1.2.2].
+
+.Implémentez la deuxième partie de `printableBody` de `buildLibraryPdf` :
+[,groovy]
+----
+anonymousBlock BlockSpec.Width.MAX, {
+    diagram buildAuthorPieDiagram(true), BlockSpec.Width.MAX
+    diagram buildBookPopularityPieDiagram(true), BlockSpec.Width.MAX
+    diagram buildBarDiagram(true, 'YEAR'), BlockSpec.Width.MAX
+    diagram buildBorrowDurationWhiskersDiagram(), BlockSpec.Width.MAX
+}
+----
+
+Mode Pro : implémentez la troisième partie de `printableBody` de `buildLibraryPdf` [TODO 1.2.3].
+
+.Implémentez la troisième partie de `printableBody` de `buildLibraryPdf` :
+[,groovy]
+----
+if (currentUser?.authorities?.any { it.authority == 'ROLE_BORROWER' }) {
+    table this.buildUserBorrowsTable(false, null, true), BlockSpec.Width.MAX
+}
+----
+
+=== Pied de page imprimable (Printable Footer)
+
+À l'intérieur du pied de page, vous dessinez le contenu à l'aide de `UiSpecifier`, tout comme pour le `printableHeader`.
+Il affiche automatiquement le numéro de page dans le coin inférieur droit.
+Pour éviter toute redondance, nous n'afficherons rien dans le `printableFooter`.
+
+== Rendu du PDF
+
+Un bouton a été ajouté au menu, affichant une icône `export_pdf` qui appelle `downloadLibraryPdf`, ce qui permettra de créer et de télécharger le PDF. Implémentons cette méthode.
+
+Rendez-vous dans `MyLibraryController`.
+
+Mode Pro : implémentez `downloadBinLibraryPdf` [TODO 2].
+
+.Implémentez `downloadBinLibraryPdf` :
+[,groovy]
+----
+def downloadBinLibraryPdf() {
+    UiPrintableSpecifier pdf = myLibraryUiService.buildLibraryPdf()
+    taackUiPdfService.downloadPdf(pdf, 'LibrarySummary', false)
+}
+----
+
+[WARNING]
+====
+Toute méthode utilisée pour créer un PDF *doit* commencer par *downloadBin*
+====
+
+
+Voici un exemple de PDF généré par ce code :
+link:LibrarySummary.pdf[Résumé de la bibliothèque (LibrarySummary)]

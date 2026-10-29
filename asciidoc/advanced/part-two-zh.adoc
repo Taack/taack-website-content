@@ -1,0 +1,630 @@
+= 第二部分
+:doctype: book
+:taack-category: 2|advanced
+:toc:
+:source-highlighter: rouge
+
+== 环境准备
+本任务的完整解答与骨架代码可从以下仓库克隆：
+
+[,shell]
+----
+git clone git@github.com:Taack/myLibrary.git
+----
+
+.要获取本部分的骨架代码，请打开终端并 `cd` 进入项目目录（`myLibrary`），然后复制以下命令。
+[,bash]
+----
+git checkout part-2-skeleton
+----
+
+或者在 IntelliJ 中直接选择所需的分支。点击左上角的 `main/myLibrary/remote`，即可看到所有分支。选择一个分支并执行 Checkout。
+
+== 简介
+
+您现在已经创建了一个个人图书馆，接下来让我们添加一些新功能。我们希望加入一个借阅系统。完成本部分后，您将能够从自己的图书馆借阅图书、审批借阅申请、归还图书，并且还可以查看借阅申请历史记录。
+
+我们已经更新了 `myLibrary` 中的代码。请拉取（`pull`）该版本以获取新的骨架代码。
+
+.表单
+image::part-two-screenshot.webp[Reload,width=800,align="left"]
+
+
+== 定义并更新领域类
+编辑目录：`app/library/src/main/groovy/myLibrary/domain/`
+
+
+.供参考的更新后类图
+[plantuml, format="svg", opts="inline"]
+----
+@startuml
+
+enum ApprovalStatus {
+    PENDING
+    APPROVED
+    REJECTED
+}
+
+class MyLibraryAuthor {
+    String firstName
+    String lastName
+    Date dateOfBirth
+    Boolean isActive = true
+    String toString()
+}
+
+class MyLibraryBook {
+    String title
+    String description
+    int numberOfPages
+    int count = 0
+    int getNumberOfInstances()
+    int getNumberOfBooksBorrowable()
+}
+
+class MyLibraryBookInstance {
+    Boolean isActive = true
+    Integer serialNumber
+    Boolean isAvailableB = true
+}
+
+class MyLibraryBorrowed {
+    Date requestDate
+    Date approvalDate
+    Date returnDate
+    ApprovalStatus statusOfApproval = PENDING
+}
+
+class User
+
+MyLibraryAuthor "1" --> "*" MyLibraryBook : listOfBooks
+MyLibraryBook "1" --> "*" MyLibraryBookInstance : listOfBookInstance
+MyLibraryBookInstance "*" --> "1" MyLibraryBook : belongsTo
+MyLibraryBookInstance "1" --> "*" MyLibraryBorrowed : borrowHistoryOfBook
+MyLibraryBorrowed "*" --> "1" MyLibraryBookInstance : bookInstance
+MyLibraryBorrowed "*" --> "1" User : user
+
+@enduml
+----
+
+专业模式：[TODO 1.1, 1.2 & 1.3]
+
+.修改 `MyLibraryBook` 类并添加以下方法（TODO 1.1）：
+[,groovy]
+----
+int getNumberOfBooksBorrowable() {
+        return MyLibraryBookInstance.countByIsAvailableBAndIsActiveAndBook(true, true, this) //<1>
+    }
+----
+<1> `countByIsAvailableBAndIsActiveAndBook` 是 Grails/GORM 中的动态查找器方法（dynamic finder），它会自动统计领域类中满足 `isAvailableB`、`isActive` 和 `book` 字段给定条件的记录数量。更多信息请参阅 link:https://docs.grails.org/latest/ref/Domain%20Classes/countBy.html[Grails 文档 (countBy)]。
+
+.修改 `MyLibraryBookInstance` 类并添加以下变量和 `hasMany` 关联关系（TODO 1.2）：
+[,groovy]
+----
+List<MyLibraryBorrowed> borrowHistoryOfBook
+Boolean isAvailableB = true
+
+static hasMany = [borrowHistoryOfBook: MyLibraryBorrowed]
+----
+
+.实现 `MyLibraryBorrowed` 类（TODO 1.3）：
+[,groovy]
+----
+enum ApprovalStatus {
+    PENDING, APPROVED, REJECTED
+}
+
+@GrailsCompileStatic
+@TaackFieldEnum
+class MyLibraryBorrowed {
+    MyLibraryBookInstance bookInstance
+    User user
+    Date requestDate
+    Date approvalDate
+    Date returnDate
+    ApprovalStatus statusOfApproval= ApprovalStatus.PENDING
+
+    static constraints = {
+        approvalDate nullable: true
+        returnDate nullable: true
+    }
+}
+----
+
+现在您已经实现了本节所需的所有类！
+
+== 定义菜单
+
+在本节中，我们需要创建两个新菜单。用户将在“图书”菜单中申请借阅某个 `bookInstance`。已申请但尚未归还的 `bookInstances`（无论是待审批申请还是已批准申请）将显示在“借阅中”菜单下。已归还的 `bookInstances` 将显示在“历史记录”菜单下。
+
+让我们先将这些菜单添加到 `buildMenu` 中。
+
+专业模式：在 `buildMenu` 中添加菜单。[TODO 2]
+
+.在 `buildMenu` 中添加以下两行：
+[,groovy]
+----
+menu MyLibraryController.&listBooksBorrowed as MC
+menu MyLibraryController.&listBooksCurrentlyBorrowed as MC
+----
+
+== 定义借阅菜单
+
+=== 借阅表格
+
+我们希望在表格中显示已借阅（尚未归还）的记录。为此需要创建一个 `UiTableSpecifier`。前往 `app/library/services/myLibrary/MyLibraryUiService` 的 `Author Menu` 部分。
+
+注意：“借阅中”菜单和“历史记录”菜单之间的唯一区别在于 `returnDate` 和 `StatusOfApproval`。
+因此，我们将为这两个菜单复用同一个 `TableSpecifier`；这也是使用独立文件（`MyLibraryUiService`）来实现 Specifier 的一大优势：只需少量修改即可在不同场景下复用。
+
+[NOTE]
+===============================
+您需要一个布尔标志来检查图书当前是否处于借出状态，我们将其命名为 `isCurrentlyBorrowed`。
+===============================
+专业模式：自行实现该表格 [TODOS 3.1]。
+
+.参考解答
+[%collapsible]
+====
+.实现 `buildBorrowedTable`：
+[,groovy]
+----
+MyLibraryBook book = new MyLibraryBook()
+MyLibraryBorrowed borrowed = new MyLibraryBorrowed()
+UiTableSpecifier buildUserBorrowsSpecifier = new UiTableSpecifier()
+MyLibraryBookInstance bookInstance = new MyLibraryBookInstance()
+
+buildUserBorrowsSpecifier.ui {
+    header {
+        sortableFieldHeader borrowed.bookInstance_,bookInstance.book_,book.title_
+        sortableFieldHeader borrowed.bookInstance_,bookInstance.book_,book.author_
+        if (isCurrently) {label borrowed.statusOfApproval_}
+        label borrowed.requestDate_
+        label borrowed.approvalDate_
+        column {label borrowed.user_}
+    }
+
+    TaackFilter.FilterBuilder filter = taackFilterService.getBuilder(MyLibraryBorrowed)
+            .setMaxNumberOfLine(10)
+            .setSortOrder(
+                TaackFilter.Order.ASC,
+                borrowed.bookInstance_,
+                bookInstance.book_,book.title_)
+
+    if(isCurrently) {filter.addFilter(new FilterExpression(null, Operator.EQ, borrowed.returnDate_))} //<1>
+    else {filter.addFilter(new FilterExpression(null, Operator.NE, borrowed.returnDate_))} //<1>
+
+    iterate(
+            filter.build()) { MyLibraryBorrowed borrowedIterator ->
+        rowColumn {
+            rowField borrowedIterator.bookInstance.book.title
+        }
+        rowField borrowedIterator.bookInstance.book.author.toString()
+        if(isCurrently) {rowField borrowedIterator.statusOfApproval_}
+        rowField borrowedIterator.requestDate_
+        rowField borrowedIterator.approvalDate_
+        rowColumn {rowField borrowedIterator.user.username_}
+    }
+}
+----
+====
+
+<1> 如果不打算在其他地方复用过滤器，这是另一种创建过滤器的简便方式。
+
+我们还希望添加一个用于过滤借阅记录的过滤器。下面来实现它。
+
+专业模式：自行实现过滤器 [TODO 3.2]。
+
+.实现 `buildUserBorrowsFilter`：
+[,groovy]
+----
+UiFilterSpecifier buildUserBorrowsFilter(User user = null) {
+    MyLibraryBook book = new MyLibraryBook()
+    UiFilterSpecifier UserBorrowsFilterSpecifier = new UiFilterSpecifier()
+    MyLibraryBorrowed borrowed = new MyLibraryBorrowed()
+    MyLibraryBookInstance bookInstance = new MyLibraryBookInstance()
+
+    UserBorrowsFilterSpecifier.ui MyLibraryBorrowed, {
+        if (user) hiddenId(user.id)
+        section "Borrows Filter", {
+            filterField borrowed.bookInstance_,bookInstance.book_,book.title_
+        }
+    }
+}
+----
+现在表格已经完成，我们只需将其渲染到页面上。我们将在名为 `listBooksCurrentlyBorrowed` 的方法中完成此操作。前往 `app/library/controller/myLibrary/MyLibraryController` 的 `Borrowed Menu` 部分。
+
+专业模式：自行实现 `listBooksCurrentlyBorrowed` [TODO 3.3]。
+
+.实现 `listBooksCurrentlyBorrowed` 方法：
+[,groovy]
+----
+def listBooksCurrentlyBorrowed() {
+    UiTableSpecifier tableUserBorrowsSpecifier = myLibraryUiService.buildUserBorrowsTable(true)
+    UiFilterSpecifier filterUserBorrowsSpecifier = myLibraryUiService.buildUserBorrowsFilter()
+
+    taackUiService.show(new UiBlockSpecifier().ui {
+        tableFilter filterUserBorrowsSpecifier, tableUserBorrowsSpecifier
+    }, myLibraryUiService.buildMenu())
+}
+----
+
+现在您可以启动服务器了。借阅表格应该已经可以正常工作，但由于数据库中还没有借阅记录，目前只能看到表头。接下来让我们创建表单并将对象保存到数据库中。现在我们需要实现 `requestBookInstance`，这需要创建一个 `UiFormSpecifier`。
+让我们回到 `MyLibraryUiService`。
+
+==== 借阅表单
+专业模式：实现 `buildRequestBookForm` [TODO 3.4]。
+
+.实现 `buildRequestBookForm`：
+[,groovy]
+----
+UiFormSpecifier buildRequestBookForm(MyLibraryBook book) {
+    User user = springSecurityService.currentUser as User
+    MyLibraryBorrowed borrowed = new MyLibraryBorrowed()
+    borrowed.user = user
+    book ?= new MyLibraryBook(params)
+    UiFormSpecifier requestBookFormSpecifier = new UiFormSpecifier()
+
+    requestBookFormSpecifier.ui borrowed, {
+        section "Request Book Form", {
+            hiddenField borrowed.user_ //<1>
+            field borrowed.requestDate_
+            ajaxField borrowed.bookInstance_, MyLibraryController.&selectBookInstanceOne as MC, book.id
+        }
+        formAction MyLibraryController.&saveBookForm as MC
+    }
+}
+----
+<1> 在用户不可见的情况下通过表单传递参数。
+
+让我们回到 `MyLibraryController`。我们将在模态框中渲染该表单。
+
+专业模式：实现 `requestBookInstance` [TODO 3.5]
+
+.实现 `requestBookInstance`：
+[,groovy]
+----
+def requestBookInstance(MyLibraryBook book){
+    UiFormSpecifier requestBookInstanceForm = myLibraryUiService.buildRequestBookForm(book)
+
+    taackUiService.show new UiBlockSpecifier().ui {
+        modal {
+            form requestBookInstanceForm
+        }
+    }
+}
+----
+
+现在我们需要保存借阅记录，因此来实现 `saveBookForm`。
+
+专业模式：实现 `saveBookForm` [TODO 3.6]。
+[,groovy]
+----
+@Transactional
+def saveBookForm() {
+    MyLibraryBorrowed borrowed = taackSaveService.save(MyLibraryBorrowed)
+    borrowed.bookInstance?.isAvailableB = false
+    taackSaveService.redirectOrRenderErrors(borrowed)
+}
+----
+
+接下来我们需要实现将使用 `buildInstanceBookTable` 的 `selectBookInstanceOne`，首先需要修改该 Specifier。
+
+专业模式：修改 `buildInstanceBookTable` [TODO 3.7]。
+
+.替换 TODO 3.7.1：
+[,groovy]
+----
+column {
+    if (isOne) {
+        label "Select Book Instance"
+    } else {
+        label "Delete"
+    }
+}
+----
+.替换 TODO 3.7.2：
+[,groovy]
+----
+filter.addFilter(buildIsAvailableBookInstances(book))
+----
+.替换 TODO 3.7.3：
+[,groovy]
+----
+rowColumn {
+    if(isOne) {
+        rowAction tr('default.serialNumber.label'), ActionIcon.SELECT * IconStyle.SCALE_DOWN, bookInstanceIterator.id, bookInstanceIterator.serialNumber.toString()
+    } else {
+        rowAction ActionIcon.DELETE * IconStyle.SCALE_DOWN, MyLibraryController.&deleteBookInstances as MC, bookInstanceIterator.id, [bookId:book.id]
+    }
+}
+----
+
+上面我们使用了 `buildIsAvailableBookInstances` 过滤器，现在来实现它。
+
+专业模式：实现 `buildIsAvailableBookInstances` [TODO 3.8]。
+
+.实现 `buildIsAvailableBookInstances`：
+[,groovy]
+----
+UiFilterSpecifier buildIsAvailableBookInstances(MyLibraryBook book) {
+    MyLibraryBookInstance bookInstance = new MyLibraryBookInstance()
+    UiFilterSpecifier bookInstanceFilterSpecifier = new UiFilterSpecifier()
+    bookInstanceFilterSpecifier.sec MyLibraryBookInstance, {
+        filterFieldExpressionBool new FilterExpression(true, Operator.EQ, bookInstance.isAvailableB_)
+    }
+}
+----
+
+专业模式：实现 `selectBookInstanceOne` [TODO 3.9]。
+
+.实现 `selectBookInstanceOne`：
+[,groovy]
+----
+def selectBookInstanceOne(MyLibraryBook book) {
+    UiTableSpecifier bookInstanceTable = myLibraryUiService.buildInstanceBookTable(book, true)
+
+    taackUiService.show new UiBlockSpecifier().ui {
+        modal {
+            table bookInstanceTable
+        }
+    }
+}
+----
+
+
+现在让我们添加用于打开借阅申请表单的按钮。同时我们还希望了解有多少本图书可供借阅，我们将在 `buildBookTable` 中实现这一功能。
+
+专业模式：修改 `buildBookTable` [TODO 3.10]
+
+.替换 TODO 3.10.1：
+[,groovy]
+----
+label "Number of Available Book Instances"
+----
+
+.替换 TODO 3.10.2：
+[,groovy]
+----
+label "Request Form"
+----
+
+.替换 TODO 3.10.3：
+[,groovy]
+----
+rowField bookIterator.numberOfBooksBorrowable_
+----
+
+.替换 TODO 3.10.4：
+[,groovy]
+----
+rowColumn {
+    rowAction ActionIcon.CREATE * IconStyle.SCALE_DOWN, MyLibraryController.&requestBookInstance as MC, bookIterator.id
+}
+----
+
+现在您拥有了一个功能完整的表格，可以显示并创建借阅申请。重新启动服务器，您应该可以点击按钮并填写表单了。
+
+接下来我们希望能够审批申请并归还已借出的 `bookInstances`。让我们实现 `approveBook` 和 `returnBook` 方法。前往 `MyLibraryUiService` 中的 `buildUserBorrowsTable` 方法。
+
+==== 审批申请与归还图书副本
+
+前往 `myLibraryUiService` 中的 `buildUserBorrowsTable`。
+
+专业模式：添加按钮 [TODO 3.11]。
+
+.添加归还按钮。替换 TODO 3.11.1 和 3.11.3：
+[,groovy]
+----
+if (isCurrently) column {label "Return Book"}
+
+if (isCurrently) {
+    rowColumn {
+        if (borrowedIterator.statusOfApproval == ApprovalStatus.APPROVED) {
+            rowAction ActionIcon.DELETE * IconStyle.SCALE_DOWN, MyLibraryController.&returnBook as MC, borrowedIterator.id
+        }
+    }
+}
+----
+
+.添加审批按钮。替换 TODO 3.11.2 和 3.11.4：
+[,groovy]
+----
+if (isCurrently) {label "Approve Book"}
+
+if (isCurrently) {
+    rowColumn {
+        rowAction ActionIcon.DELETE * IconStyle.SCALE_DOWN, MyLibraryController.&approveBook as MC, borrowedIterator.id
+    }
+}
+----
+
+现在让我们实现 `approveBook` 和 `returnBook` 所需的表单。
+
+专业模式：实现 `buildApproveBookTable` [TODO 3.12]
+
+.实现 `buildApproveBookTable`：
+[,groovy]
+----
+UiFormSpecifier buildApproveBookTable(MyLibraryBorrowed borrowed) {
+    UiFormSpecifier approveBookSpecifier = new UiFormSpecifier()
+
+    approveBookSpecifier.ui borrowed, {
+        section "Approve Book Form", {
+            field borrowed.approvalDate_
+            field borrowed.statusOfApproval_
+        }
+        formAction MyLibraryController.&saveApprovalBookForm as MC
+    }
+}
+----
+
+
+专业模式：实现 `buildRequestReturnBookForm` [TODO 3.13]
+
+.实现 `buildRequestReturnBookForm`：
+[,groovy]
+----
+UiFormSpecifier buildRequestReturnBookForm(MyLibraryBorrowed borrowed) {
+    UiFormSpecifier requestBookFormSpecifier = new UiFormSpecifier()
+
+    requestBookFormSpecifier.ui borrowed, {
+        section "Request Return Book Form", {
+            field borrowed.returnDate_
+        }
+        formAction MyLibraryController.&saveReturnBookForm as MC
+    }
+}
+----
+
+返回 `MyLibraryController` 以实现 `approveBook` 和 `returnBook` 方法。
+
+专业模式：实现这些方法 [TODO 3.14 & 3.15]
+
+.实现 `approveBook`：
+[,groovy]
+----
+def approveBook(MyLibraryBorrowed borrowed) {
+    UiFormSpecifier approveBookSpecifier = myLibraryUiService.buildApproveBookTable(borrowed)
+
+    taackUiService.show(new UiBlockSpecifier().ui {
+        modal {
+            form approveBookSpecifier
+        }
+    })
+}
+----
+
+.实现 `returnBook`：
+[,groovy]
+----
+def returnBook(MyLibraryBorrowed borrowed) {
+    UiFormSpecifier requestReturnBookInstanceForm = myLibraryUiService.buildRequestReturnBookForm(borrowed)
+
+    taackUiService.show new UiBlockSpecifier().ui {
+        modal {
+            form requestReturnBookInstanceForm
+        }
+    }
+}
+----
+
+接下来实现保存方法 `saveApprovalBookForm` 和 `saveReturnBookForm`。
+
+专业模式：实现这些方法 [TODO 3.16 & 3.17]
+
+.实现 `saveApprovalBookForm`：
+[,groovy]
+----
+ @Transactional
+def saveApprovalBookForm() {
+    Calendar cal = Calendar.getInstance()
+    cal.set(999999, Calendar.DECEMBER, 31)
+    Date date = cal.time
+    MyLibraryBorrowed borrowed = taackSaveService.save(MyLibraryBorrowed)
+    if(borrowed.statusOfApproval == ApprovalStatus.REJECTED) {
+        borrowed.returnDate = date
+    }
+    taackSaveService.redirectOrRenderErrors(borrowed)
+}
+----
+注意：日历被设置为遥远的未来日期（公元 999999 年），以表示拒绝是永久性的。
+
+
+.实现 `saveReturnBookForm`：
+[,groovy]
+----
+@Transactional
+def saveReturnBookForm() {
+    MyLibraryBorrowed borrowed = taackSaveService.save(MyLibraryBorrowed)
+    borrowed.bookInstance?.isAvailableB = true
+    taackSaveService.redirectOrRenderErrors(borrowed)
+}
+----
+
+现在您应该可以审批和归还图书了。运行服务器并试试看吧！
+
+我们希望能够在模态框中显示有关借阅申请的更多信息。
+现在来实现 `showBorrowed` 方法。首先需要在 `myLibraryUiService` 中创建指向该方法的链接以及一个 `UiShowSpecifier`。
+
+前往 `MyLibraryUiService` 中的 `buildUserBorrowsTable`。
+
+专业模式：添加按钮 [TODO 3.18]。
+
+添加显示操作。替换 TODO 3.18：
+[,groovy]
+----
+rowAction ActionIcon.SHOW * IconStyle.SCALE_DOWN, MyLibraryController.&showBorrowed as MC, borrowedIterator.id
+----
+
+专业模式：实现 `buildBorrowedShow` [TODO 3.19]
+
+.实现 `buildBorrowedShow`：
+[,groovy]
+----
+UiShowSpecifier buildBorrowedShow(MyLibraryBorrowed borrowed) {
+    UiShowSpecifier borrowedShowSpecifier = new UiShowSpecifier()
+
+    borrowedShowSpecifier.ui(borrowed, {
+        fieldLabeled borrowed.bookInstance.book.title_
+        fieldLabeled borrowed.bookInstance.book.author_
+        fieldLabeled borrowed.user.username_
+        fieldLabeled borrowed.statusOfApproval_
+        fieldLabeled borrowed.requestDate_
+        fieldLabeled borrowed.approvalDate_
+        fieldLabeled borrowed.returnDate_
+    })
+}
+----
+
+我们将使用 `showBorrowed` 在模态框中渲染 `buildBorrowedShow`。
+
+专业模式：实现 `showBorrowed` [TODO 3.20]
+
+.实现 `showBorrowed`：
+[,groovy]
+----
+def showBorrowed(MyLibraryBorrowed borrowed) {
+    UiShowSpecifier showSpec = myLibraryUiService.buildBorrowedShow(borrowed)
+
+    taackUiService.show(new UiBlockSpecifier().ui {
+        modal {
+            show showSpec
+        }
+    })
+}
+----
+
+恭喜！您现在已经实现了申请、审批和归还图书以及显示所有进行中申请所需的一切功能。重新启动服务器并测试所有新实现的功能吧。
+
+== 定义历史记录菜单
+
+现在我们希望在表格中显示以往的借阅记录。正如前面所解释的，由于我们已经有了构建器并实现了 `isCurrently`，这一步非常简单快捷。前往 `MyLibraryController` 渲染历史申请记录。
+
+专业模式：实现 `listBooksBorrowed` [TODOS 4.1]。
+
+.实现 `listBooksBorrowed`：
+[,groovy]
+----
+def listBooksBorrowed() {
+    UiTableSpecifier tableUserBorrowsSpecifier = myLibraryUiService.buildUserBorrowsTable()
+    UiFilterSpecifier filterUserBorrowsSpecifier = myLibraryUiService.buildUserBorrowsFilter()
+
+    taackUiService.show(new UiBlockSpecifier().ui {
+        tableFilter filterUserBorrowsSpecifier, tableUserBorrowsSpecifier
+    }, myLibraryUiService.buildMenu())
+}
+----
+
+.测试借阅者
+[NOTE]
+===============================
+您可以通过以下两种方式之一测试借阅者功能：
+
+-> 在 H2 数据库的 `ROLE` 表中创建 `ROLE_BORROWER`
+
+-> 使用已创建的用户登录。更多信息请参考 xref:part-four.adoc[B 节]。
+===============================
+恭喜！您已完成本项目的第二部分。
+
+在下一部分中，我们将深入探讨安全性与约束（Security and Constraints）。

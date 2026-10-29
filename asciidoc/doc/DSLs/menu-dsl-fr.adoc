@@ -1,0 +1,103 @@
+= Menu DSL
+:doctype: book
+:taack-category: 1|doc/DSLs
+:toc:
+:source-highlighter: rouge
+:icons: font
+
+* [*] Rendu en HTML
+* [ ] Rendu en Mails
+* [ ] Rendu en PDF
+* [ ] Rendu en CSV
+
+Menu DSL associe des entrées de menu à des actions de premier niveau.
+Menu DSL ne prend en charge que 2 niveaux au maximum (sans compter `section`).
+
+Les entrées ne sont affichées que si l'utilisateur courant a accès à l'action cible ; les libellés sont déduits du nom de l'action s'ils ne sont pas fournis (utilisez `lang=test` dans l'URL pour voir les clés i18n).
+
+[source,groovy]
+[[menu-sample1]]
+.Exemple de menu
+----
+private UiMenuSpecifier buildMenu(String q = null) {
+    new UiMenuSpecifier().ui {                                  <1>
+        menu CrewController.&index as MC                        <2>
+        menu CrewController.&listRoles as MC
+        menu CrewController.&hierarchy as MC
+        menuIcon ActionIcon.CONFIG_USER, this.&editUser as MC   <3>
+        menuIcon ActionIcon.EXPORT_PDF, this.&downloadBinPdf as MC
+        menuSearch this.&search as MC, q                        <4>
+        menuOptions SupportedLanguage.fromContext()             <5>
+    }
+}
+----
+
+<1> Créer un nouveau menu
+<2> Entrées dont les libellés sont déduits de l'action
+<3> Entrées d'icônes (message de survol déduit automatiquement)
+<4> Champ de recherche
+<5> Entrées d'options (ici les langues), d'autres énumérations implémentant `IEnumOptions` peuvent être ajoutées
+
+.Rendu du menu correspondant
+image::screenshot-dsl-menu-041.webp[]
+
+== Sous-menus
+
+[source,groovy]
+----
+new UiMenuSpecifier().ui {
+    label 'Roles', {                                    <1>
+        subMenu CrewController.&listRoles as MC
+        subMenu CrewController.&hierarchy as MC
+    }
+    menuIcon 'Admin', ActionIcon.CONFIG, {              <2>
+        section 'Users', {                              <3>
+            subMenu CrewController.&editUser as MC
+        }
+    }
+}
+----
+
+<1> Entrée avec libellé contenant des sous-menus
+<2> Entrée d'icône contenant des sous-menus
+<3> `section` regroupe des sous-menus sous un titre
+
+== Menus contextuels
+
+Le même DSL est utilisé pour décrire les menus contextuels (clic droit) sur des champs ou des classes :
+
+[source,groovy]
+----
+TaackUiService.registerContextualMenuClosure(
+    new Lead().leadStatus_,
+    new UiMenuSpecifier().ui { Long id ->
+        label 'Change Status'
+        Lead.read(id)?.leadStatus?.transitionsTo()?.each {
+            menu it.toString(), CrmController.&changeLeadStatus as MC,
+                [id: id, leadStatus: it.toString()]
+        }
+    })
+----
+
+== Éléments du DSL
+
+* `menu` : entrée pointant vers une action, optionnellement avec un libellé, un identifiant, une map de paramètres ou un objet `Validateable`
+* `label` : entrée sans action, ou groupe de sous-menus si une closure est fournie
+* `subMenu`, `subMenuIcon` : entrées à l'intérieur d'une closure `label` ou `menuIcon`
+* `section` : regroupe des sous-menus sous un titre
+* `menuIcon` : entrée sous forme d'icône dans la partie droite du menu, pouvant contenir des sous-menus
+* `menuSelect` : liste déroulante dont la valeur sélectionnée est transmise à l'action courante
+* `menuSearch` : champ de recherche
+* `menuOptions` : entrées d'options (langues, filiales, ...)
+* `inlineHtml` : code HTML personnalisé
+
+[graphviz,format="svg",align=center]
+.Diagramme de hiérarchie des symboles pour Menu DSL
+----
+digraph mygraph {
+    node [shape=box];
+    ui -> menu, label, menuIcon, menuSelect, menuOptions, inlineHtml [label = "0,N"]
+    ui -> menuSearch [label = "0,1"]
+    label, menuIcon -> subMenu, subMenuIcon, section, inlineHtml [label = "1,N"]
+}
+----

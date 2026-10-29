@@ -1,0 +1,38 @@
+= Sicherheit
+:taack-category: 11|doc/UserGuide
+:toc:
+:source-highlighter: rouge
+:icons: font
+
+== Spring Security
+
+Das *Taack-ui*-Framework prüft die Annotation `@Secured` bei Aktionen, um Zugriffslinks und Symbole anzuzeigen. Menüeinträge, Links und Aktionsschaltflächen werden ausgeblendet, wenn der Benutzer keine Berechtigung hat.
+
+== Feingranularerer Ansatz
+
+Eine zentrale Stelle kann komplexere Fälle verwalten und den Zugriff auf eine Aktion gewähren oder verweigern.
+
+.Code zur Verwaltung des Aktionszugriffs
+[source,groovy]
+----
+SpringSecurityService springSecurityService
+
+private securityClosure(Long id, Map p) {   <1>
+    if (!id && !p) return true
+    if (!id) return true
+    canEdit(User.read(id))
+}
+
+@PostConstruct
+void init() {
+    TaackUiEnablerService.securityClosure(
+            this.&securityClosure,          <2>
+            CrewController.&editUser as MC, <3>
+            CrewController.&saveUser as MC)
+}
+
+----
+
+<1> Parameter enthalten die Benutzer-`id` und Aktionsparameter
+<2> Registriert eine Zugriffsbeschränkung (`access constraints`)
+<3> Von dieser Zugriffsbeschränkung betroffene Aktionen

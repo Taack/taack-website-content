@@ -1,0 +1,23 @@
+= Viewers
+:doctype: book
+:taack-category: 4|App
+:toc:
+:source-highlighter: rouge
+
+
+== 用途
+
+转换并预览文件。
+
+.STEP 图像预览
+image::step-preview1.webp[]
+
+.STEP 自定义预览
+image::step-preview2.webp[]
+
+== 源码
+
+[source,bash]
+----
+$ git clone https://github.com/Taack/viewers.git
+----

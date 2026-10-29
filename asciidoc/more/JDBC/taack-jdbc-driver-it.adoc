@@ -1,0 +1,238 @@
+= Driver JDBC Taack
+:doctype: book
+:taack-category: 0|more/JDBC
+:toc:
+:source-highlighter: rouge
+:icons: font
+
+== Che cos'è?
+
+JDBC è l'acronimo di *Java Database Connectivity*. È un componente Java storico, importante e ampiamente utilizzato. Semplifica l'interrogazione e la modifica dei dati tra diversi programmi.
+
+La nostra attuale implementazione JDBC consente solo di interrogare i dati dall'Intranet.
+
+L'aggiornamento dei dati tramite questo strumento è un argomento complesso. Dobbiamo gestire i permessi degli utenti e la validazione dei dati che non sono descritti a livello di database, ma direttamente all'interno del codice dell'Intranet. È necessario un nuovo approccio da parte nostra per evitare di duplicare il codice.
+
+.Diagramma di sequenza durante l'esecuzione di una query senza errori
+[plantuml,format="svg",opts="online"]
+----
+@startuml
+group Querying Object using TQL
+        You -> Program : Type the Query
+        activate Program
+        Program -> Driver : Transmit the Query
+        Driver -> Intranet : Transmit the Query
+        Intranet -> Intranet : Validate TQL Grammar
+        Intranet -> Intranet : Validate Tables and fields
+        Intranet -> Intranet : Translate TQL to HQL
+        Intranet -> Intranet : Translate HQL to SQL
+        note right
+            **SQL** is the Database
+            Native Language
+        end note
+        Intranet -> Database : transmit the SQL
+        activate Database #000055
+        Database -> Intranet : retreive Results
+        deactivate Database
+        Intranet -> Intranet : Pack Results
+        Intranet -> Driver : Transmit the Pack
+        Driver -> Driver : Unpack
+        Driver -> Program : Transmit Results
+        Program -> You : Show Results
+        deactivate Program
+        You -> Program : You scroll on \nthe results
+        note right
+            **Program** will request for
+            more data if needed,
+            using an **offset**
+        end note
+end
+
+box "Your Computer" #LightBlue
+    participant Program
+    participant Driver
+end box
+box "The Intranet Server" #Yellow
+    participant Intranet
+    participant Database
+end box
+
+@enduml
+----
+
+== Dove interrogare i dati con questo driver?
+
+Finora sono stati testati solo *3 programmi software* con questo driver:
+|===
+|Programma          |Introspezione? |Interrogazione?|Aggiornamento?| Inserimento?
+
+|LibreOffice 7.3    |Solo elenco tabelle|Sì         |No            | No
+|dBeaver            |Sì             |Sì             |Non ancora    | Non ancora
+|Intellij           |Sì             |Sì             |Non ancora    | Non ancora
+|===
+
+L'#introspezione# aiuta durante la scrittura delle query grazie all'*autocompletamento*. Durante la digitazione della query, il programma mostrerà le tabelle e i campi disponibili.
+
+Ci sono 2 modalità di lavoro per analizzare i dati:
+
+* Scrivere e testare la query in un software che supporta l'*introspezione*;
+* Poi, in alternativa:
+** Utilizzare la query digitata direttamente in *LibreOffice*
+** Oppure lavorare con un'*estrazione CSV* e importarla in qualsiasi software (incluso *Office*)
+
+WARNING: Realizzerò più avanti dei video su come configurare il driver con questi programmi.
+
+[[_tql_queries]]
+== Query TQL
+
+La differenza principale tra un normale driver JDBC e il nostro è il linguaggio di interrogazione.
+
+Abbiamo sviluppato *TQL* (Taack Query Language); ecco alcuni vantaggi:
+
+* Sicuro: verifichiamo la query digitata prima di inviarla al database reale
+* Sintassi semplice:
+** Minore necessità di join
+** Accesso ai campi referenziati (vedere <<easy-syntax>> punto (2))
+* Indipendente dal database
+
+=== Struttura delle query di base
+
+[source,sql]
+[[easy-syntax]]
+.Esempio base di TQL
+----
+select                              <1>
+    l.client.firstName,             <2>
+    l.rep.username                  <2>
+from Lead l                         <3>
+where l.dateCreated > '2022-01-01'  <4>
+----
+<1> #Clausola Select#, che consente di selezionare le *colonne*;
+<2> #Campi dereferenziati#: se la colonna è essa stessa un oggetto, è possibile accedere ricorsivamente ai campi dell'oggetto. Qui `rep` è un oggetto `User` che contiene a sua volta dei campi (come `username`);
+<3> #Clausola From#, che consente di scegliere le *tabelle*; qui usiamo un _alias_ `l`
+<4> #Clausola Where#, che consente di filtrare i dati.
+
+=== Query di base con formule
+
+È possibile aggiungere formule aritmetiche nella clausola select.
+
+[source,sql]
+[[basic-query-with-formulas]]
+.Esempio base di TQL con formule
+----
+select
+    ll.lead.name,
+    ll.qty * ll.salePrice as totalWoTaxes   <1>
+from LeadLine ll
+where ll.qty * ll.salePrice > 100           <2>
+----
+<1> La #clausola Select# supporta sia gli `alias di colonna` sia le operazioni aritmetiche
+<2> Anche la #clausola Where# supporta l'aritmetica
+
+WARNING: Il nome dell'alias di colonna deve iniziare con una lettera minuscola e appartenere esclusivamente al set di caratteri ASCII7.
+
+.Risultati dell'esempio base con formule
+|===
+|lead.name |totalWoTaxes
+
+|Balisage pylône SFR site 240087 (Hivory)
+|250.00000000
+
+|Balisage pylône SFR site 240087 (Hivory)
+|340.00000000
+
+|Balisage pylône SFR site 240087 (Hivory)
+|3410.00000000
+
+|EL BJORN low intensity IR AWL system
+|2700.00000000
+|===
+
+=== Query con raggruppamento
+
+La clausola di raggruppamento aggiunge la capacità di aggregare i dati.
+L'<<basic-query-with-formulas>> non presenta una riga per offerta, ma per riga d'offerta.
+È possibile utilizzare il raggruppamento per ottenere una riga per offerta, come nell'esempio seguente:
+
+[source,sql]
+.Esempio TQL con raggruppamento e formule
+----
+select
+    ll.lead.rep.mainSubsidiary as salesmanSubsidiary,   <1>
+    count(ll.id),                                       <2>
+    sum(ll.qty * ll.salePrice)                          <2>
+from LeadLine ll
+group by ll.lead.rep.mainSubsidiary                     <1>
+----
+<1> Campo standard, deve essere elencato nella #clausola Group by#;
+<2> È possibile utilizzare le funzioni di aggregazione #count# o #sum#.
+
+WARNING: Gli alias di colonna non sono supportati sulle colonne aggregate
+
+|===
+|salesmanSubsidiary|count(ll.id)    |sum(ll.qty * ll.salePrice)
+
+|CITEL_2CP         |118605|212619001943.17760000
+|CITEL_GMBH        |37336 |261342488.98760000
+|CITEL_INC         |25172 |319681146.49190000
+|CITEL_INDIA       |24868 |1122541659.94000000
+|CITEL_OOO         |10382 |3990221200.80740000
+|CITEL_SH          |269   |552810.59000000
+|OBSTA             |46151 |2762758463.12580000
+|===
+
+=== Query con Inner Join
+
+A volte una colonna punta a più di una riga.
+
+Questa è chiamata relazione *molti-a-molti* (many-to-many). Non possiamo utilizzare direttamente i campi referenziati, ma dobbiamo usare quelle che vengono chiamate *join* ... (suona molto anni '70, ma non dipende da me).
+
+Nell'esempio seguente, gli *Items* contengono molti *Values* e i *Values* possono essere utilizzati da più di un *Item*. Se vogliamo elencare Items e Values nella stessa tabella, abbiamo bisogno di una sorta di prodotto cartesiano tra 2 insiemi di dati.
+
+WARNING: La cardinalità del prodotto cartesiano di 2 insiemi è #M x N#; è necessario utilizzare la *clausola Where* per ridurre il numero di risultati.
+
+[source,sql]
+.Join semplice in TQL
+----
+select
+    i.name,
+    i.ref,
+    v.valueString,
+    v.associatedProperty.valueKind as kind,
+    v.associatedProperty.kindOfCharacteristic as typeOfChar,
+    v.associatedProperty.nameAlias as nameAlias
+from Item i, Value v                                    <1>
+where v in elements(i.values) and i.range.name = 'DVM'  <2>
+
+----
+<1> Elenchiamo 2 tabelle in modo indipendente
+<2> *DOBBIAMO* limitare il numero di risultati con l'espressione `v in elements(i.values)`
+
+.Risultati
+|====
+| name | ref | valueString | kind | typeOfChar | nameAlias
+
+| DVM-230-16A | 3589015 | NULL | dico | BULLET_POINTS | bulletPoints
+| DVM-230-16A | 3589015 | IP20 | string | MECA | NULL
+| DVM-230-16A | 3589015 | -40/+85°C | string | MECA | NULL
+| DVM-230-16A | 3589015 | NULL | dico | NULL | description
+| DVM-230-16A | 3589015 | NULL | dico | NULL | subFamily
+| DVM-230-16A | 3589015 | NULL | dico | MECA | NULL
+| DVM-230-16A | 3589015 | NULL | dico | NORMES | NULL
+| DVM-230-16A | 3589015 | voir schéma | dico | MECA | NULL
+| DVM-230-16A | 3589015 | NULL | dico | MECA | NULL
+| DVM-230-16A | 3589015 | NULL | dico | MECA | NULL
+| DVM-230-16A | 3589015 | NULL | dico | MECA | NULL
+| DVM-230-16A | 3589015 | 16 A | string | ELEC | NULL
+| DVM-230-16A | 3589015 | NULL | dico | ELEC | NULL
+| DVM-230-16A | 3589015 | 0.0305 kg | string | MECA | NULL
+| DVM-230-16A | 3589015 | NULL | dico | NULL | family
+| DVM-230-16A | 3589015 | 230 V monophasé | dico | ELEC | NULL
+| DVM-230-16A | 3589015 | PTFE | string | MECA | NULL
+| DVM-230-16A | 3589015 | NULL | bool | NULL | NULL
+|====
+
+== Limitazioni attuali del driver
+
+* Non sarà possibile *dereferenziare* i campi lingua (`v.valueMap['fr']` fallirà, così come `v.valueMap`).
+* Supportiamo solo Inner join, non outer join. La nostra attuale implementazione di join è lenta; possiamo migliorarla, ma è più complesso.

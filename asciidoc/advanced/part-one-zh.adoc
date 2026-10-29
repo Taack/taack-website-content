@@ -1,0 +1,845 @@
+= 第一部分
+:doctype: book
+:taack-category: 1|advanced
+:toc:
+:source-highlighter: rouge
+
+== 简介
+
+我们将从创建一个简单的私人图书馆开始，用户可以在其中创建作者、图书以及图书副本（灵感来自之前在“使用指南”中介绍的项目）。
+
+.图书表格
+image::part-one-screenshot.webp[Reload,width=800,align="left"]
+
+我们已经在 `myLibrary` 中为您实现了一部分代码。在本教程中，您有两种选择：既可以按照此处提供的分步实现进行操作，也可以先尝试自己实现每一步，然后再核对您的实现。每个方法的说明分布在本文档与 `myLibrary` 源代码中。
+
+*专业模式（Pro Mode）：* 面向有经验用户的更具挑战性的模式。鼓励您独立尝试实现，仅在必要时参考所提供的示例。
+
+== 环境准备
+
+
+本任务的完整解答与骨架代码可从以下仓库克隆：
+
+[,shell]
+----
+git clone git@github.com:Taack/myLibrary.git
+----
+
+
+.要获取本部分的骨架代码，请打开终端并 `cd` 进入项目目录（`myLibrary`），然后复制以下命令。
+[,bash]
+----
+git checkout part-1-skeleton
+----
+
+或者在 IntelliJ 中直接选择所需的分支。点击左上角的 `main/myLibrary/remote`，即可看到所有分支。选择一个分支并执行 Checkout。
+
+注意：为了方便起见，每个 TODO 实现都提供了对应的分支。如果遇到任何问题，您可以随时切换到相应分支，而无需从头开始。注意：例如，`part-1-todo-4` 分支已经为您实现了 TODO 4。
+
+.例如，如果您想从 `part-1-todo-4` 继续该项目，请执行以下命令。
+[,bash]
+----
+git checkout part-1-todo-4
+----
+
+== 定义领域类
+编辑目录：`app/library/src/main/groovy/myLibrary/domain/`
+
+.供参考的类图
+[plantuml, format="svg", opts="inline"]
+----
+@startuml
+
+class MyLibraryAuthor {
+    String firstName
+    String lastName
+    Date dateOfBirth
+    Boolean isActive = true
+    String toString()
+}
+
+class MyLibraryBook {
+    String title
+    String description
+    int numberOfPages
+    int count = 0
+    int getNumberOfInstances()
+}
+
+class MyLibraryBookInstance {
+    Boolean isActive = true
+    Integer serialNumber
+}
+
+MyLibraryAuthor "1" --> "*" MyLibraryBook : listOfBooks
+MyLibraryBook "1" --> "*" MyLibraryBookInstance : listOfBookInstance
+MyLibraryBookInstance "*" --> "1" MyLibraryBook : belongsTo
+
+@enduml
+----
+
+专业模式：请自行实现每个类。所需的所有信息均在文件中。完成 `MyLibraryAuthor`、`MyLibraryBook` 和 `MyLibraryBookInstance` 的实现后，请在此处核对。[TODO 1.1, 1.2 & 1.3]
+
+.实现 `MyLibraryAuthor` 类（TODO 1.1）：
+[,groovy]
+----
+import grails.compiler.GrailsCompileStatic
+import taack.ast.annotation.TaackFieldEnum
+
+@GrailsCompileStatic
+@TaackFieldEnum
+class MyLibraryAuthor {
+    String firstName
+    String lastName
+    Date dateOfBirth
+    List<MyLibraryBook> listOfBooks //<1>
+    Boolean isActive = true //<2>
+
+    static constraints = {}
+
+    static hasMany = [listOfBooks: MyLibraryBook] //<3>
+
+    String toString() {
+        return firstName + ' ' + lastName
+    }
+}
+----
+<1> 该 `Author` 所著的 `Books` 将存储在 `listOfBooks` 中。
+<2> `isActive` 用于支持软删除（逻辑删除）。
+<3> `hasMany` 是 GORM 的关联关键字，允许我们在领域类之间定义一对多关系。它用于自动管理关联集合（例如属于某位作者的图书列表）。更多信息请参阅 GORM 文档。
+
+.实现 `MyLibraryBook` 类（TODO 1.2）：
+[,groovy]
+----
+import grails.compiler.GrailsCompileStatic
+import taack.ast.annotation.TaackFieldEnum
+
+@GrailsCompileStatic
+@TaackFieldEnum
+class MyLibraryBook {
+    String title
+    MyLibraryAuthor author
+    String description
+    int numberOfPages
+    List<MyLibraryBookInstance> listOfBookInstance //<1>
+    int count = 0
+
+    static constraints = {}
+
+    static hasMany = [listOfBookInstance: MyLibraryBookInstance]
+
+    int getNumberOfInstances() {
+        if (!listOfBookInstance) { return 0}
+        count = listOfBookInstance.count {it.isActive} as int
+        return count
+    }
+}
+----
+<1> 该 `Book` 的 `BookInstances` 将存储在 `listOfBookInstance` 中。
+
+.实现 `MyLibraryBookInstance` 类（TODO 1.3）：
+[,groovy]
+----
+import grails.compiler.GrailsCompileStatic
+import taack.ast.annotation.TaackFieldEnum
+
+@GrailsCompileStatic
+@TaackFieldEnum
+class MyLibraryBookInstance {
+    MyLibraryBook book
+    Boolean isActive = true
+    Integer serialNumber = new Random().nextInt(100000) //<1>
+
+    static constraints = {}
+
+    static belongsTo = [book: MyLibraryBook] //<2>
+}
+----
+<1> `Random().nextInt(100000)` 将生成一个 0 到 100 000 之间的随机数。
+<2> `belongsTo` 是 GORM 的关联关键字，用于定义领域类之间多对一关系的拥有方。它会自动管理外键关联和级联行为（例如，每本图书属于一位作者）。更多信息请参阅 GORM 文档。
+
+现在您已经创建了本节所需的所有类！
+
+前往 `src/main/groovy/mylibrary`。
+
+.查看 `NumberForInstances` 类：
+[,groovy]
+----
+import grails.compiler.GrailsCompileStatic
+import grails.validation.Validateable
+import taack.ast.annotation.TaackFieldEnum
+
+@TaackFieldEnum
+@GrailsCompileStatic
+class NumberForInstances implements Validateable {
+    Integer numberOfInstances
+}
+----
+此处无需实现任何内容。该类稍后将用于捕获用户输入。
+
+== 定义作者菜单
+
+在本节中，我们将主要回顾在 link:usage.adoc[使用指南] 中所学的内容。完成本节后，您将熟练掌握 `UiTableSpecifier`、`UiFormSpecifier`、`UiShowSpecifier` 和 `UiFilterSpecifier` 的用法。
+
+我们将创建：
+
+- 显示所有作者的表格，
+- 使用表单创建新作者的按钮，
+- 删除作者的按钮，
+- 重新激活作者的按钮，
+- 作者过滤器。
+
+=== 作者表格
+
+我们希望在表格中显示作者。为此需要创建一个 `UiTableSpecifier`。前往 `app/library/services/myLibrary/MyLibraryUiService` 中的 `Author Menu` 部分。
+
+专业模式：自行实现该表格 [TODOS 2.1.1—2.1.6]。
+
+.实现 `buildAuthorTable`：
+[,groovy]
+----
+MyLibraryAuthor author = new MyLibraryAuthor()
+UiTableSpecifier authorTableSpecifier = new UiTableSpecifier()
+
+authorTableSpecifier.ui {
+    header {
+        column {label author.firstName_}
+        label author.lastName_
+        if(!isSelect) {
+            label author.isActive_
+            label "Delete Author"
+        }
+    }
+
+    TaackFilter.FilterBuilder filter = taackFilterService.getBuilder(MyLibraryAuthor)
+            .setMaxNumberOfLine(10)
+            .setSortOrder(TaackFilter.Order.ASC, author.lastName_)
+
+    if(isSelect) {
+        filter.addFilter(buildIsActiveAuthorFilter(author))
+    }
+    iterate(
+            filter.build()) { MyLibraryAuthor authorIterator ->
+        rowColumn {
+             // TODO 2.10: Add rowAction to showAuthor with author's first name as label
+            if (isSelect) {
+                // TODO 3.5.6: Add SELECT action icon to select author with their id and string representation
+            }
+        }
+        rowField authorIterator.lastName_
+        if(!isSelect) {
+            rowField authorIterator.isActive_
+            rowColumn {
+                // TODO 2.7.1: Add DELETE action icon linked to deleteAuthor controller action
+                // TODO 2.7.2: Add ACTIVATE action icon linked to activateAuthor controller action
+            }
+        }
+    }
+}
+
+----
+如果您在理解这段代码时遇到困难，请参考 link:usage.adoc[使用指南]。
+请注意，我们添加了尚未实现的 `buildIsActiveAuthorFilter`。现在让我们来实现它。
+
+注意：在完成 TODO 2.10 之前，作者的名字不会显示出来。
+
+专业模式：自行实现过滤器 [TODO 2.2.1]。
+
+.实现 `buildIsActiveAuthorFilter`：
+[,groovy]
+----
+UiFilterSpecifier buildIsActiveAuthorFilter(MyLibraryAuthor author) {
+    UiFilterSpecifier isActiveAuthorFilter = new UiFilterSpecifier()
+    isActiveAuthorFilter.ui MyLibraryAuthor, {
+        section "Filter", {
+            filterFieldExpressionBool "Is Active", new FilterExpression(true, Operator.EQ, author.isActive_) //<1>
+        }
+    }
+}
+----
+<1> 我们创建一个接收值、运算符和 `FieldInfo` 的 `FilterExpression`。
+
+可用的运算符包括：
+
+- IN：在值列表中，
+- NI：不在值列表中，
+- EQ：等于另一个值，
+- NE：不等于另一个值，
+- LT：小于另一个值，
+- IL：相似于另一个值（is like），
+- GT：大于另一个值，
+- IS_EMPTY：为空
+
+我们还希望添加一个按 `lastName` 过滤作者的过滤器，下面来实现它。
+
+专业模式：自行实现过滤器 [TODO 2.2.2]。
+
+.实现 `buildAuthorFilter`：
+[,groovy]
+----
+UiFilterSpecifier buildAuthorFilter() {
+    MyLibraryAuthor author = new MyLibraryAuthor()
+    UiFilterSpecifier authorFilterSpecifier = new UiFilterSpecifier()
+
+    authorFilterSpecifier.ui MyLibraryAuthor, {
+        section "Author Filter", {
+            filterField author.lastName_
+        }
+    }
+}
+----
+如果您在理解这段代码时遇到困难，请参考 link:usage.adoc[使用指南]。
+
+现在表格已经完成，我们只需将其渲染到页面上。要渲染之前构建的 `UiSpecifier`，需要使用 `taackUiService`。我们将在名为 `listAuthor` 的方法中完成此操作。前往 `app/library/controller/myLibrary/MyLibraryController` 的 `Author Menu` 部分。
+
+专业模式：自行实现 `listAuthor` [TODO 2.3]。
+
+.实现 `listAuthor` 方法：
+[,groovy]
+----
+def listAuthor() {
+    UiTableSpecifier tableAuthorSpecifier = myLibraryUiService.buildAuthorTable()
+    UiFilterSpecifier filterAuthorSpecifier = myLibraryUiService.buildAuthorFilter()
+
+    taackUiService.show(new UiBlockSpecifier().ui {
+        tableFilter filterAuthorSpecifier, tableAuthorSpecifier, {
+            menuIcon ActionIcon.CREATE, this.&createAuthor as MethodClosure
+        }
+    }, myLibraryUiService.buildMenu())
+}
+----
+
+注意：`ActionIcon` 包含多个图标，我们主要使用的有：CREATE、EDIT、SAVE、DELETE、SHOW、IMPORT、EXPORT。
+
+现在您可以启动服务器并访问新应用（`myLibrary.app`）。表格应该已经可以正常工作，但由于数据库中还没有作者，目前只能看到表头。接下来让我们创建表单并将对象保存到数据库中。现在我们需要实现 `createAuthor`，这需要创建一个 `UiFormSpecifier`。
+让我们回到 `MyLibraryUiService`。
+
+==== 作者表单
+专业模式：自行实现 `buildAuthorForm` [TODO 2.4]。
+
+.实现 `buildAuthorForm`：
+[,groovy]
+----
+UiFormSpecifier buildAuthorForm(MyLibraryAuthor author) {
+    author ?= new MyLibraryAuthor(params)
+    UiFormSpecifier createAuthorSpecifier = new UiFormSpecifier()
+    createAuthorSpecifier.ui author, {
+        section "Author details", {
+            field author.firstName_
+            field author.lastName_
+            field author.dateOfBirth_
+            field author.isActive_
+        }
+        formAction MyLibraryController.&saveAuthor as MC
+    }
+}
+----
+
+让我们回到 `MyLibraryController`。我们将在模态框（modal）中渲染该表单。
+
+专业模式：实现 `createAuthor` [TODO 2.5]
+
+.实现 `createAuthor`：
+[,groovy]
+----
+def createAuthor(MyLibraryAuthor author) {
+    UiFormSpecifier formAuthorSpecifier = myLibraryUiService.buildAuthorForm(author)
+
+    taackUiService.show(new UiBlockSpecifier().ui {
+        modal {
+            form formAuthorSpecifier
+        }
+    })
+}
+----
+
+现在我们需要保存作者。让我们实现 `saveAuthor`。
+
+专业模式：实现 `saveAuthor` [TODO 2.6]。
+[,groovy]
+----
+@Transactional
+def saveAuthor() {
+    taackSaveService.saveThenReloadOrRenderErrors(MyLibraryAuthor)
+}
+----
+
+现在我们拥有了一个功能完整的表格，可以显示和添加作者。重新启动服务器，您应该可以点击按钮并填写表单了。接下来我们希望能够删除和重新激活作者。让我们实现 `deleteAuthor` 和 `reactivateAuthor` 方法。前往 `MyLibraryUiService` 中的 `buildAuthorTable`。
+
+==== 删除和重新激活作者
+
+前往 `myLibraryUiService` 中的 `buildAuthorTable`。
+
+专业模式：添加按钮 [TODO 2.7]。
+
+.添加删除和激活按钮。替换 TODO 2.7.1 和 2.7.2：
+[,groovy]
+----
+rowAction ActionIcon.DELETE * IconStyle.SCALE_DOWN, MyLibraryController.&deleteAuthor as MC, authorIterator.id
+rowAction ActionIcon.CREATE * IconStyle.SCALE_DOWN, MyLibraryController.&activateAuthor as MC, authorIterator.id
+----
+
+返回 `MyLibraryController` 以实现 `deleteAuthor` 和 `activateAuthor` 方法。
+
+专业模式：实现这些方法 [TODO 2.8 & 2.9]
+
+.实现 `deleteAuthor`：
+[,groovy]
+----
+@Transactional
+def deleteAuthor(MyLibraryAuthor author) {
+    author.isActive = false
+    redirect action: 'listAuthor'
+}
+----
+
+.实现 `activateAuthor`：
+[,groovy]
+----
+@Transactional
+def activateAuthor(MyLibraryAuthor author) {
+    author.isActive = true
+    redirect action: 'listAuthor'
+}
+----
+
+我们希望能够在模态框中显示有关作者的更多信息。
+现在来实现 `showAuthor` 方法。首先需要在 `myLibraryUiService` 中创建指向该方法的链接以及一个 `UiShowSpecifier`。
+
+前往 `MyLibraryUiService` 中的 `buildAuthorTable`。
+
+专业模式：添加按钮 [TODO 2.10]。
+
+添加显示操作。替换 TODO 2.10：
+[,groovy]
+----
+rowAction authorIterator.firstName, MyLibraryController.&showAuthor as MC, authorIterator.id
+----
+注意：这次没有 `ActionIcon`，而是会在作者名字上添加一个链接，点击后跳转到 `showAuthor`。
+
+专业模式：实现 `buildAuthorShow` [TODO 2.11]
+
+.实现 `buildAuthorShow`：
+[,groovy]
+----
+UiShowSpecifier buildAuthorShow(MyLibraryAuthor author) {
+    UiShowSpecifier authorShowSpecifier = new UiShowSpecifier()
+
+    authorShowSpecifier.ui(author, {
+        fieldLabeled author.firstName_
+        fieldLabeled author.lastName_
+        fieldLabeled author.dateOfBirth_
+        fieldLabeled author.isActive_
+    })
+}
+----
+
+我们将使用 `showAuthor` 在模态框中渲染 `buildAuthorShow`。
+
+专业模式：实现 `showAuthor` [TODO 2.12]
+
+.实现 `showAuthor`：
+[,groovy]
+----
+def showAuthor(MyLibraryAuthor author) {
+    UiTableSpecifier tableBookSpecifier = myLibraryUiService.buildBookTable(author)
+    UiFilterSpecifier filterBookSpecifier = myLibraryUiService.buildBookFilter()
+    UiShowSpecifier showAuthorSpecifier = myLibraryUiService.buildAuthorShow(author)
+
+    taackUiService.show(new UiBlockSpecifier().ui {
+        modal {
+            show showAuthorSpecifier
+            tableFilter filterBookSpecifier, tableBookSpecifier
+        }
+    })
+}
+----
+
+恭喜！您现在已经实现了列表展示、添加、删除、重新激活和查看作者详情所需的所有功能。重新启动服务器并测试所有新实现的功能吧。
+
+== 定义图书菜单
+
+现在我们希望在表格中显示图书。为此需要创建另一个 `UiTableSpecifier`。前往 `app/library/services/myLibrary/MyLibraryUiService` 的 `Book Menu` 部分。
+
+专业模式：自行实现该表格 [TODOS 3.1.1 - 3.1.6]。
+
+.实现 `buildBookTable`：
+[,groovy]
+----
+UiTableSpecifier buildBookTable(MyLibraryAuthor author = null) {
+    MyLibraryBook book = new MyLibraryBook()
+    UiTableSpecifier bookTableSpecifier = new UiTableSpecifier()
+    bookTableSpecifier.ui {
+        header {
+            column {label book.title_}
+            if (!author) {sortableFieldHeader book.author_}
+            column {
+                label "Number of instances "//book.numberOfInstances
+            }
+            if (!author) {
+                column {
+                    label "Modify number of Book Instances"
+                }
+            }
+        }
+        TaackFilter.FilterBuilder filter =  taackFilterService.getBuilder(MyLibraryBook)
+                .setMaxNumberOfLine(10)
+                .setSortOrder(TaackFilter.Order.ASC, book.title_)
+        if(author) {
+            filter.addRestrictedIds(author.listOfBooks*.id as Long[])
+        }
+        iterate(
+                filter.build()) { MyLibraryBook bookIterator ->
+            rowColumn {
+                // TODO 3.13: Add SHOW (showBook) action above title field in the rowColumn, this will be used to modify a book.
+                rowAction ActionIcon.EDIT * IconStyle.SCALE_DOWN, MyLibraryController.&createBook as MC, bookIterator.id
+                rowField bookIterator.title_
+            }
+            if (!author) {rowField bookIterator.author_}
+            rowColumn {
+                // TODO 3.8.1: Display number of instances (call getNumberOfInstances) and show as rowField.
+            }
+            if (!author) {
+                rowColumn {
+                    // TODO 3.9: If author is null, add purchase and select actions for managing book instances.
+                }
+            }
+        }
+    }
+}
+----
+
+我们希望添加一个按书名过滤图书的过滤器。现在来实现它。
+
+专业模式：自行实现过滤器 [TODO 3.2]。
+
+.实现 `buildBookFilter`：
+[,groovy]
+----
+UiFilterSpecifier buildBookFilter() {
+    MyLibraryBook book = new MyLibraryBook()
+    UiFilterSpecifier bookFilterSpecifier = new UiFilterSpecifier()
+
+    bookFilterSpecifier.ui MyLibraryBook, {
+        section "Book Filter", {
+            filterField book.title_
+        }
+    }
+}
+----
+
+现在我们有了表格和过滤器，可以渲染包含它们的页面了。前往 `app/library/controller/myLibrary/MyLibraryController` 的 `Book Menu` 部分。
+
+专业模式：自行实现 `listBook` [TODO 3.3]。
+
+.实现 `listBook` 方法：
+[,groovy]
+----
+def listBook() {
+    UiTableSpecifier tableBookSpecifier = myLibraryUiService.buildBookTable()
+    UiFilterSpecifier filterBookSpecifier = myLibraryUiService.buildBookFilter()
+
+    taackUiService.show(new UiBlockSpecifier().ui {
+        tableFilter filterBookSpecifier, tableBookSpecifier, {
+            menuIcon ActionIcon.CREATE, this.&createBook as MethodClosure
+        }
+    }, myLibraryUiService.buildMenu())
+}
+----
+
+现在可以启动服务器了。图书表格应该已经可以工作，但由于数据库中还没有图书，目前只能看到表头。接下来让我们创建表单并将对象保存到数据库中。现在我们需要实现 `createBook`，这需要创建一个 `UiFormSpecifier`。
+让我们回到 `MyLibraryUiService`。
+
+专业模式：自行实现 `buildBookForm` [TODO 3.4]。
+
+.实现 `buildBookForm`：
+[,groovy]
+----
+UiFormSpecifier buildBookForm(MyLibraryBook book) {
+    book ?= new MyLibraryBook(params)
+    UiFormSpecifier bookFormSpecifier = new UiFormSpecifier()
+    bookFormSpecifier.ui book, {
+        section "Book details", {
+            field book.title_
+            ajaxField book.author_, MyLibraryController.&selectAuthor as MC //<1>
+            field book.numberOfPages_
+            field book.description_
+        }
+        formAction MyLibraryController.&saveBook as MC
+    }
+}
+----
+<1> 这里我们使用 `AjaxField` 从 `selectAuthor` 获取信息。
+
+让我们回到 `MyLibraryController` 并实现 `selectAuthor` 来进一步说明。
+
+专业模式：自行实现位于 `Author Menu` 中的 `selectAuthor` [TODO 3.5]。注意：3.5.6 位于 `buildAuthorTable` 中。
+
+
+.实现 `selectAuthor`：
+[,groovy]
+----
+def selectAuthor() {
+    UiTableSpecifier tableAuthorSpecifier = myLibraryUiService.buildAuthorTable(true) //<1>
+    UiFilterSpecifier filterAuthorSpecifier = myLibraryUiService.buildAuthorFilter()
+    taackUiService.show(new UiBlockSpecifier().ui {
+        modal {
+            tableFilter filterAuthorSpecifier, tableAuthorSpecifier
+        }
+    })
+}
+----
+<1> 请注意，`buildAuthorTable` 接收一个 `Boolean` 参数，用于显示 `UiTableSpecifier` 的 `isSelect` 版本。
+
+.用下面这行代码替换 TODO 3.5.6，以保存用户的选择：
+[,groovy]
+----
+rowAction tr('default.role.label'), ActionIcon.SELECT * IconStyle.SCALE_DOWN, authorIterator.id, authorIterator.toString()
+----
+
+专业模式：实现 `createBook` [TODO 3.6]
+
+
+[,groovy]
+----
+def createBook(MyLibraryBook book) {
+    UiFormSpecifier tableFormSpecifier = myLibraryUiService.buildBookForm(book)
+
+    taackUiService.show new UiBlockSpecifier().ui {
+        modal {
+            form tableFormSpecifier
+        }
+    }
+}
+----
+
+现在我们需要保存图书，下面来实现 `saveBook`。
+
+专业模式：实现 `saveBook` [TODO 3.7]。
+[,groovy]
+----
+@Transactional
+def saveBook() {
+    taackSaveService.saveThenReloadOrRenderErrors(MyLibraryBook)
+}
+----
+
+现在您拥有了一个功能完整的表格，可以显示和添加图书。接下来让我们实现 `purchaseBook` 和 `selectBookInstance`，以便能够采购特定图书的 `bookInstances` 并将其删除。前往 `MyLibraryUiService` 中的 `buildBookTable`。
+
+专业模式：实现按钮并显示 `numberOfInstances` [TODOS 3.8]。
+
+.实现 `numberOfInstances`。替换 TODO 3.8.1
+[,groovy]
+----
+rowField bookIterator.numberOfInstances_
+----
+
+.添加采购和选择操作。替换 TODO 3.8.2
+[,groovy]
+----
+rowAction ActionIcon.DELETE * IconStyle.SCALE_DOWN, MyLibraryController.&selectBookInstance as MC, bookIterator.id
+rowAction ActionIcon.ADD * IconStyle.SCALE_DOWN, MyLibraryController.&purchaseBook as MC, bookIterator.id
+----
+
+我们希望用户能够选择要采购多少个 `BookInstances`。因此，我们需要实现一个 `UiFormSpecifier`：`buildBookPurchase`。
+
+专业模式：实现该 `UiFormSpecifier` [TODO 3.9]
+
+.实现 `buildBookPurchase`：
+[,groovy]
+----
+UiFormSpecifier buildBookPurchase(MyLibraryBook book) {
+    NumberForInstances numberForInstances = new NumberForInstances()
+    book ?= new MyLibraryBook(params)
+    UiFormSpecifier bookPurchaseSpecifier = new UiFormSpecifier()
+    bookPurchaseSpecifier.ui book, {
+        section "Purchase Number", {
+            field numberForInstances.numberOfInstances_ //<1>
+        }
+        formAction MyLibraryController.&purchaseAndSaveBook as MC
+    }
+}
+----
+<1> 请注意，我们使用了一个类来获取用户想要采购的 `numberOfInstances`。与其他类实例不同，该数字仅用于接收输入，不会保存到数据库中。
+
+返回 `MyLibraryController` 以实现 `purchaseBook` 和 `selectBookInstance` 方法。
+
+专业模式：实现这些方法 [TODO 3.10–3.12]
+
+.实现 `purchaseBook`：
+[,groovy]
+----
+def purchaseBook(MyLibraryBook book) {
+    UiFormSpecifier tableAddBookInstanceSpecifier = myLibraryUiService.buildBookPurchase(book)
+
+    taackUiService.show new UiBlockSpecifier().ui {
+        modal {
+            form tableAddBookInstanceSpecifier
+        }
+    }
+}
+----
+
+.实现 `purchaseAndSaveBook`：
+[,groovy]
+----
+@Transactional
+def purchaseAndSaveBook(NumberForInstances numberForInstances, MyLibraryBook book) {
+    for (int i = 0; i < (numberForInstances.numberOfInstances) as Integer; i++) {
+        MyLibraryBookInstance newBookInstance = new MyLibraryBookInstance()
+        newBookInstance.book = book
+        book.addToListOfBookInstance(newBookInstance)
+    }
+    taackUiService.ajaxReload()
+}
+----
+
+.实现 `selectBookInstance`：
+[,groovy]
+----
+def selectBookInstance(MyLibraryBook book) {
+    UiTableSpecifier bookInstanceTableSpecifier = myLibraryUiService.buildInstanceBookTable(book)
+
+    taackUiService.show new UiBlockSpecifier().ui {
+        modal true, {
+            table bookInstanceTableSpecifier
+        }
+    }
+}
+----
+
+现在让我们实现 `showBook` 方法。首先需要在 `myLibraryUiService` 中创建一个 `UiShowSpecifier`。
+
+前往 `MyLibraryUiService` 中的 `buildBookTable`。
+
+专业模式：添加按钮 [TODO 3.13]。
+
+添加显示操作。替换 TODO 3.13：
+[,groovy]
+----
+rowAction ActionIcon.SHOW * IconStyle.SCALE_DOWN, MyLibraryController.&showBook as MC, bookIterator.id
+----
+
+专业模式：实现 `buildBookShow` [TODO 3.14]
+
+.实现 `buildBookShow`：
+[,groovy]
+----
+    UiShowSpecifier buildBookShow(MyLibraryBook book) {
+        UiShowSpecifier bookShowSpecifier = new UiShowSpecifier()
+
+        bookShowSpecifier.ui(book, {
+            fieldLabeled book.title_
+            fieldLabeled book.author_
+            fieldLabeled book.numberOfPages_
+            fieldLabeled book.description_
+            fieldLabeled book.numberOfInstances_
+        })
+    }
+----
+
+专业模式：实现 `showBook` [TODO 3.15]
+
+.实现 `showBook`：
+[,groovy]
+----
+def showBook(MyLibraryBook book) {
+    UiShowSpecifier showBookSpecifier = myLibraryUiService.buildBookShow(book)
+
+    taackUiService.show(new UiBlockSpecifier().ui {
+        modal {
+            show showBookSpecifier
+        }
+    })
+}
+----
+
+接下来我们将实现 `deleteBookInstance`。我们希望选择要删除的特定图书副本。因此，我们需要创建一个带有 `isSelect` 选项的 `buildBookInstanceTable`。由于这是软删除（我们将过滤掉非活动的 `BookInstances`），还需要一个 `buildIsActiveBookInstances` 过滤器。
+
+让我们先实现 `buildIsActiveBookInstances` 过滤器。
+
+专业模式：实现 `buildIsActiveBookInstances` [TODO 3.16]。
+
+.实现 `buildIsActiveBookInstances`。
+[,groovy]
+----
+UiFilterSpecifier buildIsActiveBookInstances(MyLibraryBook book) {
+    MyLibraryBookInstance bookInstance = new MyLibraryBookInstance()
+    UiFilterSpecifier bookInstanceFilterSpecifier = new UiFilterSpecifier()
+    bookInstanceFilterSpecifier.sec MyLibraryBookInstance, {
+        filterFieldExpressionBool new FilterExpression(true, Operator.EQ, bookInstance.isActive_)
+    }
+}
+----
+
+现在可以实现 `buildBookInstanceTable` 了。
+
+专业模式：实现 `buildBookInstanceTable` [TODO 3.17]。
+
+.实现 `buildBookInstanceTable`。
+[,groovy]
+----
+UiTableSpecifier buildInstanceBookTable(
+    MyLibraryBook book,
+    MyLibraryBookInstance bookInstance = null) {
+    UiTableSpecifier table = new UiTableSpecifier()
+    table.ui {
+        header {
+            label "Serial Number"
+            column {label "Delete"}
+        }
+
+        TaackFilter.FilterBuilder filter = taackFilterService
+            .getBuilder(MyLibraryBookInstance)
+            .addRestrictedIds(book.listOfBookInstance*.id as Long[])
+
+        filter.addFilter(buildIsActiveBookInstances(book))
+
+        iterate(filter.build()) { MyLibraryBookInstance bookInstanceIterator ->
+            rowField bookInstanceIterator.serialNumber_
+            rowColumn {
+                rowAction ActionIcon.DELETE * IconStyle.SCALE_DOWN,
+                    MyLibraryController.&deleteBookInstances as MC,
+                    bookInstanceIterator.id, [bookId:book.id]
+            }
+        }
+    }
+}
+----
+
+现在让我们实现 `deleteBookInstances`。
+
+专业模式：实现 `deleteBookInstances` [TODO 3.18]。
+
+.实现 `deleteBookInstances`：
+[,groovy]
+----
+@Transactional
+def deleteBookInstances(MyLibraryBookInstance bookInstance) {
+    MyLibraryBook book = MyLibraryBook.get(params.long('bookId'))
+    UiTableSpecifier bookInstanceTable = myLibraryUiService.buildInstanceBookTable(book)
+
+    bookInstance.isActive = false
+    bookInstance.save(flush: true, validate: false)
+
+    taackUiService.show new UiBlockSpecifier().ui {
+        closeModalAndUpdateBlock { //<1>
+            tableFilter(
+                    myLibraryUiService.buildBookFilter(), //<2>
+                    myLibraryUiService.buildBookTable(), //<2>
+            ) {
+                menuIcon ActionIcon.CREATE, this.&createBook as MethodClosure //<2>
+            }
+            modal {
+                table bookInstanceTable //<3>
+            }
+        }
+    }
+}
+----
+<1> 使用 `closeModalAndUpdateBlock` 可以让用户立即看到已删除 `BookInstance` 的最新状态。当用户选择一个 `BookInstance` 后，它会立即关闭模态框。
+<2> 我们调用用于显示图书的构建器，以便在关闭模态框时更新图书表格中的 `numberOfInstances`。
+<3> 我们再次打开模态框。当用户选择一个 `BookInstance` 时，模态框会先关闭再重新打开，因此所选的 `BookInstance` 不再显示。
+
+
+恭喜！您已完成本项目的第一部分。

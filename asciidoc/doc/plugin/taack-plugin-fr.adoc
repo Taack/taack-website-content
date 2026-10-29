@@ -1,0 +1,50 @@
+[[_about_plugins]]
+= À propos des plugins
+:doctype: book
+:toc:
+:source-highlighter: rouge
+:taack-category: 1|doc/plugin
+:icons: font
+
+== Enregistrer une application
+
+Une application enregistre uniquement ses *points d'entrée* (c'est-à-dire les #actions# exécutées lors de l'accès à l'application) et les *icônes SVG* correspondantes. Les noms des points d'entrée du contrôleur sont utilisés pour les libellés et descriptions localisés dans les fichiers de propriétés `i18n`.
+
+.Enregistrement de l'application Crew
+[source,groovy]
+----
+@PostConstruct
+void init() {
+TaackAppRegisterService.register TaackApp(          <1>
+        CrewController.&index as MC,                <2>
+        new String(
+            this.class
+            .getResourceAsStream("/crew/crew.svg")  <3>
+            .readAllBytes())
+    )
+}
+
+----
+
+<1> Appel de la méthode statique `TaackAppRegisterService.register`
+<2> Définition du point d'entrée
+<3> Icône SVG
+
+== I18n
+
+Dans les propriétés `i18n`, ajoutez :
+
+[source,properties]
+----
+crew.app=Crew
+crew.desc=User Management Application
+attachment.app=Attachment
+attachment.desc=Global File Manager
+----
+
+== Mosaïque d'applications par défaut
+
+Par défaut, le https://github.com/Taack/intranet/blob/main/server/grails-app/controllers/taack/website/RootController.groovy[`RootController`] dans `server` contient le point d'entrée. Il peut être facilement modifié.
+
+.Mosaïque d'applications par défaut
+image::root-default.webp[]

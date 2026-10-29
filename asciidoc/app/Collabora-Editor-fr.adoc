@@ -1,0 +1,83 @@
+= Collabora Editor
+:doctype: book
+:taack-category: 4|App
+:toc:
+:source-highlighter: rouge
+:experimental: true
+
+== Objectif
+
+Étend le contrôleur de pièces jointes (`Attachment`) dans l'application Crew.
+
+Permet de modifier des documents bureautiques à l'aide de https://www.collaboraonline.com/[Collabora Online]. Toutes les pièces jointes deviennent modifiables en ligne.
+
+== Rôles
+
+* `ROLE_TEMPLATE_ADMIN` : Permet aux utilisateurs de créer de nouveaux modèles pour créer de nouvelles pièces jointes.
+
+== Installer et lancer l'image Docker Collabora CODE
+
+.Démarrer Docker
+[source,bash]
+----
+sudo systemctl restart docker
+----
+
+.Installer Collabora CODE
+[source,bash]
+----
+sudo docker pull collabora/code:latest
+----
+
+.Lancer Collabora CODE
+[source,bash]
+----
+sudo docker run --privileged --network host -e "username=test" -e "password=test"  -e "extra_params=--o:ssl.enable=false" -p 9980:9980 collabora/code:latest   <1>
+----
+
+<1> À des fins de test uniquement, nous désactivons SSL et choisissons un couple utilisateur / mot de passe simple. Vous n'avez pas besoin de `--network host` si Collabora s'exécute sur un serveur différent.
+
+.Vérifier que le service est lancé
+[source,bash]
+----
+$ LANG=C wget http://localhost:9980/
+--2025-02-18 22:35:56--  http://localhost:9980/
+Resolving localhost (localhost)... ::1, 127.0.0.1
+Connecting to localhost (localhost)|::1|:9980... connected.
+HTTP request sent, awaiting response... 200 OK
+
+    The file is already fully retrieved; nothing to do.
+----
+
+== Cloner et lier le dépôt `editor-collabora`
+
+[source,bash]
+----
+$ git clone https://github.com/Taack/collabora-editor.git
+----
+
+== Configuration de l'Intranet
+
+[source,yaml]
+----
+collabora.url: http://127.0.0.1:9980/     <1>
+----
+
+<1> Remplacez l'adresse IP par le nom DNS du serveur.
+
+== Capture d'écran
+
+.Édition d'un fichier ODP
+image::collabora-editor.webp[]
+
+Quelques commandes de base :
+
+* Plein écran => menu:Zoom[Fullscreen]
+* Vue compacte => menu:Display[Compact View], ou cliquez sur image:lc_sidebar.svg[width=25]
+* Fermer le panneau latéral => menu:Display[Close Panel]
+* Enregistrer le fichier pour créer une nouvelle version sur l'Intranet (cliquez sur image:lc_save.svg[width=25] ou appuyez sur btn:[CTRL + S])
+
+
+== Vidéo
+
+video::tB6mL07pzQQ[youtube,480]

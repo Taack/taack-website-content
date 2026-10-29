@@ -1,0 +1,852 @@
+= Première application
+
+== Comment fonctionne l'application avec le framework Taack ?
+
+Votre projet d'intranet comporte deux parties :
+
+* Les plugins d'application, situés dans le dossier `app`, sont des micro-projets, chacun ayant ses propres dépendances, sa propre compilation, etc. (par ex., Crew).
+Pour une explication plus détaillée de la déclaration des plugins, consultez link:doc/plugin/taack-plugin.adoc#_about_plugins[À propos des plugins].
+* Le serveur principal utilise tous les plugins d'application déclarés dans son fichier `build.gradle` et les affiche sur la page principale de l'intranet.
+
+== Créer un nouveau plugin d'application
+
+
+Pour créer un nouveau plugin d'application (un module Gradle), assurez-vous d'avoir récupéré la dernière version de votre intranet depuis notre dépôt GitHub (voir link:install.adoc[installation]).
+
+.Exécutez la commande suivante depuis le dossier racine de votre intranet :
+
+// setting system properties with the -D flag
+// setting project properties with the -P flag
+
+[,bash]
+----
+$ ./gradlew -DmodName=myBooks server:generateTaackAppTask
+----
+
+Cela crée un nouveau dossier `app/myBooks`.
+
+[NOTE]
+====
+Sous `intranet/app/myBooks/grails-app/domain`, remplacez le répertoire `myBooks` par `my.books`, ce qui garantira l'accès aux classes créées dans `domain` depuis `controllers` et `services`, car elles feront partie du même package.
+====
+
+
+.Contenu de myBooks
+image::first-app-4-content-app.webp[Reload,width=520,align="left"]
+
+Pour que votre IDE reconnaisse le module nouvellement créé, rechargez Gradle en cliquant sur l'icône ci-dessous :
+
+.Rechargement de Gradle
+image::screenshot-new-app-gradle-reload.webp[Reload,width=520,align="left"]
+
+== Gérer les futures mises à jour
+
+La plupart du temps, la mise à jour de votre intranet implique de mettre à jour le dossier `buildSrc`, le fichier `gradle.properties` et, plus rarement, les fichiers `build.gradle` des applications.
+
+[NOTE]
+====
+En réalité, ce processus est courant dans le développement logiciel à long terme et ne devrait pas intimider les nouveaux venus.
+====
+
+== Construire un menu pour l'application
+
+[sidebar]
+====
+**TODO :**
+Nous allons construire deux menus, un pour les livres et un pour les auteurs. Dans chaque menu, vous pourrez ajouter de nouveaux éléments, les filtrer et voir chaque entrée dans un tableau.
+====
+
+Concentrons-nous sur la navigation de votre nouvelle application, `myBooks`.
+La première étape consiste à définir la manière dont le menu sera construit. Allez dans `grails-app/services/my/books/MyBooksUiService`.
+
+.Vous devriez voir le code suivant (qui peut légèrement varier selon la version) :
+[,groovy]
+----
+static UiMenuSpecifier buildMenu(String q = null) { // <1>
+    new UiMenuSpecifier().ui {
+        menu MyBooksController.&index as MC
+    }
+}
+----
+<1> Ajoutez `static` s'il n'est pas déjà présent.
+
+Nous créons un objet link:doc/DSLs/menu-dsl.adoc[UiMenuSpecifier] pour définir la structure du menu, puis nous spécifions le contenu à afficher.
+
+[,groovy]
+----
+menu MyBooksController.&index as MC
+----
+
+Dans ce cas, `menu` crée un simple lien dans la barre de navigation. `index` est le nom affiché pour le lien, et `MyBooksController.&index` (utilisant une MethodClosure) définit l'action vers laquelle le lien redirigera.
+
+
+
+== Créer des classes
+Créez une classe Groovy appelée `Author` dans `grails-app/domain/my/books`.
+
+
+.Créer une classe
+image::first-app-5-create-class.webp[Reload,width=520,align="left"]
+
+
+
+.Ajoutez le code suivant :
+[,groovy]
+----
+import grails.compiler.GrailsCompileStatic
+import taack.ast.annotation.TaackFieldEnum
+
+@GrailsCompileStatic
+@TaackFieldEnum
+class Author {
+    String firstName
+    String lastName
+    Date dateOfBirth
+}
+----
+
+Créez une autre classe Groovy appelée `Book` dans `grails-app/domain/my/books`.
+
+.Ajoutez le code suivant :
+[,groovy]
+----
+import grails.compiler.GrailsCompileStatic
+import taack.ast.annotation.TaackFieldEnum
+
+@GrailsCompileStatic
+@TaackFieldEnum
+class Book {
+    String title
+    String authorName
+    int numberOfPages
+}
+----
+
+[NOTE]
+====
+Utilisez toujours `@GrailsCompileStatic` pour les performances et la sûreté du typage. Utilisez `@TaackFieldEnum`, plus d'informations link:doc/UserGuide/DevelopingStepsOverview[ici].
+====
+
+
+== Créer un tableau
+
+Affichons maintenant un tableau dans notre page `listBook`. Allez dans `grails-app/services/my/books/MyBooksUiService`.
+
+.Créez un nouveau spécificateur de tableau appelé `buildBookTable` :
+[,groovy]
+----
+
+UiTableSpecifier buildBookTable() {
+    Book book = new Book()
+    UiTableSpecifier bookTableSpecifier = new UiTableSpecifier()
+    bookTableSpecifier.ui {
+    //Add table content inside the closure here
+    }
+}
+
+----
+Ici, nous définissons un nouveau tableau qui listera les instances de `Book`. Utilisez `import taack.ui.dsl.UiTableSpecifier`.
+
+
+
+
+
+.Pour définir les en-têtes du tableau, ajoutez le code suivant dans la closure (importez les classes nécessaires) :
+[,groovy]
+----
+bookTableSpecifier.ui {
+    // -- Header --
+    header {
+        column {
+            sortableFieldHeader book.title_ //<1>
+        }
+        column {
+            label book.authorName_
+        }
+        column {
+            label book.numberOfPages_
+        }
+        column {
+            label "Delete book"
+        }
+    }
+}
+----
+<1> Notez qu'ici nous utilisons `sortableFieldHeader`, ce qui rend la colonne triable : vous pouvez trier les livres par ordre alphabétique en cliquant sur l'en-tête `book.title`.
+Maintenant, nous allons remplir notre tableau : nous allons parcourir les instances de `Book` dans la base de données à l'aide de la méthode DSL de tableau `iterate`.
+
+.Ajoutez le code suivant (initialisez et importez les classes nécessaires) :
+[,groovy]
+----
+bookTableSpecifier.ui {
+    //table headers...
+
+    iterate(taackFilterService.getBuilder(Book) // <1>
+        .setMaxNumberOfLine(8) // <2>
+        .setSortOrder(TaackFilter.Order.DESC, book.title_) // <3>
+        .build()) { Book bookIterator ->
+    rowColumn {
+        rowField bookIterator.title_ // <4>
+    }
+    rowColumn {
+        rowField bookIterator.authorName_
+    }
+    rowColumn {
+        rowField bookIterator.numberOfPages_
+    }
+    rowColumn {
+        rowAction ActionIcon.DELETE * IconStyle.SCALE_DOWN, // <5>
+            MyBooksController.&deleteBook as MethodClosure, bookIterator.id
+        }
+    }
+}
+
+----
+<1> Utilisez `import taack.domain.TaackFilterService`.
+<2> Seuls les huit premiers livres seront affichés.
+<3> Définit l'ordre d'affichage selon le titre des livres par ordre décroissant (utilisez `import taack.domain.TaackFilter`).
+<4> Le tiret bas (underscore) est nécessaire ici.
+<5> Utilisez `import taack.ui.dsl.common.ActionIcon
+import taack.ui.dsl.common.IconStyle`.
+
+[NOTE]
+====
+Nous devons créer l'action `deleteBook`. Pour l'instant, nous la laisserons vide.
+====
+
+Allez dans `grails-app/controllers/my/books/MyBooksController.groovy`.
+
+.Ajoutez la méthode suivante après l'action `index` :
+[,groovy]
+----
+def deleteBook () {}
+----
+
+Pour chaque livre de notre liste, nous créons une nouvelle ligne avec le titre du livre dans la première colonne, suivi de l'auteur, du nombre de pages et d'un bouton btn:[Delete] dans la quatrième colonne.
+
+Votre tableau est maintenant complet ; il ne nous reste plus qu'à l'afficher sur la page.
+Pour afficher les `UiSpecifier` précédemment construits, nous devons utiliser `taackUiService`, qui devrait déjà être importé dans le contrôleur créé par la commande `create-taack-app`.
+
+
+Nous ferons cela dans une action appelée `listBook` : dans la méthode `index`, remplacez son contenu par une redirection vers l'action `listBook`.
+
+.Rediriger vers l'action `listBook` :
+[,groovy]
+----
+def index() {
+    redirect action: 'listBook'
+}
+----
+
+
+.Créez une action appelée `listBook` et ajoutez le code suivant :
+[,groovy]
+----
+UiTableSpecifier tableBookSpecifier = myBooksUiService.buildBookTable() // <1>
+
+        taackUiService.show(new UiBlockSpecifier().ui {
+            table tableBookSpecifier
+        }, MyBooksUiService.buildMenu())
+----
+<1> Récupère le `tableSpecifier` que nous avons créé depuis `MyBooksUiService`.
+
+Utilisez `import taack.ui.dsl.UiTableSpecifier`.
+
+`taackUiService.show(UiBlockSpecifier block, UiMenuSpecifier menu)` se chargera du rendu de la spécification que nous lui passons.
+Nous utilisons la méthode statique `buildMenu()` créée précédemment dans `MyBooksUiService` comme second argument de `show()` pour afficher le menu avec la page.
+
+
+Vous pouvez maintenant démarrer le serveur et naviguer vers votre nouvelle application (`myBooks.app`).
+Le tableau devrait être fonctionnel, mais pour l'instant vous ne verrez que les en-têtes du tableau puisqu'il n'y a aucun livre dans votre base de données.
+Passons donc à la création d'un formulaire et à l'enregistrement d'objets dans la base de données.
+
+
+.Tableau de livres vide
+image::first-app-7-creating-table.webp[Reload,width=1000,align="left"]
+
+
+[[_adding_buttons_to_a_table_block]]
+== Ajouter des boutons à un bloc de tableau
+
+Ajoutons au tableau des livres un bouton qui ouvre une fenêtre modale via AJAX pour créer un nouveau livre.
+Pour ce faire, nous devons ajouter une closure au tableau.
+
+.Ajoutez le code suivant :
+[,groovy]
+----
+taackUiService.show(new UiBlockSpecifier().ui {
+    table tableBookSpecifier, {
+        //Added Closure here
+        menuIcon ActionIcon.CREATE, this.&bookForm as MethodClosure // <1>
+    }
+}, MyBooksUiService.buildMenu())
+
+----
+<1> Vous devrez définir l'action `bookForm`, tout comme nous l'avons fait avec `deleteBook`.
+
+N'oubliez pas d'utiliser `import taack.ui.dsl.common.ActionIcon`.
+
+Démarrez maintenant le serveur et naviguez à nouveau vers votre nouvelle application : vous verrez un bouton btn:[Create] en haut à droite du tableau.
+
+.Bouton
+image::first-app-8-adding-button.webp[Reload,width=1000,align="left"]
+
+La méthode `menuIcon` est composée des paramètres suivants :
+
+. L'icône utilisée par le bouton doit être une valeur de l'énumération `ActionIcon`.
+. L'action vers laquelle le bouton redirigera.
+
+== Créer un formulaire et enregistrer des objets
+
+Nous allons maintenant créer le formulaire qui servira à créer et mettre à jour des livres.
+Pour gérer les deux cas, nous allons initialiser un nouveau `Book` ou lire le livre si un identifiant de `Book` a été passé dans les paramètres de la requête dans `MyBooksUiService`.
+
+.Créez un nouveau spécificateur de formulaire appelé `buildBookForm` :
+[,groovy]
+----
+UiFormSpecifier buildBookForm(Book book) {
+    book ?= new Book(params) // <1>
+}
+----
+<1> Cela signifie que si `book` est null, on lui assigne une nouvelle instance à l'aide des paramètres de la requête.
+
+Définissons maintenant son formulaire et son contenu.
+
+.Ajoutez ce qui suit dans `buildBookForm` (importez les classes nécessaires) :
+[,groovy]
+----
+UiFormSpecifier bookFormSpecifier = new UiFormSpecifier()
+bookFormSpecifier.ui book, {
+    //Section of fields
+    section "Book details", {
+        field book.title_
+        field book.authorName_
+        field book.numberOfPages_
+    }
+    //Save button
+    formAction MyBooksController.&saveBook as MethodClosure // <1>
+}
+----
+<1> Vous devrez définir l'action `saveBook` (comme pour `deleteBook`) dans `MyBooksController`.
+
+Utilisez `import taack.ui.dsl.UiFormSpecifier`.
+
+Une fois votre formulaire défini, vous pouvez l'afficher à l'aide de la méthode `taackUiService.show()`.
+
+.Ajoutez ce qui suit dans la méthode `bookForm` de `MyBooksController` :
+[,groovy]
+----
+def bookForm(Book book) {
+    UiFormSpecifier tableFormSpecifier = myBooksUiService.buildBookForm book
+
+    taackUiService.show new UiBlockSpecifier().ui {
+        modal {
+            form tableFormSpecifier
+        }
+    }
+}
+----
+
+Utilisez `import taack.ui.dsl.UiFormSpecifier`.
+
+Cette fois, nous ne spécifions pas `buildMenu` dans notre appel à `show`, car nous ne voulons pas que le menu soit affiché à l'intérieur de la fenêtre modale.
+
+.Modifiez l'action `saveBook` (importez et initialisez les classes nécessaires) :
+
+[,groovy]
+----
+@Transactional
+def saveBook() {
+    taackSaveService.saveThenReloadOrRenderErrors(Book)
+}
+----
+Utilisez `import taack.render.TaackSaveService` et `import grails.gorm.transactions.Transactional`.
+
+[NOTE]
+====
+Consultez link:doc/DSLs/block-dsl.adoc#_modal_stack_code_sample[Fermer la modale et recharger la page] pour savoir comment éviter l'utilisation de `redirectAction` lors de la sauvegarde...
+====
+
+
+Redémarrez le serveur : vous devriez maintenant pouvoir cliquer sur le bouton et remplir le formulaire.
+
+.Formulaire
+image::first-app-10-creating-form.webp[Reload,width=800,align="left"]
+
+.Livres enregistrés
+image::first-app-11-adding-book.webp[Reload,width=800,align="left"]
+
+[NOTE]
+====
+Dans le coin supérieur gauche, vous pouvez basculer entre les pages de livres à l'aide des numéros de page (1 ou 2). Cette navigation apparaît car la liste est limitée à 8 livres par page.
+====
+
+== Afficher un objet
+
+Maintenant que nous pouvons créer des livres et en voir la liste dans un tableau, affichons chaque livre plus en détail à l'aide d'une fenêtre modale.
+Une fois encore, nous définissons le spécificateur et nous l'affichons dans un bloc modal avec `taackUiService.show()`.
+
+
+.Créez `showBook` (importez la classe nécessaire) :
+[,groovy]
+----
+def showBook(Book book) {
+    // Define the show displayed fields
+    UiShowSpecifier showSpec = new UiShowSpecifier().ui({
+        fieldLabeled book.title_
+        fieldLabeled book.authorName_
+    })
+
+    taackUiService.show(new UiBlockSpecifier().ui {
+        modal {
+            show showSpec
+        }
+    })
+}
+----
+Utilisez `import taack.ui.dsl.UiShowSpecifier`.
+
+Nous devons également afficher un lien vers cette fenêtre modale dans le tableau. Pour cela, ajoutez la ligne suivante dans la même `rowColumn` (sous le champ du titre du livre) où vous souhaitez voir apparaître le bouton dans `MyBooksUiService` :
+
+.Ajoutez 2 lignes dans `buildBookTable` :
+[,groovy]
+----
+
+UiTableSpecifier buildBookTable() {
+    //Section of code
+    rowColumn {
+        //Add these 2 lines
+        rowAction ActionIcon.SHOW * IconStyle.SCALE_DOWN, // <1>
+        MyBooksController.&showBook as MethodClosure, bookIterator.id
+        rowField bookIterator.title_
+    }
+    //Section of code
+}
+
+
+----
+
+<1> Ici, nous réduisons la taille de l'icône avec l'opérateur de multiplication.
+
+Cela créera un _petit_ bouton icône dans la cellule du tableau qui ouvrira une fenêtre modale contenant les informations du livre correspondant.
+
+Notez que `ActionIcon` a été multiplié par un `IconStyle` pour modifier sa taille dans ce cas.
+
+.Affichage d'un objet
+image::first-app-13-view-books.webp[Reload,width=800,align="left"]
+Cliquez sur l'icône en forme d'œil pour afficher le livre.
+
+
+== Supprimer un objet
+
+Vous vous souvenez du bouton btn:[Delete] que nous avons ajouté à notre tableau ?
+Rendons ce bouton btn:[Delete] fonctionnel en définissant l'action `deleteBook` qu'il appelle.
+
+
+[,groovy]
+----
+@Transactional
+def deleteBook(Book book) {
+    book.delete()
+    redirect action: 'index'
+}
+----
+
+[NOTE]
+====
+Dans certains cas, il est préférable d'ajouter un champ `enable` pour masquer les objets désactivés plutôt que de les supprimer.
+====
+
+Nous utilisons la méthode `delete` de Grails pour supprimer le livre de la base de données, puis nous redirigeons vers l'action `index` où se trouve le tableau des livres.
+
+.Supprimer un livre
+video::first-app-15-delete-book.mp4[Reload,width=800,align="left",options="autoplay,loop,muted"]
+
+
+Notez que les noms des champs ne sont pas des libellés directs, mais des clés i18n telles que `book.numberOfPages.label,default.numberOfPages.label` (faisant référence aux clés i18n dans `messages.properties`). Changeons cela !
+
+== Nommer les en-têtes
+
+Pour définir le nom des en-têtes, allez dans `app/myBooks/grails-app/i18n/messages.properties`.
+
+.Définissez `default.numberOfPages.label` et les autres libellés avec les noms de votre choix :
+
+[,properties]
+----
+default.authorName.label=Author Name
+default.title.label=Title
+default.numberOfPages.label=Number of Pages
+myBooks.index.label=Books
+myBooks.app=Book
+myBooks.desc=Book storage
+----
+
+Lancez le serveur pour voir les noms des libellés mis à jour.
+
+== Filtrage
+Si nous ajoutons trop de livres, nous risquons de perdre du temps à chercher un livre précis ; filtrer les livres permet de rendre la recherche plus efficace. Implémentons cela dans `MyBooksUiService`.
+
+
+.Créez un nouveau spécificateur de filtre appelé `buildBookFilter` :
+[,groovy]
+----
+UiFilterSpecifier buildBookFilter(Book book) {
+    UiFilterSpecifier bookFilterSpecifier = new UiFilterSpecifier() // <1>
+
+    bookFilterSpecifier.ui Book, { // <2>
+        section "Book Filter", {  // <3>
+            filterField book.title_ // <4>
+        }
+    }
+}
+----
+<1> Créez le filtre. Utilisez `import taack.ui.dsl.UiFilterSpecifier`.
+<2> Passez la classe de l'objet et la closure contenant les spécifications du filtre via la méthode `ui`.
+<3> Créez une section intitulée "Book Filter".
+<4> Ajoutez un champ au filtre, notez le *tiret bas* à la fin du nom du champ.
+
+L'étape suivante consiste à afficher ce filtre nouvellement créé.
+
+.Modifiez `taackUiService.show` dans `listBook` (situé dans `MyBooksController`) :
+[,groovy]
+----
+def listBook() {
+    Book book = new Book()
+    UiTableSpecifier tableBookSpecifier = myBooksUiService.buildBookTable()
+    UiFilterSpecifier filterBookSpecifier = myBooksUiService.buildBookFilter book
+
+    taackUiService.show(new UiBlockSpecifier().ui {
+        tableFilter filterBookSpecifier, tableBookSpecifier, {
+            menuIcon ActionIcon.CREATE, this.&bookForm as MethodClosure
+        }
+    }, MyBooksUiService.buildMenu())
+}
+----
+Utilisez `import taack.ui.dsl.UiFilterSpecifier`.
+
+.Filtrage
+image::first-app-20-using-filter.webp[Reload,width=800,align="left"]
+
+
+
+Pour plus d'informations détaillées sur le filtrage, consultez la link:doc/DSLs/filter-table-dsl[documentation des filtres et tableaux].
+
+== Ajouter un second menu
+Vous vous souvenez de la classe `Author` que nous avons créée au début ? Il est temps de l'utiliser ! Nous allons créer un second menu dans lequel nous pourrons ajouter des auteurs et les filtrer.
+
+.Ajoutez cette ligne de code dans `buildMenu` dans `MyBooksUiService` :
+[,groovy]
+----
+menu MyBooksController.&listAuthor as MC
+----
+Cela crée un second menu dans le coin supérieur gauche pour accéder à la page des auteurs.
+
+[NOTE]
+====
+Vous pouvez également créer des sous-menus imbriqués dans le menu principal.
+[,groovy]
+----
+label("Menu", {
+    subMenu(MyBooksController.&index as MC)
+    subMenu(MyBooksController.&listAuthor as MC)
+})
+----
+Cela crée un sous-menu intitulé "Menu" contenant un lien vers l'action `index` (qui correspond à l'action `listBook`) et vers l'action `listAuthor`. C'est utile si vous souhaitez regrouper des liens associés sous un même élément de menu.
+====
+.Ajoutez les constructeurs suivants dans `MyBooksUiService` :
+[,groovy]
+----
+UiTableSpecifier buildAuthorTable(Boolean isSelect = false ) {
+    Author author = new Author()
+    UiTableSpecifier authorTableSpecifier = new UiTableSpecifier()
+    authorTableSpecifier.ui {
+        header {
+            column {
+                sortableFieldHeader author.firstName_
+            }
+            column {
+                sortableFieldHeader author.lastName_
+            }
+            column {
+                label author.dateOfBirth_
+            }
+            column {
+                label "Delete Author"
+            }
+        }
+
+        iterate(taackFilterService.getBuilder(Author)
+                .setMaxNumberOfLine(8)
+                .setSortOrder(TaackFilter.Order.DESC, author.lastName_)
+                .build()) { Author authorIterator ->
+            rowColumn {
+                rowField authorIterator.firstName_
+                rowAction ActionIcon.SHOW * IconStyle.SCALE_DOWN,
+                        MyBooksController.&showAuthor as MethodClosure, authorIterator.id
+            }
+            rowColumn {
+                rowField authorIterator.lastName_
+            }
+            rowColumn {
+                rowField authorIterator.dateOfBirth_
+            }
+            rowColumn {
+                rowAction ActionIcon.DELETE * IconStyle.SCALE_DOWN,
+                        MyBooksController.&deleteAuthor as MC, authorIterator.id
+            }
+        }
+    }
+}
+
+UiFormSpecifier buildAuthorForm(Author author) {
+    author ?= new Author(params)
+    UiFormSpecifier authorFormSpecifier = new UiFormSpecifier()
+    authorFormSpecifier.ui author, {
+        section "Author details", {
+            field author.firstName_
+            field author.lastName_
+            field author.dateOfBirth_
+        }
+        formAction MyBooksController.&saveAuthor as MC
+    }
+}
+
+UiFilterSpecifier buildAuthorFilter() {
+    Author author = new Author()
+    UiFilterSpecifier authorFilterSpecifier = new UiFilterSpecifier()
+
+    authorFilterSpecifier.ui Author, {
+        section "Author Filter", {
+            filterField author.lastName_
+        }
+    }
+}
+----
+Notez que le paramètre `isSelect` dans `buildAuthorTable` sera utilisé plus tard.
+
+.Créez la méthode `listAuthor` dans `MyBooksController` :
+[,groovy]
+----
+def listAuthor() {
+    UiTableSpecifier tableAuthorSpecifier = myBooksUiService.buildAuthorTable()
+    UiFilterSpecifier filterAuthorSpecifier = myBooksUiService.buildAuthorFilter()
+
+    taackUiService.show(new UiBlockSpecifier().ui {
+        tableFilter filterAuthorSpecifier, tableAuthorSpecifier, {
+            menuIcon ActionIcon.CREATE, this.&authorForm as MethodClosure
+        }
+    }, MyBooksUiService.buildMenu())
+}
+----
+
+.Ajoutez les méthodes nécessaires `deleteAuthor`, `saveAuthor`, `authorForm` et `showAuthor` :
+[,groovy]
+----
+def authorForm(Author author) {
+    UiFormSpecifier tableFormSpecifier = myBooksUiService.buildAuthorForm author
+
+    taackUiService.show new UiBlockSpecifier().ui {
+        modal {
+            form tableFormSpecifier
+        }
+    }
+}
+
+@Transactional
+def deleteAuthor(Author author) {
+    author.delete()
+    redirect action: 'index'
+}
+
+@Transactional
+def saveAuthor() {
+    taackSaveService.saveThenReloadOrRenderErrors(Author)
+}
+
+def showAuthor(Author author) {
+    UiShowSpecifier showSpec = new UiShowSpecifier().ui(author, {
+        fieldLabeled author.firstName_
+        fieldLabeled author.lastName_
+    })
+
+    taackUiService.show(new UiBlockSpecifier().ui {
+        modal {
+            show showSpec
+        }
+    })
+}
+----
+
+.Définissez les nouveaux libellés par défaut avec les noms de votre choix :
+
+[,properties]
+----
+default.firstName.label=First Name
+default.lastName.label=Last Name
+default.dateOfBirth.label=Date of Birth
+myBooks.listAuthor.label= Authors
+
+----
+
+Vous disposez maintenant de menus distincts pour les livres et les auteurs, mais ils fonctionnent actuellement de manière indépendante. Et si vous pouviez sélectionner un auteur directement dans la liste des auteurs enregistrés lors de la création d'un livre ? Implémentons cette fonctionnalité.
+
+.Tableau des auteurs
+image::first-app-23-authors-filled.webp[Reload,width=800,align="left"]
+
+
+== Lier les auteurs aux livres
+
+.Ajoutez la méthode suivante à la classe `Author` :
+[,groovy]
+----
+String toString() {
+    return firstName + ' ' + lastName
+}
+----
+
+.Modifiez la variable dans la classe `Book` :
+[,groovy]
+----
+Author author
+----
+
+[NOTE]
+====
+Remplacez toutes les occurrences de `book.authorName_` par `book.author_` et de `bookIterator.authorName_` par `bookIterator.author_`, situées dans `MyBooksController` et `MyBooksUiService`.
+====
+
+
+[WARNING]
+====
+Modifier le nom ou le champ d'une classe est fortement déconseillé, car cela oblige à effacer les fichiers contenant les données précédemment ajoutées.
+Vous devez supprimer `intranet/server/intranetDb.mv.db` et `intranet/server/intranetDb.trace.db` pour éviter des erreurs d'intégrité. Cela supprimera toutes les données enregistrées précédemment.
+====
+
+.Ajoutez une ligne à `messages.properties` :
+[,properties]
+----
+default.author.label=Author Name
+----
+
+.Modifiez `buildAuthorTable` situé dans `MyBooksUiService` :
+[,groovy]
+----
+rowColumn {
+    rowField authorIterator.firstName_
+    rowAction ActionIcon.SHOW * IconStyle.SCALE_DOWN,
+            MyBooksController.&showAuthor as MethodClosure, authorIterator.id
+    // Add the following if statement
+    if (isSelect)
+        rowAction tr('default.role.label'), ActionIcon.SELECT * IconStyle.SCALE_DOWN, authorIterator.id, authorIterator.toString()
+}
+----
+Cela ajoutera un bouton de sélection permettant de choisir l'auteur lors du remplissage de `bookForm`. Utilisez `import static taack.render.TaackUiService.tr`.
+
+.Modifiez `buildBookForm` situé dans `MyBooksUiService` et remplacez `field book.author_` :
+[,groovy]
+----
+ajaxField book.author_, MyBooksController.&selectAuthor as MC
+----
+Cette ligne appellera `selectAuthor` lors de la sélection d'un auteur dans `bookForm`.
+
+Implémentons maintenant `selectAuthor`.
+
+.Implémentez `selectAuthor` dans `MyBooksController` :
+[,groovy]
+----
+def selectAuthor() {
+    UiTableSpecifier t = myBooksUiService.buildAuthorTable true // <1>
+    UiFilterSpecifier f = myBooksUiService.buildAuthorFilter()
+    taackUiService.show new UiBlockSpecifier().ui {
+        modal {
+            tableFilter f, t
+        }
+    }
+}
+----
+<1> Notez que `isSelect` vaut `true`.
+Cela affichera une version compacte du tableau `Author` et de son filtre lors de la sélection d'un auteur pour le formulaire de livre.
+
+.Ajout d'un livre avec un auteur issu du tableau des auteurs
+image::first-app-24-book-form-with-author-class.webp[Reload,width=800,align="left"]
+
+.Sélection de l'auteur (cliquez sur le bouton bleu)
+image::first-app-25-book-from-ajaxfield.webp[Reload,width=800,align="left"]
+
+
+Vous disposez désormais d'une interface CRUD entièrement fonctionnelle pour vos entités `Book` et `Author` à l'aide du framework DSL Taack, sans avoir besoin d'écrire manuellement des vues HTML ou GSP.
+
+
+*Vous êtes maintenant prêt à explorer les fonctionnalités plus avancées du framework Taack UI.*
+
+*Bienvenue !*
+
+
+
+== Dépannage et erreurs courantes
+
+.Sortie d'erreur :
+[source,console]
+----
+ERROR: Cannot resolve symbol 'MyBooksUiService'
+----
+Vous avez oublié de recharger Gradle après avoir créé le plugin. Cliquez sur le bouton de rechargement de Gradle dans votre IDE.
+
+.Sortie d'erreur :
+[,console]
+----
+ERROR:  Field 'authorName_' not found
+----
+Vous avez renommé le champ `authorName` en `author` (une référence à `Author`). Assurez-vous d'avoir remplacé tous les `authorName_` par `author_` à la fois dans le formulaire et dans le tableau.
+
+.Sortie d'erreur :
+[,console]
+----
+ERROR: No matching method for action...
+----
+Assurez-vous d'avoir déclaré la méthode correspondante dans `MyBooksController` et d'avoir utilisé correctement la syntaxe `MethodClosure` : `MyBooksController.&myMethod as MethodClosure`.
+
+
+.Le formulaire s'affiche mais n'enregistre pas :
+Il vous manque peut-être l'annotation `@Transactional` sur la méthode `saveBook` ou vous avez oublié d'importer `taackSaveService`.
+
+.Erreur de base de données après le renommage de champs :
+Si vous avez modifié des champs dans des classes du domaine, vous devez supprimer les fichiers de base de données :
+`intranet/server/intranetDb.mv.db`
+`intranet/server/intranetDb.trace.db`. Attention, cela effacera toutes les données enregistrées précédemment.
+
+.Le connecteur de base de données ne valide pas la transaction (flush) :
+
+Vous utilisez peut-être la mauvaise annotation `@Transactional`. Veillez à utiliser celle du package GORM et non celle de Javax.
+
+.Accéder à la console de base de données H2 :
+
+Vous souhaiterez peut-être vérifier l'intégrité des données et les DDL générés par la base de données embarquée H2.
+
+Pour ce faire, vous devez ajuster les paramètres de Spring Security.
+
+Naviguez vers
+Root → /server → /grails-app → /conf
+
+Vous y trouverez un fichier `application.groovy`.
+
+Ajoutez
+
+```groovy
+[pattern: '/h2-console/**',  access: ['permitAll']],
+```
+à ce bloc de configuration :
+```groovy
+grails.plugin.springsecurity.controllerAnnotations.staticRules = [
+	[pattern: '/',               access: ['permitAll']],
+	[pattern: '/error',          access: ['permitAll']],
+	[pattern: '/index',          access: ['permitAll']],
+	[pattern: '/index.gsp',      access: ['permitAll']],
+	[pattern: '/shutdown',       access: ['permitAll']],
+	[pattern: '/assets/**',      access: ['permitAll']],
+	[pattern: '/**/js/**',       access: ['permitAll']],
+	[pattern: '/**/css/**',      access: ['permitAll']],
+	[pattern: '/**/images/**',   access: ['permitAll']],
+	[pattern: '/**/favicon.ico', access: ['permitAll']]
+]
+```
