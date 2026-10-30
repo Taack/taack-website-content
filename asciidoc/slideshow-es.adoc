@@ -1,0 +1,131 @@
+include::_settings_reveal.adoc[]
+:source-highlighter: highlightjs
+:highlightjs-languages: groovy, gnuplot
+:title-slide-transition: zoom
+:title-slide-transition-speed: fast
+:icons: font
+:docinfo: shared
+:customcss: custom.css
+:taack-height: 512
+
+= Taack UI
+
+[.hero,transition=zoom]
+== Cree su intranet en [.accent]#Groovy#
+
+[.lead]
+DSL tipados para Grails: sin HTML, sin JavaScript
+
+[.chips]
+[.chip]#HTML# [.chip]#PDF# [.chip]#CSV# [.chip]#Mail#
+
+[.columns.split,transition=slide]
+== Describa, no use plantillas
+
+[.column]
+--
+[source,groovy]
+----
+new UiFormSpecifier().ui user, {
+    section "User", {
+        field user.username_
+        field user.firstName_
+        field user.lastName_
+        ajaxField user.manager_,
+            this.&selectUser
+    }
+    formAction this.&saveUser
+}
+----
+--
+
+[.column]
+--
+image::slideshow-crew-form.webp[]
+--
+
+[.columns.split,transition=slide]
+== Verificado en tiempo de compilación
+
+[.column.points]
+--
+* Símbolos [.accent]#field_# generados a partir de sus clases
+* Renombre un campo y el compilador encontrará cada pantalla
+* Errores de validación localizados, sin esfuerzo adicional
+--
+
+[.column]
+--
+image::slideshow-crew-form-validation.webp[]
+--
+
+[.shot,transition=slide]
+== Tablas, filtros, paginación
+
+image::slideshow-crew-users.webp[]
+
+[.charts,transition=slide]
+== Gráficos en pocas líneas
+
+image:diag-dsl-bar.webp[] image:diag-dsl-line.webp[] image:diag-dsl-pie.webp[] image:diag-dsl-whiskers.webp[]
+
+[.columns.split,transition=slide]
+== El mismo DSL, impreso en PDF
+
+[.column]
+--
+[source,groovy]
+----
+new UiPrintableSpecifier().ui {
+    printableHeader '2.5cm', {
+        show userHeader, Width.THIRD
+    }
+    printableBody {
+        show userShow, Width.MAX
+        table userTable, Width.MAX
+        diagram barChart, Width.MAX
+    }
+}
+----
+--
+
+[.column]
+--
+image::slideshow-pdf-sample.webp[]
+--
+
+[.cards,transition=slide]
+== Todo incluido
+
+[.card]
+--
+icon:search[] +
+Búsqueda de texto completo
+--
+
+[.card]
+--
+icon:eye[] +
+Vistas previas de archivos
+--
+
+[.card]
+--
+icon:database[] +
+JDBC sobre su modelo
+--
+
+[.card]
+--
+icon:terminal[] +
+SSH y SFTP
+--
+
+[.hero,transition=zoom]
+== Pruébelo en vivo
+
+[.lead]
+Cada página de DSL de la documentación abre sus ejemplos en una ventana modal
+
+[.chips]
+[.chip]#Docs › DSLs# [.chip]#▶ Pruébelo en vivo#

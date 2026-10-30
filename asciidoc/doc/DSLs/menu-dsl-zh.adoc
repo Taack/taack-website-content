@@ -1,0 +1,103 @@
+= 菜单 DSL (Menu DSL)
+:doctype: book
+:taack-category: 1|doc/DSLs
+:toc:
+:source-highlighter: rouge
+:icons: font
+
+* [*] 支持渲染为 HTML
+* [ ] 支持渲染为邮件 (Mails)
+* [ ] 支持渲染为 PDF
+* [ ] 支持渲染为 CSV
+
+菜单 DSL 将菜单项与顶层操作（Action）关联起来。
+菜单 DSL 最多仅支持 2 个层级（不计入 `section`）。
+
+仅当当前用户有权访问目标操作时才会显示菜单项；如果未指定标签，则会根据操作名称自动推导（在 URL 中使用 `lang=test` 可查看 i18n 键）。
+
+[source,groovy]
+[[menu-sample1]]
+.菜单示例
+----
+private UiMenuSpecifier buildMenu(String q = null) {
+    new UiMenuSpecifier().ui {                                  <1>
+        menu CrewController.&index as MC                        <2>
+        menu CrewController.&listRoles as MC
+        menu CrewController.&hierarchy as MC
+        menuIcon ActionIcon.CONFIG_USER, this.&editUser as MC   <3>
+        menuIcon ActionIcon.EXPORT_PDF, this.&downloadBinPdf as MC
+        menuSearch this.&search as MC, q                        <4>
+        menuOptions SupportedLanguage.fromContext()             <5>
+    }
+}
+----
+
+<1> 创建新菜单
+<2> 菜单项，其标签由操作名称自动推导
+<3> 图标菜单项（悬停提示信息会自动推导）
+<4> 搜索框
+<5> 选项菜单项（此处为语言），也可添加其他实现了 `IEnumOptions` 的枚举
+
+.对应的菜单渲染结果
+image::screenshot-dsl-menu-041.webp[]
+
+== 子菜单
+
+[source,groovy]
+----
+new UiMenuSpecifier().ui {
+    label 'Roles', {                                    <1>
+        subMenu CrewController.&listRoles as MC
+        subMenu CrewController.&hierarchy as MC
+    }
+    menuIcon 'Admin', ActionIcon.CONFIG, {              <2>
+        section 'Users', {                              <3>
+            subMenu CrewController.&editUser as MC
+        }
+    }
+}
+----
+
+<1> 包含子菜单的带标签菜单项
+<2> 包含子菜单的图标菜单项
+<3> `section` 将子菜单分组到标题下
+
+== 上下文菜单
+
+相同的 DSL 也用于描述字段或类上的上下文菜单（右键点击）：
+
+[source,groovy]
+----
+TaackUiService.registerContextualMenuClosure(
+    new Lead().leadStatus_,
+    new UiMenuSpecifier().ui { Long id ->
+        label 'Change Status'
+        Lead.read(id)?.leadStatus?.transitionsTo()?.each {
+            menu it.toString(), CrmController.&changeLeadStatus as MC,
+                [id: id, leadStatus: it.toString()]
+        }
+    })
+----
+
+== DSL 元素
+
+* `menu`：指向某个操作的菜单项，可选配标签、id、参数映射或 `Validateable` 对象
+* `label`：无操作的菜单项，若提供闭包则为子菜单组
+* `subMenu`、`subMenuIcon`：`label` 或 `menuIcon` 闭包内的子菜单项
+* `section`：将子菜单分组到标题下
+* `menuIcon`：菜单右侧的图标项，可包含子菜单
+* `menuSelect`：下拉选择框，所选值会传递给当前操作
+* `menuSearch`：搜索框
+* `menuOptions`：选项条目（语言、子公司等）
+* `inlineHtml`：自定义 HTML 代码
+
+[graphviz,format="svg",align=center]
+.菜单 DSL 的符号层级图
+----
+digraph mygraph {
+    node [shape=box];
+    ui -> menu, label, menuIcon, menuSelect, menuOptions, inlineHtml [label = "0,N"]
+    ui -> menuSearch [label = "0,1"]
+    label, menuIcon -> subMenu, subMenuIcon, section, inlineHtml [label = "1,N"]
+}
+----

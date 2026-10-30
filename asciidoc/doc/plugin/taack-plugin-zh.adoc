@@ -1,0 +1,50 @@
+[[_about_plugins]]
+= 关于插件
+:doctype: book
+:toc:
+:source-highlighter: rouge
+:taack-category: 1|doc/plugin
+:icons: font
+
+== 注册应用
+
+应用只需注册其 *入口点*（即访问应用时执行的 #动作#）以及对应的 *SVG 图标*。控制器入口点名称用于 `i18n` 属性文件中的本地化标签和描述。
+
+.Crew 应用注册示例
+[source,groovy]
+----
+@PostConstruct
+void init() {
+TaackAppRegisterService.register TaackApp(          <1>
+        CrewController.&index as MC,                <2>
+        new String(
+            this.class
+            .getResourceAsStream("/crew/crew.svg")  <3>
+            .readAllBytes())
+    )
+}
+
+----
+
+<1> 调用静态方法 `TaackAppRegisterService.register`
+<2> 定义入口点
+<3> SVG 图标
+
+== 国际化（I18n）
+
+在 `i18n` 属性文件中添加：
+
+[source,properties]
+----
+crew.app=Crew
+crew.desc=User Management Application
+attachment.app=Attachment
+attachment.desc=Global File Manager
+----
+
+== 默认应用磁贴面板
+
+默认情况下，server 模块中的 https://github.com/Taack/intranet/blob/main/server/grails-app/controllers/taack/website/RootController.groovy[`RootController`] 保存了主入口点，它可以很方便地进行修改。
+
+.默认应用磁贴面板
+image::root-default.webp[]

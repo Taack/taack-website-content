@@ -1,0 +1,42 @@
+= Introduction au framework Taack
+:doctype: book
+:taack-category: 1|doc/Concepts
+:toc:
+:source-highlighter: rouge
+
+== Objectifs
+
+Améliorer l'expressivité d'une application Intranet typique en utilisant des http://docs.groovy-lang.org/docs/latest/html/documentation/core-domain-specific-languages.html[*DSL Groovy*] (langages dédiés).
+
+Les *DSL* sont statiquement typés, la plupart des erreurs sont détectées pendant le cycle de développement et l'IDE peut compléter automatiquement le code plus facilement.
+
+Le framework Taack permet également de raccourcir le code applicatif habituel en évitant les *GSP* et en gérant les opérations courantes (filtrer, enregistrer, afficher).
+
+== Architecture
+
+Le *framework Taack* s'appuie sur le framework applicatif *Grails*. Grails apporte le contexte d'exécution. L'infrastructure Grails présente les caractéristiques suivantes :
+
+* Repose sur https://spring.io/projects/spring-boot[SpringBoot] (et https://micronaut.io/[Micronaut])
+* Utilise Groovy comme langage principal
+* Utilise https://gorm.grails.org/[Gorm] pour la persistance des données sur diverses technologies
+* Utilise GSP ou JSP pour le rendu des pages
+* Apporte de la simplicité à Java EE en adhérant au principe *Convention plutôt que configuration* (Convention over Configuration)
+
+== Actions
+
+Dans une application web, les points d'entrée sont des URL. Ils sont appelés *actions* dans la terminologie Grails.
+
+Les *actions* sont chargées de mettre à jour l'état du navigateur suite aux événements utilisateur tels que les clics, les pressions de touches et les mouvements de souris.
+
+Le framework Taack n'est pas un framework entièrement AJAX ; il s'agit plutôt d'un framework classique qui génère des pages complètes sur le serveur, tout en ayant la capacité de mettre à jour une partie d'une page à l'aide d'AJAX.
+
+Cette approche permet de maintenir l'état interne du navigateur au minimum. Côté serveur, toutes les actions sont *sans état* (stateless). Côté navigateur, la pile de fenêtres modales et leurs dispositions, définies par des blocs, sont conservées pour gérer les mises à jour de contenu.
+
+== Caractéristiques supplémentaires du framework
+
+* Approche applicative modulaire
+** Les développeurs peuvent se concentrer uniquement sur leurs modules Gradle
+* Prise en charge des *PDF*, *CSV* ou *e-mails* en plus du rendu HTML
+* Typage statique
+* Prise en charge de l'IDE IntelliJ
+* Le rendu des DSL est effectué en *une seule passe* la plupart du temps

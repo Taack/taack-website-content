@@ -1,0 +1,297 @@
+= 表单 DSL (Form DSL)
+:doctype: book
+:taack-category: 1|doc/DSLs
+:toc:
+:source-highlighter: rouge
+:icons: font
+
+* [*] 支持渲染为 HTML
+* [ ] 支持渲染为邮件 (Mails)
+* [ ] 支持渲染为 PDF
+* [ ] 支持渲染为 CSV
+
+[[_form_validation]]
+== 表单验证 (Form Validation)
+
+.多语言本地化表单
+image::screenshot-form-validation.webp[]
+
+保存对象时，错误信息会自动报告并完成本地化翻译，无需额外开发成本……
+
+请参阅 Grails 文档中的 https://docs.grails.org/latest/ref/Constraints/Usage.html[约束用法 (Constraints Usage)]，以在保存前检查对象的有效性。
+
+== 代码示例
+
+[source,groovy]
+.表单代码示例 1
+----
+def editUser(User user) {
+    user ?= new User(enabled: true)
+
+    UiFormSpecifier f = new UiFormSpecifier()       <1>
+    f.ui user, {                                    <2>
+        row {                                       <3>
+            col {
+                section "User", {                   <4>
+                    field user.username_            <5>
+                    field user.firstName_
+                    field user.lastName_
+                    ajaxField user.manager_,        <6>
+                        this.&selectUserM2O as MC
+                    ajaxField user.mainPicture_,
+                        this.&selectUserMainPicture as MC
+                    field user.password_
+                }
+            }
+            col {
+                section "Coords", {
+                    field user.businessUnit_
+                    field user.mail_
+                    field user.subsidiary_
+                }
+            }
+            col {
+                section "Status", {
+                    field user.enabled_
+                    field user.accountExpired_
+                    field user.accountLocked_
+                    field user.passwordExpired_
+                }
+            }
+        }
+        formAction this.&saveUser as MC, user.id    <7>
+    }
+    taackUiService.show new UiBlockSpecifier().ui { <8>
+        modal {
+            form f
+        }
+    }                                               <9>
+}
+----
+
+<1> 创建表单
+<2> 传入要编辑的对象以及表单定义闭包
+<3> 一行三列
+<4> 名为 "User" 的分区
+<5> 以“下划线”结尾的基础字段，这些符号由 Taack AST 在带有 `TaackFieldEnum` 注解的类上生成
+<6> 多对一关系，`selectUserM2O` 操作将打开弹窗以选择该用户的上级主管
+<7> 指定表单提交的目标操作。此处为 `saveUser`，用于保存用户
+<8> 在模态窗口中创建块
+<9> 将其显示出来……
+
+.模态窗口内的表单
+image::screenshot-dsl-user-form2.webp[]
+
+pass:[<a class="taackMenu" ajaxAction="/dslSample/form" href="/dslSample/form">&#9654; Try it live</a>]
+
+== 无需域类 (Without a Domain Class)
+
+DSL 不一定需要 GORM 域类（Domain Class）。任何实现了 `grails.validation.Validateable` 并带有 `@TaackFieldEnum` 注解的类都可以用于 Form、Show 和 Table DSL：字段符号（`username_`、`age_` 等）以相同方式生成，并且约束由 `validate()` 进行校验。
+
+这对于参数对象、向导（Wizards）或无需持久化的数据（计算得出的数据、来自其他服务的数据等）非常有用。
+
+[source,groovy]
+.Validateable 类，不涉及数据库
+----
+@TaackFieldEnum                                             <1>
+@GrailsCompileStatic
+class DslSampleUser implements Validateable {               <2>
+    String username
+    Integer age
+    Date birthday
+    DslSampleStatus status = DslSampleStatus.NEW
+
+    static constraints = {                                  <3>
+        username blank: false
+        age nullable: true, min: 18, max: 68
+        birthday nullable: true
+    }
+}
+----
+<1> 生成供 DSL 使用的字段符号
+<2> 使用 `Validateable` 代替域类
+<3> 调用 `validate()` 时应用约束，错误信息与域类一样支持本地化翻译
+
+表单按常规方式构建，接收表单的操作自行绑定并验证该对象，因为无需保存到数据库：
+
+[source,groovy]
+.绑定并验证 Validateable 对象
+----
+def saveForm() {
+    DslSampleUser u = new DslSampleUser()
+    taackSaveService.bindObject(u, params)                  <1>
+    if (!u.validate()) {
+        taackSaveService.renderErrors(u.errors)             <2>
+        return
+    }
+    taackUiService.show(new UiBlockSpecifier().ui {
+        replaceModal {                                      <3>
+            show buildUserShow(u)
+        }
+    })
+}
+----
+<1> 将请求参数绑定到对象
+<2> 错误信息显示在表单中，模态窗口保持打开状态
+<3> 否则，将表单替换为提交后的值展示
+
+NOTE: 筛选器 DSL (Filter DSL) 用于构建数据库查询，因此仍然需要域类。
+
+[[_asciidoc]]
+== Asciidoc
+
+您可以通过创建 `EditorOption` 对象并将其传递给 `fieldEditorFromMap` 或 `fieldEditor` 来添加 Asciidoc 编辑器。编辑器服务由 `taack-ui-asciidoc` 组件提供。
+
+该编辑器支持导入拖放到文本区域中的图片，以及导入 ODF 文件（包含图片）。
+
+=== 创建 `EditorOption` 对象
+
+.编辑器选项
+[source,groovy]
+----
+EditorOption.EditorOptionBuilder editor = EditorOption.getBuilder()
+editor.addSpanRegexes(TaackBaseAsciidocSpans.spans)
+editor.addSpanRegexes(TaackAsciidocTable.spans)
+editor.addSpanRegexes(TaackAsciidocPlantUML.spans)
+editor.onDropAction(this.&dropEditor as MC, [cmsPage: cmsPage.id])
+fieldEditor cmsPage.bodyContent_, editor.build()
+innerFormAction this.&previewBody as MC
+----
+
+=== 创建 `dropEditor` 操作
+
+[source,groovy]
+----
+@Transactional
+def dropEditor() {
+    CmsPage page = CmsPage.get(params.long('cmsPage'))
+    params.remove('cmsPage')
+    if (params.get('onpaste')) {
+        render "${convertersToAsciidocService.convertFromHtml(params.get('onpaste') as String)}"
+    } else {
+        final List<MultipartFile> mfl = (request as MultipartHttpServletRequest).getFiles('filePath')
+        final mf = mfl.first()
+
+        if ([AttachmentContentType.SHEET_ODS.mimeType, AttachmentContentType.LO_TEXT.mimeType].contains(mf.contentType)) {
+            render convertersToAsciidocService.convert(page, mf.inputStream)
+        } else {
+            CmsImage cmsImage = taackSaveService.save(CmsImage)
+            if (cmsImage && page) {
+                cmsImage.cmsPage = page
+            }
+            render "image::${cmsImage.originalName}[]"          <1>
+        }
+    }
+}
+----
+
+<1> 渲染将在编辑器中显示的 Asciidoc 代码
+
+=== 通过自定义服务导入图片
+
+使用 `taackEditorService` 转换页面，并将拖放文件中的图片保存到您的自定义对象中。
+
+[source,groovy]
+----
+String convert(CmsPage page, InputStream inputStream) {
+    taackEditorService.convert(new TaackEditorService.ISaveImage() {
+        @Override
+        String saveImage(String imagePath, byte[] image) {
+            return saveImage(page, imagePath, image)            <1>
+        }
+    }, inputStream)
+}
+
+String convertFromHtml(String html) {
+    taackEditorService.convertFromHtml(html)
+}
+----
+
+<1> 图片将附加到 `page` 对象上。
+
+== 布局 (Layout)
+
+[source,groovy]
+.行、列与标签页
+----
+new UiFormSpecifier().ui reminder, {
+    section {
+        field reminder.title_
+        rowCols 3, {                                <1>
+            field reminder.dueDate_
+            field reminder.status_
+            field reminder.priority_
+        }
+        row {                                       <2>
+            col BlockSpec.Width.TWO_THIRD, {
+                ajaxField reminder.assignee_, CrewController.&selectUserM2O as MC
+            }
+            col {
+                readOnly reminder.dateCreated_      <3>
+            }
+        }
+    }
+    tabs {                                          <4>
+        tabLabel 'Body', {
+            field reminder.body_
+        }
+        tabLabel 'Advanced', {
+            section 'Options', true, {              <5>
+                field reminder.notifyAssignee_
+            }
+        }
+    }
+    formAction this.&saveReminder as MC
+}
+----
+
+<1> `rowCols` 将字段分为 3 列，无需编写 `row` 再套多个 `col`
+<2> 使用 `row` 和 `col` 更精细地控制列宽
+<3> 仅显示，不可编辑
+<4> 表单内的标签页
+<5> 初始折叠的分区
+
+.表单中的 `rowCols`
+image::screenshot-dsl-form-rowcol.webp[]
+
+== DSL 符号层级结构
+
+[graphviz,format="svg",align=center]
+.表单 DSL 的符号层级图
+----
+digraph mygraph {
+  node [shape=box];
+  "ui"
+  "ui" -> "hiddenField" [label = "0:N"]
+  "ui" -> "section", "row", "rowCols", "tabs" [label = "0:N"]
+  "tabs" -> "tabLabel" [label = "1:N"]
+  "section", "tabLabel" -> "section", "row", "rowCols" [label = "0:N"]
+  "row" -> "col" [label = "1:N"]
+  "ui", "section", "tabLabel", "row", "rowCols", "col" -> "field", "ajaxField", "readOnly", fieldFromMap, ajaxFieldFromMap, fieldEditor, fieldEditorFromMap, innerFormAction [label = "0:N"]
+  "ui" -> "formAction" [label = "0:N"]
+}
+----
+
+== DSL 元素
+
+=== 根节点 (Root)
+* `ui`：要编辑的对象，可选后跟不可修改的字段列表（`lockedFields`）
+
+=== 输入项 (Inputs)
+* `hiddenField`：向表单中添加隐藏（`hidden`）类型的输入项。
+* `field`：添加带标签的输入项。可传入可选的 `NumberFormat` 或 `IEnumOptions`。
+* `ajaxField`：添加多对一或多对多字段。`MethodClosure` 必须指向显示**模态窗口**的块，并可向该操作传递额外字段
+* `readOnly`：显示不可修改的值
+* `fieldFromMap`、`ajaxFieldFromMap`：编辑 `Map` 字段中的条目
+* `fieldEditor`、`fieldEditorFromMap`：Asciidoc 编辑器（参见 <<_asciidoc>>）
+
+=== 结构 (Structure)
+* `section`：添加表单分区，可选配标签以及是否初始折叠
+* `row`、`col`：将分区拆分为多列，参见 `BlockSpec.Width`
+* `rowCols`：将字段拆分为 N 列
+* `tabs`、`tabLabel`：表单内的标签页
+
+=== 操作 (Actions)
+* `formAction`：提交表单时调用的操作，可选配标签、id、参数和 `ButtonStyle`
+* `innerFormAction`：次要按钮，将表单提交到另一个操作（如预览、计算等）
+* `triggerUpdate`：当指定的任一字段被修改时重新加载表单

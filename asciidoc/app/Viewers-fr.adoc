@@ -1,0 +1,23 @@
+= Viewers
+:doctype: book
+:taack-category: 4|App
+:toc:
+:source-highlighter: rouge
+
+
+== Objectif
+
+Convertir et prévisualiser des fichiers.
+
+.Aperçu d'image STEP
+image::step-preview1.webp[]
+
+.Aperçu STEP personnalisé
+image::step-preview2.webp[]
+
+== Sources
+
+[source,bash]
+----
+$ git clone https://github.com/Taack/viewers.git
+----

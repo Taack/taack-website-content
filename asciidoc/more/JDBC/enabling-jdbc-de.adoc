@@ -1,0 +1,41 @@
+= JDBC aktivieren
+:doctype: book
+:taack-category: 1|more/JDBC
+:toc:
+:source-highlighter: rouge
+:icons: font
+
+== Einen nicht-verzögerten (non-lazy) Service erstellen
+
+.JDBC für die Domänenklasse `User` aktivieren
+[,groovy]
+----
+package crew
+
+import grails.compiler.GrailsCompileStatic
+import org.taack.User
+
+import javax.annotation.PostConstruct
+
+import static taack.base.TaackJdbcService.Jdbc
+
+@GrailsCompileStatic
+class CrewJdbcService {
+
+    static lazyInit = false <1>
+
+    @PostConstruct <2>
+    private static void init() {
+        def u = new User()
+        Jdbc.registerClass(User,
+                u.username_, u.mail_,
+                u.subsidiary_, u.firstName_,
+                u.lastName_, u.businessUnit_,
+                u.enabled_) <3>
+    }
+}
+----
+
+<1> Der Service darf nicht verzögert (lazy) initialisiert werden, da er nirgendwo injiziert werden muss
+<2> Methode zum Auflisten der über TQL verfügbaren Spalten der Domänenklasse
+<3> Schritt 3 kann für alle Domänenklassen wiederholt werden

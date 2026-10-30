@@ -1,0 +1,34 @@
+= IntelliJ JDBC-Verbindung
+:doctype: book
+:taack-category: 1|more/JDBC
+:source-highlighter: rouge
+:toc:
+:icons: font
+
+== Hinzufügen des Treibers
+
+Klicken Sie im Datenbankbereich auf das `+`-Zeichen und dann auf `Driver`.
+
+image::intellij-jdbc-driver-configuration.webp[]
+
+Durch das Hinzufügen der Treiberklasse sollte das Feld `Class` ausgefüllt werden.
+
+== Hinzufügen einer Datenquelle für diesen Treiber
+
+Klicken Sie im Datenbankbereich auf das `+`-Zeichen, dann auf `Data Source` und wählen Sie anschließend den Treiber mit dem Namen aus, den Sie im vorherigen Schritt festgelegt haben.
+
+image::intellij-jdbc-dataSource-configuration.webp[]
+
+Verwenden Sie Ihren Intranet-Benutzernamen und Ihr Passwort.
+
+Die URL sollte wie folgt aussehen:
+
+```
+jdbc:taack:localhost:8080/taack
+```
+
+Für nicht-lokale Hosts erzwingen wir die Verwendung einer HTTPS-Verbindung.
+
+== Abfragen
+
+Sie sollten nun in der Lage sein, Domänenklassen zu durchsuchen, CSV-Daten zu extrahieren oder TQL-Abfragen auszuführen.

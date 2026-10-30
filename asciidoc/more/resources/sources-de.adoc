@@ -1,0 +1,35 @@
+= Quellcode
+:doctype: book
+:taack-category: 2|more/resources
+:source-highlighter: rouge
+
+== Github
+
+=== Inhalt dieser Website
+
+https://github.com/Taack/taack-website-content
+
+Wir verwenden das AsciiDoc-Format zum Schreiben von Dokumentationen. Für die Lokalisierung hängen wir das Sprachkürzel an den Dateinamen an. Die Standardsprache ist Englisch. `WhyDSL-fr.doc` ist die französische Version, `WhyDSL.adoc` die englische (Standardversion).
+
+=== Quellcode für die IntelliJ-Autovervollständigung
+
+https://github.com/Taack/taack-autocomplete
+
+Wir veröffentlichen in diesem Repository die Binärdateien des IntelliJ-Plugins für die jeweiligen IntelliJ-Versionen.
+
+=== Infra-Quellcode
+
+https://github.com/Taack/infra
+
+Infra enthält 3 Teilprojekte (wobei `taack-jdbc-common` gemeinsam genutzt wird):
+
+* `client`: Eine Reihe von Kotlin-Dateien, die nach JavaScript transpiliert werden. Dieses Projekt vermeidet das Schreiben von komplexem JavaScript; das Kompilat dieses Projekts wird direkt in die Assets von `taack-ui` kopiert.
+* `taack-jdbc-client`: Quellcode des JDBC-Treibers
+* `taack-ui`: Quellcode des Grails-Plugins
+
+
+=== Intranet-Beispielanwendung
+
+https://github.com/Taack/intranet
+
+Diese Anwendung kann als Grundgerüst (Skeleton) für Ihre zukünftigen Entwicklungen verwendet werden.

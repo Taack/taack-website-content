@@ -1,0 +1,92 @@
+= 看板 DSL (Kanban DSL)
+:doctype: book
+:taack-category: 6|doc/DSLs
+:toc:
+:source-highlighter: rouge
+:icons: font
+:experimental: true
+
+* [*] 支持渲染为 HTML
+* [ ] 支持渲染为邮件 (Mails)
+* [ ] 支持渲染为 PDF
+* [ ] 支持渲染为 CSV
+
+image:screenshot-dsl-kanban.webp[]
+
+== 代码示例
+[source,groovy]
+.看板代码示例 1
+----
+UiKanbanSpecifier buildTodoKanban() {
+    new UiKanbanSpecifier().ui {                                                                   <1>
+        column 'To Do', Style.ALIGN_CENTER, {                                                      <2>
+            custom "Custom header html code"
+        }, Gantt2Controller.&changeTodoProgression as MethodClosure, [newProgression: 0], {
+            custom "Custom html code"                                                              <3>
+            todos.forEach { Todo todo ->
+                card todo, Gantt2Controller.&showTodo as MethodClosure, todo.id, {                 <4>
+                    cardField todo.what_                                                           <5>
+                    cardFieldRaw "Custom html code"                                                <6>
+                    cardAction ActionIcon.SHOW * IconStyle.SCALE_DOWN, Gantt2Controller.&doSomething as MethodClosure, todo.id   <7>
+                }
+            }
+        }
+    }
+}
+----
+
+[source,groovy]
+.拖放操作 (Drop action)
+----
+@Transactional
+def changeTodoProgression(Integer newProgression) {
+    Todo todo = Todo.get(params.long('cardId'))                                                    <10>
+    todo.progression = newProgression
+    render status: 200
+}
+----
+
+[source,groovy]
+.在服务中注册右键上下文菜单
+----
+@PostConstruct
+void init() {
+    TaackUiService.registerContextualMenuClosure(Todo, new UiMenuSpecifier().ui { Long id ->    <8>
+        menu 'Show Gantt', Gantt2Controller.&showGanttByTodo as MethodClosure, id                 <9>
+    })
+}
+----
+
+<1> 创建看板说明符 (Kanban specifier)
+<2> 使用标签、样式和可选的头部闭包（仅限 `custom`）构建看板列，可传入在 kbd:[Drag+Drop] 到该列时调用的 action 及参数
+<3> 可为列主体添加自定义 HTML 代码
+<4> 在列中构建卡片，可传入在卡片上双击 kbd:[MouseDoubleClic] 时调用的 action 及参数
+<5> 在卡片中构建包含字段的行，请注意字段名称末尾的**下划线**
+<6> 自定义 HTML 代码，按原样渲染。带有 `String` 的 `cardField` 会经过净化（仅保留基本格式和链接）；请对应用程序生成的 HTML 使用 `cardFieldRaw`，切勿将其用于用户输入的数据
+<7> 可添加绑定点击操作的图标
+<8> 为卡片注册右键 kbd:[MouseRight] 上下文菜单
+<9> 添加绑定操作的菜单项
+<10> 被拖放卡片的 id 会通过 `cardId` 参数与列参数一起传递
+
+若要在块中显示看板，请使用 `kanban` 或使用 `kanbanFilter` 关联筛选器：
+
+[source,groovy]
+----
+taackUiService.show(new UiBlockSpecifier().ui {
+    kanbanFilter buildTodoFilter(), buildTodoKanban()
+}, buildMenu())
+----
+
+== DSL 符号层级结构
+[graphviz,format="svg",align=center]
+.看板 DSL 的符号层级图
+----
+digraph kanbanDslGraph {
+  node [shape=box];
+  ui -> column [label = "0,N"]
+  column -> header [label = "0,1"]
+  header -> custom [label = "0,N"]
+  column -> custom, card [label = "0,N"]
+  card -> cardField, cardFieldRaw, cardAction [label = "0,N"]
+}
+----

@@ -1,0 +1,288 @@
+= 面向 Grails 的 DSL
+:taack-category: 1
+:source-highlighter: rouge
+:icons: font
+
+slide::[fn=slideshow-zh]
+
+[.home-intro]
+== 使用 DSL 构建您自己的内网（无需 HTML 或 JavaScript）
+
+https://github.com/Taack/infra[Taack-UI] 是一个 https://grails.org/[Grails] 插件，它通过静态类型的 http://docs.groovy-lang.org/docs/latest/html/documentation/core-domain-specific-languages.html[Groovy DSL]（领域特定语言）来描述用户界面，从而对 Grails 进行扩展。
+
+[.home-grid.home-start]
+--
+[.home-card]
+====
+icon:rocket[]
+
+*安装*
+
+配置 Java、Grails 以及您的第一个 Taack 服务器。
+
+link:usage-zh.adoc#_installation_guide[安装指南 →]
+====
+
+[.home-card]
+====
+icon:graduation-cap[]
+
+*第一个应用*
+
+循序渐进：表格、表单、过滤器和菜单。
+
+link:usage-zh.adoc#_first_app[构建您的第一个应用 →]
+====
+
+[.home-card]
+====
+icon:play-circle[]
+
+*体验 DSL*
+
+每个 DSL 页面都可以在模态窗口中实时打开并运行示例。
+
+link:doc/DSLs/form-dsl-zh.adoc[探索 DSL →]
+====
+--
+
+[.home-news]
+****
+*最新版本：0.7.11*（含 0.7.10）：新增可从设置菜单中选择的多款主题，并重构了保存机制以避免数据绑定。
+link:news-zh.adoc[全部新闻 →]
+****
+
+== 从代码到界面
+
+只需几行 Groovy 代码即可定义一个表单。字段是由您的类生成的符号（如 `username_`），因此编译器会对其进行检查；约束条件会自动转化为本地化的错误消息。
+
+[.home-split]
+--
+[source,groovy]
+----
+def form() {
+    DslSampleUser u = new DslSampleUser()
+    taackUiService.show(new UiBlockSpecifier().ui {
+        modal {
+            form createForm(u, {
+                row {
+                    col {
+                        section 'User', {
+                            field u.username_
+                            field u.firstName_
+                            field u.lastName_
+                        }
+                    }
+                    col {
+                        section 'Details', {
+                            field u.age_
+                            field u.birthday_
+                            field u.city_
+                            field u.status_
+                            field u.enabled_
+                        }
+                    }
+                }
+                formAction this.&saveForm as MC
+            })
+        }
+    })
+}
+----
+
+image::home-form-sample.webp[Form with validation errors]
+--
+
+pass:[<a class="taackMenu" ajaxAction="/dslSample/form" href="/dslSample/form">&#9654; Try it live</a>]
+
+== 功能特性
+
+[.home-grid]
+--
+[.home-card]
+====
+icon:shield[]
+
+*字段级安全控制*
+
+根据用户在*每个字段*上的权限来显示和编辑对象。用户无权执行的链接和表单操作会自动隐藏。
+
+link:doc/UserGuide/Security-zh.adoc[安全控制 →]
+====
+
+[.home-card]
+====
+icon:file-pdf-o[]
+
+*一种 DSL，多种输出*
+
+同一份界面描述可同时渲染为 *HTML*、*PDF*、*邮件*和 *CSV*。
+
+link:doc/DSLs/block-printable-dsl-zh.adoc[打印 DSL →]
+====
+
+[.home-card]
+====
+icon:language[]
+
+*本地化与数据校验*
+
+标签来自 i18n 国际化文件，校验错误无需编写额外代码即可实现本地化显示。
+
+link:doc/DSLs/form-dsl-zh.adoc#_form_validation[表单校验 →]
+====
+
+[.home-card]
+====
+icon:table[]
+
+*过滤、排序与分页*
+
+无需编写查询语句或维护会话数据，即可实现表格与过滤器。
+
+link:doc/DSLs/filter-table-dsl-zh.adoc[过滤器与表格 DSL →]
+====
+
+[.home-card]
+====
+icon:search[]
+
+*全文检索*
+
+对静态类型的领域对象进行 Solr 索引，支持分面搜索与结果排序，并可扩展文件预览功能。
+
+link:more/Search/Search-zh.adoc[全文检索 →]
+====
+
+[.home-card]
+====
+icon:database[]
+
+*模型上的 JDBC*
+
+在 IntelliJ、DBeaver 或 LibreOffice Base 中使用 TQL（Taack 查询语言）查询领域对象。
+
+link:more/JDBC/taack-jdbc-driver-zh.adoc[Taack JDBC 驱动 →]
+====
+
+[.home-card]
+====
+icon:terminal[]
+
+*SSH 与 SFTP*
+
+在服务器进程内运行的 Shell 界面，以及按用户隔离并带有凭据校验的虚拟文件系统（`taack-ui-ssh` 模块）。
+
+<<ssh_sftp,查看截图 ↓>>
+====
+
+[.home-card]
+====
+icon:code-fork[]
+
+*Git 服务器*
+
+Intercom 应用通过 SSH 提供 Git 服务：使用 AsciiDoc 编写的文档在推送后即可直接渲染。
+
+link:app/Intercom-zh.adoc[Intercom →]
+====
+--
+
+== 为什么选择 Taack？
+
+[.home-compare,cols="2,3,3,3",options="header"]
+|===
+|
+|Taack
+|Grails 与 GSP
+|JavaScript 前端
+
+|UI 编写方式
+|静态类型的 Groovy DSL
+|GSP 模板、HTML、CSS
+|JavaScript 或 TypeScript，外加 REST API
+
+|字段名称检查
+|编译期
+|运行期
+|取决于 API 契约
+
+|字段与操作级权限
+|内置支持，自动隐藏无权限链接
+|手动编写
+|前后端均需手动编写
+
+|PDF、CSV、邮件
+|与界面使用相同的 DSL
+|需编写独立代码
+|需编写独立代码
+
+|需掌握的语言
+|Groovy
+|Groovy、HTML、CSS、JavaScript
+|Groovy 或 Java、JavaScript、HTML、CSS
+|===
+
+== 基于 Taack 构建的应用
+
+[.home-grid.home-apps]
+--
+[.home-card]
+====
+image::screenshot-dsl-table.webp[Crew]
+
+*Crew*：用户、角色与组织层级管理。
+
+link:app/Crew-zh.adoc[Crew →]
+====
+
+[.home-card]
+====
+image::plm12-screenshot.webp[FreeCAD PLM]
+
+*FreeCAD PLM*：FreeCAD 模型共享与线性版本控制。
+
+link:app/Plm-zh.adoc[FreeCAD PLM →]
+====
+
+[.home-card]
+====
+image::news-table2.webp[Intercom]
+
+*Intercom*：SSH 与 Git 服务器，支持通过 Git 推送 AsciiDoc 文档。
+
+link:app/Intercom-zh.adoc[Intercom →]
+====
+
+[.home-card]
+====
+image::step-preview1.webp[Viewers]
+
+*Viewers*：转换并预览文件（例如 STEP 模型）。
+
+link:app/Viewers-zh.adoc[Viewers →]
+====
+
+[.home-card]
+====
+image::collabora-editor.webp[Collabora Editor]
+
+*Collabora Editor*：使用 Collabora 在线编辑办公文档附件。
+
+link:app/Collabora-Editor-zh.adoc[Collabora Editor →]
+====
+--
+
+[[ssh_sftp]]
+== SSH 与 SFTP
+
+[.home-split]
+--
+[[ssh_screenshot]]
+.SSH 服务器会话
+image::screenshot-ssh.webp[]
+
+[[sftp_screenshot]]
+.SFTP 文件浏览器
+image::screenshot-sftp.webp[]
+--

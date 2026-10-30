@@ -1,0 +1,112 @@
+= Libreoffice Base
+:doctype: book
+:taack-category: 1|more/JDBC
+:source-highlighter: rouge
+:toc:
+:icons: font
+
+== 配置 LibreOffice 使用 JDK 17
+
+点击菜单 `Tools` > `Options`，然后在 *Options - LibreOffice - User Data* 对话框的树形目录中点击 `LibreOffice` > `Advanced`。
+
+必须勾选 `Use a Java runtime environment` 复选框，并确认已检测到版本为 17 的 JRE。
+
+如果没有，请安装 Java 17 并重复此过程。如果您确定已安装但未被检测到，可以点击 `Add` 按钮并按照步骤操作。
+
+.已检测到并选择 Java 17
+image::lo-java17-conf.webp[]
+
+点击 `Apply` 或 `Ok` 按钮。
+
+== 添加 Jar 驱动
+
+下载 https://github.com/Taack/infra/releases/tag/v0.1[taack-jdbc-client-0.2-SNAPSHOT-all.jar]
+
+返回高级（Advanced）对话框。
+
+点击 `Class Path...`，在对话框中点击 `Add Archive...`，选择您下载的文件。
+
+.已将驱动程序添加到运行时环境
+image::lo-java17-driver-conf.webp[]
+
+点击 `Ok` 按钮。
+
+== 创建 LibreOffice Base 文件
+
+打开 #LibreOffice#，点击 `Base Database`
+
+=== 选择 JDBC
+
+.步骤 1：选择 JDBC
+image::lo-base-databaseWizard-1.webp[]
+
+点击 `Next` 按钮。
+
+=== 输入 Jar 中的驱动程序位置
+
+jdbc: `taack:localhost:8080/taack`
+
+将 localhost 和端口替换为您的实例 URL 和端口。
+
+JDBC 驱动类：`taack.jdbc.client.TaackDriver`
+
+.步骤 2：驱动程序连接字符串
+image::lo-base-databaseWizard-2.webp[]
+
+=== 设置用户名
+
+`User name` 必须是您 Intranet 应用程序的活跃用户（具有 `ROLE_ADMIN` 或 `ROLE_JDBC_ADMIN` 角色）。
+
+请参阅 https://github.com/Taack/infra/blob/main/taack-ui/grails-app/controllers/taack/support/TaackJdbcController.groovy[TaackJdbcController 类]。
+
+image::lo-base-databaseWizard-3.webp[]
+
+点击 `Finish` 按钮，并设置文件名。
+
+== 在 Base 中使用
+
+打开上一步保存的文件，在提示时输入您的密码。
+
+.由驱动程序读取的表
+image::lo-base-tables-screenshot.webp[]
+
+点击 Queries 按钮，然后点击 `Create Query in SQL View`
+
+WARNING: 请勿使用向导（wizard）。Intranet 使用 TQL 语言查询数据，而 LibreOffice 无法识别该语言。
+
+image::lo-base-queries-screenshot.webp[]
+
+在输入查询之前，请先点击 `Run SQL Command directly`
+
+image::lo-base-queries-designer-screenshot.webp[]
+
+现在，您可以输入 TQL 查询了……
+
+请参阅 link:taack-jdbc-driver-zh.adoc#_tql_queries[TQL 查询]。
+
+== 在 Calc 中使用
+
+创建并保存一些查询后，您就可以直接从 Calc 访问数据。
+
+[[_open_query_as_a_pivot_table]]
+=== 将查询作为数据透视表打开
+
+点击 `Data` > `Pivot Table`，然后选择 `Data source in registered Calc`
+
+image::lo-calc-datasrouce-screenshot.webp[]
+
+选择保存查询的文件，输入您的 Intranet 密码，然后选择数据源（Datasource）。
+
+image::lo-calc-datasrouce-2.webp[]
+
+这里我选择 Query，并选择 Users 查询。
+
+image::lo-calc-pivotTable-layout.webp[]
+
+完成。您可以根据需要编辑数据透视表。
+
+image::lo-calc-pivotTable-results.webp[]
+
+=== 作为数据源
+
+TODO

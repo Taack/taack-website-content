@@ -1,0 +1,267 @@
+= 块 DSL (Block DSL)
+:doctype: book
+:taack-category: 10|doc/DSLs
+:toc:
+:source-highlighter: rouge
+:icons: font
+
+[%interactive]
+* [*] 支持渲染为 HTML
+* [*] 支持渲染为 PDF
+* [ ] 支持渲染为 CSV
+
+顶层 DSL，负责排列页面图形元素并统一更新 `ajaxBlock`。如果要渲染完整页面，还必须通过 link:menu-dsl-zh.adoc[菜单 DSL (Menu DSL)] 指定页面菜单描述。
+
+该 DSL 还负责管理模态窗口栈。使用 `modal` 打开模态窗口，或使用 `closeModalAndUpdateBlock`（及其他变体）关闭模态窗口。
+
+== 构建块的代码示例
+
+[[block-preview]]
+.带标签页的块示例（见 <<block-sample1>>）。
+image::screenshot-dsl-block.webp[]
+
+[source,groovy]
+[[block-sample1]]
+.带标签页的块示例
+----
+def editSlideshow(CmsPage slideshow) {
+
+    Boolean createNew = slideshow == null
+    if (!slideshow)
+        slideshow = new CmsPage(pageType: CmsPageType.SLIDESHOW)
+
+    UiBlockSpecifier b = new UiBlockSpecifier().ui {
+        if (createNew)
+            modal {
+                form buildCmsSlideshowForm(slideshow)
+            }
+        else {
+            row {                                               <1>
+                col {
+                    form buildCmsSlideshowForm(slideshow)
+                }
+                col {
+                    tabs {
+                        tab "Images", buildImagesTab(slideshow) <2>
+                        tab "Videos", buildVideosTab(slideshow)
+                    }
+                }
+            }
+
+        }
+    }
+    taackUiService.show(b, buildMenu())                     <3>
+}
+----
+
+<1> 1 行 2 列
+<2> 在内部声明 2 个标签页，页面打开时默认显示第一个
+<3> 将块与菜单描述一起发送到浏览器。
+
+pass:[<a class="taackMenu" ajaxAction="/dslSample/block" href="/dslSample/block">&#9654; Try it live</a>]
+
+[[_modal_stack_code_sample]]
+== 模态窗口栈代码示例
+
+处理完表单后，您可以刷新页面内容，或刷新当前模态窗口下方的另一个模态窗口。您也可以重新加载页面或显示其他页面。重新加载页面可使代码具有可重用性，因为它不依赖于当前 URL（请回顾在 link:../../first-app-zh.adoc#_adding_buttons_to_a_table_block[第一个应用（向表格块添加按钮）] 中看到的 `redirectAction` **参数**）。
+
+通常在处理完表单后会关闭模态窗口。如果验证未通过，错误信息会直接在浏览器的表单中显示；如果验证通过，则保存对象并刷新内容。
+
+=== 关闭模态窗口并重新加载页面
+
+[source,groovy]
+----
+@Transactional
+@Secured(["ROLE_CMS_MANAGER", "ROLE_CMS_DIRECTOR"])
+def saveCmsInsert() {
+    taackSaveService.saveThenReloadOrRenderErrors(CmsInsert)
+}
+----
+
+如果在保存 `CmsInsert` 时未检测到错误，页面将直接重新加载。
+
+=== 关闭模态窗口并加载指定页面
+
+[source,groovy]
+----
+@Transactional
+@Secured(["ROLE_ADMIN", "ROLE_CMS_MANAGER", "ROLE_CMS_DIRECTOR"])
+def saveCmsPage() {
+    taackSaveService.saveThenRedirectOrRenderErrors(  <1>
+        CmsPage, this.&pages as MethodClosure
+    )
+}
+----
+<1> 将加载此控制器中的方法闭包（遵循 URL 映射规则）
+
+=== 关闭模态窗口并刷新下方的模态窗口
+
+[source,groovy]
+----
+@Transactional
+@Secured(['ROLE_ADMIN'])
+def saveLlmRag() {
+    taackSaveService.saveOrCloseModalAndRefresh(LlmRag)  <1>
+}
+----
+<1> 如果未检测到错误，则关闭最后一个模态窗口并刷新下方的内容（页面或前一个模态窗口）
+
+=== 关闭模态窗口并刷新页面 Ajax 块
+
+.复杂用例：关闭模态窗口并刷新页面中存在的 `ajaxBlock`
+[source,groovy]
+----
+@Transactional
+def saveProjects() {
+    EngineeringChangeRequest ecr = taackSaveService.save(EngineeringChangeRequest) <1>
+    taackSaveService.displayBlockOrRenderErrors(ecr,
+        new UiBlockSpecifier().ui {                                             <2>
+            closeModalAndUpdateBlock {                                          <3>
+                show buildShowProjects(ecr), {
+                    menuIcon ActionIcon.ADD, Ecr2Controller.&projectsForm as MC, ecr.id
+                }
+            }
+        }
+    )
+}
+----
+
+<1> 绑定参数并保存对象
+<2> `displayBlockOrRenderErrors` 接收一个 `UiBlockSpecifier` 作为参数，仅当对象没有错误时才会渲染
+<3> `closeModalAndUpdateBlock` 会先关闭最后打开的模态窗口，然后应用更改
+
+=== 替换模态窗口的内容
+
+[source,groovy]
+----
+taackUiService.show(new UiBlockSpecifier().ui {
+    replaceModal {                                      <1>
+        custom "<h1>Done.</h1>"
+    }
+})
+----
+<1> 替换当前模态窗口的内容，而不打开新的模态窗口
+
+== 布局元素 (Layout Elements)
+
+[source,groovy]
+.行、列、手风琴折叠面板、卡片与滚动面板
+----
+new UiBlockSpecifier().ui {
+    row {
+        col BlockSpec.Width.TWO_THIRD, {                <1>
+            card 'Customers', {                         <2>
+                menu 'Export', this.&export as MC
+            }, {
+                scrollPanel '512px', {                  <3>
+                    table buildCustomerTable()
+                }
+            }
+        }
+        col BlockSpec.Width.THIRD, {
+            accordion {                                 <4>
+                accordionItem 'Filter', true, {
+                    form buildFilterForm()
+                }
+            }
+        }
+    }
+}
+----
+<1> `col` 宽度，取自 `BlockSpec.Width`：`MAX`、`THREE_QUARTER`、`TWO_THIRD`、`HALF`（默认）、`THIRD`、`QUARTER` 或 `FLEX`
+<2> `card`，带可选标题、可选菜单闭包及其内容
+<3> `scrollPanel` 限制其内容的高度，必要时添加滚动条
+<4> `accordion` 包含 `accordionItem`，第二个参数表示该项默认是否展开
+
+[source,groovy]
+.使用 `poke` 仅刷新部分块
+----
+def topCustomerSalesCard(StatsParams statsParams) {
+    boolean p0 = statsParams.v == 0
+    boolean p1 = statsParams.v == 1
+    boolean p2 = statsParams.v == 2
+
+    taackUiService.show(new UiBlockSpecifier().ui {
+        poke p0, {
+            table statsService.buildTable()                         <1>
+        }
+        row {
+            poke p1, {                                              <2>
+                col BlockSpec.Width.HALF, {
+                    card({                                          <3>
+                        label 'Sales1'
+                        menu 'Yearly', StatsController.&topCustomerSalesCard as MC,
+                            new StatsParams(showMonthlyGraph1: false, v: 1)
+                        menu 'Monthly', StatsController.&topCustomerSalesCard as MC,
+                            new StatsParams(groupPerMonth1: false, v: 1)
+                    }, {
+                        diagram statsService.&buildChart1 as MC     <4>
+                    })
+                }
+            }
+            poke p2, {
+                col BlockSpec.Width.HALF, {
+                    diagram(statsService.&buildChart2 as MC) {      <5>
+                        label 'Sales2'
+                        menu 'Yearly', StatsController.&topCustomerSalesCard as MC,
+                            new StatsParams(showMonthlyGraph2: false, v: 2)
+                    }
+                }
+            }
+        }
+    }, RootController.buildMenu(), statsParams)                     <6>
+}
+----
+<1> 表格行携带 `v: 1` 或 `v: 2` 链接到此操作，从而仅刷新其中一个图表
+<2> `p1` 和 `p2` 是布尔值。如果为 `true`，则刷新 `poke` 块内的子块
+<3> 带有菜单闭包和内容闭包的 `card`
+<4> `diagram` 可以接收返回 `UiDiagramSpecifier` 的 `MethodClosure`
+<5> 任何叶子元素都可以接收一个显示在其头部的菜单闭包
+<6> `StatsParams` 是一个 `Validateable`，点击链接时其值会被保留
+
+.卡片、图表与 `poke`
+image::screenshot-dsl-block-poke.webp[]
+
+== 块 DSL 元素
+
+=== 容器 (Containers)
+* `modal`：打开模态窗口，`modal(true) {}` 会在模态窗口关闭时重新加载页面
+* `replaceModal`：替换当前模态窗口的内容
+* `closeModalAndUpdateBlock`：关闭最后一个模态窗口并更新页面（或前一个模态窗口）中的块
+* `closeModal`：关闭模态窗口并将 id 和值传递给打开它的表单（用于 `ajaxField` 选择）
+* `ajaxBlock`：包裹其他元素，允许仅更新页面的一部分
+* `row`、`col`：水平排列元素，参见 `BlockSpec.Width`
+* `tabs`、`tab`：标签页，默认显示第一个
+* `accordion`、`accordionItem`：可折叠元素
+* `card`：带标题和菜单的卡片
+* `scrollPanel`：具有最大高度限制的元素
+* `poke`：仅当条件为真时才刷新内容
+
+=== 叶子元素 (Leaves)
+所有叶子元素都可以接收一个可选闭包来描述显示在块头部的菜单（参见 link:menu-dsl-zh.adoc[Menu DSL]）。
+
+* `form`：参见 link:form-dsl-zh.adoc[Form DSL]
+* `show`：参见 link:show-dsl-zh.adoc[Show DSL]
+* `table`、`tableFilter`：参见 link:filter-table-dsl-zh.adoc[FilterTable DSL]
+* `diagram`、`diagramFilter`：参见 link:diagram-dsl-zh.adoc[Diagram DSL]
+* `kanban`、`kanbanFilter`：参见 link:kanban-dsl-zh.adoc[Kanban DSL]
+* `custom`：自定义 HTML 代码
+* `iframe`：在 iframe 中显示 URL
+
+== 块 DSL 符号层级结构
+
+[graphviz,format="svg",align=center]
+.块 DSL 的符号层级图（不含 ajaxBlock）
+----
+digraph mygraph {
+  node [shape=box];
+  ui -> modal, replaceModal, closeModalAndUpdateBlock [label = "0,1"]
+  ui, modal, replaceModal, closeModalAndUpdateBlock -> row, tabs, accordion, card, scrollPanel, poke [label = "0,N"]
+  row -> col [label = "1,N"]
+  tabs -> tab [label = "1,N"]
+  accordion -> accordionItem [label = "1,N"]
+  ui, modal, tab, col, accordionItem, card, scrollPanel, poke -> form, show, table, tableFilter, diagram, diagramFilter, kanban, kanbanFilter, custom, iframe [label = "0,N"]
+}
+----
+
+`ajaxBlock` 可以包裹其他元素，从而允许仅更新页面的一部分。

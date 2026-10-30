@@ -1,0 +1,111 @@
+= Buone pratiche (Best Practices)
+:taack-category: 10|doc/UserGuide
+:toc:
+:source-highlighter: rouge
+:icons: font
+
+== Codice lento
+
+Quando l'elaborazione dei dati è lenta e la closure viene caricata in modo differito (lazy loaded), è importante inserire il codice lento direttamente nella closure. In questo modo verrà eseguito solo se la closure viene effettivamente visualizzata.
+
+[source,groovy]
+----
+def showPage() {
+    // [. . .]
+    def b = new UiBlockSpecifier().ui {
+        diagram buildDiagram()                  <1>
+        tableFilter t, f                        <2>
+    }
+
+    taackUiService.show b
+}
+
+private UiDiagramSpecifier buildDiagram() {
+    // Always called                            <3>
+    new UiDisagramSpecifier().ui {
+        // Called only when needed              <4>
+        def data = slowDataRetreiveMethod()
+        // Draw data Stuffs
+    }
+}
+----
+
+<1> `buildDiagram` viene sempre chiamato, anche se l'elemento da disegnare è `tableFilter`, ma la closure risultante non viene chiamata ogni volta
+<2> Durante l'ordinamento o il filtraggio, viene disegnata solo la tabella, non il diagramma
+<3> Parte sempre eseguita
+<4> Eseguita solo se necessario; il codice lento dovrebbe essere scritto qui.
+
+== Guida allo stile di codifica per lo sviluppo di applicazioni Grails
+
+Ecco alcune linee guida che facilitano la manutenzione dell'applicazione:
+
+- Modificatori dei metodi:
+** Utilizzare i modificatori `protected`, `private` e `final` per i metodi di un controller che non sono azioni.
+- Stile di codifica:
+** Dare priorità a un codice conciso, mantenendo la chiarezza.
+** Utilizzare le annotazioni `@GrailsCompileStatic` o `@CompileStatic` in tutta la base di codice.
+- Azioni stateless:
+** Progettare sempre le azioni affinché siano stateless (senza stato) ed evitare l'uso delle sessioni.
+- Trait dei controller:
+** Evitare di utilizzare servizi per implementare i trait dei controller.
+- Annotazione `@Transactional`:
+** Riservare l'annotazione `@Transactional` esclusivamente alle azioni del controller.
+- Regole generali:
+** Utilizzare il modificatore `final` quando opportuno.
+** Aderire al principio DRY (Don't Repeat Yourself).
+** Mantenere l'ambito (scope) dei simboli il più ristretto possibile per migliorare la leggibilità del codice.
+** Scegliere nomi di variabili locali concisi e significativi.
+** Specificare chiaramente i parametri dei metodi pubblici e i nomi dei membri.
+
+Seguendo queste linee guida, è possibile mantenere una base di codice pulita ed espressiva per l'applicazione Grails.
+
+== i18n
+
+- Non centralizzare l'`i18n`, utilizzare le cartelle `i18n` del modulo applicativo Gradle per ciascuna applicazione.
+
+[,groovy]
+----
+class Book {
+    String title
+}
+----
+- localizzazione del nome della classe: "book.label = Libro"
+- localizzazione del nome del campo della classe: "book.title.label = Título del libro"
+- Per essere efficienti:
+** non tradurre troppo presto
+** iniziare a tradurre quando si ha una visione d'insieme
+** mantenere brevi le etichette più importanti utilizzando per esse il namespace `default`; le etichette specializzate possono essere più lunghe
+- Utilizzare convenzioni per l'`i18n`:
+** aggiungere il prefisso "default." a tutto ciò che può essere riutilizzato
+** non aggiungere prefissi al nome della classe tradotta
+** Nell'applicazione `crew` utilizziamo file di proprietà specifici per azioni e domini (vedi https://github.com/Taack/intranet/tree/main/app/crew/grails-app/i18n[cartella i18n di Crew])
+
+Le traduzioni `i18n` comuni dovrebbero essere collocate nel modulo applicativo `Crew` o `Server`; le proprietà non sono private per un singolo modulo applicativo.
+
+== Configurazione
+
+- Utilizzare gli `enum`, nel codice, per la configurazione
+** La tipizzazione statica è fondamentale
+** Gli Enum di Groovy sono leggibili (più di XML, Json, Yaml...)
+
+== Sicurezza
+
+- Il codice relativo alla sicurezza dovrebbe trovarsi vicino al punto in cui agisce
+** Vogliamo evitare la centralizzazione di tutti gli aspetti
+*** Creare un nuovo dominio in base alle esigenze, evitando di appesantire la classe `User`
+*** I concetti astratti dovrebbero essere ridotti al minimo per motivi di sicurezza; i controlli statici sono fondamentali
+- Evitare regole complesse che non possono essere verificate staticamente durante la compilazione
+- Le regole amministrative non devono basarsi su stringhe di permessi; un valore booleano in un oggetto è più esplicito nei controlli all'interno del codice.
+
+== Classi di dominio
+
+* Evitare dipendenze cicliche nel dominio (`User` => `Cart` E `Cart` => `User`) se le classi di dominio appartengono a moduli applicativi diversi
+* Le classi di dominio dovrebbero essere ridotte all'essenziale
+* *Nessun helper* con dipendenze esterne nel dominio
+
+== Possiamo dirci efficienti se:
+
+- Piccole evoluzioni non richiedono una riscrittura completa del codice
+- L'integrazione di nuove funzionalità è immediata
+- I diversi aspetti rimangono isolati, riducendo al minimo le influenze reciproche
+- Le cose appaiono semplici

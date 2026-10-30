@@ -1,0 +1,3 @@
+= Taack 插件
+:doctype: book
+:taack-category: 100|doc/plugin

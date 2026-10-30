@@ -1,0 +1,160 @@
+= PDFs
+:doctype: book
+:taack-category: 5|advanced
+:toc:
+:source-highlighter: rouge
+
+== Einrichtung
+Die Lösung und die Grundgerüste für diese Aufgabe können aus diesem Repository geklont werden:
+
+[,shell]
+----
+git clone git@github.com:Taack/myLibrary.git
+----
+
+.Um auf das Grundgerüst für diesen Teil zuzugreifen, wechseln Sie im Terminal mit `cd` in das Projekt (`myLibrary`) und kopieren Sie die folgende Zeile.
+[,bash]
+----
+git checkout part-5-skeleton
+----
+
+Alternativ können Sie in IntelliJ den gewünschten Branch direkt auswählen. Wählen Sie oben links `main/myLibrary/remote` aus, um alle Branches anzuzeigen. Wählen Sie einen Branch aus und klicken Sie auf Checkout.
+
+== PDFs erstellen
+
+In diesem Abschnitt lernen Sie, wie Sie PDFs auf Basis der Daten in Ihrem Projekt erstellen.
+
+Um ein PDF zu erstellen, verwenden Sie einen `UiPrintableSpecifier()`, der aus folgenden Elementen besteht:
+
+- `printableHeader`: ermöglicht das Definieren einer Kopfzeile, die auf allen Seiten wiederholt wird.
+- `printableBody`: ermöglicht das Definieren des Inhalts des PDFs über mehrere Seiten hinweg.
+- `printableFooter`: ermöglicht das Definieren der Fußzeile, die auf allen Seiten wiederholt wird (die Größe darf 2 cm nicht überschreiten).
+
+Wenn Sie ein Beispiel sehen möchten, lesen Sie link:doc/DSLs/block-printable-dsl-de.adoc[DSL für druckbare Blöcke (Printable Block DSL)].
+
+=== Druckbare Kopfzeile (Printable Header)
+
+Der Höhenparameter ist obligatorisch, wenn Sie eine andere Höhe als 2 cm benötigen.
+
+Es gibt drei Optionen, um die Darstellung der Kopfzeile zu organisieren:
+
+- `printableHeaderLeft`: zeichnet von links nach rechts
+- `printableHeader`: Sie müssen die Position angeben (Mitte, links, rechts)
+- `printableHeaderRight`: zeichnet von rechts nach links
+
+Innerhalb der Kopfzeile zeichnen Sie den Inhalt mithilfe von `UiSpecifier`-Objekten.
+
+.Beispielcode:
+[,groovy]
+----
+printableHeaderRight('7.5cm') { //<1>
+    show new UiShowSpecifier().ui {
+        field'Content'
+    }, BlockSpec.Width.MAX
+}
+----
+<1> zeichnet die Kopfzeile beginnend auf der rechten Seite mit einer Höhe von 7,5 cm.
+
+Wir werden unseren eigenen `printableHeader` implementieren, in dem wir den Namen des Benutzers, der das PDF anfordert, das Taack-Logo und das Datum der PDF-Anforderung darstellen.
+
+Gehen Sie zu `MyLibraryUiService`.
+
+Pro-Modus: Implementieren Sie den `printableHeader` von `buildLibraryPdf` [TODO 1.1].
+
+.Den `printableHeader` von `buildLibraryPdf` implementieren:
+[,groovy]
+----
+printableHeaderLeft('7.5cm') {
+    show new UiShowSpecifier().ui {
+        field Style.BOLD, 'Printed for'
+        field """${currentUser.firstName} ${currentUser.lastName}"""
+    }, BlockSpec.Width.THIRD
+    show new UiShowSpecifier().ui {
+        field """
+            <div style='height: 2cm; text-align: center; width: 75%;'>
+                ${this.taackUiService.dumpAsset('logo-taack-web.svg')}
+            </div>
+        """
+    }, BlockSpec.Width.THIRD
+    show new UiShowSpecifier().ui {
+        field Style.ALIGN_RIGHT, """${new Date()}"""
+    }, BlockSpec.Width.THIRD
+}
+----
+
+=== Druckbarer Hauptteil (Printable Body)
+
+Innerhalb des Hauptteils zeichnen Sie den Inhalt mithilfe von `UiSpecifier`-Objekten, genau wie beim `printableHeader`.
+
+1. Wir möchten alle Autorennamen anzeigen, jeweils mit einer Tabelle darunter, die die von den jeweiligen Autoren geschriebenen Bücher auflistet.
+2. Außerdem möchten wir die Diagramme anzeigen, die wir zuvor implementiert haben.
+3. Wenn der Benutzer, der das PDF anfordert, ein Ausleiher ist, möchten wir schließlich die Liste der Ausleihanfragen für bereits zurückgegebene Bücher in einer Tabelle anzeigen.
+
+Pro-Modus: Implementieren Sie den ersten Teil von `printableBody` in `buildLibraryPdf` [TODO 1.2.1].
+
+.Den ersten Teil von `printableBody` in `buildLibraryPdf` implementieren:
+[,groovy]
+----
+List<MyLibraryAuthor> authors = MyLibraryAuthor.list(sort: 'lastName')
+for (MyLibraryAuthor author : authors) {
+    show new UiShowSpecifier().ui {
+        field """<h2>${author.firstName} ${author.lastName}</h2>"""
+    }, BlockSpec.Width.MAX
+    table this.buildAuthorTablePdf(author), BlockSpec.Width.MAX
+}
+----
+
+Pro-Modus: Implementieren Sie den zweiten Teil von `printableBody` in `buildLibraryPdf` [TODO 1.2.2].
+
+.Den zweiten Teil von `printableBody` in `buildLibraryPdf` implementieren:
+[,groovy]
+----
+anonymousBlock BlockSpec.Width.MAX, {
+    diagram buildAuthorPieDiagram(true), BlockSpec.Width.MAX
+    diagram buildBookPopularityPieDiagram(true), BlockSpec.Width.MAX
+    diagram buildBarDiagram(true, 'YEAR'), BlockSpec.Width.MAX
+    diagram buildBorrowDurationWhiskersDiagram(), BlockSpec.Width.MAX
+}
+----
+
+Pro-Modus: Implementieren Sie den dritten Teil von `printableBody` in `buildLibraryPdf` [TODO 1.2.3].
+
+.Den dritten Teil von `printableBody` in `buildLibraryPdf` implementieren:
+[,groovy]
+----
+if (currentUser?.authorities?.any { it.authority == 'ROLE_BORROWER' }) {
+    table this.buildUserBorrowsTable(false, null, true), BlockSpec.Width.MAX
+}
+----
+
+=== Druckbare Fußzeile (Printable Footer)
+
+Innerhalb der Fußzeile zeichnen Sie den Inhalt mithilfe von `UiSpecifier`-Objekten, genau wie beim `printableHeader`.
+Die Seitenzahl wird automatisch unten rechts angezeigt.
+Um Redundanzen zu vermeiden, zeigen wir im `printableFooter` keinen zusätzlichen Inhalt an.
+
+== Das PDF rendern
+
+Dem Menü wurde eine Schaltfläche mit einem `export_pdf`-Symbol hinzugefügt, die `downloadLibraryPdf` aufruft, wodurch das PDF erstellt und heruntergeladen werden kann. Implementieren wir diese Methode.
+
+Gehen Sie zu `MyLibraryController`.
+
+Pro-Modus: Implementieren Sie `downloadBinLibraryPdf` [TODO 2].
+
+.`downloadBinLibraryPdf` implementieren:
+[,groovy]
+----
+def downloadBinLibraryPdf() {
+    UiPrintableSpecifier pdf = myLibraryUiService.buildLibraryPdf()
+    taackUiPdfService.downloadPdf(pdf, 'LibrarySummary', false)
+}
+----
+
+[WARNING]
+====
+Jede Methode, die zum Erstellen eines PDFs verwendet wird, *muss* mit *downloadBin* beginnen.
+====
+
+
+Hier ist ein Beispiel für ein PDF, das mit diesem Code generiert wurde:
+link:LibrarySummary.pdf[Bibliotheksübersicht (LibrarySummary)]

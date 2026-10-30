@@ -1,0 +1,427 @@
+= Seguridad y restricciones
+:doctype: book
+:taack-category: 3|advanced
+:toc:
+:source-highlighter: rouge
+
+== Configuración
+La solución y las plantillas base (skeletons) para esta tarea están disponibles para clonar en este repositorio:
+
+[,shell]
+----
+git clone git@github.com:Taack/myLibrary.git
+----
+
+.Para acceder a la plantilla base de esta parte, vaya a su terminal, entre en el directorio del proyecto (`myLibrary`) con `cd` y copie la siguiente línea.
+[,bash]
+----
+git checkout part-3-skeleton
+----
+
+O bien, en IntelliJ puede seleccionar directamente la rama deseada. Seleccione en la esquina superior izquierda `main/myLibrary/remote` y verá todas las ramas. Seleccione una rama y haga clic en checkout.
+== Introducción
+
+En esta sección, aprenderemos sobre seguridad y restricciones (constraints). Primero, aprenderemos cómo implementar estas restricciones, lo que nos permitirá limitar las entradas de los usuarios. Luego, profundizaremos en la seguridad creando dos tipos de usuarios: administradores y prestatarios, cada uno con acceso a diferentes funcionalidades.
+
+Los administradores podrán:
+
+- añadir, eliminar y reactivar autores en el menú Author.
+- añadir libros en el menú Book.
+- comprar y eliminar ejemplares (`bookInstances`) en el menú Book.
+- tener acceso a la lista de usuarios y a la información sobre cada uno de ellos en el menú User.
+- aprobar libros en el menú Borrowed.
+
+Los prestatarios podrán:
+
+- ver los autores en el menú Author.
+- ver los libros en el menú Book.
+- solicitar un ejemplar (`bookInstance`) en el menú Book.
+- devolver un ejemplar (`bookInstance`) en el menú Borrowed.
+- ver sus solicitudes anteriores en el menú History.
+
+.Administradores
+image::part-three-admin-screenshot.webp[Reload,width=800,align="left"]
+
+.Prestatarios
+image::part-three-borrower-screenshot.webp[Reload,width=800,align="left"]
+
+
+== Restricciones (Constraints)
+
+Si un administrador está aprobando una solicitud, no tendría sentido que pudiera aprobar el libro en una fecha anterior a la fecha en que se realizó la solicitud; no se le debería permitir hacer eso. Lo mismo ocurre con la fecha en que el usuario devuelve el libro: no debería poder devolverlo antes de la fecha de aprobación. Implementemos esto en `MyLibraryBorrowed`.
+
+.Diagrama de clases para su comodidad
+[plantuml, format="svg", opts="inline"]
+----
+@startuml
+
+enum ApprovalStatus {
+    PENDING
+    APPROVED
+    REJECTED
+}
+
+class MyLibraryAuthor {
+    String firstName
+    String lastName
+    Date dateOfBirth
+    Boolean isActive = true
+    String toString()
+}
+
+class MyLibraryBook {
+    String title
+    String description
+    int numberOfPages
+    int count = 0
+    int getNumberOfInstances()
+    int getNumberOfBooksBorrowable()
+}
+
+class MyLibraryBookInstance {
+    Boolean isActive = true
+    Integer serialNumber
+    Boolean isAvailableB = true
+}
+
+class MyLibraryBorrowed {
+    Date requestDate
+    Date approvalDate
+    Date returnDate
+    ApprovalStatus statusOfApproval = ApprovalStatus.PENDING
+}
+
+MyLibraryAuthor "1" --> "*" MyLibraryBook : listOfBooks
+MyLibraryBook "1" --> "*" MyLibraryBookInstance : listOfBookInstance
+MyLibraryBookInstance "*" --> "1" MyLibraryBook : belongsTo
+MyLibraryBookInstance "1" --> "*" MyLibraryBorrowed : borrowHistoryOfBook
+MyLibraryBorrowed "*" --> "1" MyLibraryBookInstance : bookInstance
+MyLibraryBorrowed "*" --> "1" User : user
+MyLibraryBorrowed --> ApprovalStatus
+
+@enduml
+----
+
+Necesitamos implementar restricciones en nuestras entidades de dominio para asegurarnos de proporcionar datos coherentes y lógicos a nuestra biblioteca.
+
+Intente añadir una restricción `nullable` en las fechas de préstamo, con un validador (la fecha de aprobación debe ser posterior o igual a `requestDate`, y `returnDate` debe ser posterior o igual a la fecha de aprobación del préstamo).
+
+.Solución
+[%collapsible]
+====
+.Añada las siguientes restricciones:
+[,groovy]
+----
+static constraints = {
+    approvalDate nullable: true, validator: { Date val, MyLibraryBorrowed obj ->
+        if (val == null) return true
+        return val >= obj.requestDate
+    }
+
+    returnDate nullable: true, validator: { Date val, MyLibraryBorrowed obj ->
+        if (val == null) return true
+        return val >= obj.approvalDate
+    }
+
+    bookInstance nullable:false
+    user nullable:false
+}
+----
+====
+Para obtener más información, consulte la link:https://docs.grails.org/latest/ref/Constraints/Usage.html[documentación de Grails] sobre restricciones.
+
+== Definir menús
+
+Como se explicó anteriormente, habrá dos nuevos menús disponibles únicamente para los administradores. Añadámoslos en `MyLibraryUiService` dentro de `buildMenu`.
+
+Modo Pro: Añada los menús [TODO 2]
+
+.Añada los siguientes menús:
+[%collapsible]
+====
+[,groovy]
+----
+menu MyLibraryController.&listOfUsers as MC
+menu MyLibraryController.&listOfRequests as MC
+----
+====
+
+== Configurar los usuarios
+
+Primero, crearemos un método para determinar qué tipo de usuario está conectado en `MyLibraryUiService`.
+
+Modo Pro: implemente `isAdmin` [TODO 3.1].
+
+.Implemente `isAdmin`:
+.Solución
+[%collapsible]
+====
+[,groovy]
+----
+boolean isAdmin() {
+    User currentUser = springSecurityService.currentUser as User
+    return currentUser?.authorities?.any { it.authority == 'ROLE_ADMIN' }
+}
+----
+====
+
+En segundo lugar, modificaremos el método `index` del controlador para poder determinar qué tipo de usuario está conectado en `MyLibraryController`.
+
+.Solución
+[%collapsible]
+====
+.Modifique `index()`:
+[,groovy]
+----
+def index() {
+    currentUser = springSecurityService.currentUser as User
+    isAdmin = currentUser?.authorities?.any { it.authority == 'ROLE_ADMIN' }
+    redirect action: 'listAuthor'
+}
+----
+====
+
+== Modificar los Builders
+
+Para adaptar los cambios, tendremos que modificar las tablas de autores, libros y préstamos de usuario (`userBorrowed`).
+
+.Solución
+[%collapsible]
+====
+.Modifique `buildAuthorTable` TODO 4.1.1–4.1.4:
+[,groovy]
+----
+boolean isAdmin = isAdmin() //TODO 4.1.1
+if(!isSelect && isAdmin) { // TODO 4.1.2 & TODO 4.1.4
+if(!isAdmin) {filter.addFilter(buildIsActiveAuthorFilter(author))} //TODO 4.1.3
+----
+
+
+.Modifique `buildBookTable` TODO 4.2.1–4.2.8:
+[,groovy]
+----
+boolean isAdmin = isAdmin() //TODO 4.2.1
+if(isAdmin) column {label "Number of instances "} // TODO 4.2.2
+if(isAdmin) column {label "Modify number of Book Instances"} // TODO 4.2.3
+if (!isAdmin) label "Request Form" // TODO 4.2.4
+
+// TODO 4.2.5
+if(!isAdmin) {
+    MyLibraryBookInstance bookInstance = new MyLibraryBookInstance()
+    filter.addFilter(new FilterExpression(true, Operator.EQ, book.listOfBookInstance_,bookInstance.isAvailableB_))
+}
+
+if (isAdmin) {rowColumn {rowField bookIterator.numberOfInstances_}} // TODO 4.2.6
+
+// TODO 4.2.7 & 4.2.8
+if(isAdmin) {
+    rowColumn {
+        rowAction ActionIcon.DELETE * IconStyle.SCALE_DOWN, MyLibraryController.&selectBookInstance as MC, bookIterator.id
+        rowAction ActionIcon.ADD * IconStyle.SCALE_DOWN, MyLibraryController.&purchaseBook as MC, bookIterator.id
+    }
+} else {
+    rowColumn {
+        rowAction ActionIcon.CREATE * IconStyle.SCALE_DOWN, MyLibraryController.&requestBookInstance as MC, bookIterator.id
+    }
+}
+----
+====
+
+
+
+Necesitamos añadir una variable `showUser`, que permite mostrar los registros de préstamos de ese usuario específico.
+
+.Solución
+[%collapsible]
+====
+.Modifique `buildUserBorrowsTable` TODO 4.3.1–4.3.7:
+[,groovy]
+----
+Boolean isAdmin = isAdmin() // TODO 4.3.1
+if (isCurrently  && !isAdmin) column {label "Return Book"} // TODO 4.3.2
+
+if(isAdmin) {
+    column { label borrowed.user_ }
+    if (!showUser) {
+        label "Approve Book"
+    }
+}
+
+User currentUser = springSecurityService.currentUser as User
+if (showUser) {
+    currentUser = showUser
+}
+
+if(!isUser || showUser) {
+    filter.addFilter(new FilterExpression(currentUser, Operator.EQ, borrowed.user_))
+}
+
+if (isCurrently && !isAdmin) {  // TODO 4.3.6
+
+if(isAdmin) {
+    rowColumn { rowField borrowedIterator.user.username_ }
+    if (!showUser) {
+        rowColumn {
+            rowAction ActionIcon.DELETE * IconStyle.SCALE_DOWN, MyLibraryController.&approveBook as MC, borrowedIterator.id
+        }
+    }
+}
+----
+====
+Ahora que hemos añadido los elementos necesarios para mostrar todas las solicitudes de todos los usuarios, vamos a renderizar esta tabla.
+
+.Solución
+[%collapsible]
+====
+[,groovy]
+----
+def listOfRequests() {
+    UiTableSpecifier tableUserBorrowsSpecifier = myLibraryUiService.buildUserBorrowsTable(true, null, true)
+    UiFilterSpecifier filterUserBorrowsSpecifier = myLibraryUiService.buildUserBorrowsFilter()
+
+    taackUiService.show(new UiBlockSpecifier().ui {
+        tableFilter filterUserBorrowsSpecifier, tableUserBorrowsSpecifier
+    }, myLibraryUiService.buildMenu())
+}
+----
+====
+== Menú de Usuarios (User Menu)
+Como se explicó anteriormente, también queremos tener una tabla que muestre todos los usuarios para los administradores.
+Empecemos implementando `buildUsersTable` (puede utilizar la tabla de autores como ejemplo base para implementarla).
+
+.Solución
+[%collapsible]
+====
+[,groovy]
+----
+UiTableSpecifier buildUsersTable() {
+    UiTableSpecifier buildUsersSpecifier = new UiTableSpecifier()
+    User user = new User()
+
+    buildUsersSpecifier.ui {
+        header {
+            label user.username_
+            label "Authorities"
+        }
+
+        TaackFilter taackFilter = taackFilterService.getBuilder(User)
+                .setSortOrder(TaackFilter.Order.ASC, user.username_)
+                .setMaxNumberOfLine(10).build()
+
+        iterate taackFilter, {User userIterator ->
+            rowColumn {
+                rowAction ActionIcon.SHOW * IconStyle.SCALE_DOWN, MyLibraryController.&showUser as MC, userIterator.id
+                rowField userIterator.username_
+            }
+            rowField userIterator.authorities_
+        }
+    }
+}
+----
+====
+
+Luego podemos renderizarla y servirla en una página desde su controlador.
+
+.Solución
+[%collapsible]
+====
+[,groovy]
+----
+def listOfUsers() {
+    UiTableSpecifier tableUsersSpecifier = myLibraryUiService.buildUsersTable()
+
+    taackUiService.show(new UiBlockSpecifier().ui {
+        table tableUsersSpecifier
+    }, myLibraryUiService.buildMenu())
+}
+----
+====
+
+Implementemos los métodos `showUser` y `buildUserShow` en el controlador y en el servicio de UI.
+Vaya a `MyLibraryUiService`.
+
+.UIService
+[%collapsible]
+====
+[,groovy]
+----
+UiShowSpecifier buildUserShow(User user) {
+    UiShowSpecifier userShowSpecifier = new UiShowSpecifier()
+
+    userShowSpecifier.ui(user, {
+        fieldLabeled user.username_
+        fieldLabeled user.firstName_
+        fieldLabeled user.lastName_
+        fieldLabeled user.authorities_
+    })
+}
+----
+====
+
+.Controlador
+[%collapsible]
+====
+[,groovy]
+----
+def showUser(User user) {
+    UiShowSpecifier showSpec = myLibraryUiService.buildUserShow(user)
+    UiTableSpecifier userBorrowsSpecifier = myLibraryUiService.buildUserBorrowsTable(false, user)
+    UiFilterSpecifier userBorrowsFilterSpecifier = myLibraryUiService.buildUserBorrowsFilter(user)
+    UiTableSpecifier userBorrowsCurrentlySpecifier = myLibraryUiService.buildUserBorrowsTable(true, user)
+
+    taackUiService.show(new UiBlockSpecifier().ui {
+        modal {
+            show showSpec
+            tableFilter userBorrowsFilterSpecifier, userBorrowsSpecifier
+            tableFilter userBorrowsFilterSpecifier, userBorrowsCurrentlySpecifier
+        }
+    })
+
+}
+----
+====
+
+== Seguridad Parte 1
+Genial, ahora tenemos todo lo que necesitamos. Solo nos falta añadir la capa de seguridad.
+Una de las grandes ventajas de Taack es lo sencillo que resulta esto. Simplemente añadiendo `@Secured(['ROLE_ADMIN'])` encima de un método, estará protegiendo dicho método frente a cualquier usuario que no tenga el rol `ROLE_ADMIN`. `@Secured(['ROLE_ADMIN'])` no solo ocultará el icono, sino que también hará que el método sea inaccesible mediante un enlace directo.
+
+Vamos a añadir `@Secured(['ROLE_ADMIN'])` y `@Secured(['ROLE_BORROWER'])` a los métodos necesarios. [TODO 6.1] Pista: hay un total de 11 anotaciones `@Secured` para añadir en `MyLibraryController`.
+
+En proyectos más grandes, añadir sentencias condicionales para ocultar botones o columnas puede volverse muy complejo. Por ello, recomendamos intentar mantener el mismo número de filas/columnas en pantalla para todas las páginas o ventanas modales que utilicen el mismo builder. Para ocultar botones en este caso, puede utilizar otra técnica.
+
+== Seguridad Parte 2
+Puede crear un archivo donde especificará los métodos que deben protegerse, así como las condiciones bajo las cuales deben asegurarse algunos métodos.
+
+Navegue hasta `intranet/app/myLibrary/grails-app/services/my/library/MyLibrarySecurityService.groovy`, que ha sido creado para usted.
+
+La mayoría de los métodos ya han sido implementados para usted. Lea la documentación en el archivo para obtener más información.
+
+Siguiendo la misma idea que `returnSecurityClosure` (que comprueba si `ApprovalStatus` es `APPROVED` para permitir al usuario ver el botón de devolución de un libro), implementará `approvedSecurityClosure`.
+
+Modo Pro: implemente `approvedSecurityClosure` [TODO 6.2]
+
+
+.SecurityService
+[%collapsible]
+====
+[,groovy]
+----
+private static boolean approvedSecurityClosure(Long id, Map p) {
+    MyLibraryBorrowed borrowed = MyLibraryBorrowed.get(id)
+    return (borrowed.statusOfApproval != ApprovalStatus.APPROVED)
+}
+----
+====
+
+.Añada las siguientes líneas de código en `init`:
+[,groovy]
+----
+TaackUiEnablerService.securityClosure(
+    this.&approvedSecurityClosure,
+    MyLibraryController.&approveBook as MethodClosure)
+----
+
+
+¡Felicidades! Ha terminado de implementar el proyecto.
+
+En la siguiente parte, aprenderá a crear gráficos.

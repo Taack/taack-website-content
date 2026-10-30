@@ -1,0 +1,238 @@
+= Pilote JDBC Taack
+:doctype: book
+:taack-category: 0|more/JDBC
+:toc:
+:source-highlighter: rouge
+:icons: font
+
+== Qu'est-ce que c'est ?
+
+JDBC signifie *Java Database Connectivity*. C'est un composant Java ancien, important et extrêmement utilisé. Il simplifie l'interrogation et l'édition de données entre différents programmes.
+
+Notre implémentation JDBC actuelle permet uniquement d'interroger les données depuis l'Intranet.
+
+La mise à jour des données par ce biais est un sujet complexe. Nous devons gérer les droits des utilisateurs et la validation des données qui ne sont pas décrits au niveau de la base de données, mais directement dans le code de l'Intranet. Une nouvelle approche est nécessaire de notre côté pour éviter de dupliquer le code.
+
+.Diagramme de séquence lors de l'exécution d'une requête sans erreur
+[plantuml,format="svg",opts="online"]
+----
+@startuml
+group Querying Object using TQL
+        You -> Program : Type the Query
+        activate Program
+        Program -> Driver : Transmit the Query
+        Driver -> Intranet : Transmit the Query
+        Intranet -> Intranet : Validate TQL Grammar
+        Intranet -> Intranet : Validate Tables and fields
+        Intranet -> Intranet : Translate TQL to HQL
+        Intranet -> Intranet : Translate HQL to SQL
+        note right
+            **SQL** is the Database
+            Native Language
+        end note
+        Intranet -> Database : transmit the SQL
+        activate Database #000055
+        Database -> Intranet : retreive Results
+        deactivate Database
+        Intranet -> Intranet : Pack Results
+        Intranet -> Driver : Transmit the Pack
+        Driver -> Driver : Unpack
+        Driver -> Program : Transmit Results
+        Program -> You : Show Results
+        deactivate Program
+        You -> Program : You scroll on \nthe results
+        note right
+            **Program** will request for
+            more data if needed,
+            using an **offset**
+        end note
+end
+
+box "Your Computer" #LightBlue
+    participant Program
+    participant Driver
+end box
+box "The Intranet Server" #Yellow
+    participant Intranet
+    participant Database
+end box
+
+@enduml
+----
+
+== Où interroger les données avec ce pilote ?
+
+Seuls *3 logiciels* ont été testés avec ce pilote jusqu'à présent :
+|===
+|Programme          |Introspection ?|Requêtage ?|Mise à jour ? | Insertion ?
+
+|LibreOffice 7.3    |Liste des tables uniquement|Oui|Non       | Non
+|dBeaver            |Oui            |Oui        |Pas encore    | Pas encore
+|Intellij           |Oui            |Oui        |Pas encore    | Pas encore
+|===
+
+L'#introspection# vous aide lors de l'écriture de requêtes grâce à l'*autocomplétion*. Pendant la saisie de la requête, le programme vous indiquera les tables et les champs disponibles.
+
+Il existe 2 méthodes de travail pour analyser les données :
+
+* Écrire et tester la requête dans un logiciel prenant en charge l'*introspection* ;
+* Puis, soit :
+** Utiliser la requête saisie directement dans *LibreOffice*
+** Ou travailler avec une *extraction CSV* et l'importer dans n'importe quel logiciel (y compris *Office*)
+
+WARNING: Je ferai des vidéos plus tard sur la façon de configurer le pilote avec ces programmes.
+
+[[_tql_queries]]
+== Requêtes TQL
+
+La principale différence entre un pilote JDBC classique et le nôtre est le langage de requête.
+
+Nous avons développé le *TQL* (Taack Query Language), dont voici quelques avantages :
+
+* Sécurisé, nous vérifions la requête saisie avant de l'envoyer à la base de données réelle
+* Syntaxe simple :
+** Moins besoin de jointures
+** Accès aux champs référencés (voir <<easy-syntax>> point (2))
+* Indépendant de la base de données
+
+=== Structure des requêtes de base
+
+[source,sql]
+[[easy-syntax]]
+.Exemple de base TQL
+----
+select                              <1>
+    l.client.firstName,             <2>
+    l.rep.username                  <2>
+from Lead l                         <3>
+where l.dateCreated > '2022-01-01'  <4>
+----
+<1> #Clause Select#, permettant de sélectionner des *colonnes* ;
+<2> #Champs déréférencés#, si la colonne est elle-même un objet, vous pouvez accéder récursivement aux champs de l'objet. Ici, `rep` est un objet `User` qui contient lui-même des champs (comme `username`) ;
+<3> #Clause From#, permettant de choisir des *tables*, ici nous utilisons un _alias_ `l`
+<4> #Clause Where# permettant de filtrer les données.
+
+=== Requêtes de base avec formules
+
+Il est possible d'ajouter des formules arithmétiques dans la clause select.
+
+[source,sql]
+[[basic-query-with-formulas]]
+.Exemple de base TQL avec formules
+----
+select
+    ll.lead.name,
+    ll.qty * ll.salePrice as totalWoTaxes   <1>
+from LeadLine ll
+where ll.qty * ll.salePrice > 100           <2>
+----
+<1> La #clause Select# prend en charge à la fois les `alias de colonne` et les opérations arithmétiques
+<2> La #clause Where# prend également en charge l'arithmétique
+
+WARNING: Le nom de l'alias de colonne doit commencer par une lettre minuscule et faire uniquement partie du jeu de caractères ASCII7.
+
+.Résultats de l'exemple de base avec formules
+|===
+|lead.name |totalWoTaxes
+
+|Balisage pylône SFR site 240087 (Hivory)
+|250.00000000
+
+|Balisage pylône SFR site 240087 (Hivory)
+|340.00000000
+
+|Balisage pylône SFR site 240087 (Hivory)
+|3410.00000000
+
+|EL BJORN low intensity IR AWL system
+|2700.00000000
+|===
+
+=== Requêtes avec regroupement
+
+La clause de regroupement ajoute la possibilité d'agréger des données.
+L'exemple <<basic-query-with-formulas>> ne comporte pas une ligne par offre, mais par ligne d'offre.
+Il est possible d'utiliser le regroupement pour obtenir une ligne par offre, comme dans l'exemple suivant :
+
+[source,sql]
+.Exemple TQL avec regroupement et formules
+----
+select
+    ll.lead.rep.mainSubsidiary as salesmanSubsidiary,   <1>
+    count(ll.id),                                       <2>
+    sum(ll.qty * ll.salePrice)                          <2>
+from LeadLine ll
+group by ll.lead.rep.mainSubsidiary                     <1>
+----
+<1> Champ standard, il doit figurer dans la #clause Group by# ;
+<2> Vous pouvez utiliser les fonctions d'agrégation #count# ou #sum#.
+
+WARNING: Les alias de colonnes ne sont pas pris en charge sur les colonnes agrégées
+
+|===
+|salesmanSubsidiary|count(ll.id)    |sum(ll.qty * ll.salePrice)
+
+|CITEL_2CP         |118605|212619001943.17760000
+|CITEL_GMBH        |37336 |261342488.98760000
+|CITEL_INC         |25172 |319681146.49190000
+|CITEL_INDIA       |24868 |1122541659.94000000
+|CITEL_OOO         |10382 |3990221200.80740000
+|CITEL_SH          |269   |552810.59000000
+|OBSTA             |46151 |2762758463.12580000
+|===
+
+=== Requêtes avec jointures internes (Inner Joins)
+
+Parfois, une colonne pointe vers plusieurs lignes.
+
+On appelle cela une relation *plusieurs-à-plusieurs* (many-to-many). Nous ne pouvons pas utiliser directement les champs référencés, vous devez utiliser ce qu'on appelle des *jointures* (joins) ... (cela fait très années 70, mais ce n'est pas de ma faute)
+
+Dans l'exemple suivant, les *Items* contiennent plusieurs *Values*, et les *Values* peuvent être utilisées par plusieurs *Items*. Si nous voulons lister les Items et les Values dans la même table, nous avons besoin d'une sorte de produit cartésien entre 2 ensembles de données.
+
+WARNING: La cardinalité du produit cartésien de 2 ensembles est #M x N#, vous devez utiliser la *clause Where* pour réduire le nombre de résultats.
+
+[source,sql]
+.Jointure simple TQL
+----
+select
+    i.name,
+    i.ref,
+    v.valueString,
+    v.associatedProperty.valueKind as kind,
+    v.associatedProperty.kindOfCharacteristic as typeOfChar,
+    v.associatedProperty.nameAlias as nameAlias
+from Item i, Value v                                    <1>
+where v in elements(i.values) and i.range.name = 'DVM'  <2>
+
+----
+<1> Nous listons 2 tables indépendamment
+<2> Nous *DEVONS* limiter le nombre de résultats avec l'expression `v in elements(i.values)`
+
+.Résultats
+|====
+| name | ref | valueString | kind | typeOfChar | nameAlias
+
+| DVM-230-16A | 3589015 | NULL | dico | BULLET_POINTS | bulletPoints
+| DVM-230-16A | 3589015 | IP20 | string | MECA | NULL
+| DVM-230-16A | 3589015 | -40/+85°C | string | MECA | NULL
+| DVM-230-16A | 3589015 | NULL | dico | NULL | description
+| DVM-230-16A | 3589015 | NULL | dico | NULL | subFamily
+| DVM-230-16A | 3589015 | NULL | dico | MECA | NULL
+| DVM-230-16A | 3589015 | NULL | dico | NORMES | NULL
+| DVM-230-16A | 3589015 | voir schéma | dico | MECA | NULL
+| DVM-230-16A | 3589015 | NULL | dico | MECA | NULL
+| DVM-230-16A | 3589015 | NULL | dico | MECA | NULL
+| DVM-230-16A | 3589015 | NULL | dico | MECA | NULL
+| DVM-230-16A | 3589015 | 16 A | string | ELEC | NULL
+| DVM-230-16A | 3589015 | NULL | dico | ELEC | NULL
+| DVM-230-16A | 3589015 | 0.0305 kg | string | MECA | NULL
+| DVM-230-16A | 3589015 | NULL | dico | NULL | family
+| DVM-230-16A | 3589015 | 230 V monophasé | dico | ELEC | NULL
+| DVM-230-16A | 3589015 | PTFE | string | MECA | NULL
+| DVM-230-16A | 3589015 | NULL | bool | NULL | NULL
+|====
+
+== Limitations actuelles du pilote
+
+* Vous ne pourrez pas *déréférencer* les champs de langue (`v.valueMap['fr']` échouera, tout comme `v.valueMap`).
+* Nous prenons uniquement en charge les jointures internes (Inner join), et non les jointures externes (outer join). Notre implémentation actuelle des jointures est lente ; nous pouvons l'améliorer, mais c'est plus complexe.

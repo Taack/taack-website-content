@@ -1,0 +1,112 @@
+= Libreoffice Base
+:doctype: book
+:taack-category: 1|more/JDBC
+:source-highlighter: rouge
+:toc:
+:icons: font
+
+== Configurare LibreOffice per utilizzare JDK 17
+
+Fare clic su `Tools` > `Options`, quindi nella finestra di dialogo *Options - LibreOffice - User Data* fare clic su `LibreOffice` > `Advanced` nell'albero.
+
+La casella di controllo `Use a Java runtime environment` deve essere selezionata e verificare che venga rilevata una versione 17 di JRE.
+
+In caso contrario, installare Java 17 e ripetere la procedura. È possibile fare clic sul pulsante `Add` e seguire la procedura se non viene rilevato ma si è certi che sia installato.
+
+.Java 17 viene rilevato e selezionato
+image::lo-java17-conf.webp[]
+
+Fare clic sul pulsante `Apply` o `Ok`.
+
+== Aggiungere il driver Jar
+
+Scaricare https://github.com/Taack/infra/releases/tag/v0.1[taack-jdbc-client-0.2-SNAPSHOT-all.jar]
+
+Tornare alla finestra di dialogo avanzata.
+
+Fare clic su `Class Path...`, nella finestra di dialogo fare clic su `Add Archive...` e selezionare il file scaricato.
+
+.Driver aggiunto al runtime
+image::lo-java17-driver-conf.webp[]
+
+Fare clic sul pulsante `Ok`.
+
+== Creare un file LibreOffice Base
+
+Aprire #LibreOffice#, fare clic su `Base Database`
+
+=== Selezionare JDBC
+
+.Passaggio 1: Selezionare JDBC
+image::lo-base-databaseWizard-1.webp[]
+
+Fare clic sul pulsante `Next`.
+
+=== Inserire la posizione del driver nel Jar
+
+jdbc: `taack:localhost:8080/taack`
+
+Sostituire localhost e la porta con l'URL e la porta della propria istanza.
+
+Classe del driver JDBC: `taack.jdbc.client.TaackDriver`
+
+.Passaggio 2: Stringa di connessione del driver
+image::lo-base-databaseWizard-2.webp[]
+
+=== Impostare il nome utente
+
+Lo `User name` deve essere un utente attivo della propria applicazione Intranet (con `ROLE_ADMIN` o `ROLE_JDBC_ADMIN`).
+
+Vedere https://github.com/Taack/infra/blob/main/taack-ui/grails-app/controllers/taack/support/TaackJdbcController.groovy[la classe TaackJdbcController].
+
+image::lo-base-databaseWizard-3.webp[]
+
+Fare clic sul pulsante `Finish` e impostare un nome per il file.
+
+== Utilizzo in Base
+
+Aprire il file salvato nel passaggio precedente e inserire la password quando richiesto.
+
+.Tabelle lette dal driver
+image::lo-base-tables-screenshot.webp[]
+
+Fare clic sul pulsante Queries, quindi su `Create Query in SQL View`
+
+WARNING: Non utilizzare la procedura guidata (wizard). L'Intranet utilizza il linguaggio TQL per interrogare i dati; LibreOffice non conosce questo linguaggio.
+
+image::lo-base-queries-screenshot.webp[]
+
+Prima di poter digitare le query, fare clic su `Run SQL Command directly`
+
+image::lo-base-queries-designer-screenshot.webp[]
+
+Ora è possibile digitare le proprie query TQL...
+
+Vedere link:taack-jdbc-driver-it.adoc#_tql_queries[Query TQL].
+
+== Utilizzo in Calc
+
+Una volta create e salvate alcune query, è possibile accedere ai dati direttamente da Calc.
+
+[[_open_query_as_a_pivot_table]]
+=== Aprire una query come tabella pivot
+
+`Data` > `Pivot Table` quindi `Data source in registered Calc`
+
+image::lo-calc-datasrouce-screenshot.webp[]
+
+Selezionare il file in cui sono state salvate le query, inserire la password dell'Intranet, quindi selezionare la sorgente dati.
+
+image::lo-calc-datasrouce-2.webp[]
+
+Qui scelgo Query e seleziono la query Users.
+
+image::lo-calc-pivotTable-layout.webp[]
+
+Ecco fatto. È possibile modificare la tabella pivot in base alle proprie esigenze.
+
+image::lo-calc-pivotTable-results.webp[]
+
+=== Come sorgente dati
+
+TODO
