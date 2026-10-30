@@ -179,7 +179,7 @@ No hay nada que implementar aquí. Esta clase se utilizará más adelante para c
 
 == Definir el menú de autores
 
-En esta sección, repasaremos principalmente lo que se ha hecho en link:usage.adoc[Uso]. Después de esta sección, dominará el uso de `UiTableSpecifier`, `UiFormSpecifier`, `UiShowSpecifier` y `UiFilterSpecifier`.
+En esta sección, repasaremos principalmente lo que se ha hecho en link:usage-es.adoc[Uso]. Después de esta sección, dominará el uso de `UiTableSpecifier`, `UiFormSpecifier`, `UiShowSpecifier` y `UiFilterSpecifier`.
 
 Vamos a crear:
 
@@ -238,7 +238,7 @@ authorTableSpecifier.ui {
 }
 
 ----
-Si tiene dificultades para comprender este código, consulte link:usage.adoc[Uso].
+Si tiene dificultades para comprender este código, consulte link:usage-es.adoc[Uso].
 Observe que hemos añadido `buildIsActiveAuthorFilter`, que aún no se ha implementado. Vamos a implementarlo ahora.
 
 Nota: El nombre del autor no se mostrará hasta que se complete el TODO 2.10.
@@ -288,7 +288,7 @@ UiFilterSpecifier buildAuthorFilter() {
     }
 }
 ----
-Si tiene dificultades para comprender este código, consulte link:usage.adoc[Uso].
+Si tiene dificultades para comprender este código, consulte link:usage-es.adoc[Uso].
 
 Su tabla ya está completa; solo necesitamos renderizarla en la página. Para renderizar los `UiSpecifier` construidos previamente, debemos usar `taackUiService`. Haremos esto en un método llamado `listAuthor`. Vaya a `app/library/controller/myLibrary/MyLibraryController` en `Author Menu`.
 

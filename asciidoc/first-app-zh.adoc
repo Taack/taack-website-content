@@ -5,13 +5,13 @@
 您的内网项目包含两个部分：
 
 * 位于 `app` 目录下的应用插件是独立的微项目，每个微项目都有自己的依赖和构建配置等（例如 Crew）。
-有关如何声明插件的更详细说明，请参阅 link:doc/plugin/taack-plugin.adoc#_about_plugins[关于插件]。
+有关如何声明插件的更详细说明，请参阅 link:doc/plugin/taack-plugin-zh.adoc#_about_plugins[关于插件]。
 * 主服务器会引入其 `build.gradle` 中声明的所有应用插件，并将它们显示在内网主页上。
 
 == 创建新的应用插件
 
 
-若要创建新的应用插件（即一个 Gradle 模块），请确保您已从我们的 GitHub 仓库拉取了最新版本的内网代码（请参阅 link:install.adoc[安装指南]）。
+若要创建新的应用插件（即一个 Gradle 模块），请确保您已从我们的 GitHub 仓库拉取了最新版本的内网代码（请参阅 link:install-zh.adoc[安装指南]）。
 
 .在内网根目录下执行以下命令：
 
@@ -70,7 +70,7 @@ static UiMenuSpecifier buildMenu(String q = null) { // <1>
 ----
 <1> 如果还没有 `static` 关键字，请将其加上。
 
-我们创建一个 link:doc/DSLs/menu-dsl.adoc[UiMenuSpecifier] 对象来定义菜单结构，然后指定要显示的内容。
+我们创建一个 link:doc/DSLs/menu-dsl-zh.adoc[UiMenuSpecifier] 对象来定义菜单结构，然后指定要显示的内容。
 
 [,groovy]
 ----
@@ -364,7 +364,7 @@ def saveBook() {
 
 [NOTE]
 ====
-请参阅 link:doc/DSLs/block-dsl.adoc#_modal_stack_code_sample[关闭模态窗口并重新加载页面]，了解如何在保存时避免使用 `redirectAction`...
+请参阅 link:doc/DSLs/block-dsl-zh.adoc#_modal_stack_code_sample[关闭模态窗口并重新加载页面]，了解如何在保存时避免使用 `redirectAction`...
 ====
 
 

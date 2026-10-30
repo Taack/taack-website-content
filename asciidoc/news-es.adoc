@@ -602,7 +602,7 @@ def dropEditor() {                                                  <2>
 <7> Si el archivo es ODS o Writer, se convertirá a Asciidoc y las imágenes se importarán
 <8> Si el archivo es una imagen, se guardará en el CMS.
 
-WARNING: `taackAsciidocService` utiliza el servicio `TaackEditorService` de `taack-ui-asciidoc`, consulte link:doc/DSLs/form-dsl.adoc#_asciidoc[DSL de formularios]
+WARNING: `taackAsciidocService` utiliza el servicio `TaackEditorService` de `taack-ui-asciidoc`, consulte link:doc/DSLs/form-dsl-es.adoc#_asciidoc[DSL de formularios]
 
 [[taack-ui-configuration]]
 .TaackUiConfiguration
@@ -797,7 +797,7 @@ def showPart(PlmFreeCadPart part, Long partVersion, Boolean isHistory) {<1>
 
 == Versión 0.5.4
 
-* Rediseño del DSL de diagramas (consulte link:doc/DSLs/diagram-dsl.adoc[])
+* Rediseño del DSL de diagramas (consulte link:doc/DSLs/diagram-dsl-es.adoc[])
 
 == Versión 0.5.3
 

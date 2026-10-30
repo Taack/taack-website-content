@@ -30,7 +30,7 @@ git checkout part-5-skeleton
 - `printableBody`：用于定义跨越多页的 PDF 正文内容。
 - `printableFooter`：用于定义将在所有页面上重复显示的页脚（高度不得超过 2cm）。
 
-如果您想查看示例，请参阅 link:doc/DSLs/block-printable-dsl.adoc[可打印块 DSL（Printable Block DSL）]。
+如果您想查看示例，请参阅 link:doc/DSLs/block-printable-dsl-zh.adoc[可打印块 DSL（Printable Block DSL）]。
 
 === 可打印页眉（Printable Header）
 

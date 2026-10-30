@@ -7,7 +7,7 @@
 
 = 模块化应用开发
 
-https://github.com/Taack/intranet[内联网示例应用] 是一个模块化的 https://gradle.org/[Gradle] 应用。您可以点击此处获取运行说明：link:../../usage.adoc[安装示例内联网]。
+https://github.com/Taack/intranet[内联网示例应用] 是一个模块化的 https://gradle.org/[Gradle] 应用。您可以点击此处获取运行说明：link:../../usage-zh.adoc[安装示例内联网]。
 
 == 内联网示例应用目录结构
 
@@ -80,4 +80,4 @@ https://github.com/Taack/intranet[内联网示例应用] 是一个模块化的 h
 
 * _browser_ 文件夹包含将在浏览器中执行的代码
 * _taack-jdbc-common_ 包含 _taack-ui_ 和 _taack-jdbc-client_ 之间共享的公共类
-* _taack-jdbc-client_ 包含 JDBC 驱动程序（参见 link:../../more/JDBC/taack-jdbc-driver.adoc[taack-jdbc-driver]）
+* _taack-jdbc-client_ 包含 JDBC 驱动程序（参见 link:../../more/JDBC/taack-jdbc-driver-zh.adoc[taack-jdbc-driver]）

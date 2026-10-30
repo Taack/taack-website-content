@@ -5,13 +5,13 @@
 Il tuo progetto intranet è diviso in due parti:
 
 * I plugin dell'applicazione, situati nella cartella `app`, sono micro-progetti, ciascuno con le proprie dipendenze, la propria build, ecc. (ad es., Crew).
-Per una spiegazione più approfondita su come vengono dichiarati i plugin, consulta link:doc/plugin/taack-plugin.adoc#_about_plugins[Informazioni sui plugin].
+Per una spiegazione più approfondita su come vengono dichiarati i plugin, consulta link:doc/plugin/taack-plugin-it.adoc#_about_plugins[Informazioni sui plugin].
 * Il server principale utilizza tutti i plugin dell'applicazione implementati nel suo file `build.gradle` e li visualizza nella pagina principale dell'intranet.
 
 == Creare un nuovo plugin dell'applicazione
 
 
-Per creare un nuovo plugin dell'applicazione (un modulo Gradle), assicurati di scaricare l'ultima versione della tua intranet dal nostro repository GitHub (vedi link:install.adoc[installazione]).
+Per creare un nuovo plugin dell'applicazione (un modulo Gradle), assicurati di scaricare l'ultima versione della tua intranet dal nostro repository GitHub (vedi link:install-it.adoc[installazione]).
 
 .Esegui il seguente comando dalla cartella principale della tua intranet:
 
@@ -70,7 +70,7 @@ static UiMenuSpecifier buildMenu(String q = null) { // <1>
 ----
 <1> Aggiungi `static` se non è già presente.
 
-Creiamo un oggetto link:doc/DSLs/menu-dsl.adoc[UiMenuSpecifier] per definire la struttura del menu, quindi specifichiamo il contenuto da visualizzare.
+Creiamo un oggetto link:doc/DSLs/menu-dsl-it.adoc[UiMenuSpecifier] per definire la struttura del menu, quindi specifichiamo il contenuto da visualizzare.
 
 [,groovy]
 ----
@@ -364,7 +364,7 @@ Usa `import taack.render.TaackSaveService` e `import grails.gorm.transactions.Tr
 
 [NOTE]
 ====
-Vedi link:doc/DSLs/block-dsl.adoc#_modal_stack_code_sample[Chiudere la modale e ricaricare la pagina] per scoprire come evitare l'uso di `redirectAction` durante il salvataggio...
+Vedi link:doc/DSLs/block-dsl-it.adoc#_modal_stack_code_sample[Chiudere la modale e ricaricare la pagina] per scoprire come evitare l'uso di `redirectAction` durante il salvataggio...
 ====
 
 

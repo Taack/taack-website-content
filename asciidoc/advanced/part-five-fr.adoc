@@ -30,7 +30,7 @@ Pour créer un PDF, vous utiliserez un `UiPrintableSpecifier()`, composé de :
 - `printableBody` qui permet de définir le contenu du PDF sur plusieurs pages.
 - `printableFooter` qui permet de définir le pied de page qui sera répété sur toutes les pages (la taille ne doit pas dépasser 2 cm).
 
-Si vous souhaitez voir un exemple, consultez link:doc/DSLs/block-printable-dsl.adoc[DSL de blocs imprimables (Printable Block DSL)].
+Si vous souhaitez voir un exemple, consultez link:doc/DSLs/block-printable-dsl-fr.adoc[DSL de blocs imprimables (Printable Block DSL)].
 
 === En-tête imprimable (Printable Header)
 

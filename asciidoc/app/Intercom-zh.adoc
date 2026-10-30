@@ -14,7 +14,7 @@
 * `ROLE_INTERCOM_DIRECTOR`
 * `ROLE_INTERCOM_MANAGER`
 
-请参阅 link:Crew.adoc#_purpose[在 Crew 中配置角色] 以将该角色添加到您的内网（Intranet）中。
+请参阅 link:Crew-zh.adoc#_purpose[在 Crew 中配置角色] 以将该角色添加到您的内网（Intranet）中。
 
 == AsciidoctorJ 扩展
 

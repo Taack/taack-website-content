@@ -5,13 +5,13 @@
 Ihr Intranet-Projekt besteht aus zwei Teilen:
 
 * Die Anwendungs-Plugins im Ordner `app` sind Mikroprojekte mit jeweils eigenen Abhängigkeiten, eigenem Build usw. (z. B. Crew).
-Eine ausführlichere Erklärung zur Deklaration von Plugins finden Sie unter link:doc/plugin/taack-plugin.adoc#_about_plugins[Über Plugins].
+Eine ausführlichere Erklärung zur Deklaration von Plugins finden Sie unter link:doc/plugin/taack-plugin-de.adoc#_about_plugins[Über Plugins].
 * Der Hauptserver verwendet alle Anwendungs-Plugins, die in seiner Datei `build.gradle` eingebunden sind, und zeigt sie auf der Hauptseite des Intranets an.
 
 == Ein neues Anwendungs-Plugin erstellen
 
 
-Stellen Sie vor dem Erstellen eines neuen Anwendungs-Plugins (eines Gradle-Moduls) sicher, dass Sie die neueste Version Ihres Intranets aus unserem GitHub-Repository abgerufen haben (siehe link:install.adoc[Installation]).
+Stellen Sie vor dem Erstellen eines neuen Anwendungs-Plugins (eines Gradle-Moduls) sicher, dass Sie die neueste Version Ihres Intranets aus unserem GitHub-Repository abgerufen haben (siehe link:install-de.adoc[Installation]).
 
 .Führen Sie den folgenden Befehl im Stammverzeichnis Ihres Intranets aus:
 
@@ -70,7 +70,7 @@ static UiMenuSpecifier buildMenu(String q = null) { // <1>
 ----
 <1> Fügen Sie `static` hinzu, falls es noch nicht vorhanden ist.
 
-Wir erstellen ein link:doc/DSLs/menu-dsl.adoc[UiMenuSpecifier]-Objekt, um die Menüstruktur zu definieren, und geben dann den anzuzeigenden Inhalt an.
+Wir erstellen ein link:doc/DSLs/menu-dsl-de.adoc[UiMenuSpecifier]-Objekt, um die Menüstruktur zu definieren, und geben dann den anzuzeigenden Inhalt an.
 
 [,groovy]
 ----
@@ -364,7 +364,7 @@ Verwenden Sie `import taack.render.TaackSaveService` und `import grails.gorm.tra
 
 [NOTE]
 ====
-Siehe link:doc/DSLs/block-dsl.adoc#_modal_stack_code_sample[Modales Fenster schließen und Seite neu laden], um zu erfahren, wie Sie die Verwendung von `redirectAction` beim Speichern vermeiden können...
+Siehe link:doc/DSLs/block-dsl-de.adoc#_modal_stack_code_sample[Modales Fenster schließen und Seite neu laden], um zu erfahren, wie Sie die Verwendung von `redirectAction` beim Speichern vermeiden können...
 ====
 
 

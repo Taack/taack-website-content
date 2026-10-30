@@ -38,7 +38,7 @@ Um die Daten zu erstellen, rufen Sie einfach `/myLibraryData/createDataUsers` in
 
 === Beispielcode
 
-Um ein Diagramm zu erstellen, verwenden Sie einen `UiDiagramSpecifier()`. Es gibt eine Vielzahl verschiedener Diagrammoptionen (Balken-, Linien-, Kreis-, Boxplot-/Whiskers- und Flächendiagramme). Um zu sehen, wie all diese implementiert werden, lesen Sie link:../doc/DSLs/diagram-dsl.adoc[Diagramm-DSL].
+Um ein Diagramm zu erstellen, verwenden Sie einen `UiDiagramSpecifier()`. Es gibt eine Vielzahl verschiedener Diagrammoptionen (Balken-, Linien-, Kreis-, Boxplot-/Whiskers- und Flächendiagramme). Um zu sehen, wie all diese implementiert werden, lesen Sie link:../doc/DSLs/diagram-dsl-de.adoc[Diagramm-DSL].
 
 In diesem Beispiel möchten wir die Anzahl der Bücher pro Autor für die Top-10-Autoren mit den meisten Büchern in der Bibliothek visualisieren.
 

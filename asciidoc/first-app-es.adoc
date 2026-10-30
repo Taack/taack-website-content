@@ -5,13 +5,13 @@
 Su proyecto de intranet consta de dos partes:
 
 * Los plugins de aplicación, ubicados en la carpeta `app`, son microproyectos, cada uno con sus propias dependencias, compilación, etc. (p. ej., Crew).
-Para una explicación más detallada sobre cómo se declaran los plugins, consulte link:doc/plugin/taack-plugin.adoc#_about_plugins[Acerca de los plugins].
+Para una explicación más detallada sobre cómo se declaran los plugins, consulte link:doc/plugin/taack-plugin-es.adoc#_about_plugins[Acerca de los plugins].
 * El servidor principal utiliza todos los plugins de aplicación implementados en su archivo `build.gradle` y los muestra en la página principal de la intranet.
 
 == Crear un nuevo plugin de aplicación
 
 
-Para crear un nuevo plugin de aplicación (un módulo de Gradle), asegúrese de obtener la última versión de su intranet desde nuestro repositorio de GitHub (consulte link:install.adoc[instalación]).
+Para crear un nuevo plugin de aplicación (un módulo de Gradle), asegúrese de obtener la última versión de su intranet desde nuestro repositorio de GitHub (consulte link:install-es.adoc[instalación]).
 
 .Ejecute el siguiente comando desde la carpeta raíz de su intranet:
 
@@ -70,7 +70,7 @@ static UiMenuSpecifier buildMenu(String q = null) { // <1>
 ----
 <1> Añada `static` si aún no está presente.
 
-Creamos un objeto link:doc/DSLs/menu-dsl.adoc[UiMenuSpecifier] para definir la estructura del menú y luego especificamos el contenido que se mostrará.
+Creamos un objeto link:doc/DSLs/menu-dsl-es.adoc[UiMenuSpecifier] para definir la estructura del menú y luego especificamos el contenido que se mostrará.
 
 [,groovy]
 ----
@@ -364,7 +364,7 @@ Utilice `import taack.render.TaackSaveService` e `import grails.gorm.transaction
 
 [NOTE]
 ====
-Consulte link:doc/DSLs/block-dsl.adoc#_modal_stack_code_sample[Cerrar ventana modal y recargar página] para ver cómo evitar el uso de `redirectAction` al guardar...
+Consulte link:doc/DSLs/block-dsl-es.adoc#_modal_stack_code_sample[Cerrar ventana modal y recargar página] para ver cómo evitar el uso de `redirectAction` al guardar...
 ====
 
 

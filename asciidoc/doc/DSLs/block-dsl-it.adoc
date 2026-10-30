@@ -10,7 +10,7 @@
 * [*] Renderizzato in PDF
 * [ ] Renderizzato in CSV
 
-DSL di primo livello responsabile della disposizione degli elementi grafici della pagina e dell'aggiornamento congiunto degli `ajaxBlock`. Nel caso in cui si stia renderizzando una pagina completa, è necessario specificare anche la descrizione del menu della pagina tramite il link:menu-dsl.adoc[Menu DSL].
+DSL di primo livello responsabile della disposizione degli elementi grafici della pagina e dell'aggiornamento congiunto degli `ajaxBlock`. Nel caso in cui si stia renderizzando una pagina completa, è necessario specificare anche la descrizione del menu della pagina tramite il link:menu-dsl-it.adoc[Menu DSL].
 
 Questo DSL è inoltre responsabile della gestione dello stack delle finestre modali. Aprire una modale usando `modal` o chiuderla usando `closeModalAndUpdateBlock` (e altre varianti).
 
@@ -60,9 +60,10 @@ def editSlideshow(CmsPage slideshow) {
 
 pass:[<a class="taackMenu" ajaxAction="/dslSample/block" href="/dslSample/block">&#9654; Try it live</a>]
 
+[[_modal_stack_code_sample]]
 == Esempio di codice per lo stack modale
 
-Dopo aver elaborato un modulo, è possibile aggiornare il contenuto della pagina o di un'altra finestra modale sottostante a quella corrente. È anche possibile ricaricare la pagina o visualizzare un'altra pagina. Ricaricare la pagina consente al codice di essere riutilizzabile, poiché non dipende dall'URL corrente (ricordate i *parametri* `redirectAction` visti in link:../../first-app.adoc#_adding_buttons_to_a_table_block[Prima applicazione (Aggiungere pulsanti a un blocco tabella)]).
+Dopo aver elaborato un modulo, è possibile aggiornare il contenuto della pagina o di un'altra finestra modale sottostante a quella corrente. È anche possibile ricaricare la pagina o visualizzare un'altra pagina. Ricaricare la pagina consente al codice di essere riutilizzabile, poiché non dipende dall'URL corrente (ricordate i *parametri* `redirectAction` visti in link:../../first-app-it.adoc#_adding_buttons_to_a_table_block[Prima applicazione (Aggiungere pulsanti a un blocco tabella)]).
 
 Di solito una finestra modale viene chiusa dopo l'elaborazione di un modulo. O non è valido, e gli errori vengono mostrati nel browser direttamente nel modulo, oppure salviamo l'oggetto e aggiorniamo il contenuto.
 
@@ -237,13 +238,13 @@ image::screenshot-dsl-block-poke.webp[]
 * `poke`: aggiorna il contenuto solo se la condizione è vera
 
 === Foglie (Leaves)
-Tutte le foglie possono accettare una closure opzionale che descrive un menu (vedi link:menu-dsl.adoc[Menu DSL]) visualizzato nell'intestazione del blocco.
+Tutte le foglie possono accettare una closure opzionale che descrive un menu (vedi link:menu-dsl-it.adoc[Menu DSL]) visualizzato nell'intestazione del blocco.
 
-* `form`: vedi link:form-dsl.adoc[Form DSL]
-* `show`: vedi link:show-dsl.adoc[Show DSL]
-* `table`, `tableFilter`: vedi link:filter-table-dsl.adoc[FilterTable DSL]
-* `diagram`, `diagramFilter`: vedi link:diagram-dsl.adoc[Diagram DSL]
-* `kanban`, `kanbanFilter`: vedi link:kanban-dsl.adoc[Kanban DSL]
+* `form`: vedi link:form-dsl-it.adoc[Form DSL]
+* `show`: vedi link:show-dsl-it.adoc[Show DSL]
+* `table`, `tableFilter`: vedi link:filter-table-dsl-it.adoc[FilterTable DSL]
+* `diagram`, `diagramFilter`: vedi link:diagram-dsl-it.adoc[Diagram DSL]
+* `kanban`, `kanbanFilter`: vedi link:kanban-dsl-it.adoc[Kanban DSL]
 * `custom`: codice HTML personalizzato
 * `iframe`: visualizza un URL in un iframe
 

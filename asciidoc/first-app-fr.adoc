@@ -5,13 +5,13 @@
 Votre projet d'intranet comporte deux parties :
 
 * Les plugins d'application, situés dans le dossier `app`, sont des micro-projets, chacun ayant ses propres dépendances, sa propre compilation, etc. (par ex., Crew).
-Pour une explication plus détaillée de la déclaration des plugins, consultez link:doc/plugin/taack-plugin.adoc#_about_plugins[À propos des plugins].
+Pour une explication plus détaillée de la déclaration des plugins, consultez link:doc/plugin/taack-plugin-fr.adoc#_about_plugins[À propos des plugins].
 * Le serveur principal utilise tous les plugins d'application déclarés dans son fichier `build.gradle` et les affiche sur la page principale de l'intranet.
 
 == Créer un nouveau plugin d'application
 
 
-Pour créer un nouveau plugin d'application (un module Gradle), assurez-vous d'avoir récupéré la dernière version de votre intranet depuis notre dépôt GitHub (voir link:install.adoc[installation]).
+Pour créer un nouveau plugin d'application (un module Gradle), assurez-vous d'avoir récupéré la dernière version de votre intranet depuis notre dépôt GitHub (voir link:install-fr.adoc[installation]).
 
 .Exécutez la commande suivante depuis le dossier racine de votre intranet :
 
@@ -70,7 +70,7 @@ static UiMenuSpecifier buildMenu(String q = null) { // <1>
 ----
 <1> Ajoutez `static` s'il n'est pas déjà présent.
 
-Nous créons un objet link:doc/DSLs/menu-dsl.adoc[UiMenuSpecifier] pour définir la structure du menu, puis nous spécifions le contenu à afficher.
+Nous créons un objet link:doc/DSLs/menu-dsl-fr.adoc[UiMenuSpecifier] pour définir la structure du menu, puis nous spécifions le contenu à afficher.
 
 [,groovy]
 ----
@@ -364,7 +364,7 @@ Utilisez `import taack.render.TaackSaveService` et `import grails.gorm.transacti
 
 [NOTE]
 ====
-Consultez link:doc/DSLs/block-dsl.adoc#_modal_stack_code_sample[Fermer la modale et recharger la page] pour savoir comment éviter l'utilisation de `redirectAction` lors de la sauvegarde...
+Consultez link:doc/DSLs/block-dsl-fr.adoc#_modal_stack_code_sample[Fermer la modale et recharger la page] pour savoir comment éviter l'utilisation de `redirectAction` lors de la sauvegarde...
 ====
 
 

@@ -38,7 +38,7 @@ Per creare i dati, richiama semplicemente `/myLibraryData/createDataUsers` nella
 
 === Codice di esempio
 
-Per creare un grafico, utilizzerai un `UiDiagramSpecifier()`. Esiste una varietà di diverse opzioni di grafico (a barre, a linee, a torta, box-and-whiskers, ad area). Per vedere come implementarli tutti, fai riferimento a link:../doc/DSLs/diagram-dsl.adoc[DSL dei diagrammi].
+Per creare un grafico, utilizzerai un `UiDiagramSpecifier()`. Esiste una varietà di diverse opzioni di grafico (a barre, a linee, a torta, box-and-whiskers, ad area). Per vedere come implementarli tutti, fai riferimento a link:../doc/DSLs/diagram-dsl-it.adoc[DSL dei diagrammi].
 
 In questo esempio, vogliamo visualizzare il numero di libri per autore per i primi 10 autori con il maggior numero di libri nella biblioteca.
 

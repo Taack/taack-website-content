@@ -38,7 +38,7 @@ git checkout part-4-skeleton
 
 === 示例代码
 
-要创建图表，您将使用 `UiDiagramSpecifier()`。框架提供了多种不同的图表选项（柱状图、折线图、饼图、箱线图/whiskers、面积图）。要查看所有这些图表的实现方式，请参阅 link:../doc/DSLs/diagram-dsl.adoc[图表 DSL（Diagram DSL）]。
+要创建图表，您将使用 `UiDiagramSpecifier()`。框架提供了多种不同的图表选项（柱状图、折线图、饼图、箱线图/whiskers、面积图）。要查看所有这些图表的实现方式，请参阅 link:../doc/DSLs/diagram-dsl-zh.adoc[图表 DSL（Diagram DSL）]。
 
 在本示例中，我们希望可视化馆藏图书数量最多的前 10 位作者各自的图书数量。
 

@@ -10,4 +10,5 @@
 
 include::install-zh.adoc[leveloffset=+1]
 
+[[_first_app]]
 include::first-app-zh.adoc[leveloffset=+1]

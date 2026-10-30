@@ -14,7 +14,7 @@ SSH-Server, Git-Server und Asciidoctor-Rendering-Dienst, hochgeladen über Git.
 * `ROLE_INTERCOM_DIRECTOR`
 * `ROLE_INTERCOM_MANAGER`
 
-Siehe link:Crew.adoc#_purpose[Rollen in Crew konfigurieren], um die Rolle zu Ihrem Intranet hinzuzufügen.
+Siehe link:Crew-de.adoc#_purpose[Rollen in Crew konfigurieren], um die Rolle zu Ihrem Intranet hinzuzufügen.
 
 == AsciidoctorJ-Erweiterungen
 

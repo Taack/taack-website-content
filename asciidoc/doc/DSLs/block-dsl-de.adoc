@@ -10,7 +10,7 @@
 * [*] Gerendert in PDF
 * [ ] Gerendert in CSV
 
-DSL der obersten Ebene, die für die Anordnung der grafischen Seitenelemente und die gemeinsame Aktualisierung von `ajaxBlocks` zuständig ist. Wenn eine vollständige Seite gerendert wird, muss außerdem die Seitenmenübeschreibung über die link:menu-dsl.adoc[Menu DSL] angegeben werden.
+DSL der obersten Ebene, die für die Anordnung der grafischen Seitenelemente und die gemeinsame Aktualisierung von `ajaxBlocks` zuständig ist. Wenn eine vollständige Seite gerendert wird, muss außerdem die Seitenmenübeschreibung über die link:menu-dsl-de.adoc[Menu DSL] angegeben werden.
 
 Diese DSL ist auch für die Verwaltung des Stapels modaler Fenster verantwortlich. Öffnen Sie ein Modal mit `modal` oder schließen Sie es mit `closeModalAndUpdateBlock` (und anderen Varianten).
 
@@ -60,9 +60,10 @@ def editSlideshow(CmsPage slideshow) {
 
 pass:[<a class="taackMenu" ajaxAction="/dslSample/block" href="/dslSample/block">&#9654; Try it live</a>]
 
+[[_modal_stack_code_sample]]
 == Codebeispiel für den Modal-Stapel
 
-Nach der Verarbeitung eines Formulars können Sie den Inhalt der Seite oder eines anderen Modals unterhalb des aktuellen aktualisieren. Sie können die Seite auch neu laden oder eine andere Seite anzeigen. Das Neuladen der Seite macht den Code wiederverwendbar, da er nicht von der aktuellen URL abhängt (denken Sie an die `redirectAction`-*Parameter* in link:../../first-app.adoc#_adding_buttons_to_a_table_block[Erste App (Schaltflächen zu einem Tabellenblock hinzufügen)]).
+Nach der Verarbeitung eines Formulars können Sie den Inhalt der Seite oder eines anderen Modals unterhalb des aktuellen aktualisieren. Sie können die Seite auch neu laden oder eine andere Seite anzeigen. Das Neuladen der Seite macht den Code wiederverwendbar, da er nicht von der aktuellen URL abhängt (denken Sie an die `redirectAction`-*Parameter* in link:../../first-app-de.adoc#_adding_buttons_to_a_table_block[Erste App (Schaltflächen zu einem Tabellenblock hinzufügen)]).
 
 Normalerweise wird ein Modal nach der Verarbeitung eines Formulars geschlossen. Entweder ist es ungültig und die Fehler werden im Browser direkt im Formular angezeigt, oder das Objekt wird gespeichert und der Inhalt aktualisiert.
 
@@ -237,13 +238,13 @@ image::screenshot-dsl-block-poke.webp[]
 * `poke`: aktualisiert den Inhalt nur, wenn die Bedingung wahr ist
 
 === Blätter (Leaves)
-Alle Blätter können eine optionale Closure entgegennehmen, die ein Menü beschreibt (siehe link:menu-dsl.adoc[Menu DSL]), das in der Blockkopfzeile angezeigt wird.
+Alle Blätter können eine optionale Closure entgegennehmen, die ein Menü beschreibt (siehe link:menu-dsl-de.adoc[Menu DSL]), das in der Blockkopfzeile angezeigt wird.
 
-* `form`: siehe link:form-dsl.adoc[Form DSL]
-* `show`: siehe link:show-dsl.adoc[Show DSL]
-* `table`, `tableFilter`: siehe link:filter-table-dsl.adoc[FilterTable DSL]
-* `diagram`, `diagramFilter`: siehe link:diagram-dsl.adoc[Diagram DSL]
-* `kanban`, `kanbanFilter`: siehe link:kanban-dsl.adoc[Kanban DSL]
+* `form`: siehe link:form-dsl-de.adoc[Form DSL]
+* `show`: siehe link:show-dsl-de.adoc[Show DSL]
+* `table`, `tableFilter`: siehe link:filter-table-dsl-de.adoc[FilterTable DSL]
+* `diagram`, `diagramFilter`: siehe link:diagram-dsl-de.adoc[Diagram DSL]
+* `kanban`, `kanbanFilter`: siehe link:kanban-dsl-de.adoc[Kanban DSL]
 * `custom`: benutzerdefinierter HTML-Code
 * `iframe`: zeigt eine URL in einem Iframe an
 

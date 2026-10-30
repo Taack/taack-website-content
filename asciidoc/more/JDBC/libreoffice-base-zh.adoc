@@ -82,7 +82,7 @@ image::lo-base-queries-designer-screenshot.webp[]
 
 现在，您可以输入 TQL 查询了……
 
-请参阅 link:taack-jdbc-driver.adoc#_tql_queries[TQL 查询]。
+请参阅 link:taack-jdbc-driver-zh.adoc#_tql_queries[TQL 查询]。
 
 == 在 Calc 中使用
 

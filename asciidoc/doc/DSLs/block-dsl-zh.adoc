@@ -10,7 +10,7 @@
 * [*] 支持渲染为 PDF
 * [ ] 支持渲染为 CSV
 
-顶层 DSL，负责排列页面图形元素并统一更新 `ajaxBlock`。如果要渲染完整页面，还必须通过 link:menu-dsl.adoc[菜单 DSL (Menu DSL)] 指定页面菜单描述。
+顶层 DSL，负责排列页面图形元素并统一更新 `ajaxBlock`。如果要渲染完整页面，还必须通过 link:menu-dsl-zh.adoc[菜单 DSL (Menu DSL)] 指定页面菜单描述。
 
 该 DSL 还负责管理模态窗口栈。使用 `modal` 打开模态窗口，或使用 `closeModalAndUpdateBlock`（及其他变体）关闭模态窗口。
 
@@ -60,9 +60,10 @@ def editSlideshow(CmsPage slideshow) {
 
 pass:[<a class="taackMenu" ajaxAction="/dslSample/block" href="/dslSample/block">&#9654; Try it live</a>]
 
+[[_modal_stack_code_sample]]
 == 模态窗口栈代码示例
 
-处理完表单后，您可以刷新页面内容，或刷新当前模态窗口下方的另一个模态窗口。您也可以重新加载页面或显示其他页面。重新加载页面可使代码具有可重用性，因为它不依赖于当前 URL（请回顾在 link:../../first-app.adoc#_adding_buttons_to_a_table_block[第一个应用（向表格块添加按钮）] 中看到的 `redirectAction` **参数**）。
+处理完表单后，您可以刷新页面内容，或刷新当前模态窗口下方的另一个模态窗口。您也可以重新加载页面或显示其他页面。重新加载页面可使代码具有可重用性，因为它不依赖于当前 URL（请回顾在 link:../../first-app-zh.adoc#_adding_buttons_to_a_table_block[第一个应用（向表格块添加按钮）] 中看到的 `redirectAction` **参数**）。
 
 通常在处理完表单后会关闭模态窗口。如果验证未通过，错误信息会直接在浏览器的表单中显示；如果验证通过，则保存对象并刷新内容。
 
@@ -237,13 +238,13 @@ image::screenshot-dsl-block-poke.webp[]
 * `poke`：仅当条件为真时才刷新内容
 
 === 叶子元素 (Leaves)
-所有叶子元素都可以接收一个可选闭包来描述显示在块头部的菜单（参见 link:menu-dsl.adoc[Menu DSL]）。
+所有叶子元素都可以接收一个可选闭包来描述显示在块头部的菜单（参见 link:menu-dsl-zh.adoc[Menu DSL]）。
 
-* `form`：参见 link:form-dsl.adoc[Form DSL]
-* `show`：参见 link:show-dsl.adoc[Show DSL]
-* `table`、`tableFilter`：参见 link:filter-table-dsl.adoc[FilterTable DSL]
-* `diagram`、`diagramFilter`：参见 link:diagram-dsl.adoc[Diagram DSL]
-* `kanban`、`kanbanFilter`：参见 link:kanban-dsl.adoc[Kanban DSL]
+* `form`：参见 link:form-dsl-zh.adoc[Form DSL]
+* `show`：参见 link:show-dsl-zh.adoc[Show DSL]
+* `table`、`tableFilter`：参见 link:filter-table-dsl-zh.adoc[FilterTable DSL]
+* `diagram`、`diagramFilter`：参见 link:diagram-dsl-zh.adoc[Diagram DSL]
+* `kanban`、`kanbanFilter`：参见 link:kanban-dsl-zh.adoc[Kanban DSL]
 * `custom`：自定义 HTML 代码
 * `iframe`：在 iframe 中显示 URL
 

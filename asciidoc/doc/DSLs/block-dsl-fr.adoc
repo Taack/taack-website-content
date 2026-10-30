@@ -10,7 +10,7 @@
 * [*] Rendu en PDF
 * [ ] Rendu en CSV
 
-DSL de premier niveau responsable de l'agencement des éléments graphiques de la page et de la mise à jour conjointe des `ajaxBlock`. Dans le cas du rendu d'une page complète, il faut également spécifier la description du menu de la page via le link:menu-dsl.adoc[Menu DSL].
+DSL de premier niveau responsable de l'agencement des éléments graphiques de la page et de la mise à jour conjointe des `ajaxBlock`. Dans le cas du rendu d'une page complète, il faut également spécifier la description du menu de la page via le link:menu-dsl-fr.adoc[Menu DSL].
 
 Ce DSL est également responsable de la gestion de la pile de fenêtres modales. Ouvrez une modale à l'aide de `modal` ou fermez-la à l'aide de `closeModalAndUpdateBlock` (et d'autres variantes).
 
@@ -60,9 +60,10 @@ def editSlideshow(CmsPage slideshow) {
 
 pass:[<a class="taackMenu" ajaxAction="/dslSample/block" href="/dslSample/block">&#9654; Try it live</a>]
 
+[[_modal_stack_code_sample]]
 == Exemple de code de pile modale
 
-Après le traitement d'un formulaire, vous pouvez rafraîchir le contenu de la page ou d'une autre fenêtre modale située sous la modale courante. Vous pouvez également recharger la page ou afficher une autre page. Le rechargement de la page permet au code d'être réutilisable, car il ne dépend pas de l'URL courante (souvenez-vous du *paramètre* `redirectAction` vu dans link:../../first-app.adoc#_adding_buttons_to_a_table_block[Première application (Ajout de boutons à un bloc de table)]).
+Après le traitement d'un formulaire, vous pouvez rafraîchir le contenu de la page ou d'une autre fenêtre modale située sous la modale courante. Vous pouvez également recharger la page ou afficher une autre page. Le rechargement de la page permet au code d'être réutilisable, car il ne dépend pas de l'URL courante (souvenez-vous du *paramètre* `redirectAction` vu dans link:../../first-app-fr.adoc#_adding_buttons_to_a_table_block[Première application (Ajout de boutons à un bloc de table)]).
 
 Généralement, une modale est fermée après le traitement d'un formulaire. Soit l'objet n'est pas valide et les erreurs sont affichées directement dans le formulaire par le navigateur, soit l'objet est enregistré et le contenu est rafraîchi.
 
@@ -237,13 +238,13 @@ image::screenshot-dsl-block-poke.webp[]
 * `poke` : rafraîchit le contenu uniquement si la condition est vraie
 
 === Feuilles (Leaves)
-Toutes les feuilles peuvent prendre une closure optionnelle décrivant un menu (voir link:menu-dsl.adoc[Menu DSL]) affiché dans l'en-tête du bloc.
+Toutes les feuilles peuvent prendre une closure optionnelle décrivant un menu (voir link:menu-dsl-fr.adoc[Menu DSL]) affiché dans l'en-tête du bloc.
 
-* `form` : voir link:form-dsl.adoc[Form DSL]
-* `show` : voir link:show-dsl.adoc[Show DSL]
-* `table`, `tableFilter` : voir link:filter-table-dsl.adoc[FilterTable DSL]
-* `diagram`, `diagramFilter` : voir link:diagram-dsl.adoc[Diagram DSL]
-* `kanban`, `kanbanFilter` : voir link:kanban-dsl.adoc[Kanban DSL]
+* `form` : voir link:form-dsl-fr.adoc[Form DSL]
+* `show` : voir link:show-dsl-fr.adoc[Show DSL]
+* `table`, `tableFilter` : voir link:filter-table-dsl-fr.adoc[FilterTable DSL]
+* `diagram`, `diagramFilter` : voir link:diagram-dsl-fr.adoc[Diagram DSL]
+* `kanban`, `kanbanFilter` : voir link:kanban-dsl-fr.adoc[Kanban DSL]
 * `custom` : code HTML personnalisé
 * `iframe` : affiche une URL dans une iframe
 

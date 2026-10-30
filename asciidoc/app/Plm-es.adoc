@@ -15,7 +15,7 @@ Gestionar el uso compartido de modelos de FreeCAD y el versionado lineal. Esta a
 * `ROLE_ADMIN`
 * `ROLE_PLM_USER`
 
-Consulte link:Crew.adoc#_purpose[configurar roles en Crew] para añadir el rol en su Intranet.
+Consulte link:Crew-es.adoc#_purpose[configurar roles en Crew] para añadir el rol en su Intranet.
 
 == Instalación del servidor
 

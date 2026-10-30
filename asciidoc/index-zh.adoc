@@ -20,7 +20,7 @@ icon:rocket[]
 
 配置 Java、Grails 以及您的第一个 Taack 服务器。
 
-link:usage.adoc#_installation_guide[安装指南 →]
+link:usage-zh.adoc#_installation_guide[安装指南 →]
 ====
 
 [.home-card]
@@ -31,7 +31,7 @@ icon:graduation-cap[]
 
 循序渐进：表格、表单、过滤器和菜单。
 
-link:usage.adoc#_first_app[构建您的第一个应用 →]
+link:usage-zh.adoc#_first_app[构建您的第一个应用 →]
 ====
 
 [.home-card]
@@ -42,14 +42,14 @@ icon:play-circle[]
 
 每个 DSL 页面都可以在模态窗口中实时打开并运行示例。
 
-link:doc/DSLs/form-dsl.adoc[探索 DSL →]
+link:doc/DSLs/form-dsl-zh.adoc[探索 DSL →]
 ====
 --
 
 [.home-news]
 ****
 *最新版本：0.7.11*（含 0.7.10）：新增可从设置菜单中选择的多款主题，并重构了保存机制以避免数据绑定。
-link:news.adoc[全部新闻 →]
+link:news-zh.adoc[全部新闻 →]
 ****
 
 == 从代码到界面
@@ -107,7 +107,7 @@ icon:shield[]
 
 根据用户在*每个字段*上的权限来显示和编辑对象。用户无权执行的链接和表单操作会自动隐藏。
 
-link:doc/UserGuide/Security.adoc[安全控制 →]
+link:doc/UserGuide/Security-zh.adoc[安全控制 →]
 ====
 
 [.home-card]
@@ -118,7 +118,7 @@ icon:file-pdf-o[]
 
 同一份界面描述可同时渲染为 *HTML*、*PDF*、*邮件*和 *CSV*。
 
-link:doc/DSLs/block-printable-dsl.adoc[打印 DSL →]
+link:doc/DSLs/block-printable-dsl-zh.adoc[打印 DSL →]
 ====
 
 [.home-card]
@@ -129,7 +129,7 @@ icon:language[]
 
 标签来自 i18n 国际化文件，校验错误无需编写额外代码即可实现本地化显示。
 
-link:doc/DSLs/form-dsl.adoc#_form_validation[表单校验 →]
+link:doc/DSLs/form-dsl-zh.adoc#_form_validation[表单校验 →]
 ====
 
 [.home-card]
@@ -140,7 +140,7 @@ icon:table[]
 
 无需编写查询语句或维护会话数据，即可实现表格与过滤器。
 
-link:doc/DSLs/filter-table-dsl.adoc[过滤器与表格 DSL →]
+link:doc/DSLs/filter-table-dsl-zh.adoc[过滤器与表格 DSL →]
 ====
 
 [.home-card]
@@ -151,7 +151,7 @@ icon:search[]
 
 对静态类型的领域对象进行 Solr 索引，支持分面搜索与结果排序，并可扩展文件预览功能。
 
-link:more/Search/Search.adoc[全文检索 →]
+link:more/Search/Search-zh.adoc[全文检索 →]
 ====
 
 [.home-card]
@@ -162,7 +162,7 @@ icon:database[]
 
 在 IntelliJ、DBeaver 或 LibreOffice Base 中使用 TQL（Taack 查询语言）查询领域对象。
 
-link:more/JDBC/taack-jdbc-driver.adoc[Taack JDBC 驱动 →]
+link:more/JDBC/taack-jdbc-driver-zh.adoc[Taack JDBC 驱动 →]
 ====
 
 [.home-card]
@@ -184,7 +184,7 @@ icon:code-fork[]
 
 Intercom 应用通过 SSH 提供 Git 服务：使用 AsciiDoc 编写的文档在推送后即可直接渲染。
 
-link:app/Intercom.adoc[Intercom →]
+link:app/Intercom-zh.adoc[Intercom →]
 ====
 --
 
@@ -233,7 +233,7 @@ image::screenshot-dsl-table.webp[Crew]
 
 *Crew*：用户、角色与组织层级管理。
 
-link:app/Crew.adoc[Crew →]
+link:app/Crew-zh.adoc[Crew →]
 ====
 
 [.home-card]
@@ -242,7 +242,7 @@ image::plm12-screenshot.webp[FreeCAD PLM]
 
 *FreeCAD PLM*：FreeCAD 模型共享与线性版本控制。
 
-link:app/Plm.adoc[FreeCAD PLM →]
+link:app/Plm-zh.adoc[FreeCAD PLM →]
 ====
 
 [.home-card]
@@ -251,7 +251,7 @@ image::news-table2.webp[Intercom]
 
 *Intercom*：SSH 与 Git 服务器，支持通过 Git 推送 AsciiDoc 文档。
 
-link:app/Intercom.adoc[Intercom →]
+link:app/Intercom-zh.adoc[Intercom →]
 ====
 
 [.home-card]
@@ -260,7 +260,7 @@ image::step-preview1.webp[Viewers]
 
 *Viewers*：转换并预览文件（例如 STEP 模型）。
 
-link:app/Viewers.adoc[Viewers →]
+link:app/Viewers-zh.adoc[Viewers →]
 ====
 
 [.home-card]
@@ -269,7 +269,7 @@ image::collabora-editor.webp[Collabora Editor]
 
 *Collabora Editor*：使用 Collabora 在线编辑办公文档附件。
 
-link:app/Collabora-Editor.adoc[Collabora Editor →]
+link:app/Collabora-Editor-zh.adoc[Collabora Editor →]
 ====
 --
 

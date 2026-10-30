@@ -15,7 +15,7 @@ Verwaltung des Austauschs von FreeCAD-Modellen und der linearen Versionierung. D
 * `ROLE_ADMIN`
 * `ROLE_PLM_USER`
 
-Siehe link:Crew.adoc#_purpose[Rollen in Crew konfigurieren], um die Rolle zu Ihrem Intranet hinzuzufügen.
+Siehe link:Crew-de.adoc#_purpose[Rollen in Crew konfigurieren], um die Rolle zu Ihrem Intranet hinzuzufügen.
 
 == Server-Installation
 

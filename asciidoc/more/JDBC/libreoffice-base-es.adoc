@@ -82,7 +82,7 @@ image::lo-base-queries-designer-screenshot.webp[]
 
 Ahora puede escribir sus consultas TQL...
 
-Consulte link:taack-jdbc-driver.adoc#_tql_queries[Consultas TQL].
+Consulte link:taack-jdbc-driver-es.adoc#_tql_queries[Consultas TQL].
 
 == Uso en Calc
 

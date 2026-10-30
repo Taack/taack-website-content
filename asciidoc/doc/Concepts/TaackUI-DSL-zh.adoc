@@ -9,7 +9,7 @@
 
 Block DSL 允许通过定义包含图形元素的块（Block）来指定页面布局。块可以通过动作（action）进行更新。`AJAX 块` 可以通过其 ID 进行定向更新。块也支持嵌套。
 
-更多信息请参阅 link:../DSLs/block-dsl.adoc[Block DSL] 专属页面。PDF 拥有独立的块管理机制，即通过 link:../DSLs/block-printable-dsl.adoc[可打印块（Printable Blocks）] 进行管理，其中同样可以使用详情展示（show）、表格（table）和图表（diagram）DSL。
+更多信息请参阅 link:../DSLs/block-dsl.adoc[Block DSL] 专属页面。PDF 拥有独立的块管理机制，即通过 link:../DSLs/block-printable-dsl-zh.adoc[可打印块（Printable Blocks）] 进行管理，其中同样可以使用详情展示（show）、表格（table）和图表（diagram）DSL。
 
 [source,groovy]
 ----
@@ -31,21 +31,21 @@ image::screenshot-dsl-user-form-800h.webp[]
 
 == 块元素 DSL
 
-* link:../DSLs/form-dsl.adoc[*表单 DSL（Form DSL）*]：允许定义要包含在块中的表单
+* link:../DSLs/form-dsl-zh.adoc[*表单 DSL（Form DSL）*]：允许定义要包含在块中的表单
 
-* link:../DSLs/show-dsl.adoc[*详情展示 DSL（Show DSL）*]：允许显示对象摘要，并支持有限的字段编辑功能
+* link:../DSLs/show-dsl-zh.adoc[*详情展示 DSL（Show DSL）*]：允许显示对象摘要，并支持有限的字段编辑功能
 
-* link:../DSLs/filter-table-dsl.adoc[*表格与表格筛选器 DSL（Table and Table filter DSL）*]：一个表格可关联零个或一个筛选器。筛选器不能脱离表格单独显示。
+* link:../DSLs/filter-table-dsl-zh.adoc[*表格与表格筛选器 DSL（Table and Table filter DSL）*]：一个表格可关联零个或一个筛选器。筛选器不能脱离表格单独显示。
 ** 表格 DSL 允许对列进行分组和排序
 ** 内置分页功能
 ** 表格也可以呈现树形结构
 ** 支持行内快速编辑（`rowQuickEdit`）
 ** 筛选器可以显示在表格旁边，或作为工具栏显示在表格上方（`FilterLayout`）
-* link:../DSLs/diagram-dsl.adoc[*图表 DSL（Diagram DSL）*]：允许在块、PDF 或邮件中绘制图表（柱状图、折线图、面积图、散点图、饼图、箱线图、时间轴图）
-* link:../DSLs/kanban-dsl.adoc[*看板 DSL（Kanban DSL）*]：允许绘制支持列间拖放的看板（Kanban）
+* link:../DSLs/diagram-dsl-zh.adoc[*图表 DSL（Diagram DSL）*]：允许在块、PDF 或邮件中绘制图表（柱状图、折线图、面积图、散点图、饼图、箱线图、时间轴图）
+* link:../DSLs/kanban-dsl-zh.adoc[*看板 DSL（Kanban DSL）*]：允许绘制支持列间拖放的看板（Kanban）
 * `custom`：允许将自定义 HTML 代码插入到块中。
 
 == 页面级 DSL
 
-* link:../DSLs/menu-dsl.adoc[*菜单 DSL（Menu DSL）*]：描述页面菜单（菜单项、子菜单、图标、搜索框、选项）
-* link:../DSLs/block-printable-dsl.adoc[*可打印块 DSL（Printable Block DSL）*]：描述 PDF 文档的布局
+* link:../DSLs/menu-dsl-zh.adoc[*菜单 DSL（Menu DSL）*]：描述页面菜单（菜单项、子菜单、图标、搜索框、选项）
+* link:../DSLs/block-printable-dsl-zh.adoc[*可打印块 DSL（Printable Block DSL）*]：描述 PDF 文档的布局

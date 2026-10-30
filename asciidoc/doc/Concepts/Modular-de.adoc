@@ -7,7 +7,7 @@
 
 = Modulare Anwendungsentwicklung
 
-Die https://github.com/Taack/intranet[Intranet-Beispielanwendung] ist eine modulare https://gradle.org/[Gradle]-Anwendung. Eine Anleitung zum Ausführen erhalten Sie unter: link:../../usage.adoc[Beispiel-Intranet installieren].
+Die https://github.com/Taack/intranet[Intranet-Beispielanwendung] ist eine modulare https://gradle.org/[Gradle]-Anwendung. Eine Anleitung zum Ausführen erhalten Sie unter: link:../../usage-de.adoc[Beispiel-Intranet installieren].
 
 == Verzeichnisstruktur der Intranet-Beispielanwendung
 
@@ -80,4 +80,4 @@ Enthält den Quellcode des Plugins *taack-ui*.
 
 * Der Ordner _browser_ enthält Code, der im Browser ausgeführt wird
 * _taack-jdbc-common_ enthält gemeinsame Klassen, die von _taack-ui_ und _taack-jdbc-client_ genutzt werden
-* _taack-jdbc-client_ ist der JDBC-Treiber (siehe link:../../more/JDBC/taack-jdbc-driver.adoc[taack-jdbc-driver])
+* _taack-jdbc-client_ ist der JDBC-Treiber (siehe link:../../more/JDBC/taack-jdbc-driver-de.adoc[taack-jdbc-driver])

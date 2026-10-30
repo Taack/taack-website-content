@@ -20,7 +20,7 @@ icon:rocket[]
 
 Configura Java, Grails e il tuo primo server Taack.
 
-link:usage.adoc#_installation_guide[Guida all'installazione →]
+link:usage-it.adoc#_installation_guide[Guida all'installazione →]
 ====
 
 [.home-card]
@@ -31,7 +31,7 @@ icon:graduation-cap[]
 
 Passo dopo passo: una tabella, un modulo, un filtro, un menu.
 
-link:usage.adoc#_first_app[Crea la tua prima applicazione →]
+link:usage-it.adoc#_first_app[Crea la tua prima applicazione →]
 ====
 
 [.home-card]
@@ -42,14 +42,14 @@ icon:play-circle[]
 
 Ogni pagina DSL apre i propri esempi dal vivo, in una finestra modale.
 
-link:doc/DSLs/form-dsl.adoc[Esplora i DSL →]
+link:doc/DSLs/form-dsl-it.adoc[Esplora i DSL →]
 ====
 --
 
 [.home-news]
 ****
 *Ultima versione: 0.7.11* (con 0.7.10): nuovi temi selezionabili dal menu delle impostazioni e un salvataggio riprogettato che evita il binding.
-link:news.adoc[Tutte le novità →]
+link:news-it.adoc[Tutte le novità →]
 ****
 
 == Dal codice allo schermo
@@ -107,7 +107,7 @@ icon:shield[]
 
 Gli oggetti vengono visualizzati e modificati in base ai permessi dell'utente su *ogni campo*. I link e le azioni dei moduli che l'utente non può eseguire vengono nascosti automaticamente.
 
-link:doc/UserGuide/Security.adoc[Sicurezza →]
+link:doc/UserGuide/Security-it.adoc[Sicurezza →]
 ====
 
 [.home-card]
@@ -118,7 +118,7 @@ icon:file-pdf-o[]
 
 La stessa descrizione genera *HTML*, *PDF*, *email* e *CSV*.
 
-link:doc/DSLs/block-printable-dsl.adoc[DSL di stampa →]
+link:doc/DSLs/block-printable-dsl-it.adoc[DSL di stampa →]
 ====
 
 [.home-card]
@@ -129,7 +129,7 @@ icon:language[]
 
 Le etichette provengono dai file i18n e gli errori di validazione vengono localizzati senza codice aggiuntivo.
 
-link:doc/DSLs/form-dsl.adoc#_form_validation[Validazione dei moduli →]
+link:doc/DSLs/form-dsl-it.adoc#_form_validation[Validazione dei moduli →]
 ====
 
 [.home-card]
@@ -140,7 +140,7 @@ icon:table[]
 
 Tabelle e filtri senza scrivere query né mantenere dati in sessione.
 
-link:doc/DSLs/filter-table-dsl.adoc[DSL per filtri e tabelle →]
+link:doc/DSLs/filter-table-dsl-it.adoc[DSL per filtri e tabelle →]
 ====
 
 [.home-card]
@@ -151,7 +151,7 @@ icon:search[]
 
 Indicizzazione Solr di oggetti di dominio tipizzati staticamente, con faceting e ranking. Le anteprime dei file sono estendibili.
 
-link:more/Search/Search.adoc[Ricerca →]
+link:more/Search/Search-it.adoc[Ricerca →]
 ====
 
 [.home-card]
@@ -162,7 +162,7 @@ icon:database[]
 
 Interroga gli oggetti di dominio con TQL (Taack Query Language) da IntelliJ, DBeaver o LibreOffice Base.
 
-link:more/JDBC/taack-jdbc-driver.adoc[Driver JDBC Taack →]
+link:more/JDBC/taack-jdbc-driver-it.adoc[Driver JDBC Taack →]
 ====
 
 [.home-card]
@@ -184,7 +184,7 @@ icon:code-fork[]
 
 L'applicazione Intercom fornisce Git su SSH: la documentazione scritta in AsciiDoc viene inviata tramite push e quindi renderizzata.
 
-link:app/Intercom.adoc[Intercom →]
+link:app/Intercom-it.adoc[Intercom →]
 ====
 --
 
@@ -233,7 +233,7 @@ image::screenshot-dsl-table.webp[Crew]
 
 *Crew*: utenti, ruoli e gerarchia.
 
-link:app/Crew.adoc[Crew →]
+link:app/Crew-it.adoc[Crew →]
 ====
 
 [.home-card]
@@ -242,7 +242,7 @@ image::plm12-screenshot.webp[FreeCAD PLM]
 
 *FreeCAD PLM*: condivisione di modelli FreeCAD e versionamento lineare.
 
-link:app/Plm.adoc[FreeCAD PLM →]
+link:app/Plm-it.adoc[FreeCAD PLM →]
 ====
 
 [.home-card]
@@ -251,7 +251,7 @@ image::news-table2.webp[Intercom]
 
 *Intercom*: server SSH e Git, documentazione AsciiDoc pubblicata tramite Git.
 
-link:app/Intercom.adoc[Intercom →]
+link:app/Intercom-it.adoc[Intercom →]
 ====
 
 [.home-card]
@@ -260,7 +260,7 @@ image::step-preview1.webp[Viewers]
 
 *Viewers*: conversione e anteprima di file, come i modelli STEP.
 
-link:app/Viewers.adoc[Viewers →]
+link:app/Viewers-it.adoc[Viewers →]
 ====
 
 [.home-card]
@@ -269,7 +269,7 @@ image::collabora-editor.webp[Collabora Editor]
 
 *Collabora Editor*: modifica online di allegati da ufficio con Collabora.
 
-link:app/Collabora-Editor.adoc[Collabora Editor →]
+link:app/Collabora-Editor-it.adoc[Collabora Editor →]
 ====
 --
 

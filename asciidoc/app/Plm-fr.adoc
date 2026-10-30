@@ -15,7 +15,7 @@ Gérer le partage de modèles FreeCAD et le versionnement linéaire. Cette appli
 * `ROLE_ADMIN`
 * `ROLE_PLM_USER`
 
-Voir link:Crew.adoc#_purpose[configurer les rôles dans Crew] pour ajouter le rôle dans votre Intranet.
+Voir link:Crew-fr.adoc#_purpose[configurer les rôles dans Crew] pour ajouter le rôle dans votre Intranet.
 
 == Installation du serveur
 

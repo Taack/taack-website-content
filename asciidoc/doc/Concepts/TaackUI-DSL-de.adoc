@@ -9,7 +9,7 @@
 
 Die Block DSL ermöglicht die Spezifikation des Seitenlayouts durch die Definition von Blöcken, die grafische Elemente enthalten. Ein Block kann durch Aktionen aktualisiert werden. `AJAX-Blöcke` können über ihre ID adressiert werden. Blöcke können auch verschachtelt werden.
 
-Weitere Informationen finden Sie auf der entsprechenden Seite zur link:../DSLs/block-dsl.adoc[Block DSL]. PDFs verfügen über eine eigene Blockverwaltung über link:../DSLs/block-printable-dsl.adoc[Printable Blocks], wobei die Show-, Table- und Diagram-DSLs ebenfalls anwendbar sind.
+Weitere Informationen finden Sie auf der entsprechenden Seite zur link:../DSLs/block-dsl.adoc[Block DSL]. PDFs verfügen über eine eigene Blockverwaltung über link:../DSLs/block-printable-dsl-de.adoc[Printable Blocks], wobei die Show-, Table- und Diagram-DSLs ebenfalls anwendbar sind.
 
 [source,groovy]
 ----
@@ -31,21 +31,21 @@ image::screenshot-dsl-user-form-800h.webp[]
 
 == Blockelement-DSLs
 
-* link:../DSLs/form-dsl.adoc[*Form DSL*]: Ermöglicht die Definition eines Formulars, das in einen Block eingebunden wird
+* link:../DSLs/form-dsl-de.adoc[*Form DSL*]: Ermöglicht die Definition eines Formulars, das in einen Block eingebunden wird
 
-* link:../DSLs/show-dsl.adoc[*Show DSL*]: Ermöglicht die Anzeige einer Objektzusammenfassung. Unterstützt eine eingeschränkte Feldbearbeitung
+* link:../DSLs/show-dsl-de.adoc[*Show DSL*]: Ermöglicht die Anzeige einer Objektzusammenfassung. Unterstützt eine eingeschränkte Feldbearbeitung
 
-* link:../DSLs/filter-table-dsl.adoc[*Table- und Table-Filter-DSL*]: Eine Tabelle ist mit einem oder keinem Filter verknüpft. Filter können nicht ohne eine Tabelle angezeigt werden.
+* link:../DSLs/filter-table-dsl-de.adoc[*Table- und Table-Filter-DSL*]: Eine Tabelle ist mit einem oder keinem Filter verknüpft. Filter können nicht ohne eine Tabelle angezeigt werden.
 ** Die Table DSL ermöglicht das Gruppieren und Sortieren von Spalten
 ** Paginierung ist integriert
 ** Die Tabelle kann auch eine Baumstruktur darstellen
 ** Zeilen können direkt inline bearbeitet werden (`rowQuickEdit`)
 ** Der Filter kann neben der Tabelle oder als Symbolleiste darüber angezeigt werden (`FilterLayout`)
-* link:../DSLs/diagram-dsl.adoc[*Diagram DSL*]: Ermöglicht das Zeichnen von Diagrammen (Balken-, Linien-, Flächen-, Streu-, Kreis-, Boxplot-, Zeitachsendiagramme) in einem Block, einem PDF oder einer E-Mail
-* link:../DSLs/kanban-dsl.adoc[*Kanban DSL*]: Ermöglicht das Zeichnen eines Kanban-Boards mit Drag & Drop zwischen Spalten
+* link:../DSLs/diagram-dsl-de.adoc[*Diagram DSL*]: Ermöglicht das Zeichnen von Diagrammen (Balken-, Linien-, Flächen-, Streu-, Kreis-, Boxplot-, Zeitachsendiagramme) in einem Block, einem PDF oder einer E-Mail
+* link:../DSLs/kanban-dsl-de.adoc[*Kanban DSL*]: Ermöglicht das Zeichnen eines Kanban-Boards mit Drag & Drop zwischen Spalten
 * `custom`: Ermöglicht das Einfügen von benutzerdefiniertem HTML-Code in einen Block.
 
 == DSLs auf Seitenebene
 
-* link:../DSLs/menu-dsl.adoc[*Menu DSL*]: Beschreibt das Seitenmenü (Einträge, Untermenüs, Symbole, Suchfeld, Optionen)
-* link:../DSLs/block-printable-dsl.adoc[*Printable Block DSL*]: Beschreibt das Layout eines PDF-Dokuments
+* link:../DSLs/menu-dsl-de.adoc[*Menu DSL*]: Beschreibt das Seitenmenü (Einträge, Untermenüs, Symbole, Suchfeld, Optionen)
+* link:../DSLs/block-printable-dsl-de.adoc[*Printable Block DSL*]: Beschreibt das Layout eines PDF-Dokuments

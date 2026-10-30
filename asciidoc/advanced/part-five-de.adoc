@@ -30,7 +30,7 @@ Um ein PDF zu erstellen, verwenden Sie einen `UiPrintableSpecifier()`, der aus f
 - `printableBody`: ermöglicht das Definieren des Inhalts des PDFs über mehrere Seiten hinweg.
 - `printableFooter`: ermöglicht das Definieren der Fußzeile, die auf allen Seiten wiederholt wird (die Größe darf 2 cm nicht überschreiten).
 
-Wenn Sie ein Beispiel sehen möchten, lesen Sie link:doc/DSLs/block-printable-dsl.adoc[DSL für druckbare Blöcke (Printable Block DSL)].
+Wenn Sie ein Beispiel sehen möchten, lesen Sie link:doc/DSLs/block-printable-dsl-de.adoc[DSL für druckbare Blöcke (Printable Block DSL)].
 
 === Druckbare Kopfzeile (Printable Header)
 

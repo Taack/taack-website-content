@@ -602,7 +602,7 @@ def dropEditor() {                                                  <2>
 <7> 如果文件是 ODS 或 Writer 文件，它将被转换为 Asciidoc 并导入图片
 <8> 如果文件是图片，它将被保存到 CMS 中。
 
-WARNING: `taackAsciidocService` 使用了来自 `taack-ui-asciidoc` 的 `TaackEditorService` 服务，参见 link:doc/DSLs/form-dsl.adoc#_asciidoc[表单 DSL]
+WARNING: `taackAsciidocService` 使用了来自 `taack-ui-asciidoc` 的 `TaackEditorService` 服务，参见 link:doc/DSLs/form-dsl-zh.adoc#_asciidoc[表单 DSL]
 
 [[taack-ui-configuration]]
 .TaackUiConfiguration
@@ -797,7 +797,7 @@ def showPart(PlmFreeCadPart part, Long partVersion, Boolean isHistory) {<1>
 
 == 0.5.4 版本
 
-* 重构图表 DSL（参见 link:doc/DSLs/diagram-dsl.adoc[]）
+* 重构图表 DSL（参见 link:doc/DSLs/diagram-dsl-zh.adoc[]）
 
 == 0.5.3 版本
 

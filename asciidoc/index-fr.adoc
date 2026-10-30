@@ -20,7 +20,7 @@ icon:rocket[]
 
 Configurez Java, Grails et votre premier serveur Taack.
 
-link:usage.adoc#_installation_guide[Guide d'installation →]
+link:usage-fr.adoc#_installation_guide[Guide d'installation →]
 ====
 
 [.home-card]
@@ -31,7 +31,7 @@ icon:graduation-cap[]
 
 Étape par étape : un tableau, un formulaire, un filtre, un menu.
 
-link:usage.adoc#_first_app[Créer votre première application →]
+link:usage-fr.adoc#_first_app[Créer votre première application →]
 ====
 
 [.home-card]
@@ -42,14 +42,14 @@ icon:play-circle[]
 
 Chaque page de DSL ouvre ses exemples en direct, dans une fenêtre modale.
 
-link:doc/DSLs/form-dsl.adoc[Explorer les DSL →]
+link:doc/DSLs/form-dsl-fr.adoc[Explorer les DSL →]
 ====
 --
 
 [.home-news]
 ****
 *Dernière version : 0.7.11* (avec 0.7.10) : nouveaux thèmes sélectionnables depuis le menu des paramètres, et une sauvegarde repensée qui évite le binding.
-link:news.adoc[Toutes les actualités →]
+link:news-fr.adoc[Toutes les actualités →]
 ****
 
 == Du code à l'écran
@@ -107,7 +107,7 @@ icon:shield[]
 
 Les objets sont affichés et modifiés selon les droits de l'utilisateur sur *chaque champ*. Les liens et actions de formulaire que l'utilisateur ne peut pas exécuter sont automatiquement masqués.
 
-link:doc/UserGuide/Security.adoc[Sécurité →]
+link:doc/UserGuide/Security-fr.adoc[Sécurité →]
 ====
 
 [.home-card]
@@ -118,7 +118,7 @@ icon:file-pdf-o[]
 
 La même description génère du *HTML*, du *PDF*, des *e-mails* et du *CSV*.
 
-link:doc/DSLs/block-printable-dsl.adoc[DSL d'impression →]
+link:doc/DSLs/block-printable-dsl-fr.adoc[DSL d'impression →]
 ====
 
 [.home-card]
@@ -129,7 +129,7 @@ icon:language[]
 
 Les libellés proviennent des fichiers i18n, et les erreurs de validation sont traduites sans code supplémentaire.
 
-link:doc/DSLs/form-dsl.adoc#_form_validation[Validation de formulaire →]
+link:doc/DSLs/form-dsl-fr.adoc#_form_validation[Validation de formulaire →]
 ====
 
 [.home-card]
@@ -140,7 +140,7 @@ icon:table[]
 
 Des tableaux et des filtres sans écrire de requêtes ni conserver de données en session.
 
-link:doc/DSLs/filter-table-dsl.adoc[DSL de filtre et de tableau →]
+link:doc/DSLs/filter-table-dsl-fr.adoc[DSL de filtre et de tableau →]
 ====
 
 [.home-card]
@@ -151,7 +151,7 @@ icon:search[]
 
 Indexation Solr d'objets du domaine typés statiquement, avec facettes et classement. Les aperçus de fichiers sont extensibles.
 
-link:more/Search/Search.adoc[Recherche →]
+link:more/Search/Search-fr.adoc[Recherche →]
 ====
 
 [.home-card]
@@ -162,7 +162,7 @@ icon:database[]
 
 Interrogez les objets du domaine avec TQL (Taack Query Language) depuis IntelliJ, DBeaver ou LibreOffice Base.
 
-link:more/JDBC/taack-jdbc-driver.adoc[Pilote JDBC Taack →]
+link:more/JDBC/taack-jdbc-driver-fr.adoc[Pilote JDBC Taack →]
 ====
 
 [.home-card]
@@ -184,7 +184,7 @@ icon:code-fork[]
 
 L'application Intercom sert Git via SSH : la documentation écrite en AsciiDoc est poussée via Git, puis rendue.
 
-link:app/Intercom.adoc[Intercom →]
+link:app/Intercom-fr.adoc[Intercom →]
 ====
 --
 
@@ -233,7 +233,7 @@ image::screenshot-dsl-table.webp[Crew]
 
 *Crew* : utilisateurs, rôles et hiérarchie.
 
-link:app/Crew.adoc[Crew →]
+link:app/Crew-fr.adoc[Crew →]
 ====
 
 [.home-card]
@@ -242,7 +242,7 @@ image::plm12-screenshot.webp[FreeCAD PLM]
 
 *FreeCAD PLM* : partage de modèles FreeCAD et gestion de versions linéaire.
 
-link:app/Plm.adoc[FreeCAD PLM →]
+link:app/Plm-fr.adoc[FreeCAD PLM →]
 ====
 
 [.home-card]
@@ -251,7 +251,7 @@ image::news-table2.webp[Intercom]
 
 *Intercom* : serveur SSH et Git, documentation AsciiDoc poussée via Git.
 
-link:app/Intercom.adoc[Intercom →]
+link:app/Intercom-fr.adoc[Intercom →]
 ====
 
 [.home-card]
@@ -260,7 +260,7 @@ image::step-preview1.webp[Viewers]
 
 *Viewers* : conversion et prévisualisation de fichiers, tels que les modèles STEP.
 
-link:app/Viewers.adoc[Viewers →]
+link:app/Viewers-fr.adoc[Viewers →]
 ====
 
 [.home-card]
@@ -269,7 +269,7 @@ image::collabora-editor.webp[Collabora Editor]
 
 *Collabora Editor* : édition en ligne de pièces jointes bureautiques avec Collabora.
 
-link:app/Collabora-Editor.adoc[Collabora Editor →]
+link:app/Collabora-Editor-fr.adoc[Collabora Editor →]
 ====
 --
 
