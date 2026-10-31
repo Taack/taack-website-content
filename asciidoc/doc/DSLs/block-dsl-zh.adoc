@@ -222,6 +222,8 @@ def topCustomerSalesCard(StatsParams statsParams) {
 .卡片、图表与 `poke`
 image::screenshot-dsl-block-poke.webp[]
 
+pass:[<a class="taackMenu" href="/dslSample/poke" target="_blank">&#9654; Try it live</a>]
+
 == 块 DSL 元素
 
 === 容器 (Containers)
