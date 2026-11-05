@@ -188,20 +188,18 @@ def topCustomerSalesCard(StatsParams statsParams) {
         row {
             poke p1, {                                              <2>
                 col BlockSpec.Width.HALF, {
-                    card({                                          <3>
+                    diagram(statsService.&buildChart1 as MC) {      <3>
                         label 'Sales1'
                         menu 'Yearly', StatsController.&topCustomerSalesCard as MC,
                             new StatsParams(showMonthlyGraph1: false, v: 1)
                         menu 'Monthly', StatsController.&topCustomerSalesCard as MC,
                             new StatsParams(groupPerMonth1: false, v: 1)
-                    }, {
-                        diagram statsService.&buildChart1 as MC     <4>
-                    })
+                    }
                 }
             }
             poke p2, {
                 col BlockSpec.Width.HALF, {
-                    diagram(statsService.&buildChart2 as MC) {      <5>
+                    diagram(statsService.&buildChart2 as MC) {      <4>
                         label 'Sales2'
                         menu 'Yearly', StatsController.&topCustomerSalesCard as MC,
                             new StatsParams(showMonthlyGraph2: false, v: 2)
@@ -209,20 +207,19 @@ def topCustomerSalesCard(StatsParams statsParams) {
                 }
             }
         }
-    }, RootController.buildMenu(), statsParams)                     <6>
+    }, RootController.buildMenu(), statsParams)                     <5>
 }
 ----
 <1> 表格行携带 `v: 1` 或 `v: 2` 链接到此操作，从而仅刷新其中一个图表
 <2> `p1` 和 `p2` 是布尔值。如果为 `true`，则刷新 `poke` 块内的子块
-<3> 带有菜单闭包和内容闭包的 `card`
-<4> `diagram` 可以接收返回 `UiDiagramSpecifier` 的 `MethodClosure`
-<5> 任何叶子元素都可以接收一个显示在其头部的菜单闭包
-<6> `StatsParams` 是一个 `Validateable`，点击链接时其值会被保留
+<3> `diagram` 可以接收返回 `UiDiagramSpecifier` 的 `MethodClosure`
+<4> 任何叶子元素都可以接收一个显示在其头部的菜单闭包
+<5> `StatsParams` 是一个 `Validateable`，点击链接时其值会被保留
 
 .卡片、图表与 `poke`
 image::screenshot-dsl-block-poke.webp[]
 
-pass:[<a class="taackMenu" href="/dslSample/poke" target="_blank">&#9654; Try it live</a>]
+pass:[<a class="taackMenu" ajaxAction="/dslSample/poke" href="/dslSample/poke">&#9654; Try it live</a>]
 
 == 块 DSL 元素
 

@@ -187,20 +187,18 @@ def topCustomerSalesCard(StatsParams statsParams) {
         row {
             poke p1, {                                              <2>
                 col BlockSpec.Width.HALF, {
-                    card({                                          <3>
+                    diagram(statsService.&buildChart1 as MC) {      <3>
                         label 'Sales1'
                         menu 'Yearly', StatsController.&topCustomerSalesCard as MC,
                             new StatsParams(showMonthlyGraph1: false, v: 1)
                         menu 'Monthly', StatsController.&topCustomerSalesCard as MC,
                             new StatsParams(groupPerMonth1: false, v: 1)
-                    }, {
-                        diagram statsService.&buildChart1 as MC     <4>
-                    })
+                    }
                 }
             }
             poke p2, {
                 col BlockSpec.Width.HALF, {
-                    diagram(statsService.&buildChart2 as MC) {      <5>
+                    diagram(statsService.&buildChart2 as MC) {      <4>
                         label 'Sales2'
                         menu 'Yearly', StatsController.&topCustomerSalesCard as MC,
                             new StatsParams(showMonthlyGraph2: false, v: 2)
@@ -208,20 +206,19 @@ def topCustomerSalesCard(StatsParams statsParams) {
                 }
             }
         }
-    }, RootController.buildMenu(), statsParams)                     <6>
+    }, RootController.buildMenu(), statsParams)                     <5>
 }
 ----
 <1> Table rows link to this action with `v: 1` or `v: 2`, refreshing only one of the diagrams
 <2> `p1` and `p2` are booleans. If true, blocks inside the `poke` block are refreshed
-<3> `card` with a menu closure and a content closure
-<4> `diagram` can take a `MethodClosure` returning an `UiDiagramSpecifier`
-<5> Any leaf can take a menu closure, displayed in its header
-<6> `StatsParams` is a `Validateable`, its values are kept when clicking on links
+<3> `diagram` can take a `MethodClosure` returning an `UiDiagramSpecifier`
+<4> Any leaf can take a menu closure, displayed in its header
+<5> `StatsParams` is a `Validateable`, its values are kept when clicking on links
 
 .Cards, Diagrams and `poke`
 image::screenshot-dsl-block-poke.webp[]
 
-pass:[<a class="taackMenu" href="/dslSample/poke" target="_blank">&#9654; Try it live</a>]
+pass:[<a class="taackMenu" ajaxAction="/dslSample/poke" href="/dslSample/poke">&#9654; Try it live</a>]
 
 == Block DSL Elements
 

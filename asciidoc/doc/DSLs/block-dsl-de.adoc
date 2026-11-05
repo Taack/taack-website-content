@@ -188,20 +188,18 @@ def topCustomerSalesCard(StatsParams statsParams) {
         row {
             poke p1, {                                              <2>
                 col BlockSpec.Width.HALF, {
-                    card({                                          <3>
+                    diagram(statsService.&buildChart1 as MC) {      <3>
                         label 'Sales1'
                         menu 'Yearly', StatsController.&topCustomerSalesCard as MC,
                             new StatsParams(showMonthlyGraph1: false, v: 1)
                         menu 'Monthly', StatsController.&topCustomerSalesCard as MC,
                             new StatsParams(groupPerMonth1: false, v: 1)
-                    }, {
-                        diagram statsService.&buildChart1 as MC     <4>
-                    })
+                    }
                 }
             }
             poke p2, {
                 col BlockSpec.Width.HALF, {
-                    diagram(statsService.&buildChart2 as MC) {      <5>
+                    diagram(statsService.&buildChart2 as MC) {      <4>
                         label 'Sales2'
                         menu 'Yearly', StatsController.&topCustomerSalesCard as MC,
                             new StatsParams(showMonthlyGraph2: false, v: 2)
@@ -209,20 +207,19 @@ def topCustomerSalesCard(StatsParams statsParams) {
                 }
             }
         }
-    }, RootController.buildMenu(), statsParams)                     <6>
+    }, RootController.buildMenu(), statsParams)                     <5>
 }
 ----
 <1> Tabellenzeilen verlinken auf diese Aktion mit `v: 1` oder `v: 2`, wodurch nur eines der Diagramme aktualisiert wird
 <2> `p1` und `p2` sind boolesche Werte. Wenn sie `true` sind, werden die Blöcke innerhalb des `poke`-Blocks aktualisiert
-<3> `card` mit einer Menü-Closure und einer Inhalts-Closure
-<4> `diagram` kann eine `MethodClosure` entgegennehmen, die einen `UiDiagramSpecifier` zurückgibt
-<5> Jedes Blatt-Element kann eine Menü-Closure entgegennehmen, die in seiner Kopfzeile angezeigt wird
-<6> `StatsParams` ist ein `Validateable`; seine Werte bleiben beim Klicken auf Links erhalten
+<3> `diagram` kann eine `MethodClosure` entgegennehmen, die einen `UiDiagramSpecifier` zurückgibt
+<4> Jedes Blatt-Element kann eine Menü-Closure entgegennehmen, die in seiner Kopfzeile angezeigt wird
+<5> `StatsParams` ist ein `Validateable`; seine Werte bleiben beim Klicken auf Links erhalten
 
 .Karten, Diagramme und `poke`
 image::screenshot-dsl-block-poke.webp[]
 
-pass:[<a class="taackMenu" href="/dslSample/poke" target="_blank">&#9654; Try it live</a>]
+pass:[<a class="taackMenu" ajaxAction="/dslSample/poke" href="/dslSample/poke">&#9654; Try it live</a>]
 
 == Block-DSL-Elemente
 

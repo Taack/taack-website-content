@@ -188,20 +188,18 @@ def topCustomerSalesCard(StatsParams statsParams) {
         row {
             poke p1, {                                              <2>
                 col BlockSpec.Width.HALF, {
-                    card({                                          <3>
+                    diagram(statsService.&buildChart1 as MC) {     <3>
                         label 'Sales1'
                         menu 'Yearly', StatsController.&topCustomerSalesCard as MC,
                             new StatsParams(showMonthlyGraph1: false, v: 1)
                         menu 'Monthly', StatsController.&topCustomerSalesCard as MC,
                             new StatsParams(groupPerMonth1: false, v: 1)
-                    }, {
-                        diagram statsService.&buildChart1 as MC     <4>
-                    })
+                    }
                 }
             }
             poke p2, {
                 col BlockSpec.Width.HALF, {
-                    diagram(statsService.&buildChart2 as MC) {      <5>
+                    diagram(statsService.&buildChart2 as MC) {      <4>
                         label 'Sales2'
                         menu 'Yearly', StatsController.&topCustomerSalesCard as MC,
                             new StatsParams(showMonthlyGraph2: false, v: 2)
@@ -209,20 +207,19 @@ def topCustomerSalesCard(StatsParams statsParams) {
                 }
             }
         }
-    }, RootController.buildMenu(), statsParams)                     <6>
+    }, RootController.buildMenu(), statsParams)                     <5>
 }
 ----
 <1> Le righe della tabella puntano a questa azione con `v: 1` o `v: 2`, aggiornando solo uno dei diagrammi
 <2> `p1` e `p2` sono booleani. Se `true`, i blocchi all'interno del blocco `poke` vengono aggiornati
-<3> `card` con una closure di menu e una closure di contenuto
-<4> `diagram` può accettare una `MethodClosure` che restituisce un `UiDiagramSpecifier`
-<5> Qualsiasi elemento foglia può accettare una closure di menu, visualizzata nella sua intestazione
-<6> `StatsParams` è un `Validateable`; i suoi valori vengono mantenuti quando si fa clic sui link
+<3> `diagram` può accettare una `MethodClosure` che restituisce un `UiDiagramSpecifier`
+<4> Qualsiasi elemento foglia può accettare una closure di menu, visualizzata nella sua intestazione
+<5> `StatsParams` è un `Validateable`; i suoi valori vengono mantenuti quando si fa clic sui link
 
 .Schede, diagrammi e `poke`
 image::screenshot-dsl-block-poke.webp[]
 
-pass:[<a class="taackMenu" href="/dslSample/poke" target="_blank">&#9654; Try it live</a>]
+pass:[<a class="taackMenu" ajaxAction="/dslSample/poke" href="/dslSample/poke">&#9654; Try it live</a>]
 
 == Elementi del Block DSL
 
