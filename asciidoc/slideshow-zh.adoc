@@ -1,0 +1,131 @@
+include::_settings_reveal.adoc[]
+:source-highlighter: highlightjs
+:highlightjs-languages: groovy, gnuplot
+:title-slide-transition: zoom
+:title-slide-transition-speed: fast
+:icons: font
+:docinfo: shared
+:customcss: custom.css
+:taack-height: 512
+
+= Taack UI
+
+[.hero,transition=zoom]
+== 使用 [.accent]#Groovy# 构建您的内网
+
+[.lead]
+面向 Grails 的类型安全 DSL：无需 HTML，无需 JavaScript
+
+[.chips]
+[.chip]#HTML# [.chip]#PDF# [.chip]#CSV# [.chip]#Mail#
+
+[.columns.split,transition=slide]
+== 声明式描述，告别模板
+
+[.column]
+--
+[source,groovy]
+----
+new UiFormSpecifier().ui user, {
+    section "User", {
+        field user.username_
+        field user.firstName_
+        field user.lastName_
+        ajaxField user.manager_,
+            this.&selectUser
+    }
+    formAction this.&saveUser
+}
+----
+--
+
+[.column]
+--
+image::slideshow-crew-form.webp[]
+--
+
+[.columns.split,transition=slide]
+== 编译期类型检查
+
+[.column.points]
+--
+* 从您的类自动生成 [.accent]#field_# 字段符号
+* 重命名字段时，编译器会定位所有使用该字段的界面
+* 零额外代码实现校验错误本地化
+--
+
+[.column]
+--
+image::slideshow-crew-form-validation.webp[]
+--
+
+[.shot,transition=slide]
+== 表格、过滤器与分页
+
+image::slideshow-crew-users.webp[]
+
+[.charts,transition=slide]
+== 几行代码生成图表
+
+image:diag-dsl-bar.webp[] image:diag-dsl-line.webp[] image:diag-dsl-pie.webp[] image:diag-dsl-whiskers.webp[]
+
+[.columns.split,transition=slide]
+== 同一套 DSL，直接输出 PDF
+
+[.column]
+--
+[source,groovy]
+----
+new UiPrintableSpecifier().ui {
+    printableHeader '2.5cm', {
+        show userHeader, Width.THIRD
+    }
+    printableBody {
+        show userShow, Width.MAX
+        table userTable, Width.MAX
+        diagram barChart, Width.MAX
+    }
+}
+----
+--
+
+[.column]
+--
+image::slideshow-pdf-sample.webp[]
+--
+
+[.cards,transition=slide]
+== 功能开箱即用
+
+[.card]
+--
+icon:search[] +
+全文检索
+--
+
+[.card]
+--
+icon:eye[] +
+文件预览
+--
+
+[.card]
+--
+icon:database[] +
+模型上的 JDBC
+--
+
+[.card]
+--
+icon:terminal[] +
+SSH 与 SFTP
+--
+
+[.hero,transition=zoom]
+== 在线实时体验
+
+[.lead]
+文档中的每个 DSL 页面都能在模态窗口中打开并运行示例
+
+[.chips]
+[.chip]#Docs › DSLs# [.chip]#▶ 在线体验#

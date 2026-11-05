@@ -1,0 +1,17 @@
+= Informazioni
+:doctype: book
+:taack-category: ZZZZZZZ|more
+
+Questo framework applicativo colma il divario tra gli sviluppatori backend e il frontend.
+
+GSP/JSP sono sempre disponibili per i casi d'uso complessi.
+
+Grazie agli sviluppatori del framework Grails per aver reso tutto questo possibile.
+
+
+== Sviluppatori
+
+.Responsabile del progetto
+image::ag.webp[width=480]
+
+Molti altri arriveranno più avanti ...

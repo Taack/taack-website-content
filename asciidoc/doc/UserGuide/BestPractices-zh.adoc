@@ -1,0 +1,111 @@
+= 最佳实践
+:taack-category: 10|doc/UserGuide
+:toc:
+:source-highlighter: rouge
+:icons: font
+
+== 耗时代码处理
+
+当数据处理较慢且闭包采用懒加载（lazy loaded）时，务必将耗时代码直接放在闭包内部。这样只有在该闭包实际被渲染显示时，耗时代码才会被执行。
+
+[source,groovy]
+----
+def showPage() {
+    // [. . .]
+    def b = new UiBlockSpecifier().ui {
+        diagram buildDiagram()                  <1>
+        tableFilter t, f                        <2>
+    }
+
+    taackUiService.show b
+}
+
+private UiDiagramSpecifier buildDiagram() {
+    // Always called                            <3>
+    new UiDisagramSpecifier().ui {
+        // Called only when needed              <4>
+        def data = slowDataRetreiveMethod()
+        // Draw data Stuffs
+    }
+}
+----
+
+<1> 即使当前只需渲染 `tableFilter`，`buildDiagram` 方法本身也总会被调用，但其返回的闭包并不会每次都被执行
+<2> 在进行排序或筛选时，只会重新渲染表格，而不会重新绘制图表
+<3> 总是被调用的部分
+<4> 仅在需要时被调用，耗时代码应当写在这里。
+
+== Grails 应用开发编码风格指南
+
+以下准则有助于简化应用的维护工作：
+
+- 方法修饰符：
+** 对于控制器中非动作（action）的方法，请使用 `protected`、`private` 和 `final` 修饰符。
+- 编码风格：
+** 在保持清晰的前提下，优先编写简洁的代码。
+** 在整个代码库中广泛使用 `@GrailsCompileStatic` 或 `@CompileStatic` 注解。
+- 无状态动作（Stateless Actions）：
+** 始终将动作设计为无状态的，避免使用 Session。
+- 控制器特征（Controller Traits）：
+** 避免在控制器 Trait 中使用 Service。
+- `@Transactional` 注解：
+** 仅在控制器动作上使用 `@Transactional` 注解。
+- 通用规则：
+** 在适当的地方使用 `final` 修饰符。
+** 遵循 DRY（Don't Repeat Yourself，不要重复自己）原则。
+** 尽量缩小符号的作用域，以提高代码可读性。
+** 选择简明且有意义的局部变量名。
+** 明确指定公共方法的参数类型和成员名称。
+
+遵循这些准则，您可以为 Grails 应用维护一个整洁且富有表现力的代码库。
+
+== 国际化（i18n）
+
+- 不要将 `i18n` 集中管理，每个应用应使用各自 Gradle 应用模块下的 `i18n` 文件夹。
+
+[,groovy]
+----
+class Book {
+    String title
+}
+----
+- 类名本地化："book.label = Libro"
+- 类字段名本地化："book.title.label = Título del libro"
+- 为了保持高效：
+** 不要过早进行翻译
+** 当对系统有全局把控后再开始翻译
+** 保持最常用的重要标签简短，并使用 `default` 命名空间；专用标签可以适当长一些
+- 遵循 `i18n` 命名约定：
+** 所有可复用的内容统一以 "default." 作为前缀
+** 翻译类名时不要加前缀
+** 在 `crew` 应用中，我们按动作（actions）和领域类（domains）拆分属性文件（参见 https://github.com/Taack/intranet/tree/main/app/crew/grails-app/i18n[Crew i18n 文件夹]）
+
+公共的 `i18n` 配置应当放在 `Crew` 应用模块或 `Server` 中，属性文件并非某个应用模块私有。
+
+== 配置
+
+- 在代码中使用 `enum` 进行配置
+** 静态类型检查至关重要
+** Groovy 枚举具有良好的可读性（优于 XML、Json、Yaml 等）
+
+== 安全性
+
+- 与安全相关的代码应放置在靠近其作用点的位置
+** 我们希望避免将所有关注点过度集中
+*** 根据需求创建新的领域类，避免让 `User` 类变得臃肿
+*** 出于安全考虑，应尽量减少抽象概念；编译期静态检查至关重要
+- 避免编写无法在编译期进行静态验证的复杂规则
+- 管理权限规则不应依赖权限字符串，在代码中进行判断时，对象中的布尔值更加直观明确。
+
+== 领域类（Domain Classes）
+
+* 如果领域类属于不同的应用模块，请避免领域类之间的循环依赖（例如 `User` => `Cart` 同时 `Cart` => `User`）
+* 领域类应保持极简
+* 领域类中 *不要包含* 带有外部依赖的辅助方法（helper）
+
+== 衡量开发是否高效的标准：
+
+- 小的需求演进不会引发大规模代码重写
+- 引入新功能直观顺畅
+- 不同的关注点保持隔离，将相互影响降到最低
+- 整体结构清晰简单

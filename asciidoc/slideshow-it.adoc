@@ -1,0 +1,131 @@
+include::_settings_reveal.adoc[]
+:source-highlighter: highlightjs
+:highlightjs-languages: groovy, gnuplot
+:title-slide-transition: zoom
+:title-slide-transition-speed: fast
+:icons: font
+:docinfo: shared
+:customcss: custom.css
+:taack-height: 512
+
+= Taack UI
+
+[.hero,transition=zoom]
+== Crea la tua intranet in [.accent]#Groovy#
+
+[.lead]
+DSL tipizzati per Grails: niente HTML, niente JavaScript
+
+[.chips]
+[.chip]#HTML# [.chip]#PDF# [.chip]#CSV# [.chip]#Mail#
+
+[.columns.split,transition=slide]
+== Descrivi, non usare template
+
+[.column]
+--
+[source,groovy]
+----
+new UiFormSpecifier().ui user, {
+    section "User", {
+        field user.username_
+        field user.firstName_
+        field user.lastName_
+        ajaxField user.manager_,
+            this.&selectUser
+    }
+    formAction this.&saveUser
+}
+----
+--
+
+[.column]
+--
+image::slideshow-crew-form.webp[]
+--
+
+[.columns.split,transition=slide]
+== Verificato in fase di compilazione
+
+[.column.points]
+--
+* Simboli [.accent]#field_# generati dalle tue classi
+* Rinomina un campo e il compilatore trova ogni schermata
+* Errori di validazione localizzati gratuitamente
+--
+
+[.column]
+--
+image::slideshow-crew-form-validation.webp[]
+--
+
+[.shot,transition=slide]
+== Tabelle, filtri, paginazione
+
+image::slideshow-crew-users.webp[]
+
+[.charts,transition=slide]
+== Grafici in poche righe
+
+image:diag-dsl-bar.webp[] image:diag-dsl-line.webp[] image:diag-dsl-pie.webp[] image:diag-dsl-whiskers.webp[]
+
+[.columns.split,transition=slide]
+== Lo stesso DSL, stampato in PDF
+
+[.column]
+--
+[source,groovy]
+----
+new UiPrintableSpecifier().ui {
+    printableHeader '2.5cm', {
+        show userHeader, Width.THIRD
+    }
+    printableBody {
+        show userShow, Width.MAX
+        table userTable, Width.MAX
+        diagram barChart, Width.MAX
+    }
+}
+----
+--
+
+[.column]
+--
+image::slideshow-pdf-sample.webp[]
+--
+
+[.cards,transition=slide]
+== Tutto incluso
+
+[.card]
+--
+icon:search[] +
+Ricerca full-text
+--
+
+[.card]
+--
+icon:eye[] +
+Anteprime dei file
+--
+
+[.card]
+--
+icon:database[] +
+JDBC sul tuo modello
+--
+
+[.card]
+--
+icon:terminal[] +
+SSH e SFTP
+--
+
+[.hero,transition=zoom]
+== Provalo dal vivo
+
+[.lead]
+Ogni pagina DSL della documentazione apre i propri esempi in una finestra modale
+
+[.chips]
+[.chip]#Docs › DSLs# [.chip]#▶ Provalo dal vivo#

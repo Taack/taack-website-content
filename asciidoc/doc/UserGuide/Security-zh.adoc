@@ -1,0 +1,38 @@
+= 安全性
+:taack-category: 11|doc/UserGuide
+:toc:
+:source-highlighter: rouge
+:icons: font
+
+== Spring Security
+
+*Taack-ui* 框架会检查动作（action）上的 `@Secured` 注解，以决定是否显示访问链接和图标。当用户未获授权时，菜单项、链接和操作按钮会自动隐藏。
+
+== 更细粒度的控制方式
+
+可以通过集中式安全闭包来处理更复杂的权限判断逻辑，以决定是否允许访问某个动作。
+
+.管理动作访问权限的代码示例
+[source,groovy]
+----
+SpringSecurityService springSecurityService
+
+private securityClosure(Long id, Map p) {   <1>
+    if (!id && !p) return true
+    if (!id) return true
+    canEdit(User.read(id))
+}
+
+@PostConstruct
+void init() {
+    TaackUiEnablerService.securityClosure(
+            this.&securityClosure,          <2>
+            CrewController.&editUser as MC, <3>
+            CrewController.&saveUser as MC)
+}
+
+----
+
+<1> 参数包含目标对象的 `id` 以及动作请求参数
+<2> 注册访问约束（`access constraints`）闭包
+<3> 受此访问约束管控的动作

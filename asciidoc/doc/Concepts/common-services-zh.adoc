@@ -1,0 +1,21 @@
+= 公共服务
+:doctype: book
+:taack-category: 3|doc/Concepts
+:toc:
+:source-highlighter: rouge
+
+在未来的版本中，所有服务都将直接包含在独立于应用模块的 *Taack UI* Grails 插件中。
+
+== Taack-UI 模块服务
+
+* `TaackUiService`：负责显示块（Block）的服务，既可以使用 #ajax# 局部更新页面，也可以渲染整个新页面。
+
+* `TaackSaveService`：允许将对象保存到数据库中并初始化部分字段。当对象未通过校验时报告错误，并向最终用户显示本地化的错误消息。
+
+* `TaackFilterService`：允许在显示表格时列出对象，支持分组和排序。
+
+== 附加服务
+
+* `TaackJdbcService` 与外部 JDBC 客户端通信的服务
+
+* `TaackSearchService` 全文检索支持服务

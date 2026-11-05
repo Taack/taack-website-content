@@ -1,0 +1,42 @@
+= Taack 框架简介
+:doctype: book
+:taack-category: 1|doc/Concepts
+:toc:
+:source-highlighter: rouge
+
+== 目标
+
+通过使用 http://docs.groovy-lang.org/docs/latest/html/documentation/core-domain-specific-languages.html[*Groovy DSL*]（领域特定语言）来提升典型内联网（Intranet）应用的表达能力。
+
+*DSL* 是静态类型的，大多数错误可在开发周期中被检测出来，且 IDE 能够更轻松地实现代码自动补全。
+
+Taack 框架还通过避免编写 *GSP* 以及内置管理常见操作（筛选、保存、详情展示），大幅精简了常规应用代码。
+
+== 架构
+
+*Taack 框架* 依赖于 *Grails* 应用框架。Grails 提供运行时上下文。Grails 基础设施具有以下特点：
+
+* 构建于 https://spring.io/projects/spring-boot[SpringBoot]（以及 https://micronaut.io/[Micronaut]）之上
+* 使用 Groovy 作为主要开发语言
+* 使用 https://gorm.grails.org/[Gorm] 在多种数据存储技术之上实现数据持久化
+* 使用 GSP 或 JSP 进行页面渲染
+* 遵循 *约定优于配置*（Convention over Configuration）的理念，为 Java EE 带来简洁性
+
+== 动作（Actions）
+
+在 Web 应用中，入口点是 URL。在 Grails 术语中，它们被称为 *动作*（actions）。
+
+*动作* 负责在用户触发点击、按键和鼠标移动等事件后更新浏览器状态。
+
+Taack 框架并非纯 AJAX 框架；相反，它主要是一个在服务器端生成完整页面的传统风格框架，但同时也具备使用 AJAX 局部更新页面的能力。
+
+这种方式有助于将浏览器的内部状态保持在最小限度。在服务器端，所有动作都是 *无状态的*（stateless）。在浏览器端，则会保存模态窗口栈及其由块（Block）定义的布局，以便管理内容更新。
+
+== 其他框架特性
+
+* 模块化应用开发方法
+** 开发者只需专注于各自的 Gradle 模块
+* 除 HTML 渲染外，还支持 *PDF*、*CSV* 或 *邮件*
+* 静态类型检查
+* IntelliJ IDE 支持
+* DSL 渲染在大多数情况下以 *单遍（single pass）* 完成

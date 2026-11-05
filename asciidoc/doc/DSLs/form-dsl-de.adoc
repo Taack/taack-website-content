@@ -1,0 +1,297 @@
+= Form DSL
+:doctype: book
+:taack-category: 1|doc/DSLs
+:toc:
+:source-highlighter: rouge
+:icons: font
+
+* [*] Gerendert in HTML
+* [ ] Gerendert in Mails
+* [ ] Gerendert in PDF
+* [ ] Gerendert in CSV
+
+[[_form_validation]]
+== Formularvalidierung
+
+.Lokalisiertes Formular
+image::screenshot-form-validation.webp[]
+
+Beim Speichern eines Objekts werden Fehler ohne zusätzlichen Aufwand lokalisiert gemeldet...
+
+Siehe die Grails-Dokumentation unter https://docs.grails.org/latest/ref/Constraints/Usage.html[Constraints Usage], um die Gültigkeit Ihres Objekts vor dem Speichern zu prüfen.
+
+== Codebeispiel
+
+[source,groovy]
+.Formular-Codebeispiel 1.
+----
+def editUser(User user) {
+    user ?= new User(enabled: true)
+
+    UiFormSpecifier f = new UiFormSpecifier()       <1>
+    f.ui user, {                                    <2>
+        row {                                       <3>
+            col {
+                section "User", {                   <4>
+                    field user.username_            <5>
+                    field user.firstName_
+                    field user.lastName_
+                    ajaxField user.manager_,        <6>
+                        this.&selectUserM2O as MC
+                    ajaxField user.mainPicture_,
+                        this.&selectUserMainPicture as MC
+                    field user.password_
+                }
+            }
+            col {
+                section "Coords", {
+                    field user.businessUnit_
+                    field user.mail_
+                    field user.subsidiary_
+                }
+            }
+            col {
+                section "Status", {
+                    field user.enabled_
+                    field user.accountExpired_
+                    field user.accountLocked_
+                    field user.passwordExpired_
+                }
+            }
+        }
+        formAction this.&saveUser as MC, user.id    <7>
+    }
+    taackUiService.show new UiBlockSpecifier().ui { <8>
+        modal {
+            form f
+        }
+    }                                               <9>
+}
+----
+
+<1> Das Formular erstellen
+<2> Zu bearbeitendes Objekt und Spezifikation des Formulars übergeben
+<3> Eine Zeile, drei Spalten
+<4> Abschnitt namens "User"
+<5> Einfaches Feld, das mit einem Unterstrich endet; diese Symbole werden durch die Taack-AST-Transformation auf Klassen mit der Annotation `TaackFieldEnum` generiert
+<6> Many-To-One-Beziehung: Die Aktion `selectUserM2O` öffnet ein Popup-Fenster zur Auswahl des Vorgesetzten des Benutzers
+<7> Eine Aktion angeben, an die das Formular gesendet wird. Hier ist es `saveUser`, womit der Benutzer gespeichert wird
+<8> Den Block in einem modalen Fenster erstellen
+<9> Anzeigen...
+
+.Formular in einem modalen Fenster.
+image::screenshot-dsl-user-form2.webp[]
+
+pass:[<a class="taackMenu" ajaxAction="/dslSample/form" href="/dslSample/form">&#9654; Try it live</a>]
+
+== Ohne Domänenklasse (Domain Class)
+
+DSLs benötigen keine GORM-Domänenklasse. Jede Klasse, die `grails.validation.Validateable` implementiert und mit `@TaackFieldEnum` annotiert ist, kann in Form-, Show- und Table-DSLs verwendet werden: Feldsymbole (`username_`, `age_` ...) werden auf dieselbe Weise generiert, und Constraints werden durch `validate()` geprüft.
+
+Dies ist nützlich für Parameterobjekte, Assistenten (Wizards) oder Daten, die nicht persistiert werden (berechnet, aus einem anderen Service stammend ...).
+
+[source,groovy]
+.Validateable-Klasse, ohne Datenbank
+----
+@TaackFieldEnum                                             <1>
+@GrailsCompileStatic
+class DslSampleUser implements Validateable {               <2>
+    String username
+    Integer age
+    Date birthday
+    DslSampleStatus status = DslSampleStatus.NEW
+
+    static constraints = {                                  <3>
+        username blank: false
+        age nullable: true, min: 18, max: 68
+        birthday nullable: true
+    }
+}
+----
+<1> Generiert die von den DSLs verwendeten Feldsymbole
+<2> `Validateable` anstelle einer Domänenklasse
+<3> Constraints werden beim Aufruf von `validate()` angewendet; Fehler werden wie bei Domänenklassen lokalisiert
+
+Das Formular wird wie gewohnt aufgebaut, und die empfangende Aktion bindet und validiert das Objekt selbst, da nichts in der Datenbank gespeichert werden muss:
+
+[source,groovy]
+.Binden und Validieren eines Validateable-Objekts
+----
+def saveForm() {
+    DslSampleUser u = new DslSampleUser()
+    taackSaveService.bindObject(u, params)                  <1>
+    if (!u.validate()) {
+        taackSaveService.renderErrors(u.errors)             <2>
+        return
+    }
+    taackUiService.show(new UiBlockSpecifier().ui {
+        replaceModal {                                      <3>
+            show buildUserShow(u)
+        }
+    })
+}
+----
+<1> Request-Parameter an das Objekt binden
+<2> Fehler werden im Formular angezeigt, das Modal bleibt geöffnet
+<3> Andernfalls wird das Formular durch die übermittelten Werte ersetzt
+
+NOTE: Die Filter-DSL erstellt Datenbankabfragen und erfordert daher weiterhin eine Domänenklasse.
+
+[[_asciidoc]]
+== Asciidoc
+
+Sie können einen Asciidoc-Editor hinzufügen, indem Sie ein `EditorOption`-Objekt erstellen und es an `fieldEditorFromMap` oder `fieldEditor` übergeben. Die Editor-Services stammen aus dem Artefakt `taack-ui-asciidoc`.
+
+Dieser Editor kann in das Textfeld gezogene Bilder sowie ODF-Dateien (einschließlich Bildern) importieren.
+
+=== `EditorOption`-Objekt erstellen
+
+.Editor-Optionen
+[source,groovy]
+----
+EditorOption.EditorOptionBuilder editor = EditorOption.getBuilder()
+editor.addSpanRegexes(TaackBaseAsciidocSpans.spans)
+editor.addSpanRegexes(TaackAsciidocTable.spans)
+editor.addSpanRegexes(TaackAsciidocPlantUML.spans)
+editor.onDropAction(this.&dropEditor as MC, [cmsPage: cmsPage.id])
+fieldEditor cmsPage.bodyContent_, editor.build()
+innerFormAction this.&previewBody as MC
+----
+
+=== `dropEditor`-Aktion erstellen
+
+[source,groovy]
+----
+@Transactional
+def dropEditor() {
+    CmsPage page = CmsPage.get(params.long('cmsPage'))
+    params.remove('cmsPage')
+    if (params.get('onpaste')) {
+        render "${convertersToAsciidocService.convertFromHtml(params.get('onpaste') as String)}"
+    } else {
+        final List<MultipartFile> mfl = (request as MultipartHttpServletRequest).getFiles('filePath')
+        final mf = mfl.first()
+
+        if ([AttachmentContentType.SHEET_ODS.mimeType, AttachmentContentType.LO_TEXT.mimeType].contains(mf.contentType)) {
+            render convertersToAsciidocService.convert(page, mf.inputStream)
+        } else {
+            CmsImage cmsImage = taackSaveService.save(CmsImage)
+            if (cmsImage && page) {
+                cmsImage.cmsPage = page
+            }
+            render "image::${cmsImage.originalName}[]"          <1>
+        }
+    }
+}
+----
+
+<1> Asciidoc-Code rendern, der im Editor angezeigt wird
+
+=== Bilder über einen benutzerdefinierten Service importieren
+
+Verwenden Sie `taackEditorService`, um die Seite zu konvertieren und Bilder aus abgelegten Dateien in Ihrem benutzerdefinierten Objekt zu speichern.
+
+[source,groovy]
+----
+String convert(CmsPage page, InputStream inputStream) {
+    taackEditorService.convert(new TaackEditorService.ISaveImage() {
+        @Override
+        String saveImage(String imagePath, byte[] image) {
+            return saveImage(page, imagePath, image)            <1>
+        }
+    }, inputStream)
+}
+
+String convertFromHtml(String html) {
+    taackEditorService.convertFromHtml(html)
+}
+----
+
+<1> Bilder werden an das `page`-Objekt angehängt.
+
+== Layout
+
+[source,groovy]
+.Zeilen, Spalten und Tabs
+----
+new UiFormSpecifier().ui reminder, {
+    section {
+        field reminder.title_
+        rowCols 3, {                                <1>
+            field reminder.dueDate_
+            field reminder.status_
+            field reminder.priority_
+        }
+        row {                                       <2>
+            col BlockSpec.Width.TWO_THIRD, {
+                ajaxField reminder.assignee_, CrewController.&selectUserM2O as MC
+            }
+            col {
+                readOnly reminder.dateCreated_      <3>
+            }
+        }
+    }
+    tabs {                                          <4>
+        tabLabel 'Body', {
+            field reminder.body_
+        }
+        tabLabel 'Advanced', {
+            section 'Options', true, {              <5>
+                field reminder.notifyAssignee_
+            }
+        }
+    }
+    formAction this.&saveReminder as MC
+}
+----
+
+<1> `rowCols` teilt die Felder in 3 Spalten auf und vermeidet so `row` gefolgt von `col`, `col`, `col` ...
+<2> `row` und `col` für eine feinere Steuerung der Breite
+<3> Angezeigt, aber nicht bearbeitbar
+<4> Tabs innerhalb des Formulars
+<5> Abschnitt standardmäßig eingeklappt
+
+.`rowCols` im Formular
+image::screenshot-dsl-form-rowcol.webp[]
+
+== DSL-Symbolhierarchie
+
+[graphviz,format="svg",align=center]
+.Symbolhierarchiediagramm für Form DSL
+----
+digraph mygraph {
+  node [shape=box];
+  "ui"
+  "ui" -> "hiddenField" [label = "0:N"]
+  "ui" -> "section", "row", "rowCols", "tabs" [label = "0:N"]
+  "tabs" -> "tabLabel" [label = "1:N"]
+  "section", "tabLabel" -> "section", "row", "rowCols" [label = "0:N"]
+  "row" -> "col" [label = "1:N"]
+  "ui", "section", "tabLabel", "row", "rowCols", "col" -> "field", "ajaxField", "readOnly", fieldFromMap, ajaxFieldFromMap, fieldEditor, fieldEditorFromMap, innerFormAction [label = "0:N"]
+  "ui" -> "formAction" [label = "0:N"]
+}
+----
+
+== DSL-Elemente
+
+=== Wurzel (Root)
+* `ui`: zu bearbeitendes Objekt, optional gefolgt von Feldern, die nicht geändert werden dürfen (`lockedFields`)
+
+=== Eingaben (Inputs)
+* `hiddenField`: fügt ein verstecktes Eingabefeld (`hidden`) in das Formular ein.
+* `field`: fügt ein Eingabefeld mit Beschriftung hinzu. Optional kann ein `NumberFormat` oder `IEnumOptions` angegeben werden.
+* `ajaxField`: fügt ein Many-to-One- oder Many-to-Many-Feld hinzu. Die `MethodClosure` muss auf einen Block verweisen, der ein *modales Fenster* anzeigt; zusätzliche Felder können an diese Aktion übertragen werden
+* `readOnly`: zeigt einen Wert an, der nicht geändert werden kann
+* `fieldFromMap`, `ajaxFieldFromMap`: bearbeitet einen Eintrag eines `Map`-Feldes
+* `fieldEditor`, `fieldEditorFromMap`: Asciidoc-Editor (siehe <<_asciidoc>>)
+
+=== Struktur
+* `section`: fügt einen Formularabschnitt hinzu, optional beschriftet und anfangs eingeklappt
+* `row`, `col`: teilt einen Abschnitt in Spalten auf, siehe `BlockSpec.Width`
+* `rowCols`: teilt die Felder in N Spalten auf
+* `tabs`, `tabLabel`: Tabs innerhalb des Formulars
+
+=== Aktionen
+* `formAction`: Aktion, die beim Absenden des Formulars aufgerufen wird, optional mit Beschriftung, ID, Parametern und einem `ButtonStyle`
+* `innerFormAction`: sekundäre Schaltfläche, die das Formular an eine andere Aktion sendet (Vorschau, Berechnung ...)
+* `triggerUpdate`: lädt das Formular neu, wenn eines der angegebenen Felder geändert wird

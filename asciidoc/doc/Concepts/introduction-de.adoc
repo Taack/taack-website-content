@@ -1,0 +1,42 @@
+= Einführung in das Taack-Framework
+:doctype: book
+:taack-category: 1|doc/Concepts
+:toc:
+:source-highlighter: rouge
+
+== Ziele
+
+Verbesserung der Ausdruckskraft einer typischen Intranet-Anwendung durch den Einsatz von http://docs.groovy-lang.org/docs/latest/html/documentation/core-domain-specific-languages.html[*Groovy DSL*] (domänenspezifische Sprachen).
+
+*DSLs* sind statisch typisiert, die meisten Fehler werden bereits während des Entwicklungszyklus erkannt, und die IDE kann Code leichter automatisch vervollständigen.
+
+Das Taack-Framework ermöglicht es außerdem, den üblichen Anwendungscode zu verkürzen, indem *GSPs* vermieden und allgemeine Operationen (Filtern, Speichern, Anzeigen) verwaltet werden.
+
+== Architektur
+
+Das *Taack-Framework* basiert auf dem Anwendungsframework *Grails*. Grails stellt den Laufzeitkontext bereit. Die Grails-Infrastruktur weist folgende Merkmale auf:
+
+* Baut auf https://spring.io/projects/spring-boot[SpringBoot] (und https://micronaut.io/[Micronaut]) auf
+* Verwendet Groovy als Hauptsprache
+* Nutzt https://gorm.grails.org/[Gorm] für die Datenpersistenz über verschiedene Technologien hinweg
+* Verwendet GSP oder JSP für das Seitenrendering
+* Vereinfacht Java EE durch das Prinzip *Konvention vor Konfiguration* (Convention over Configuration)
+
+== Aktionen
+
+In einer Webanwendung sind Einstiegspunkte URLs. In der Grails-Terminologie werden sie *Aktionen* (actions) genannt.
+
+*Aktionen* sind dafür verantwortlich, den Browserzustand nach Benutzerereignissen wie Klicks, Tastatureingaben und Mausbewegungen zu aktualisieren.
+
+Das Taack-Framework ist kein reines AJAX-Framework; vielmehr ist es größtenteils ein klassisches Framework, das vollständige Seiten auf dem Server generiert, aber auch die Möglichkeit bietet, einen Teil einer Seite per AJAX zu aktualisieren.
+
+Dieser Ansatz hilft dabei, den internen Zustand des Browsers minimal zu halten. Auf der Serverseite sind alle Aktionen *zustandslos* (stateless). Auf der Browserseite werden der Stapel modaler Fenster und deren durch Blöcke definierte Layouts gespeichert, um Inhaltsaktualisierungen zu verwalten.
+
+== Weitere Merkmale des Frameworks
+
+* Modularer Anwendungsansatz
+** Entwickler können sich ausschließlich auf ihre Gradle-Module konzentrieren
+* Unterstützung für *PDF*, *CSV* oder *E-Mails* zusätzlich zum HTML-Rendering
+* Statisch typisiert
+* Unterstützung für die IntelliJ-IDE
+* Das DSL-Rendering erfolgt in den meisten Fällen in einem *einzigen Durchlauf* (single pass)

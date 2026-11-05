@@ -1,0 +1,1073 @@
+= Novità
+:doctype: book
+:taack-category: 3
+:toc:
+:source-highlighter: rouge
+:icons: font
+
+== Versione 0.7.10 e 0.7.11
+
+* Nuovi temi (cliccare su image:https://taack.org/assets/taack/icons/actions/config.svg[] e selezionare un tema)
+* Riprogettazione del salvataggio per evitare `bind`
+
+== Versione 0.7.9
+
+* Consente `IN` o `NOT IN` su una sottoquery HQL interna, vedere <<filterFieldExpressionReverse>>
+* Grails 7.2.4
+* Miglioramento dei diagrammi
+
+[[filterFieldExpressionReverse]]
+.Nuovo filtro filterFieldExpressionReverse
+====
+.Filtro filterFieldExpressionReverse
+[source,groovy]
+----
+def parentParts() {
+    UiFilterSpecifier f = new UiFilterSpecifier().sec PlmFreeCadPart, {         <1>
+        PlmFreeCadLink link = new PlmFreeCadLink()
+        filterFieldExpressionReverse(link.part_,                                <2>
+                true,                                                           <3>
+                new FilterExpression(null as Object, Operator.NE, link.part_))  <4>
+    }
+    taackUiService.show(new UiBlockSpecifier().ui {
+        tableFilter(plmFreeCadUiService.buildPartFilter(), plmFreeCadUiService.buildPartTable(null, f), {
+            menuIcon ActionIcon.GRAPH, this.&model as MC
+        })
+    }, buildMenu())
+}
+----
+<1> Stiamo costruendo un filtro per `PlmFreeCadPart`
+<2> Vogliamo elencare gli assiemi padre, ovvero quelli per cui il campo `PlmFreeCadLink part` non punta al `PlmFreeCadPart` elencato
+<3> `true` sta per `notIn`
+<4> Letteralmente: vogliamo tutti i *PlmFreeCadPart* che non sono figli
+
+.HQL generato
+[source,hql]
+----
+select
+    distinct sc  ,sc.dateCreated
+from PlmFreeCadPart sc
+where
+    sc.id NOT IN (select auo.part.id from PlmFreeCadLink auo where auo.part IS NOT NULL)    <1>
+    and sc.nextVersion IS NULL
+order by sc.dateCreated DESC
+----
+
+<1> Clausola `where` aggiunta dall'espressione `filterFieldExpressionReverse`
+
+====
+
+
+== Versione 0.7.8
+
+* Versione di manutenzione
+
+== Versione 0.7.7
+
+* Grails 7.2.3
+* Nuovo artefatto Maven `taack-ui-ext` per aggiungere componenti grafici
+* <<calendar-component>>
+
+[[calendar-component]]
+.Nuovo componente calendario
+====
+
+
+.Visualizzazione a tabella
+[source,groovy]
+----
+def calendarTable(TaackCalendarParams calendarParams) {
+    UiTableSpecifier t = taackCalendarUiService.calendarUiTable(calendarEvents.collect {    <1>
+        new TaackCalendarEventAdapter(it.key, it.value)
+    }.iterator() as Iterator<TaackCalendarEvent>, calendarParams)
+    taackUiService.show new UiBlockSpecifier().ui {
+        table t
+    }, RootController.buildMenu()
+}
+----
+<1> Crea una tabella da un iteratore `TaackCalendarEvent`. Utilizza il pattern Adapter per convertire qualsiasi oggetto in `TaackCalendarEvent`.
+
+image::news-calendar-table-view.webp[]
+
+.Visualizzazione standard
+[source,groovy]
+----
+def calendarEntries(TaackCalendarParams calendarParams) {
+    taackUiService.show taackCalendarUiService.calendarBlock(CalendarController.&fromCustom as MC, calendarEvents.collect {
+        new TaackCalendarEventAdapter(it.key, it.value)
+    }.iterator() as Iterator<TaackCalendarEvent>, calendarParams), RootController.buildMenu()}
+----
+image::news-calendar-regular-view.webp[]
+
+====
+
+== Versione 0.7.6
+
+* Miglioramento dell'editor personalizzato
+* Grails 7.2.0
+
+== Versione 0.7.5
+
+* <<show-grid-layout>>
+* <<replace-modal>>
+* <<save-or-close-and-refresh>>
+
+image:show-grid-layout.webp[]
+
+[[show-grid-layout]]
+.Layout a griglia per Show (Show Grid Layout)
+====
+
+.Disporre uno Show su una griglia responsiva tramite `ShowLayout.GRID`
+[source,groovy]
+----
+new UiShowSpecifier().ui ShowLayout.GRID, {                      <1>
+    fieldLabeled item.ref_
+    fieldLabeled item.name_
+    fieldLabeled item.itemStatus_
+    fieldLabeled item.gtin_
+    fieldLabeled Style.SPAN_TWO, item.labeling_                  <2>
+    fieldLabeled Style.BOLD + Style.SPAN_FULL, item.description_ <3>
+}
+----
+
+<1> Passare `ShowLayout.GRID` per disporre i campi su una griglia ad adattamento automatico invece che verticalmente in una colonna. Il valore predefinito è `ShowLayout.LIST`.
+<2> Ogni campo occupa per impostazione predefinita una cella della griglia. `Style.SPAN_TWO` / `Style.SPAN_THREE` possono essere utilizzati per far sì che le celle si estendano su più colonne.
+<3> `Style.SPAN_FULL` fa sì che un campo occupi l'intera riga. Gli span si combinano con qualsiasi altro stile tramite `+` (qui con `Style.BOLD`).
+
+Si noti che la griglia adatta automaticamente tante colonne quante ne consente la larghezza del contenitore, ciascuna larga almeno `220px` (`grid-template-columns: repeat(auto-fit, minmax(220px, 1fr))` sulla classe `taackShowGrid`; il valore minimo può essere sovrascritto nel proprio CSS).
+
+====
+
+[[replace-modal]]
+.Nuova sostituzione del contenuto della finestra modale
+====
+.Sostituire qualsiasi contenuto di una finestra modale superiore
+[source,groovy]
+----
+@Transactional
+def doComplexStuff() {
+    boolean isDone = false
+
+    // doComplexStuff
+
+    taackUiService.show(new UiBlockSpecifier().ui {
+        replaceModal {
+            custom("<h1> ${isDone ? 'Done.' : 'Not Done.'} </h1>")
+        }
+    })
+}
+----
+====
+
+[[save-or-close-and-refresh]]
+.Nuovo salvataggio o chiusura della modale con aggiornamento
+====
+.Codice
+[source,groovy]
+----
+@Transactional
+@Secured(['ROLE_ADMIN', 'ROLE_CONSOLATOR_ADMIN'])
+def saveLlmRag() {
+    taackSaveService.saveOrCloseModalAndRefresh(LlmRag)     <1>
+}
+----
+
+<1> Se più finestre modali sono impilate, è ora possibile aggiornare la modale sottostante all'ultima, che verrà chiusa.
+
+====
+
+== Versione 0.7.4
+
+* Utilizzo di Flying Saucer per produrre PDF, evitando i problemi relativi alla licenza AGPL di iText
+* Miglioramento dell'interazione utente sui diagrammi
+* xref:doc/DSLs/diagram-dsl.adoc[DSL dei diagrammi] :
+** Aggiunto il nuovo tipo di diagramma `timeline`
+** Fornito `DiagramOption` per personalizzare il grafico
+* <<table-sticky-columns>>
+
+[[table-sticky-columns]]
+.Colonne fisse nelle tabelle (Table Sticky Columns)
+====
+
+.Bloccare le colonne più a sinistra tramite `TableOption`
+[source,groovy]
+----
+TableOption tableOption = new TableOption.TableOptionBuilder()
+        .stickyColumns(2).build() <1>
+
+new UiTableSpecifier().ui tableOption, {
+    header {
+        sortableFieldHeader p.ref_
+        sortableFieldHeader p.name_
+        // ... any number of columns ...
+    }
+}
+----
+
+<1> Numero di colonne più a sinistra da bloccare. Rimangono visibili mentre la tabella scorre orizzontalmente.
+
+Si noti che le tabelle che utilizzano colonne fisse non avranno vincoli di larghezza e utilizzeranno invece la classe CSS `taack-sticky-table`, che limita la larghezza massima di ciascuna colonna a 12rem.
+
+====
+
+
+== Versione 0.7.2
+
+* Grails 7.0.7, Java 25 per runtime e build
+* <<kan-ban>>
+* <<table-inline-edit>>
+* Supporto della classe in `section` per l'etichettatura (vedere <2> in <<section-labelling>>)
+* <<fileter72>>
+* <<rowCol>>
+* <<poke>>
+* <<accordion>>
+* <<scrollPanel>>
+
+[[kan-ban]]
+.Kan-ban con Drag & Drop
+====
+
+.Specifica Kanban senza filtro
+[source,groovy]
+----
+new UiKanbanSpecifier().ui {
+    ReminderStatus.values().each { ReminderStatus status ->             <1>
+        column(this.&changeStatus as MC, [newStatus: status.name()]) {  <2>
+            header status.name()                                        <3>
+            reminders.grep { Reminder t -> t.status == status }
+                     .sort { -it.lastUpdated.getTime() }
+                     .each { Reminder rIt ->
+                card(rIt.selfObject_) {                                 <4>
+                    cardField rIt.title_, null, Style.BOLD + Style.BLUE
+                    cardFieldRaw this.getReminderDoersHtml(rIt),
+                        new Style('', 'position: absolute; right: 3px; top: 12px;')
+                    cardAction ActionIcon.SHOW * IconStyle.SCALE_DOWN,
+                        ReminderController.&showReminder as MethodClosure, rIt.id
+                    cardField rIt.priority_
+                }
+            }
+        }
+    }
+}
+----
+
+<1> Iterare sulle colonne
+<2> Definire una colonna
+<3> Nome dell'intestazione di questa colonna
+<4> Creare la scheda con `cardField`, `cardFieldRaw` e `cardAction`
+
+.Kan-Ban
+image::screenshot-kanban.webp[]
+
+
+====
+
+[[table-inline-edit]]
+.Modificare oggetti nella tabella
+====
+.Dichiarare il blocco `rowQuickEdit`
+[source,groovy]
+----
+rowQuickEdit(CrmController.&applyLeadLine as MC, ll.id) {           <1>
+    rowColumn {
+        rowFieldEdit ll.salePrice_                                  <2>
+        rowFieldEdit ll.qty_                                        <2>
+        rowField nf.format(tot), style                              <3>
+    }
+}
+----
+
+<1> `rowQuickEdit` dichiara quale azione chiamare in caso di modifica in linea
+<2> `rowFieldEdit` modifica il valore in un campo di input OPPURE visualizza il contenuto se non consentito
+<3> Gli altri campi vengono ricalcolati durante le modifiche
+
+.Definizione di `applyLeadLine`
+[source,groovy]
+----
+@Transactional
+def applyLeadLine() {
+    LeadLine ll = new LeadLine()
+    taackSaveService.saveThenReloadOrRenderErrors
+                    LeadLine, ll.qty_, ll.salePrice_            <1>
+}
+----
+
+<1> Durante il salvataggio, elencare i campi che possono essere aggiornati solo nel blocco `rowQuickEdit`
+
+.Modifica in linea con feedback di errore localizzato
+image::screenshot-inline-edit.webp[]
+
+====
+
+[[fileter72]]
+.Nuova serializzazione dei filtri
+====
+.Dichiarare il filtro
+[source,groovy]
+----
+UiFilterSpecifier createReminderFilter(FieldInfo... leftField) {
+    Reminder r = new Reminder()
+    User u = new User()
+    new UiFilterSpecifier(leftField).ui Reminder, {                 <1>
+        section Reminder, {                                         <2>
+            filterField r.assignee_, u.username_
+            filterField r.status_
+            filterField r.priority_
+            filterField r.title_
+        }
+    }
+}
+----
+
+[[section-labelling]]
+<1> `leftField` elenca i campi che puntano a un promemoria nell'oggetto contenitore
+<2> Nuova `section` con argomento classe per calcolare automaticamente l'i18n
+
+.Unione di filtri (Joining Filter)
+[source,groovy]
+----
+UiFilterSpecifier createReminderLinkFilter(FieldInfo... leftField) {
+    ReminderLink rl = new ReminderLink()
+    new UiFilterSpecifier(leftField).ui(ReminderLink, {
+        section tr('reminderLink.label'), {
+            filterField rl.kind_
+        }
+    }).join(createReminderFilter(rl.reminder_))                     <1>
+}
+----
+
+<1> Il campo `reminder` è un `Reminder`; riutilizziamo il filtro della classe `Reminder`.
+
+.Filtri uniti
+image::screenshot-filter-join.webp[]
+
+====
+
+[[rowCol]]
+.Nuova opzione di layout `rowCol`
+====
+[source,groovy]
+----
+        taackUiService.show createModalForm(reminder, {
+            section {
+                field reminder.title_
+                rowCols 3, {                                        <1>
+                        field reminder.dueDate_
+                        field reminder.status_
+                        field reminder.priority_
+                }
+                ajaxField reminder.assignee_, CrewController.&selectUserM2O as MC
+                field reminder.body_
+            }
+----
+
+<1> Evita di usare `row`, seguito da `col`, `col`, `col` ...
+
+.`rowCol` nel modulo
+image::screenshot-form-rowcol.webp[]
+====
+
+
+[[poke]]
+.Nuova istruzione di layout `poke` per l'aggiornamento dei blocchi
+====
+[source,groovy]
+----
+taackUiService.show(new UiBlockSpecifier().ui {
+    table statsService.buildTable()                                 <1>
+
+    row {
+        poke p1, {                                                  <2>
+            col BlockSpec.Width.HALF, {
+                diagram(statsService.&buildChart1 as MethodClosure)
+            }
+        }
+        poke p2, {                                                  <2>
+            col BlockSpec.Width.HALF, {
+                diagram(statsService::buildChart2 as MethodClosure)
+            }
+        }
+    }
+}
+----
+
+<1> Cliccando su una tabella è possibile aggiornare altri blocchi
+<2> `poke` p1 e p2 sono booleani. Se `true`, i blocchi all'interno del blocco `poke` verranno aggiornati
+
+====
+
+[[accordion]]
+.Fisarmonica (Accordion)
+====
+[source,groovy]
+----
+accordion {
+    accordionItem('Filter') {
+        form CrmDashboardUiService.filterForm(filter)
+    }
+}
+----
+
+====
+
+[[scrollPanel]]
+.scrollPanel
+====
+[source,groovy]
+----
+scrollPanel('512px') {
+    UiTableSpecifier t
+    boolean seeSalesmen = params.boolean('seeSalesmen')
+    boolean seeTop = params.boolean('seeTop')
+    if (seeTop) {
+        t = crmDashboardUiService.topSalesmen(leads)
+    } else if (seeSalesmen) {
+        t = this.crmDashboardUiService.topCountries(leads)
+    } else {
+        t = crmDashboardUiService.topCustomer(leads)
+    }
+    table(t) {
+        menu 'Salesmen', this.&group as MC, [seeTop: true, seeSalesmen: false]
+        menu 'Customers', this.&group as MC, [seeTop: false, seeSalesmen: false]
+        menu 'Countries', this.&group as MC, [seeTop: false, seeSalesmen: true]
+    }
+}
+----
+
+image::screenshot-scrollpanel.webp[]
+
+====
+
+== Versione 0.7.1
+
+* Correzione dell'i18n con il task `bootRun` quando l'hot-reload è abilitato
+
+.Novità nella versione 0.7.1
+video::ZLj-YqnxMew[youtube, 480]
+
+
+== Versione 0.7.0
+
+* Grails 7, Gradle 8.4, Java 24, Groovy 4.0.28 ...
+* Miglioramento delle prestazioni: avvio anticipato della trasmissione della pagina e minore consumo di memoria per pagina
+* Suddivisione di `taack-ui` in `taack-ui`, `taack-ui-jdbc`, `taack-ui-pdf`, `taack-ui-ssh`, `taack-ui-search`, `taack-ui-asciidoc`. Un server minimale che utilizza solo `taack-ui` dovrebbe produrre un Jar di circa 70 MB
+* Menu contestuali per campi e classi (vedere <<contextual-menu-code-sample>>)
+* Helper di notifica: consente di contrassegnare le righe non lette in una tabella tramite il setter del filtro `setLastReadingDate` (vedere <<notification-setLastReadingDate-sample>>)
+* #Modifiche a SolrSearch#: il contesto degli oggetti deve essere registrato in modo generico (vedere <<TaackGormClassRegisterService>>)
+* Nuova personalizzazione dei diagrammi tramite builder, facilitando l'integrazione dei diagrammi nelle e-mail e nei PDF (vedere <<diagram-builders>>)
+* Editor Asciidoc con funzionalità di conversione su copia/incolla (vedere <<asciidoc-editor>>)
+* Miglioramento dell'output dei diagrammi nelle e-mail e nei PDF
+* `TaackUiConfiguration` non viene più inizializzato tramite `application.yml`; i membri sono statici e possono essere modificati in `server/grails-app/init/.../Application.groovy` (vedere <<taack-ui-configuration>>)
+* È ora possibile ricevere una callback su un evento di rilascio (drop) su una tabella o una cella di tabella (vedere <<drop-on-table>>, <<drop-on-cell>>)
+
+[[contextual-menu-code-sample]]
+.Esempio di codice per il menu contestuale
+[source,groovy]
+----
+TaackUiService.registerContextualMenuClosure(                           <1>
+    new Lead().leadStatus_,
+    new UiMenuSpecifier().ui { Long id ->                               <2>
+        label 'Change Status'
+        Lead.read(id)?.leadStatus?.transitionsTo()?.each {
+            menu it.toString(),                                         <3>
+                CrmController.&changeLeadStatus as MC,
+                [id: id, leadStatus: it.toString()]
+    }
+})
+----
+
+<1> Registrare un menu contestuale per un campo
+<2> Utilizzare la normale closure `MenuSpecifier` (come per qualsiasi menu)
+
+.Risultato di un clic destro sullo stato di un Lead
+image::news-contextual-menu-on-field.webp[align=center]
+
+[[notification-setLastReadingDate-sample]]
+.Creare un filtro che contrassegna le voci non lette
+[source,groovy]
+----
+TaackFilter.FilterBuilder tf = taackFilterService.getBuilder(Item)
+        .setMaxNumberOfLine(10)
+        .setSortOrder(TaackFilter.Order.DESC, i.dateCreated_)
+
+tf.setLastReadingDate(lastAccessDateFromUser)   <1>
+----
+
+<1> Gli oggetti più recenti saranno in grassetto, vedere <<unread-notif>>
+
+[[unread-notif]]
+.Righe non lette in cui `lastUpdated` dell'oggetto > `lastAccessDateFromUser`
+image::news-notif.webp[align=center]
+
+[[TaackGormClassRegisterService]]
+.Registrare come verrà mostrato un oggetto
+[source,groovy]
+----
+TaackGormClassRegisterService.register(
+        new TaackGormClass(ItemRange.class).builder
+                .setShowMethod(Bp2Controller.&showRange as MethodClosure)   <1>
+                .build(),
+        new TaackGormClass(Item.class).builder
+                .setShowMethod(Bp2Controller.&showItem as MethodClosure)    <1>
+                .setShowLabel({ Long id ->                                  <2>
+                    def i = Item.read(id)
+                    return "${i.name} ${i.ref ?: ''} ($id)"
+                })
+                .setTypeLabel({ Long id ->                                  <3>
+                    return TaackUiService.tr('default.item.label')
+                }).build()
+)
+----
+
+<1> Come mostrare l'oggetto
+<2> Etichetta personalizzata
+<3> Tipo per il faceting
+
+[[diagram-builders]]
+.Builder di diagrammi
+[source,groovy]
+----
+new UiDiagramSpecifier().ui {
+    bar {
+        labels 'xLabel1', 'xLabel2', 'xLabel3', 'xLabel4'
+        dataset 'dataset1', 1.0, 2.0, 3.0, 4.0
+        dataset 'dataset2', 6.0, 1.0, 2.0, 4.0
+
+        option DiagramOption.builder
+            .setClickAction(Rma2Controller.&editClaim as MethodClosure)
+            // "diagramAction" was moved to here
+            .showDataCount()
+            // The numbers are hidden by default. Use this option if need to show
+            .hideLegend()
+            // The legends are shown by default. Use this option if need to hide
+            .setResolution(DiagramOption.DiagramResolution.DEFAULT_4K)
+            // Default resolution is [SVG: 960x480, PNG: 2160x1080].
+            // Allow to set to 540p, 720p, 1080p, 2K, 1440p, 4K
+            .setKeyColors(Color.RED, Color.BLUE)
+            // Allow to self-define the colors for each dataset
+            // (If not set, there are by default 7 colors)
+            .setTitle("Test Chart") // Diagram title
+            .build()
+    }
+}
+----
+
+[[asciidoc-editor]]
+.Editor Asciidoc
+[source,groovy]
+----
+//...
+EditorOption.EditorOptionBuilder editor = EditorOption.getBuilder()
+editor.addSpanRegexes(TaackBaseAsciidocSpans.spans)                 <1>
+editor.addSpanRegexes(TaackAsciidocTable.spans)                     <1>
+editor.addSpanRegexes(TaackAsciidocPlantUML.spans)                  <1>
+editor.onDrop(this.&dropEditor as MC, cmsPage.id)                   <2>
+fieldEditor cmsPage.bodyContent_, editor.build()                    <3>
+innerFormAction this.&previewBody as MC                             <4>
+//...
+
+@Transactional
+def dropEditor() {                                                  <2>
+    CmsPage page = CmsPage.get(params.long('cmsPage'))
+    params.remove('cmsPage')
+    String past = params.get('onpaste')
+    if (past) {                                                     <5>
+        render taackAsciidocService.convertFromHtml(past)
+    } else {                                                        <6>
+        final List<MultipartFile> mfl = (request as MultipartHttpServletRequest).getFiles('filePath')
+        final mf = mfl.first()
+
+        if ([AttachmentContentType.SHEET_ODS.mimeType,
+             AttachmentContentType.LO_TEXT.mimeType
+            ].contains(mf.contentType)) {                           <7>
+            render taackAsciidocService.convert(page, mf.inputStream)
+        } else {                                                    <8>
+            CmsImage cmsImage = taackSaveService.save(CmsImage)
+            if (cmsImage && page) {
+                cmsImage.cmsPage = page
+            }
+            render "image::${cmsImage.originalName}[]"
+        }
+    }
+}
+----
+
+<1> Aggiunge estensioni per gli span di sintassi (sostanzialmente un'espressione regolare e una classe per colorare il codice)
+<2> Callback quando viene rilasciato un file o viene incollato del contenuto da un'altra pagina o applicazione
+<3> Il campo nel modulo
+<4> Azione di anteprima opzionale
+<5> Incolla di contenuto HTML. Il contenuto verrà convertito in Asciidoc
+<6> Parte relativa al rilascio di file
+<7> Se il file è un documento ODS o Writer, verrà convertito in Asciidoc e le immagini verranno importate
+<8> Se il file è un'immagine, verrà salvata nel CMS.
+
+WARNING: `taackAsciidocService` utilizza il servizio `TaackEditorService` di `taack-ui-asciidoc`, vedere link:doc/DSLs/form-dsl-it.adoc#_asciidoc[DSL dei moduli]
+
+[[taack-ui-configuration]]
+.TaackUiConfiguration
+[source,groovy]
+----
+@CompileStatic
+class TaackUiConfiguration {
+    static String defaultTitle = 'Taack'
+    static String logoFileName = 'logo-taack-web.svg'
+    static int logoWidth = 70
+    static int logoHeight = 60
+
+    static boolean fixedTop = false
+    static boolean hasMenuLogin = true
+    static boolean outlineContainer = false
+    static String bgColor = '#05294c'
+    static String fgColor = '#eeeeee'
+    static String bodyBgColor = '#fff'
+
+    static String home = System.getProperty('user.home')
+    static String root = home + '/intranetFiles'
+    static String taack = home + '/taack'
+    static String resources = taack + '/resources'
+    static String javaPath = '/usr/bin/java'
+    static String plantUmlPath = home + '/plantuml-1.2022.7.jar'
+    static String solrUrl = 'http://localhost:8983/solr/taack'
+    static Boolean disableSecurity = false
+}
+----
+
+.`Application.groovy`
+[source,groovy]
+----
+@CompileStatic
+class Application extends GrailsAutoConfiguration {
+    static void main(String[] args) {
+        TaackUiConfiguration.disableSecurity = true
+        TaackUiConfiguration.hasMenuLogin = false
+        GrailsApp.run(Application, args)
+    }
+}
+----
+
+[[drop-on-table]]
+.Rilascio su una tabella (Drop on Table)
+[source,groovy]
+----
+        TableOption tableOption = new TableOption.TableOptionBuilder()
+                .onDropAction(this.&testDrop as MC).build()             <1>
+
+        new UiTableSpecifier().ui tableOption, {
+            header {
+                sortableFieldHeader cb.position_
+                sortableFieldHeader cb.subsidiary_
+                label 'Page OR Menu Entry'
+            }
+----
+
+<1> Azione chiamata in caso di rilascio in un punto qualsiasi della tabella.
+
+[[drop-on-cell]]
+.Rilascio sulle celle (Drop on Cells), la colonna della riga è un'area di rilascio
+[source,groovy]
+----
+cellDropAction(CmsController.&testCellDrop as MC)                       <1>
+rowColumn {
+    rowField cp.title_
+    rowField 'test drop'
+}
+----
+
+<1> Azione chiamata in caso di rilascio in un punto qualsiasi della cella.
+
+
+== Versione 0.6.1
+
+* Azione sul diagramma (vedere <<_diagram_action>>)
+* Finestra modale a schermo intero
+* Helper statici (vedere <<_static_helper>>)
+
+[[_diagram_action]]
+.Utilizzo delle azioni sul diagramma
+[source,groovy]
+----
+new UiDiagramSpecifier().ui {
+    bar {
+        labels 'date1', 'date2', 'date3'
+        dataset 'Stuff1', 3.0, 4.0, 5.0
+
+        diagramAction this.&clickDiagram as MC, id, <1>
+        [optionalParam: 'value']                    <2>
+    }
+}
+
+def clickDiagram() {
+    println(params)
+    // [id: 123456, dataset: "Stuff1",
+    // optionalParam: "value"                       <3>
+    // x: "date1", y: "3.0"]
+}
+
+----
+
+<1> Azione sul diagramma
+<2> È possibile passare una mappa
+<3> I parametri dell'azione contengono *label*, *value*, *dataset name* e *map*
+
+[[_static_helper]]
+.Utilizzo degli helper statici
+[source,groovy]
+----
+import org.codehaus.groovy.runtime.MethodClosure as MC
+
+import static taack.ui.TaackUi.createMenu           <1>
+
+@Override
+UiMenuSpecifier editorCreate() {
+    createMenu {                                    <2>
+        menu this.&createFromTemplate as MC
+        menuIcon
+            CollaboraIcons.WRITER,
+            this.&createFromTemplate as MC,
+            [collaboraApp: CollaboraApp.WRITER]
+    }
+}
+----
+
+<1> Importazione statica
+<2> Chiamata statica `createMenu`, scorciatoia per `new UiMenuSpecifier().ui`; altre scorciatoie includono `createModal`, che restituisce `UiBlockSpecifier`
+
+video::wF323zHFa94[youtube, 480]
+
+== Versione 0.6
+
+* Animazione di caricamento
+* Zoom / scorrimento dei diagrammi
+* Tooltip dei diagrammi
+* Selezione multipla nelle tabelle (vedere <<doc/DSLs/filter-table-dsl.adoc#table-sample1>>)
+* Caricamento differito (lazy loading) delle schede
+* Miglioramento della paginazione
+* Ottimizzazione del disegno, evitando ridisegni non necessari
+* Evita il caso in cui i blocchi venivano disegnati due volte
+* Miglioramento del layout di ricerca
+* Supporto per `BigDecimal` nelle tabelle, mostrato secondo le impostazioni internazionali dell'utente
+* WiP: Semplice editor Asciidoc WYSIWYG
+
+== Versione 0.5.7
+
+* Pulizia del codice DSL `show`, depreca il passaggio del parametro oggetto a `UiShowSpecifier().ui`
+* Editor WYSIWYG Asciidoctor iniziale
+** Supporto per il trascinamento e rilascio (Drag and Drop) di immagini e file
+* Ulteriori DSL per i diagrammi
+** timeSeries
+** areaChart
+** bubbleChart
+* Sicurezza
+** Sanificazione predefinita delle informazioni visualizzate (usare `fieldRaw` per evitare la sanificazione)
+** Controllo degli accessi su tutti i punti di ingresso
+* Correzioni di bug e aggiornamento delle dipendenze
+
+
+WARNING: Sostituire `field <html code>` con `fieldRaw <html code>`
+
+== Versione 0.5.6 (corregge bug della 0.5.5)
+
+* Riduzione dello scope delle dipendenze Solr e Tika
+* Mostra le colonne ordinabili della tabella e la direzione di ordinamento (vedere <<sorting-screenshot>>)
+* I menu dei blocchi vengono ora aggiornati come i blocchi
+* Per i layout complessi, il codice può essere riutilizzato facilmente. È ora possibile conservare facilmente le variabili che contestualizzano il layout (vedere <<context-keeper>>)
+
+[[sorting-screenshot]]
+.Le intestazioni di colonna mostrano le direzioni di ordinamento
+image::screenshot-news-sorting.webp[width=720,align=center]
+
+[[context-keeper]]
+.Come mantenere il contesto quando si clicca su una tabella
+[source,groovy]
+----
+def showPart(PlmFreeCadPart part, Long partVersion, Boolean isHistory) {<1>
+    taackUiService.show(
+            plmFreeCadUiService.buildFreeCadPartBlockShow(
+                    part, partVersion, false, isHistory),               <2>
+            buildMenu(),
+            "isHistory")                                                <3>
+}
+----
+
+<1> `isHistory` è un parametro dell'azione
+<2> `isHistory` viene utilizzato durante il disegno del blocco; dobbiamo ritrasmetterlo per disegnare esattamente lo stesso layout del blocco, mantenendo il contesto
+<3> La chiave `isHistory` viene passata come ultimo argomento di `taackUiService.show`. È possibile specificare più chiavi da mantenere.
+
+
+== Versione 0.5.4
+
+* Riprogettazione del DSL dei diagrammi (vedere link:doc/DSLs/diagram-dsl-it.adoc[])
+
+== Versione 0.5.3
+
+* Correzione delle caselle di controllo (checkbox) nei moduli
+* Consente gli alias in *TQL* per le colonne formula
+* Pulizia del codice e incremento delle versioni delle dipendenze
+
+== Versione 0.5.2
+
+* Il client JDBC è ora anche un'estensione AsciidoctorJ
+* Aggiunti getter ai campi di dominio accessibili tramite JDBC
+* Aggiunto il DSL <<tql_tdl>> per descrivere come visualizzare i dati interrogati (come tabella o grafico a barre)
+* Ripristinata l'etichettatura manuale sui menu
+* Ulteriori miglioramenti al DSL dei diagrammi (grazie a Chong e ZhenQing)
+* Migliore personalizzazione
+
+[[tql_tdl]]
+.TQL e TDL (Taack Display Language)
+[source,sql]
+----
+select
+    u.rawImg,
+    u.username,
+    u.manager.username
+from User u
+where u.dateCreated > '2024-01-01' and u.manager.username = 'admin';
+--
+table rawImg as "Pic", username as "Name", manager as "Manager"
+
+----
+
+.Risultati
+image::news-table.webp[width=720,align=center]
+
+== Versione 0.5.1
+
+* <<_replacement_tp>>, il modulo applicativo si registra in modo indipendente
+* Rimozione del DSL Charts
+* Correzione del DSL Diagram, <<_replacement_chart>>
+* Consente l'inserimento di diagrammi nei PDF (vedere <<_diagrams_into_pdf>> e <<_diagrams_output>>)
+
+[[_replacement_tp]]
+.Sostituzione di TaackPlugin
+[source,groovy]
+----
+@PostConstruct
+void init() {
+    TaackUiEnablerService.securityClosure(
+        this.&securityClosure,
+        CrewController.&editUser as MC,
+        CrewController.&saveUser as MC)
+    TaackAppRegisterService.register(
+        new TaackApp(
+            CrewController.&index as MC,                    <1>
+            new String(
+                this.class
+                    .getResourceAsStream("/crew/crew.svg")  <2>
+                    .readAllBytes()
+            )
+        )
+    )
+}
+----
+
+<1> Punto di ingresso
+<2> Icona
+
+[[_replacement_chart]]
+.Sostituzione di Charts: Diagrammi
+[source,groovy]
+----
+private static UiDiagramSpecifier d1() {
+    new UiDiagramSpecifier().ui {
+        bar(["T1", "T2", "T3", "T4"] as List<String>, false, {
+            dataset 'Truc1', [1.0, 2.0, 1.0, 4.0]
+            dataset 'Truc2', [2.0, 0.1, 1.0, 0.0]
+            dataset 'Truc3', [2.0, 0.1, 1.0, 1.0]
+        }, DiagramTypeSpec.HeightWidthRadio.ONE)
+    }
+}
+----
+
+[[_diagrams_into_pdf]]
+.PDF contenente diagrammi
+[source,groovy]
+----
+printableBody {
+    diagram(d1(), BlockSpec.Width.HALF)
+    diagram(d2(), BlockSpec.Width.HALF)
+}
+----
+
+[[_diagrams_output]]
+.Diagramma a barre impilate
+image::news-diagram.svg[width=480,align=center]
+
+== Versione 0.5.0
+
+slide::[fn=slideshow-whatsnew050-it]
+
+== Versione 0.4.2
+
+In arrivo... questa versione dovrebbe portare alcune interessanti novità (rompendo talvolta del vecchio codice)
+
+- Migliorare la gerarchia DSL
+* campi nascosti solo in alto per migliorare la leggibilità
+* nessun passaggio ridondante di parametri nel modulo
+* nessun passaggio ridondante di parametri nel filtro
+* `filterField` esclusivamente sotto `section`
+* campo di primo livello del modulo solo nell'intestazione
+- hook per i campi del modulo per visualizzare correttamente le relazioni M2M
+- hook per registrare un filtro oggetto tipico
+- Migliorare il ripristino dello stato
+- Correggere il raggruppamento delle tabelle / alberi con paginazione
+- Da definire (TBD)
+
+
+== Versione 0.4.1
+
+- Unire il menu di ricerca, il menu delle icone e il menu della lingua, vedere <<new_menu_layout>>
+- Mantenere alcuni parametri ... (lingua, filiale, stock, altri ...) tramite il DSL dei menu
+** Spostare le lingue supportate nei menu (dalla dichiarazione del plugin), vedere <<new_menu_layout_code>>
+- Consentire il debug del codice Kotlin JS, vedere <<new_allow_kotlinjs_debug>>
+- Correggere il percorso del file durante l'aggiornamento. Allo stesso modo di O2M, con anteprima
+- Migliorare il ripristino dello stato
+- Testare il runtime su Mac e il riavvio automatico a freddo in sviluppo
+- Etichettatura automatica per `indexField` di Solr, vedere <<new_solr_code>>
+
+
+[[new_menu_layout]]
+.Layout dei menu aggiornato
+image::screenshot-news-menu-0.4.1.webp[width=720,align=center]
+
+[[new_menu_layout_code]]
+.Codice del layout dei menu
+[source,groovy]
+----
+private UiMenuSpecifier buildMenu(String q = null) {
+    new UiMenuSpecifier().ui {
+        menu CrewController.&index as MC
+        menu CrewController.&listRoles as MC
+        menu CrewController.&hierarchy as MC
+        menuIcon ActionIcon.CONFIG_USER, this.&editUser as MC
+        menuIcon ActionIcon.EXPORT_PDF, this.&downloadBinPdf as MC
+        menuSearch this.&search as MethodClosure, q
+        menuOptions(SupportedLanguage.fromContext())            <1>
+    }
+}
+----
+
+<1> La scelta della lingua si trova a destra della barra di ricerca ed è possibile aggiungere altre enumerazioni
+
+[[new_allow_kotlinjs_debug]]
+.Guida al debug di Kotlin JS
+[source,bash]
+----
+$ cd infra/browser/client                             <1>
+$ ./gradlew browserDevelopmentRun                     <2>
+$ vi intranet/server/grails-app/conf/application.yml  <3>
+# Uncomment line bellow
+# client.js.path: 'http://localhost:8080/client.js'
+
+# Then your browser should show Kotlin code !
+----
+
+<1> Spostarsi nella cartella client dove viene generato il codice JS
+<2> Avviare un server che espone `client.js` e `client.js.map` ...
+<3> Modificare il file `application.yml` della propria intranet
+
+[[new_solr_code]]
+.Nuova semplificazione del DSL Solr (non è più necessaria l'etichettatura)
+[source,groovy]
+----
+@PostConstruct
+private void init() {
+    taackSearchService.registerSolrSpecifier(this,
+            new SolrSpecifier(User,
+                CrewController.&showUserFromSearch as MethodClosure,
+                this.&labeling as MethodClosure, { User u ->
+        u ?= new User()
+        indexField SolrFieldType.TXT_NO_ACCENT, u.username_
+        indexField SolrFieldType.TXT_GENERAL, u.username_
+        indexField SolrFieldType.TXT_NO_ACCENT, u.firstName_
+        indexField SolrFieldType.TXT_NO_ACCENT, u.lastName_
+        indexField SolrFieldType.POINT_STRING, "mainSubsidiary", true, u.subsidiary?.toString()
+        indexField SolrFieldType.POINT_STRING, "businessUnit", true, u.businessUnit?.toString()
+        indexField SolrFieldType.DATE, 0.5f, true, u.dateCreated_
+        indexField SolrFieldType.POINT_STRING, "userCreated", 0.5f, true, u.userCreated?.username
+    }))
+}
+----
+
+== Versione 0.4.0
+
+* Niente più `paginate` nelle tabelle. Vedere <<new_iterate_code>>
+* Niente `list`, ma un `iterate` che accetta una closure come parametro, con un approccio basato sul pattern builder per passare gli argomenti
+* I menu vengono ora etichettati automaticamente (usare `lang=test` nell'URL per tradurre i menu). Vedere <<new_menu_code>>
+* Niente più parametro #isAjax# nelle tabelle ... Vedere <<new_rowAction_code>>
+* Sostituzione di `rowLink` con `rowAction` <<i18n_isAjax>>
+* Nessuna etichetta necessaria su #rowAction# nelle tabelle. Vedere <<new_rowAction_code>>
+* Non è più richiesto `ajaxBlock` per tabelle, moduli e `tableFilters`
+* `formAction` non ha più il parametro #isAjax#
+* `formAction` non ha più il parametro i18n obbligatorio
+* `form` non ha più il parametro i18n obbligatorio, l'i18n si basa sul nome dell'azione corrente
+* L'azione di blocco non ha più il parametro i18n obbligatorio, l'i18n si basa sull'azione di destinazione
+* L'azione di blocco non ha più il parametro `isAjax` obbligatorio
+
+[[new_iterate_code]]
+.Nuovo utilizzo di `iterate`
+[source,groovy]
+----
+iterate(taackFilterService.getBuilder(Role)                     <1>
+        .setMaxNumberOfLine(20)                                 <2>
+        .setSortOrder(TaackFilter.Order.DESC, u.authority_)     <3>
+        .build()) { Role r, Long counter ->
+            row {
+                rowColumn {
+                    rowField r.authority
+                    if (hasSelect)
+                        rowAction
+                            ActionIcon.SELECT * IconStyle.SCALE_DOWN,
+                            CrewController.&selectRole as MC
+                            r.id                                <4>
+                }
+            }
+        }
+
+----
+
+<1> iterare
+<2> Specificare `max` è sufficiente per attivare la paginazione se ci sono più righe
+<3> Sostituisce il vecchio pattern inefficiente per descrivere l'ordinamento e la direzione iniziali
+[[i18n_isAjax]]
+<4> Niente più parametri i18n e `isAjax`
+
+[[new_menu_code]]
+.Nuovo codice per `menu`
+[source,groovy]
+----
+private UiMenuSpecifier buildMenu(String q = null) {
+    UiMenuSpecifier m = new UiMenuSpecifier()
+    m.ui {
+        menu CrewController.&index as MC        <1>
+        menu CrewController.&listRoles as MC
+        menu CrewController.&hierarchy as MC
+        menuSearch this.&search as MethodClosure, q
+    }
+    m
+}
+----
+
+<1> Nessun parametro i18n
+
+[[new_rowAction_code]]
+.Nuovo codice per `rowAction`
+[source,groovy]
+----
+if (hasActions) {
+    rowColumn {
+        rowAction ActionIcon.EDIT * IconStyle.SCALE_DOWN, this.&roleForm as MC, r.id <1>
+    }
+}
+----
+
+<1> Nessun parametro i18n, nessun ultimo parametro `isAjax`
+
+== Versione 0.3.9
+
+Nessun aggiornamento da troppo tempo, il letargo sta giungendo al termine. Questa versione offre:
+
+- Grails 6.2.0
+- Groovy 3.0.21
+- Aggiornamento di varie dipendenze ... (vedere https://github.com/Taack/infra/compare/v0.3.8...v0.3.9[Changelog])

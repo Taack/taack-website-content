@@ -1,0 +1,17 @@
+= Video
+:doctype: book
+:taack-category: 1|more/resources
+:source-highlighter: rouge
+
+== Youtube
+
+https://www.youtube.com/channel/UCPB81L10AKGXgqPc-zhsvVA[Taack-Kanal]
+
+.Vorstellung der Intranet-App
+video::OYtrOL5adj8[youtube, width=640, height=480]
+
+.Konfiguration Ihres Intranets und IntelliJ
+video::Q-T390A9bzY[youtube, width=640, height=480]
+
+.Eine neue App in Ihrem Intranet erstellen
+video::tTRJ6R27JNo[youtube, width=640, height=480]

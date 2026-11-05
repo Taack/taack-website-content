@@ -1,0 +1,6 @@
+= *Vorwort*
+:doctype: whitepaper
+:taack-category: 0|App
+:toc:
+
+Einige Anwendungen können das Framework erweitern, indem sie neue Funktionen hinzufügen. Dieser Abschnitt dokumentiert diese zusätzlichen Funktionen.

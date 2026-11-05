@@ -1,0 +1,16 @@
+= Extensión del IDE
+:doctype: book
+:taack-category: 0|more/resources
+:source-highlighter: rouge
+
+== Intellij
+
+Además, también puede importar las Live Templates de Taack-UI para evitar fácilmente el código repetitivo (boilerplate) de la siguiente manera:
+
+video::6ADI8FrnIzg[youtube,title=IntelliJ Live Templates, opts="autoplay,loop", width=640, height=480]
+
+Para hacerlo, descargue `taack-intellij-templates.zip` en la https://github.com/Taack/taack-autocomplete/releases/tag/v1.6[página de versiones (releases)].
+Luego, en IntelliJ, vaya a `File > Manage IDE Settings > Import Settings`. Después de elegir el archivo, haga clic en "OK" cuando IntelliJ le pregunte qué desea importar y estará listo para empezar.
+
+
+== Visual Studio Code

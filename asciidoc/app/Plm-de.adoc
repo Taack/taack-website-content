@@ -1,0 +1,226 @@
+= FreeCAD PLM
+:doctype: book
+:taack-category: 2|App
+:toc:
+:icons: font
+
+
+
+== Zweck
+
+Verwaltung des Austauschs von FreeCAD-Modellen und der linearen Versionierung. Diese Anwendung demonstriert die Leistungsfähigkeit des Frameworks. Nur sehr wenige Codezeilen beschreiben die Benutzeroberfläche und verwalten persistente Daten. Man kann diese Anwendung als ein kleines PLM (Product Lifecycle Management) für FreeCAD betrachten.
+
+== Rollen
+
+* `ROLE_ADMIN`
+* `ROLE_PLM_USER`
+
+Siehe link:Crew-de.adoc#_purpose[Rollen in Crew konfigurieren], um die Rolle zu Ihrem Intranet hinzuzufügen.
+
+== Server-Installation
+
+
+=== Den PLM-Server konfigurieren
+
+Wenn Sie sich nur einen Überblick verschaffen möchten, können Sie den Demo-Server mit der Standardkonfiguration herunterladen – springen Sie direkt zu <<_launch_server_binaries>>.
+
+Hier sind die Befehle Schritt für Schritt:
+
+.Das Intranet-Repository klonen
+[source,bash]
+----
+git clone https://github.com/Taack/intranet.git
+OR
+git clone git@github.com:Taack/intranet.git
+----
+
+.In den Ordner `app` wechseln
+[source,bash]
+----
+cd intranet/app
+----
+
+.Das PLM-Repository klonen
+[source,bash]
+----
+git clone https://github.com/Taack/plm.git
+OR
+git clone git@github.com:Taack/plm.git
+----
+
+Von hier aus können Sie den Server bauen oder ausführen. Wechseln Sie in das `intranet`-Verzeichnis und führen Sie einen der folgenden Schritte aus:
+
+.Die Server-Binärdateien bauen (für die Produktionsumgebung)
+[source,bash]
+----
+./gradlew bootJar
+----
+
+.Den Server starten (für die Entwicklungsumgebung)
+[source,bash]
+----
+./gradlew bootRun
+----
+
+[[_launch_server_binaries]]
+=== Server-Binärdateien starten
+
+Eine Demo-Version ist hier verfügbar: https://github.com/Taack/plm/releases[Taack PLM Releases], laden Sie `server-0.6.jar` herunter.
+
+Wenn Sie sich entschieden haben, die Server-Binärdateien selbst zu bauen, führen Sie Folgendes aus:
+
+[source,bash]
+.Den Server starten
+----
+java -jar server/build/libs/server-0.6.jar
+----
+
+==== Server-Argumente
+
+Siehe `server/grails-app/conf/application.yml` für eine Liste der verfügbaren Optionen.
+
+Optionen können dem Server wie folgt übergeben werden:
+
+[source,bash]
+.Optionen kombinieren
+----
+java -DOption1=Value1 -DOption2=Value2 ... -jar server-0.3.jar
+----
+
+===== Optionen
+
+* Pfad, unter dem das Intranet seine Dateien speichert: `-Dintranet.root=/home/test/someDir`
+* Server-Port: `-Dserver.port=9444`
+* Datenbank-URL: `-DdataSource.url='jdbc:h2./prodDb2;LOCK_TIMEOUT=10000;DB_CLOSE_ON_EXIT=FALSE'`
+* Pfad zur ausführbaren `dot`-Datei: `-Dexe.dot.path=/somePath...`
+
+
+[[python-protobuf-install]]
+== Installation der FreeCAD-Workbench
+
+Gehen Sie zu #Tools# > #Addon Manager#, aktualisieren Sie den lokalen Cache und suchen Sie nach *Taack*.
+
+image::addon-screenshot2.webp[]
+
+Klicken Sie auf die Schaltfläche zum Installieren.
+
+== Verwendung
+
+=== Mit dem PLM verbinden
+
+.Mit dem PLM verbinden
+image::fc-connect-plm.webp[]
+
+<1> Server-URL (mit abschließendem `/`)
+<2> Benutzername
+<3> Passwort
+<4> Verzeichnis, in dem heruntergeladene Bauteile abgelegt werden (stellen Sie sicher, dass es ausschließlich für Bauteile aus dem PLM reserviert ist)
+<5> Klicken Sie auf `Connect` und warten Sie, bis `Connected` erscheint
+
+=== Bauteile hochladen
+
+Wenn Sie im Reiter `Check-in` auf die Schaltfläche `Upload` (oder `Ok`) klicken, wird die Datei in Ihr Intranet hochgeladen. Das Intranet erstellt anschließend eine Vorschau; dieser Vorgang kann einige Zeit in Anspruch nehmen.
+
+.Hochladen in das PLM
+image::freecad-plm.webp[]
+
+=== Nach Bauteilen suchen
+
+Anschließend können Sie nach Bauteilen suchen:
+
+.Nach Bauteilen suchen
+image::fc-search-plm.webp[]
+
+<1> Klicken Sie auf den Reiter `Search Part`
+<2> Bauteil suchen
+<3> Nur Hauptbaugruppen (Bauteile, die zu keinem anderen Bauteil gehören)
+<4> Klicken, um ein Dialogfeld mit Details zu öffnen
+<5> Vorschau des Bauteils
+<6> Check-in: lädt das Modell lokal herunter und sperrt die Datei auf dem Server, sodass niemand eine neue Version hochladen kann, bis Sie eine neue Version hochladen
+<7> Lädt das Modell lokal im schreibgeschützten Modus herunter
+<8> Schließt das Fenster
+
+=== Hochgeladene Bauteile verwalten
+
+.Hochgeladene Bauteile verwalten
+image::freecad-plm-2.webp[]
+
+<1> Ein Klick auf `Checkin` sperrt das Bauteil zur Bearbeitung für Sie und lädt es in FreeCAD. Wenn Sie das Bauteil anschließend hochladen, werden Ihre neuen Änderungen zur Bauteilhistorie hinzugefügt und das Bauteil wird wieder entsperrt.
+<2> Ein Klick auf `Download Read-Only` lädt das Bauteil auf Ihren Computer herunter und öffnet es in FreeCAD. Sie können keine Änderungen an diesem Bauteil hochladen, es sei denn, Sie duplizieren es.
+
+=== Schreibgeschützt herunterladen (Download Read-Only)
+
+Beachten Sie den Hinweis `READ_ONLY` im Hauptfeld der Bauteil-ID. Wenn Sie versuchen, es über den Reiter `Check-in` hochzuladen, erinnert Sie eine Fehlermeldung daran, dass das Bauteil schreibgeschützt ist. Sie müssen das Bauteil duplizieren, um eine neue Version hochzuladen.
+
+.Schreibgeschützt herunterladen
+image::fc-download-only-plm.webp[]
+
+<1> Modellhierarchie
+<2> Beachten Sie das Schlüsselwort `READ_ONLY`
+<3> Das 3D-Modell
+
+=== Bauteile duplizieren
+
+Um ein schreibgeschütztes Bauteil hochzuladen, müssen Sie es duplizieren. Sie können auch ein ausgechecktes Bauteil duplizieren, wenn Sie das Modell abzweigen (forken) möchten.
+
+.Bauteile duplizieren
+image::fc-duplicate-plm.webp[]
+
+<1> Wählen Sie aus, wie Sie das Modell duplizieren möchten, und klicken Sie auf `Duplicate History`, um das Modell zu duplizieren
+
+Dadurch wird ein neues Bauteil auf dem Server erstellt, wobei eine Verknüpfung zwischen den beiden Bauteilen erhalten bleibt:
+
+.Duplizierte Bauteile auf dem Server
+image::freecad-taack-plm-server-part-details-duplicated.webp[]
+
+<1> Reiter für duplizierte Bauteile (`Duplicated Parts`)
+<2> Das geklonte Bauteil
+<3> Den Hierarchiegraphen dieses Bauteils anzeigen
+
+=== Server-Ansichten
+
+==== Bauteilliste
+
+.Bauteilliste
+image::freecad-taack-plm-server-part-list2.webp[]
+
+<1> Kontexthilfe
+<2> Filter zum Suchen eines Bauteils
+<3> Ergebnisliste
+<4> Klicken, um den Abhängigkeitsgraphen der Baugruppe anzuzeigen
+<5> Gesperrte Bauteile (ausgecheckte Bauteile)
+
+==== Bauteildetails
+
+.Detailansicht von Bauteilen
+image::freecad-taack-plm-server-part-details.webp[]
+
+<1> Vorschau der aktuellen Version
+<2> Unterbauteile mit Vorschau und Verknüpfungen zur jeweiligen Version des Unterbauteils
+<3> Versionsinformationen
+<4> Das Modell und seine Unterbauteile als ZIP-Datei herunterladen
+<5> Vorschau des Modells in einem 3D-Drahtgitter-Viewer
+<6> Status des Bauteils ändern oder das Bauteil entsperren, sofern Sie es gesperrt haben oder über die erforderlichen Berechtigungen verfügen
+<7> Schlagwörter (Tags) zum Bauteil hinzufügen, um die Suche zu erleichtern
+
+==== Bauteilhistorie
+
+.Bauteilhistorie
+image::freecad-taack-plm-server-part-details-history.webp[]
+
+<1> Ursprüngliche Version
+<2> Bauteil ist entsperrt, jemand kann es auschecken (Check-in)
+<3> Status von `CREATED` auf `FREE` geändert
+<4> Neuer Upload des Bauteils; Sie können das 3D-Drahtgittermodell der alten Version betrachten, um Änderungen visuell nachzuverfolgen
+
+WARNING: Wenn Sie viele Verknüpfungen haben, importieren Sie diese von demselben Computer. Laden Sie von anderen Computern die ZIP-Datei aus Ihrem Intranet herunter.
+
+Das war's; ich werde noch einige Videos aufnehmen, die die Möglichkeiten dieser Anwendung demonstrieren.
+
+video::YNbKiaUQY94[youtube, width=820, height=480]
+
+// # [auo@auo-systemproductname FreeCAD]$ yay -S boost cmake coin curl desktop-file-utils eigen gcc-fortran git glew hicolor-icon-theme jsoncpp libspnav med nlohmann-json opencascade pyside6-tools pyside6 python-matplotlib python-netcdf4 python-packaging python-pivy qt6-svg qt6-tools qt6-webengine shared-mime-info shiboken6 swig utf8cpp xerces-c yaml-cpp
+// git submodule update --init
+// ccmake -DFREECAD_QT_VERSION=6 ..
+// cmake .
+// make -j$(nproc --ignore=2)

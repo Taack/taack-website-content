@@ -1,0 +1,83 @@
+= Collabora Editor
+:doctype: book
+:taack-category: 4|App
+:toc:
+:source-highlighter: rouge
+:experimental: true
+
+== Scopo
+
+Estende il controller degli allegati (`Attachment`) nell'applicazione Crew.
+
+Consente di modificare documenti d'ufficio utilizzando https://www.collaboraonline.com/[Collabora Online]. Tutti gli allegati diventano modificabili online.
+
+== Ruoli
+
+* `ROLE_TEMPLATE_ADMIN`: Consente agli utenti di creare nuovi modelli per creare nuovi allegati.
+
+== Installare ed eseguire l'immagine Docker Collabora CODE
+
+.Avviare Docker
+[source,bash]
+----
+sudo systemctl restart docker
+----
+
+.Installare Collabora CODE
+[source,bash]
+----
+sudo docker pull collabora/code:latest
+----
+
+.Eseguire Collabora CODE
+[source,bash]
+----
+sudo docker run --privileged --network host -e "username=test" -e "password=test"  -e "extra_params=--o:ssl.enable=false" -p 9980:9980 collabora/code:latest   <1>
+----
+
+<1> Solo a scopo di test, disattiviamo SSL e scegliamo un utente / password semplici. Non è necessario `--network host` se Collabora viene eseguito su un server diverso.
+
+.Verificare che sia avviato
+[source,bash]
+----
+$ LANG=C wget http://localhost:9980/
+--2025-02-18 22:35:56--  http://localhost:9980/
+Resolving localhost (localhost)... ::1, 127.0.0.1
+Connecting to localhost (localhost)|::1|:9980... connected.
+HTTP request sent, awaiting response... 200 OK
+
+    The file is already fully retrieved; nothing to do.
+----
+
+== Clonare e collegare il repository `editor-collabora`
+
+[source,bash]
+----
+$ git clone https://github.com/Taack/collabora-editor.git
+----
+
+== Configurazione Intranet
+
+[source,yaml]
+----
+collabora.url: http://127.0.0.1:9980/     <1>
+----
+
+<1> Sostituire l'indirizzo IP con il nome DNS del server.
+
+== Screenshot
+
+.Modifica di un file ODP
+image::collabora-editor.webp[]
+
+Alcuni comandi di base:
+
+* Schermo intero => menu:Zoom[Fullscreen]
+* Vista compatta => menu:Display[Compact View], oppure fare clic su image:lc_sidebar.svg[width=25]
+* Chiudere il pannello laterale => menu:Display[Close Panel]
+* Salvare il file per creare una nuova versione sull'Intranet (fare clic su image:lc_save.svg[width=25] o premere btn:[CTRL + S])
+
+
+== Video
+
+video::tB6mL07pzQQ[youtube,480]

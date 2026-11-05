@@ -1,0 +1,28 @@
+= Crew
+:doctype: book
+:taack-category: 1|App
+:toc:
+
+[[_purpose]]
+== Propósito
+
+Gestionar los usuarios en el sistema:
+
+* haga clic en el signo `más` (`plus`) para añadir un usuario
+* haga clic en #Roles# y luego en el signo `más` (`plus`) en la tabla para añadir un rol.
+
+== Roles
+
+`ROLE_ADMIN`
+
+=== Controladores regulares
+* *crew*
+* *attachment*
+
+=== Controladores de soporte
+* *modelVisitor*: Vuelca un grafo del modelo
+* *progress*: Controlador de soporte para la barra de progreso
+
+=== Dependencia externa
+
+* Instalar `convert` de ImageMagick

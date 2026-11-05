@@ -1,0 +1,22 @@
+= 简介
+:doctype: book
+:taack-category: 0| Advanced
+:toc:
+:source-highlighter: rouge
+
+我们强烈建议您先完成 first-app 项目，因为本项目是该项目的延续。
+
+== 环境准备
+=== 克隆开箱即用的开发环境 Intranet
+
+.克隆初始仓库：
+
+[source,bash]
+----
+$ git clone https://github.com/Taack/intranet.git
+$ cd intranet/app/
+$ git clone https://github.com/Taack/myLibrary.git
+$ cd myLibrary
+----
+
+这将克隆 intranet，然后克隆我们将在此处创建的 myLibrary 应用的骨架代码。

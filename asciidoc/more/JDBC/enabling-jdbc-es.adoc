@@ -1,0 +1,41 @@
+= Habilitar JDBC
+:doctype: book
+:taack-category: 1|more/JDBC
+:toc:
+:source-highlighter: rouge
+:icons: font
+
+== Crear un servicio no perezoso (non-lazy)
+
+.Habilitar JDBC para la clase de dominio `User`
+[,groovy]
+----
+package crew
+
+import grails.compiler.GrailsCompileStatic
+import org.taack.User
+
+import javax.annotation.PostConstruct
+
+import static taack.base.TaackJdbcService.Jdbc
+
+@GrailsCompileStatic
+class CrewJdbcService {
+
+    static lazyInit = false <1>
+
+    @PostConstruct <2>
+    private static void init() {
+        def u = new User()
+        Jdbc.registerClass(User,
+                u.username_, u.mail_,
+                u.subsidiary_, u.firstName_,
+                u.lastName_, u.businessUnit_,
+                u.enabled_) <3>
+    }
+}
+----
+
+<1> El servicio no debe inicializarse de forma perezosa (lazy) ya que no necesita ser inyectado en ningún lugar
+<2> Método que lista las columnas de la clase de dominio disponibles a través de TQL
+<3> El paso 3 se puede repetir para todas las clases de dominio

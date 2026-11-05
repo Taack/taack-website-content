@@ -9,7 +9,7 @@
 
 The Block DSL enables the specification of the page layout by defining blocks that contain graphical elements. A block can be updated by  actions. `AJAX blocks` can be targeted using their ID. Blocks can also be nested.
 
-For more information, please refer to the dedicated page on link:../DSLs/block-dsl.adoc[Block DSL]. PDFs have their own block management through link:../DSLs/block-printable-dsl.adoc[Printable Blocks], while the table and show DSLs are also applicable (charts will be available later).
+For more information, please refer to the dedicated page on link:../DSLs/block-dsl.adoc[Block DSL]. PDFs have their own block management through link:../DSLs/block-printable-dsl.adoc[Printable Blocks], where the show, table and diagram DSLs are also applicable.
 
 [source,groovy]
 ----
@@ -23,7 +23,7 @@ b.ui {
 
 <1> Create the block, constructed via the ui method
 <2> This block will contain a modal window, which is also a block
-<3> This ajax block will contain one form
+<3> The modal contains one form
 
 [[form-html-output]]
 .Form inside a modal Window.
@@ -39,6 +39,13 @@ image::screenshot-dsl-user-form-800h.webp[]
 ** Table DSL allows grouping and sorting columns
 ** Pagination is included
 ** Table can also represent a tree
-* link:../DSLs/diagram-dsl.adoc[*Diagram DSL*]: Allows drawing diagrams into a block
-* *Custom DSL*:
-Allows inserting custom HTML code into a block.
+** Rows can be edited inline (`rowQuickEdit`)
+** The filter can be displayed beside the table or as a toolbar above it (`FilterLayout`)
+* link:../DSLs/diagram-dsl.adoc[*Diagram DSL*]: Allows drawing diagrams (bar, line, area, scatter, pie, whiskers, timeline) into a block, a PDF or a mail
+* link:../DSLs/kanban-dsl.adoc[*Kanban DSL*]: Allows drawing a Kanban board with drag & drop between columns
+* `custom`: Allows inserting custom HTML code into a block.
+
+== Page Level DSLs
+
+* link:../DSLs/menu-dsl.adoc[*Menu DSL*]: Describes the page menu (entries, sub-menus, icons, search box, options)
+* link:../DSLs/block-printable-dsl.adoc[*Printable Block DSL*]: Describes the layout of a PDF document

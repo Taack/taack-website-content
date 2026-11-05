@@ -1,0 +1,50 @@
+[[_about_plugins]]
+= Über Plugins
+:doctype: book
+:toc:
+:source-highlighter: rouge
+:taack-category: 1|doc/plugin
+:icons: font
+
+== Eine Anwendung registrieren
+
+Eine Anwendung registriert lediglich ihre *Einstiegspunkte* (d. h. #Aktionen#, die beim Zugriff auf die Anwendung ausgeführt werden) sowie die zugehörigen *SVG-Symbole*. Die Namen der Controller-Einstiegspunkte werden für lokalisierte Beschriftungen und Beschreibungen in den `i18n`-Property-Dateien verwendet.
+
+.Registrierung der Crew-Anwendung
+[source,groovy]
+----
+@PostConstruct
+void init() {
+TaackAppRegisterService.register TaackApp(          <1>
+        CrewController.&index as MC,                <2>
+        new String(
+            this.class
+            .getResourceAsStream("/crew/crew.svg")  <3>
+            .readAllBytes())
+    )
+}
+
+----
+
+<1> Aufruf der statischen Methode `TaackAppRegisterService.register`
+<2> Einstiegspunkt definieren
+<3> SVG-Symbol
+
+== I18n
+
+Fügen Sie in den `i18n`-Properties Folgendes hinzu:
+
+[source,properties]
+----
+crew.app=Crew
+crew.desc=User Management Application
+attachment.app=Attachment
+attachment.desc=Global File Manager
+----
+
+== Standard-Anwendungsmosaik
+
+Standardmäßig enthält der https://github.com/Taack/intranet/blob/main/server/grails-app/controllers/taack/website/RootController.groovy[`RootController`] im Server den Einstiegspunkt. Dieser kann leicht geändert werden.
+
+.Standard-Anwendungsmosaik
+image::root-default.webp[]

@@ -1,0 +1,272 @@
+= Casi d'uso
+:taack-category: 2|doc/UserGuide
+:toc:
+:source-highlighter: rouge
+:icons: font
+
+Questi casi d'uso mostrano ciò che compete allo sviluppatore dell'applicazione (nei diagrammi è l'attore `controller`) e ciò che viene eseguito automaticamente dal framework (rettangolo azzurro).
+
+== Visualizzare un modulo e salvare un oggetto
+
+
+Sono coinvolte due azioni che utilizzano 2 servizi:
+
+.Diagramma di sequenza per il rendering del modulo e l'elaborazione dell'oggetto
+[plantuml,format="svg",opts={optsi}]
+----
+@startuml
+group Display Form
+    user -> controller : click on create or edit
+    activate controller
+    controller -> controller : buildForm
+    controller -> controller : buildBlock
+    controller -> taackUiService : show(block)
+    deactivate controller
+    activate taackUiService #005500
+    note right
+        choose Ajax or
+        full page rendering
+        to render the block
+    end note
+    taackUiService -> user : show the block containing the form
+    deactivate taackUiService
+end
+
+box "Taack Service" #LightBlue
+    participant taackUiService
+    participant taackSaveService
+end box
+
+== Edit Form ==
+
+group Save Form
+    user -> controller : click save
+    activate controller
+    controller -> taackSaveService : saveThenRedirectOrRenderErrors
+    deactivate controller
+    activate taackSaveService
+    taackSaveService -> taackSaveService : save
+    taackSaveService -> taackSaveService : redirectOrRenderErrors
+    alt valid object
+        taackSaveService -> user : redirect to target action
+    else invalid object
+        taackSaveService -> user : ajax form rendered with errors
+        deactivate taackSaveService
+    end
+end
+@enduml
+----
+
+.Esempio di codice: flusso di lavoro modulo + salvataggio
+[,groovy]
+----
+def userForm(User user) {                           <1>
+    user ?= new User()                              <2>
+
+    UiFormSpecifier f = new UiFormSpecifier()       <3>
+    f.ui user, {
+        hiddenField user.subsidiary_
+        hiddenField user.origin_
+        section "User", {
+            field user.username_
+            field user.firstName_
+            field user.lastName_
+            ajaxField user.manager_, this.&selectUserM2O as MC
+            field user.trigram_
+            field user.password_
+        }
+        section "Coords", {
+            field user.businessUnit_
+            field user.job_
+            field user.directPhone_
+            field user.additionalPhone_
+            field user.mail_
+            field user.mainSubsidiary_
+            field user.allowedSubsidiaries_
+        }
+        // [. . .]
+        formAction this.&saveUser as MC, user.id    <4>
+    }
+
+    taackUiService.show new UiBlockSpecifier().ui { <5>
+        modal {
+            form "User Form", f, BlockSpec.Width.MAX
+        }
+    }
+}
+
+@Transactional
+@Secured("ROLE_ADMIN")                              <6>
+def saveUser() {                                    <7>
+    taackSaveService.saveThenRedirectOrRenderErrors(User, this.&listUser) <8>
+}
+----
+
+<1> Azione che visualizza il modulo
+<2> Crea l'oggetto se è `null`
+<3> Crea il modulo
+<4> Pulsante del modulo che invia i dati del modulo all'azione `saveUser`
+<5> Mostra il modulo
+<6> Protegge l'azione di salvataggio
+<7> Azione che salverà l'oggetto
+<8> Chiamata a `taackSaveService`; qui, se l'oggetto è valido, l'utente viene reindirizzato all'azione `listUsers`.
+
+== Visualizzare una tabella con colonne ordinabili, azioni in linea e un filtro
+
+È necessaria una sola azione per gestire paginazione, filtraggio e ordinamento:
+
+.Diagramma di sequenza che gestisce l'azione su una tabella per elaborare un elenco di oggetti
+[plantuml,format="svg",opts={optsi}]
+----
+@startuml
+group Display Table with filter
+    loop as much as the user click on the table
+        user -> controller : filter or sort objects
+        activate controller
+        controller -> controller : buildFilter (optionaly)
+        controller -> controller : buildTableHeader
+        controller -> taackFilterService : iterate
+        activate taackFilterService #005500
+        controller -> controller : build row from object
+        return loop over each row
+        controller -> controller : buildBlock
+        controller -> taackUiService : show(block)
+        deactivate controller
+        activate taackUiService #005500
+        note right
+            choose Ajax or
+            full page rendering
+        end note
+        taackUiService -> user : show the table and the filter if any into the block
+        deactivate taackUiService
+    end
+end
+
+box "Taack Service" #LightBlue
+    participant taackUiService
+    participant taackFilterService
+end box
+
+@enduml
+----
+
+.Esempio di codice per filtro e tabella
+[,groovy]
+----
+def index() {                                                   <1>
+    User cu = authenticatedUser as User
+
+    UiFilterSpecifier f = buildUserTableFilter cu               <2>
+    UiTableSpecifier t = buildUserTable f                       <3>
+
+    UiBlockSpecifier b = new UiBlockSpecifier().ui {            <4>
+        tableFilter(f, t) {
+            menuIcon ActionIcon.ADD, this.&userForm as MC       <5>
+        }
+    }
+
+    taackUiService.show(b, buildMenu())                         <6>
+}
+----
+
+<1> Azione che visualizza un elenco di oggetti
+<2> Costruisce il filtro; qui il filtro riceve come parametro l'utente attualmente connesso perché vogliamo poter elencare il team dell'utente.
+<3> Costruisce la tabella
+<4> Costruisce il blocco contenente la tabella e il filtro
+<5> Aggiunge un'azione per creare un nuovo utente
+<6> Mostra il blocco
+
+WARNING: Passiamo eccezionalmente il filtro a `buildTable` per costruire la query ed evitare la *manipolazione dei filtri (filter hacking)*.
+
+
+== Visualizzare una finestra modale, chiuderla e aggiornare parte del contenuto corrente
+
+.Diagramma di sequenza che gestisce l'azione su una tabella per elaborare un elenco di oggetti
+[plantuml,format="svg",opts={optsi}]
+----
+@startuml
+group Open Modal, Edit or create object, then refresh the page
+    user -> controller : click on create or edit
+    activate controller
+    controller -> controller : buildForm
+    controller -> controller : buildBlock
+    controller -> taackUiService : show(block)
+    deactivate controller
+    activate taackUiService #005500
+    note right
+        The block open a modal
+    end note
+    taackUiService -> user : show the block containing the form
+    deactivate taackUiService
+end
+
+box "Taack Service" #LightBlue
+    participant taackUiService
+    participant taackSaveService
+end box
+
+== Edit Form ==
+
+group Save Form
+    user -> controller : click save
+    activate controller
+    controller -> controller : buildBlock
+    note left
+        Here, the block contains
+        **closeModalAndUpdateBlock**
+    end note
+    controller -> taackSaveService : saveThenDisplayBlockOrRenderErrors
+    deactivate controller
+    activate taackSaveService
+    taackSaveService -> taackSaveService : save
+    taackSaveService -> taackSaveService : displayBlockOrRenderErrors
+    alt valid object
+        taackSaveService -> user : close modal and refresh current page
+    else invalid object
+        taackSaveService -> user : ajax form rendered with errors
+        deactivate taackSaveService
+    end
+end
+@enduml
+----
+
+.Esempio di codice per chiudere la finestra modale e aggiornare la pagina corrente
+[,groovy]
+----
+taackSaveService.saveThenDisplayBlockOrRenderErrors(EngineeringChangeRequest,   <1>
+    new UiBlockSpecifier().ui {                                                 <2>
+        closeModalAndUpdateBlock {                                              <3>
+            show buildShowProjects(ecr), {
+                menuIcon
+                    ActionIcon.ADD,
+                    Ecr2Controller.&projectsForm as MC, ecr.id
+            }
+        }
+})
+----
+
+<1> Dopo che in una finestra modale viene chiamata un'azione che comporta il salvataggio di un oggetto, è possibile chiudere la finestra modale e aggiornare gli elementi della pagina in un'unica azione
+<2> `saveThenDisplayBlockOrRenderErrors` accetta uno `UiBlockSpecifier` come parametro
+<3> `closeModalAndUpdateBlock` chiuderà prima l'ultima finestra modale aperta e poi applicherà la modifica
+<4> Qui verrà aggiornato il blocco il cui nome è contenuto in `ajaxBlockId`
+
+
+== Quando si utilizza un `ajaxBlock`
+
+
+
+== TODO
+
+* Aggiornare una porzione di pagina
+
+* Mostrare un oggetto con un campo modificabile
+
+* Mostrare un grafico
+
+* Esportare una tabella in CSV
+
+* Eseguire il rendering di un blocco in un PDF
+
+* Eseguire il rendering di un blocco in un'e-mail
+
+* ...

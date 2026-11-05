@@ -1,0 +1,22 @@
+= Introduzione
+:doctype: book
+:taack-category: 0| Advanced
+:toc:
+:source-highlighter: rouge
+
+Consigliamo vivamente di completare prima il progetto first-app, poiché questo ne costituisce la continuazione.
+
+== Configurazione
+=== Clonazione dell'Intranet pronta per lo sviluppo
+
+.Clona il repository iniziale:
+
+[source,bash]
+----
+$ git clone https://github.com/Taack/intranet.git
+$ cd intranet/app/
+$ git clone https://github.com/Taack/myLibrary.git
+$ cd myLibrary
+----
+
+Questo clonerà l'intranet e successivamente lo scheletro dell'applicazione myLibrary che creeremo qui.

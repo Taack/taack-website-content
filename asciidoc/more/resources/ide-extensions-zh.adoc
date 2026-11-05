@@ -1,0 +1,16 @@
+= IDE 扩展
+:doctype: book
+:taack-category: 0|more/resources
+:source-highlighter: rouge
+
+== Intellij
+
+此外，您还可以导入 Taack-UI 实时模板（Live Templates），从而轻松省去编写样板代码（boilerplate code）的繁琐工作，如下所示：
+
+video::6ADI8FrnIzg[youtube,title=IntelliJ Live Templates, opts="autoplay,loop", width=640, height=480]
+
+为此，请在 https://github.com/Taack/taack-autocomplete/releases/tag/v1.6[发布页面] 上下载 `taack-intellij-templates.zip`。
+然后在 IntelliJ 中，前往 `File > Manage IDE Settings > Import Settings`。选择该文件后，当 IntelliJ 询问您要导入哪些内容时点击“OK”即可完成配置。
+
+
+== Visual Studio Code

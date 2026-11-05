@@ -1,0 +1,852 @@
+= 第一个应用
+
+== 应用如何与 Taack 框架配合工作？
+
+您的内网项目包含两个部分：
+
+* 位于 `app` 目录下的应用插件是独立的微项目，每个微项目都有自己的依赖和构建配置等（例如 Crew）。
+有关如何声明插件的更详细说明，请参阅 link:doc/plugin/taack-plugin-zh.adoc#_about_plugins[关于插件]。
+* 主服务器会引入其 `build.gradle` 中声明的所有应用插件，并将它们显示在内网主页上。
+
+== 创建新的应用插件
+
+
+若要创建新的应用插件（即一个 Gradle 模块），请确保您已从我们的 GitHub 仓库拉取了最新版本的内网代码（请参阅 link:install-zh.adoc[安装指南]）。
+
+.在内网根目录下执行以下命令：
+
+// setting system properties with the -D flag
+// setting project properties with the -P flag
+
+[,bash]
+----
+$ ./gradlew -DmodName=myBooks server:generateTaackAppTask
+----
+
+这将创建一个新目录 `app/myBooks`。
+
+[NOTE]
+====
+在 `intranet/app/myBooks/grails-app/domain` 下，将目录 `myBooks` 替换为 `my.books`。这能确保 `controllers` 和 `services` 可以访问在 `domain` 中创建的类，因为它们将属于同一个包。
+====
+
+
+.myBooks 目录结构
+image::first-app-4-content-app.webp[Reload,width=520,align="left"]
+
+为了让您的 IDE 识别新创建的模块，请点击下图所示的图标重新加载 Gradle：
+
+.重新加载 Gradle
+image::screenshot-new-app-gradle-reload.webp[Reload,width=520,align="left"]
+
+== 管理后续更新
+
+大多数情况下，更新您的内网只需更新 `buildSrc` 目录、`gradle.properties` 文件，极少数情况下才需要更新各个应用的 `build.gradle` 文件。
+
+[NOTE]
+====
+事实上，这种流程在长期软件开发中非常常见，新手无需对此感到担心。
+====
+
+== 构建应用全局菜单
+
+[sidebar]
+====
+**TODO：**
+我们将构建两个菜单：一个用于书籍，另一个用于作者。在每个菜单中，您都可以添加新条目、进行过滤，并在表格中查看所有记录。
+====
+
+让我们先关注新应用 `myBooks` 的导航栏。
+第一步是定义如何构建菜单。请打开 `grails-app/services/my/books/MyBooksUiService`。
+
+.您应该会看到以下代码（不同版本可能略有差异）：
+[,groovy]
+----
+static UiMenuSpecifier buildMenu(String q = null) { // <1>
+    new UiMenuSpecifier().ui {
+        menu MyBooksController.&index as MC
+    }
+}
+----
+<1> 如果还没有 `static` 关键字，请将其加上。
+
+我们创建一个 link:doc/DSLs/menu-dsl-zh.adoc[UiMenuSpecifier] 对象来定义菜单结构，然后指定要显示的内容。
+
+[,groovy]
+----
+menu MyBooksController.&index as MC
+----
+
+在这个例子中，`menu` 在导航栏中创建了一个简单的链接。`index` 是该链接显示的名称，而 `MyBooksController.&index`（使用 MethodClosure）则定义了点击链接后跳转的目标操作（Action）。
+
+
+
+== 创建领域类
+在 `grails-app/domain/my/books` 中创建一个名为 `Author` 的 Groovy 类。
+
+
+.创建类
+image::first-app-5-create-class.webp[Reload,width=520,align="left"]
+
+
+
+.添加以下代码：
+[,groovy]
+----
+import grails.compiler.GrailsCompileStatic
+import taack.ast.annotation.TaackFieldEnum
+
+@GrailsCompileStatic
+@TaackFieldEnum
+class Author {
+    String firstName
+    String lastName
+    Date dateOfBirth
+}
+----
+
+在 `grails-app/domain/my/books` 中再创建一个名为 `Book` 的 Groovy 类。
+
+.添加以下代码：
+[,groovy]
+----
+import grails.compiler.GrailsCompileStatic
+import taack.ast.annotation.TaackFieldEnum
+
+@GrailsCompileStatic
+@TaackFieldEnum
+class Book {
+    String title
+    String authorName
+    int numberOfPages
+}
+----
+
+[NOTE]
+====
+为了兼顾性能与类型安全，请始终使用 `@GrailsCompileStatic`。同时请使用 `@TaackFieldEnum`，更多信息请参阅link:doc/UserGuide/DevelopingStepsOverview[此处]。
+====
+
+
+== 创建表格
+
+现在让我们在 `listBook` 页面中显示一个表格。请打开 `grails-app/services/my/books/MyBooksUiService`。
+
+.创建一个名为 `buildBookTable` 的表格描述器（Specifier）：
+[,groovy]
+----
+
+UiTableSpecifier buildBookTable() {
+    Book book = new Book()
+    UiTableSpecifier bookTableSpecifier = new UiTableSpecifier()
+    bookTableSpecifier.ui {
+    //Add table content inside the closure here
+    }
+}
+
+----
+这里我们定义了一个用于列出 `Book` 实例的新表格。请使用 `import taack.ui.dsl.UiTableSpecifier`。
+
+
+
+
+
+.若要定义表头，请在闭包中添加以下代码（并导入所需的类）：
+[,groovy]
+----
+bookTableSpecifier.ui {
+    // -- Header --
+    header {
+        column {
+            sortableFieldHeader book.title_ //<1>
+        }
+        column {
+            label book.authorName_
+        }
+        column {
+            label book.numberOfPages_
+        }
+        column {
+            label "Delete book"
+        }
+    }
+}
+----
+<1> 注意这里我们使用了 `sortableFieldHeader`，这会使该列支持排序，您可以通过点击 `book.title` 表头按字母顺序对书籍进行排序。
+接下来我们将填充表格，使用表格 DSL 的 `iterate` 方法遍历数据库中的 `Book` 实例。
+
+.添加以下代码（初始化并导入所需的类）：
+[,groovy]
+----
+bookTableSpecifier.ui {
+    //table headers...
+
+    iterate(taackFilterService.getBuilder(Book) // <1>
+        .setMaxNumberOfLine(8) // <2>
+        .setSortOrder(TaackFilter.Order.DESC, book.title_) // <3>
+        .build()) { Book bookIterator ->
+    rowColumn {
+        rowField bookIterator.title_ // <4>
+    }
+    rowColumn {
+        rowField bookIterator.authorName_
+    }
+    rowColumn {
+        rowField bookIterator.numberOfPages_
+    }
+    rowColumn {
+        rowAction ActionIcon.DELETE * IconStyle.SCALE_DOWN, // <5>
+            MyBooksController.&deleteBook as MethodClosure, bookIterator.id
+        }
+    }
+}
+
+----
+<1> 请使用 `import taack.domain.TaackFilterService`。
+<2> 每页仅显示前 8 本书。
+<3> 设置按书名降序排列显示（请使用 `import taack.domain.TaackFilter`）。
+<4> 此处末尾的下划线是必需的。
+<5> 请使用 `import taack.ui.dsl.common.ActionIcon
+import taack.ui.dsl.common.IconStyle`。
+
+[NOTE]
+====
+我们需要创建 `deleteBook` 操作。目前先将其留空。
+====
+
+打开 `grails-app/controllers/my/books/MyBooksController.groovy`。
+
+.在 `index` 操作之后添加以下方法：
+[,groovy]
+----
+def deleteBook () {}
+----
+
+对于列表中的每一本书，我们都会生成新的一行：第一列显示书名，随后是作者、页数，第四列则是一个 btn:[Delete] 按钮。
+
+现在表格已经构建完成，我们只需将其渲染到页面上即可。
+为了渲染前面构建好的 `UiSpecifier`，我们需要使用 `taackUiService`，它通常已经由 `create-taack-app` 命令在生成的控制器中自动导入了。
+
+
+我们将在名为 `listBook` 的操作中完成渲染，并将 `index` 方法的内容替换为重定向到 `listBook` 操作。
+
+.重定向到 `listBook` 操作：
+[,groovy]
+----
+def index() {
+    redirect action: 'listBook'
+}
+----
+
+
+.创建一个名为 `listBook` 的操作并添加以下代码：
+[,groovy]
+----
+UiTableSpecifier tableBookSpecifier = myBooksUiService.buildBookTable() // <1>
+
+        taackUiService.show(new UiBlockSpecifier().ui {
+            table tableBookSpecifier
+        }, MyBooksUiService.buildMenu())
+----
+<1> 从 `MyBooksUiService` 获取我们创建的 `tableSpecifier`。
+
+请使用 `import taack.ui.dsl.UiTableSpecifier`。
+
+`taackUiService.show(UiBlockSpecifier block, UiMenuSpecifier menu)` 负责渲染我们传入的界面描述。
+我们将前面在 `MyBooksUiService` 中创建的静态方法 `buildMenu()` 作为 `show()` 的第二个参数，以便在页面上同时渲染菜单。
+
+
+现在您可以启动服务器并访问您的新应用（`myBooks.app`）。
+此时表格已经可以正常工作了，但由于数据库中还没有任何书籍，您目前只能看到表头。
+接下来让我们继续创建表单并将对象保存到数据库中。
+
+
+.空的书籍表格
+image::first-app-7-creating-table.webp[Reload,width=1000,align="left"]
+
+
+[[_adding_buttons_to_a_table_block]]
+== 向表格区块添加按钮
+
+让我们在书籍表格中添加一个按钮，点击后通过 AJAX 打开模态窗口以创建新书。
+为此，我们需要在 `table` 中添加一个闭包。
+
+.添加以下代码：
+[,groovy]
+----
+taackUiService.show(new UiBlockSpecifier().ui {
+    table tableBookSpecifier, {
+        //Added Closure here
+        menuIcon ActionIcon.CREATE, this.&bookForm as MethodClosure // <1>
+    }
+}, MyBooksUiService.buildMenu())
+
+----
+<1> 您需要像定义 `deleteBook` 一样定义 `bookForm` 操作。
+
+别忘了使用 `import taack.ui.dsl.common.ActionIcon`。
+
+现在启动服务器并再次访问您的新应用，您将在表格右上角看到一个 btn:[Create] 按钮。
+
+.按钮
+image::first-app-8-adding-button.webp[Reload,width=1000,align="left"]
+
+`menuIcon` 方法包含以下参数：
+
+. 按钮使用的图标，必须是 `ActionIcon` 枚举值。
+. 点击按钮后跳转的目标操作。
+
+== 创建表单并保存对象
+
+现在我们来构建用于创建和更新书籍的表单。
+为了同时处理这两种情况，我们将在 `MyBooksUiService` 中判断请求参数是否传入了书籍 ID：若有则读取该书籍，否则初始化一个新的 `Book` 实例。
+
+.创建一个名为 `buildBookForm` 的表单描述器：
+[,groovy]
+----
+UiFormSpecifier buildBookForm(Book book) {
+    book ?= new Book(params) // <1>
+}
+----
+<1> 这表示如果 `book` 为 null，则使用请求参数为其赋一个新的实例。
+
+接下来我们定义表单及其内容。
+
+.在 `buildBookForm` 中添加以下代码（并导入所需的类）：
+[,groovy]
+----
+UiFormSpecifier bookFormSpecifier = new UiFormSpecifier()
+bookFormSpecifier.ui book, {
+    //Section of fields
+    section "Book details", {
+        field book.title_
+        field book.authorName_
+        field book.numberOfPages_
+    }
+    //Save button
+    formAction MyBooksController.&saveBook as MethodClosure // <1>
+}
+----
+<1> 您需要在 `MyBooksController` 中定义 `saveBook` 操作（与 `deleteBook` 类似）。
+
+请使用 `import taack.ui.dsl.UiFormSpecifier`。
+
+定义好表单后，您可以使用 `taackUiService.show()` 方法将其显示出来。
+
+.在 `MyBooksController` 的 `bookForm` 方法中添加以下代码：
+[,groovy]
+----
+def bookForm(Book book) {
+    UiFormSpecifier tableFormSpecifier = myBooksUiService.buildBookForm book
+
+    taackUiService.show new UiBlockSpecifier().ui {
+        modal {
+            form tableFormSpecifier
+        }
+    }
+}
+----
+
+请使用 `import taack.ui.dsl.UiFormSpecifier`。
+
+这次我们在调用 `show` 时没有传入 `buildMenu`，因为我们不希望在模态窗口内部渲染菜单。
+
+.修改 `saveBook` 操作（导入并初始化所需的类）：
+
+[,groovy]
+----
+@Transactional
+def saveBook() {
+    taackSaveService.saveThenReloadOrRenderErrors(Book)
+}
+----
+请使用 `import taack.render.TaackSaveService` 和 `import grails.gorm.transactions.Transactional`。
+
+[NOTE]
+====
+请参阅 link:doc/DSLs/block-dsl-zh.adoc#_modal_stack_code_sample[关闭模态窗口并重新加载页面]，了解如何在保存时避免使用 `redirectAction`...
+====
+
+
+再次启动服务器，现在您应该可以点击按钮并填写表单了。
+
+.表单
+image::first-app-10-creating-form.webp[Reload,width=800,align="left"]
+
+.已保存的书籍
+image::first-app-11-adding-book.webp[Reload,width=800,align="left"]
+
+[NOTE]
+====
+在左上角，您可以使用页码（1 或 2）在不同批次的书籍之间切换。出现该分页导航是因为列表限制为每页显示 8 本书。
+====
+
+== 查看对象详情
+
+现在我们已经可以创建书籍并在表格中查看列表了，接下来让我们使用模态窗口展示每本书的详细信息。
+同样地，我们先定义描述器，然后使用 `taackUiService.show()` 将其渲染在模态窗口区块中。
+
+
+.创建 `showBook`（并导入所需的类）：
+[,groovy]
+----
+def showBook(Book book) {
+    // Define the show displayed fields
+    UiShowSpecifier showSpec = new UiShowSpecifier().ui({
+        fieldLabeled book.title_
+        fieldLabeled book.authorName_
+    })
+
+    taackUiService.show(new UiBlockSpecifier().ui {
+        modal {
+            show showSpec
+        }
+    })
+}
+----
+请使用 `import taack.ui.dsl.UiShowSpecifier`。
+
+我们还需要在表格中显示打开该模态窗口的链接。为此，请在 `MyBooksUiService` 中您希望按钮出现的同一个 `rowColumn` 内（书名字段附近）添加以下行：
+
+.在 `buildBookTable` 中添加 2 行代码：
+[,groovy]
+----
+
+UiTableSpecifier buildBookTable() {
+    //Section of code
+    rowColumn {
+        //Add these 2 lines
+        rowAction ActionIcon.SHOW * IconStyle.SCALE_DOWN, // <1>
+        MyBooksController.&showBook as MethodClosure, bookIterator.id
+        rowField bookIterator.title_
+    }
+    //Section of code
+}
+
+
+----
+
+<1> 这里我们使用乘法运算符缩小了图标的尺寸。
+
+这将在表格单元格中创建一个_小型_图标按钮，点击后会打开包含对应书籍详情的模态窗口。
+
+注意，此处通过将 `ActionIcon` 与 `IconStyle` 相乘来调整图标大小。
+
+.查看对象详情
+image::first-app-13-view-books.webp[Reload,width=800,align="left"]
+点击眼睛图标即可显示书籍详情。
+
+
+== 删除对象
+
+还记得我们在表格中添加的 btn:[Delete] 按钮吗？
+现在让我们通过定义它所调用的 `deleteBook` 操作，使 btn:[Delete] 按钮真正生效。
+
+
+[,groovy]
+----
+@Transactional
+def deleteBook(Book book) {
+    book.delete()
+    redirect action: 'index'
+}
+----
+
+[NOTE]
+====
+在某些场景下，最好添加一个 `enable` 字段来隐藏已禁用的对象，而不是直接从数据库中删除它们。
+====
+
+我们使用 Grails 的 `delete` 方法从数据库中删除该书籍，然后重定向到包含书籍表格的 `index` 操作。
+
+.删除书籍
+video::first-app-15-delete-book.mp4[Reload,width=800,align="left",options="autoplay,loop,muted"]
+
+
+请注意，此时字段名称还不是直观的标签，而是像 `book.numberOfPages.label,default.numberOfPages.label` 这样的 i18n 键（指向 `messages.properties` 中的国际化键）。让我们来修改它！
+
+== 命名表头与标签
+
+若要设置表头名称，请打开 `app/myBooks/grails-app/i18n/messages.properties`。
+
+.将 `default.numberOfPages.label` 及其他标签设置为您想要的名称：
+
+[,properties]
+----
+default.authorName.label=Author Name
+default.title.label=Title
+default.numberOfPages.label=Number of Pages
+myBooks.index.label=Books
+myBooks.app=Book
+myBooks.desc=Book storage
+----
+
+运行服务器即可查看更新后的标签名称。
+
+== 过滤数据
+如果添加的书籍过多，查找特定书籍可能会耗费大量时间，通过过滤功能可以让书籍搜索更加高效。让我们在 `MyBooksUiService` 中实现这一功能。
+
+
+.创建一个名为 `buildBookFilter` 的新过滤器描述器：
+[,groovy]
+----
+UiFilterSpecifier buildBookFilter(Book book) {
+    UiFilterSpecifier bookFilterSpecifier = new UiFilterSpecifier() // <1>
+
+    bookFilterSpecifier.ui Book, { // <2>
+        section "Book Filter", {  // <3>
+            filterField book.title_ // <4>
+        }
+    }
+}
+----
+<1> 创建过滤器。请使用 `import taack.ui.dsl.UiFilterSpecifier`。
+<2> 通过 `ui` 方法传入对象类以及包含过滤器规格定义的闭包。
+<3> 创建一个标题为 "Book Filter" 的分区。
+<4> 向过滤器中添加字段，请注意字段名末尾的*下划线*。
+
+下一步是将刚刚创建的过滤器显示出来。
+
+.修改 `listBook`（位于 `MyBooksController` 中）里的 `taackUiService.show`：
+[,groovy]
+----
+def listBook() {
+    Book book = new Book()
+    UiTableSpecifier tableBookSpecifier = myBooksUiService.buildBookTable()
+    UiFilterSpecifier filterBookSpecifier = myBooksUiService.buildBookFilter book
+
+    taackUiService.show(new UiBlockSpecifier().ui {
+        tableFilter filterBookSpecifier, tableBookSpecifier, {
+            menuIcon ActionIcon.CREATE, this.&bookForm as MethodClosure
+        }
+    }, MyBooksUiService.buildMenu())
+}
+----
+请使用 `import taack.ui.dsl.UiFilterSpecifier`。
+
+.过滤效果
+image::first-app-20-using-filter.webp[Reload,width=800,align="left"]
+
+
+
+有关过滤功能的更多详细信息，请参阅link:doc/DSLs/filter-table-dsl[过滤器与表格文档]。
+
+== 添加第二个菜单
+还记得我们一开始创建的 `Author` 类吗？现在是时候使用它了！我们将创建第二个菜单，用于添加和过滤作者。
+
+.在 `MyBooksUiService` 的 `buildMenu` 中添加以下代码行：
+[,groovy]
+----
+menu MyBooksController.&listAuthor as MC
+----
+这将在左上角创建第二个菜单，用于访问作者页面。
+
+[NOTE]
+====
+您也可以在主菜单中创建嵌套的子菜单。
+[,groovy]
+----
+label("Menu", {
+    subMenu(MyBooksController.&index as MC)
+    subMenu(MyBooksController.&listAuthor as MC)
+})
+----
+这会创建一个名为 "Menu" 的子菜单，其中包含指向 `index` 操作（对应 `listBook` 操作）和 `listAuthor` 操作的链接。如果您希望将相关链接归类到同一个菜单项下，这会非常实用。
+====
+.在 `MyBooksUiService` 中添加以下构建方法：
+[,groovy]
+----
+UiTableSpecifier buildAuthorTable(Boolean isSelect = false ) {
+    Author author = new Author()
+    UiTableSpecifier authorTableSpecifier = new UiTableSpecifier()
+    authorTableSpecifier.ui {
+        header {
+            column {
+                sortableFieldHeader author.firstName_
+            }
+            column {
+                sortableFieldHeader author.lastName_
+            }
+            column {
+                label author.dateOfBirth_
+            }
+            column {
+                label "Delete Author"
+            }
+        }
+
+        iterate(taackFilterService.getBuilder(Author)
+                .setMaxNumberOfLine(8)
+                .setSortOrder(TaackFilter.Order.DESC, author.lastName_)
+                .build()) { Author authorIterator ->
+            rowColumn {
+                rowField authorIterator.firstName_
+                rowAction ActionIcon.SHOW * IconStyle.SCALE_DOWN,
+                        MyBooksController.&showAuthor as MethodClosure, authorIterator.id
+            }
+            rowColumn {
+                rowField authorIterator.lastName_
+            }
+            rowColumn {
+                rowField authorIterator.dateOfBirth_
+            }
+            rowColumn {
+                rowAction ActionIcon.DELETE * IconStyle.SCALE_DOWN,
+                        MyBooksController.&deleteAuthor as MC, authorIterator.id
+            }
+        }
+    }
+}
+
+UiFormSpecifier buildAuthorForm(Author author) {
+    author ?= new Author(params)
+    UiFormSpecifier authorFormSpecifier = new UiFormSpecifier()
+    authorFormSpecifier.ui author, {
+        section "Author details", {
+            field author.firstName_
+            field author.lastName_
+            field author.dateOfBirth_
+        }
+        formAction MyBooksController.&saveAuthor as MC
+    }
+}
+
+UiFilterSpecifier buildAuthorFilter() {
+    Author author = new Author()
+    UiFilterSpecifier authorFilterSpecifier = new UiFilterSpecifier()
+
+    authorFilterSpecifier.ui Author, {
+        section "Author Filter", {
+            filterField author.lastName_
+        }
+    }
+}
+----
+注意 `buildAuthorTable` 中的 `isSelect` 参数将在稍后用到。
+
+.在 `MyBooksController` 中创建 `listAuthor` 方法：
+[,groovy]
+----
+def listAuthor() {
+    UiTableSpecifier tableAuthorSpecifier = myBooksUiService.buildAuthorTable()
+    UiFilterSpecifier filterAuthorSpecifier = myBooksUiService.buildAuthorFilter()
+
+    taackUiService.show(new UiBlockSpecifier().ui {
+        tableFilter filterAuthorSpecifier, tableAuthorSpecifier, {
+            menuIcon ActionIcon.CREATE, this.&authorForm as MethodClosure
+        }
+    }, MyBooksUiService.buildMenu())
+}
+----
+
+.添加所需的 `deleteAuthor`、`saveAuthor`、`authorForm` 和 `showAuthor` 方法：
+[,groovy]
+----
+def authorForm(Author author) {
+    UiFormSpecifier tableFormSpecifier = myBooksUiService.buildAuthorForm author
+
+    taackUiService.show new UiBlockSpecifier().ui {
+        modal {
+            form tableFormSpecifier
+        }
+    }
+}
+
+@Transactional
+def deleteAuthor(Author author) {
+    author.delete()
+    redirect action: 'index'
+}
+
+@Transactional
+def saveAuthor() {
+    taackSaveService.saveThenReloadOrRenderErrors(Author)
+}
+
+def showAuthor(Author author) {
+    UiShowSpecifier showSpec = new UiShowSpecifier().ui(author, {
+        fieldLabeled author.firstName_
+        fieldLabeled author.lastName_
+    })
+
+    taackUiService.show(new UiBlockSpecifier().ui {
+        modal {
+            show showSpec
+        }
+    })
+}
+----
+
+.将新的默认标签设置为您想要的名称：
+
+[,properties]
+----
+default.firstName.label=First Name
+default.lastName.label=Last Name
+default.dateOfBirth.label=Date of Birth
+myBooks.listAuthor.label= Authors
+
+----
+
+现在您已经拥有了独立的书籍菜单和作者菜单，但它们目前还是各自独立运行的。如果在创建书籍时，可以直接从已注册的作者列表中进行选择会怎样？让我们来实现这个功能。
+
+.作者表格
+image::first-app-23-authors-filled.webp[Reload,width=800,align="left"]
+
+
+== 将作者关联到书籍
+
+.在 `Author` 类中添加以下方法：
+[,groovy]
+----
+String toString() {
+    return firstName + ' ' + lastName
+}
+----
+
+.修改 `Book` 类中的成员变量：
+[,groovy]
+----
+Author author
+----
+
+[NOTE]
+====
+请将 `MyBooksController` 和 `MyBooksUiService` 中所有的 `book.authorName_` 替换为 `book.author_`，并将所有的 `bookIterator.authorName_` 替换为 `bookIterator.author_`。
+====
+
+
+[WARNING]
+====
+强烈建议不要随意修改类的名称或字段，因为这需要清除包含先前已添加数据的数据库文件。
+您必须删除 `intranet/server/intranetDb.mv.db` 和 `intranet/server/intranetDb.trace.db` 以避免数据完整性错误。这将删除之前保存的所有数据。
+====
+
+.在 `messages.properties` 中添加一行：
+[,properties]
+----
+default.author.label=Author Name
+----
+
+.修改位于 `MyBooksUiService` 中的 `buildAuthorTable`：
+[,groovy]
+----
+rowColumn {
+    rowField authorIterator.firstName_
+    rowAction ActionIcon.SHOW * IconStyle.SCALE_DOWN,
+            MyBooksController.&showAuthor as MethodClosure, authorIterator.id
+    // Add the following if statement
+    if (isSelect)
+        rowAction tr('default.role.label'), ActionIcon.SELECT * IconStyle.SCALE_DOWN, authorIterator.id, authorIterator.toString()
+}
+----
+这将添加一个选择按钮，以便在填写 `bookForm` 时选择作者。请使用 `import static taack.render.TaackUiService.tr`。
+
+.修改位于 `MyBooksUiService` 中的 `buildBookForm`，替换 `field book.author_`：
+[,groovy]
+----
+ajaxField book.author_, MyBooksController.&selectAuthor as MC
+----
+当在 `bookForm` 中选择作者时，该行代码会调用 `selectAuthor`。
+
+接下来让我们实现 `selectAuthor`。
+
+.在 `MyBooksController` 中实现 `selectAuthor`：
+[,groovy]
+----
+def selectAuthor() {
+    UiTableSpecifier t = myBooksUiService.buildAuthorTable true // <1>
+    UiFilterSpecifier f = myBooksUiService.buildAuthorFilter()
+    taackUiService.show new UiBlockSpecifier().ui {
+        modal {
+            tableFilter f, t
+        }
+    }
+}
+----
+<1> 注意此处 `isSelect` 为 `true`。
+当为书籍表单选择作者时，这会渲染一个紧凑版的 `Author` 表格及其过滤器。
+
+.从作者表格中选择作者来添加书籍
+image::first-app-24-book-form-with-author-class.webp[Reload,width=800,align="left"]
+
+.选择作者（点击蓝色按钮）
+image::first-app-25-book-from-ajaxfield.webp[Reload,width=800,align="left"]
+
+
+现在，您已经使用 Taack DSL 框架为 `Book` 和 `Author` 实体构建了功能完备的 CRUD 界面，而无需手动编写任何 HTML 或 GSP 视图。
+
+
+*现在您已经准备好探索 Taack UI 框架的更多高级特性了。*
+
+*欢迎使用！*
+
+
+
+== 故障排除与常见错误
+
+.错误输出：
+[source,console]
+----
+ERROR: Cannot resolve symbol 'MyBooksUiService'
+----
+您在创建插件后忘记重新加载 Gradle 了。请点击 IDE 中的 Gradle 重新加载按钮。
+
+.错误输出：
+[,console]
+----
+ERROR:  Field 'authorName_' not found
+----
+您将 `authorName` 字段重命名为了 `author`（指向 `Author` 的引用）。请确保已在表单和表格中将所有的 `authorName_` 替换为 `author_`。
+
+.错误输出：
+[,console]
+----
+ERROR: No matching method for action...
+----
+请确保已在 `MyBooksController` 中声明了对应的方法，并且正确使用了 `MethodClosure` 语法：`MyBooksController.&myMethod as MethodClosure`。
+
+
+.表单可以显示但无法保存：
+您可能遗漏了 `saveBook` 方法上的 `@Transactional` 注解，或者忘记导入 `taackSaveService`。
+
+.重命名字段后出现数据库错误：
+如果您修改了领域类中的字段，则必须删除数据库文件：
+`intranet/server/intranetDb.mv.db`
+`intranet/server/intranetDb.trace.db`。请注意，这会清除之前保存的所有数据。
+
+.数据库连接器未刷新事务（Flush）：
+
+您可能使用了错误的 `@Transactional` 注解。请注意应当使用来自 GORM 包的注解，而不是 Javax 包中的注解。
+
+.访问 H2 数据库控制台：
+
+您可能希望检查内嵌 H2 数据库的数据完整性和生成的 DDL。
+
+为此，您需要调整 Spring Security 的配置。
+
+请前往
+Root → /server → /grails-app → /conf
+
+您会找到一个 `application.groovy` 文件。
+
+将
+
+```groovy
+[pattern: '/h2-console/**',  access: ['permitAll']],
+```
+添加到以下配置块中：
+```groovy
+grails.plugin.springsecurity.controllerAnnotations.staticRules = [
+	[pattern: '/',               access: ['permitAll']],
+	[pattern: '/error',          access: ['permitAll']],
+	[pattern: '/index',          access: ['permitAll']],
+	[pattern: '/index.gsp',      access: ['permitAll']],
+	[pattern: '/shutdown',       access: ['permitAll']],
+	[pattern: '/assets/**',      access: ['permitAll']],
+	[pattern: '/**/js/**',       access: ['permitAll']],
+	[pattern: '/**/css/**',      access: ['permitAll']],
+	[pattern: '/**/images/**',   access: ['permitAll']],
+	[pattern: '/**/favicon.ico', access: ['permitAll']]
+]
+```

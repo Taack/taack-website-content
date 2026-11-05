@@ -10,41 +10,94 @@
 * [ ] Rendered into PDF
 * [ ] Rendered into CSV
 
-Menu DSL associate menu entries with top level actions.
+Menu DSL associates menu entries with top level actions.
 Menu DSL supports only 2 levels max (without taking into account `section`).
+
+Entries are displayed only if the current user has access to the target action, labels are deduced from the action name if not given (use `lang=test` in the URL to see i18n keys).
 
 [source,groovy]
 [[menu-sample1]]
-.Menu Sample with conditional
+.Menu Sample
 ----
 private UiMenuSpecifier buildMenu(String q = null) {
-    new UiMenuSpecifier().ui {                          <1>
-        menu CrewController.&index as MC
+    new UiMenuSpecifier().ui {                                  <1>
+        menu CrewController.&index as MC                        <2>
         menu CrewController.&listRoles as MC
         menu CrewController.&hierarchy as MC
-        menuIcon ActionIcon.CONFIG_USER, this.&editUser as MC   <4>
+        menuIcon ActionIcon.CONFIG_USER, this.&editUser as MC   <3>
         menuIcon ActionIcon.EXPORT_PDF, this.&downloadBinPdf as MC
-        menuSearch this.&search as MethodClosure, q     <2>
-        menuOptions(SupportedLanguage.fromContext())    <3>
+        menuSearch this.&search as MC, q                        <4>
+        menuOptions SupportedLanguage.fromContext()             <5>
     }
 }
 ----
 
 <1> Create a new menu
-<2> Search menu
-<3> Languages entries
-<4> Icon entries (hoover message automatically deduced) .Corresponding Menu Rendering.
+<2> Entries, labels are deduced from the action
+<3> Icon entries (hover message automatically deduced)
+<4> Search box
+<5> Options entries (here languages), other enums implementing `IEnumOptions` can be added
 
-image:screenshot-dsl-menu-041.webp[]
+.Corresponding Menu Rendering
+image::screenshot-dsl-menu-041.webp[]
+
+== Sub-menus
+
+[source,groovy]
+----
+new UiMenuSpecifier().ui {
+    label 'Roles', {                                    <1>
+        subMenu CrewController.&listRoles as MC
+        subMenu CrewController.&hierarchy as MC
+    }
+    menuIcon 'Admin', ActionIcon.CONFIG, {              <2>
+        section 'Users', {                              <3>
+            subMenu CrewController.&editUser as MC
+        }
+    }
+}
+----
+
+<1> Labeled entry containing sub-menus
+<2> Icon entry containing sub-menus
+<3> `section` groups sub-menus under a title
+
+== Contextual Menus
+
+The same DSL is used to describe contextual menus (right click) on fields or classes:
+
+[source,groovy]
+----
+TaackUiService.registerContextualMenuClosure(
+    new Lead().leadStatus_,
+    new UiMenuSpecifier().ui { Long id ->
+        label 'Change Status'
+        Lead.read(id)?.leadStatus?.transitionsTo()?.each {
+            menu it.toString(), CrmController.&changeLeadStatus as MC,
+                [id: id, leadStatus: it.toString()]
+        }
+    })
+----
+
+== DSL Elements
+
+* `menu`: entry pointing to an action, optionally with a label, an id, a params map or a `Validateable` object
+* `label`: entry without action, or a group of sub-menus if a closure is given
+* `subMenu`, `subMenuIcon`: entries inside a `label` or a `menuIcon` closure
+* `section`: group sub-menus under a title
+* `menuIcon`: icon entry on the right part of the menu, can contain sub-menus
+* `menuSelect`: select box, the selected value is transmitted to the current action
+* `menuSearch`: search box
+* `menuOptions`: options entries (languages, subsidiaries, ...)
+* `inlineHtml`: custom HTML code
 
 [graphviz,format="svg",align=center]
 .Symbol's hierarchy diagram for Menu DSL
 ----
 digraph mygraph {
     node [shape=box];
-    ui -> menu, menuIcon, subMenu, menuOption [label = "0,N"]
+    ui -> menu, label, menuIcon, menuSelect, menuOptions, inlineHtml [label = "0,N"]
     ui -> menuSearch [label = "0,1"]
-    subMenu -> menu [label = "1,N"]
+    label, menuIcon -> subMenu, subMenuIcon, section, inlineHtml [label = "1,N"]
 }
 ----
-

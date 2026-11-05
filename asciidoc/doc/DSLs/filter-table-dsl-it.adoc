@@ -1,0 +1,369 @@
+= FilterTable DSL
+:doctype: book
+:taack-category: 5|doc/DSLs
+:toc:
+:source-highlighter: rouge
+:icons: font
+
+== Filtro (Filter)
+
+* [*] Renderizzato in HTML
+* [ ] Renderizzato in PDF
+* [ ] Renderizzato in Mail
+* [ ] Renderizzato in CSV
+
+.Filtro applicato a una tabella, da <<filter-sample1>>
+image::screenshot-dsl-filter.webp[width=250,align=center]
+
+Il Filter DSL è sempre associato a una Tabella, a un Diagramma o a un Kanban. Un blocco non può contenere solo un filtro.
+
+[[filter-code-sample]]
+=== Esempio di codice
+
+[source,groovy]
+[[filter-sample1]]
+.Esempio di codice filtro 1
+----
+UiFilterSpecifier f = new UiFilterSpecifier()           <1>
+
+f.ui User, {                                            <2>
+    section "User", {                                   <3>
+    	filterField u.username_                         <4>
+    	filterField u.lastName_
+    	filterField u.firstName_
+    	filterField u.manager_, u.manager.username_     <5>
+    	filterField u.subsidiary_
+    	filterField u.businessUnit_
+    	filterField u.enabled_
+    	filterFieldExpressionBool "My Team", true,      <6>
+            new FilterExpression(cu.allManagedUsers*.id,
+                    Operator.IN,
+                    u.selfObject_)
+    }
+    section "Role", {
+    	UserRole ur = new UserRole(role: new Role())
+    	filterFieldInverse "Role", UserRole,            <7>
+            ur.user_, ur.role_, ur.role.authority_
+    }
+}
+----
+
+<1> Creare il filtro
+<2> Passare la classe dell'oggetto e la closure contenente le specifiche del filtro tramite il metodo `ui`
+<3> Creare una sezione con etichetta "User"
+<4> Aggiungere il campo al filtro; notare il *trattino basso* (`_`) alla fine del nome del campo
+<5> Se il campo è un oggetto, passare un array con tutti i passaggi necessari per raggiungere il campo su cui si desidera filtrare
+<6> `filterFieldExpressionBool` consente filtri più complessi, visualizzati come casella di controllo; `true` è il valore predefinito
+<7> `filterFieldInverse` filtra gli utenti puntati da un `UserRole` la cui autorità di ruolo corrisponde
+
+[source,groovy]
+[[sample2]]
+.Esempio di filtro 2
+----
+UiFilterSpecifier f = new UiFilterSpecifier()
+
+CmsImage i = new CmsImage(cmsPage: new CmsPage())
+
+f.ui CmsImage, cmsPage ? [id: cmsPage.id] : null, { <1>
+    section "Image", {
+        filterField i.hide_
+        filterField i.filePath_
+        filterField i.imageType_
+    }
+    section "Origin", {
+        filterField i.cmsPage_, i.cmsPage.name_
+        filterField i.cmsPage_, i.cmsPage.subsidiary_
+        filterField i.cmsPage_, i.cmsPage.pageLayout_
+        filterField i.cmsPage_, i.cmsPage.pageType_
+    }
+}
+f
+----
+
+<1> È possibile passare parametri opzionali all'azione
+
+[source,groovy]
+[[filter-sample-join]]
+.Riutilizzo dei filtri
+----
+UiFilterSpecifier createReminderFilter(FieldInfo... leftField) {
+    Reminder r = new Reminder()
+    User u = new User()
+    new UiFilterSpecifier(leftField).ui Reminder, {     <1>
+        section Reminder, {                             <2>
+            filterField r.assignee_, u.username_
+            filterField r.status_
+            filterField r.title_
+        }
+    }
+}
+
+UiFilterSpecifier createReminderLinkFilter(FieldInfo... leftField) {
+    ReminderLink rl = new ReminderLink()
+    new UiFilterSpecifier(leftField).ui(ReminderLink, {
+        section 'Link', {
+            filterField rl.kind_
+        }
+    }).join(createReminderFilter(rl.reminder_))         <3>
+}
+----
+
+<1> `leftField` elenca i campi che puntano a un `Reminder` dall'oggetto contenitore
+<2> L'etichetta della sezione viene calcolata a partire dalla classe (i18n)
+<3> Il campo `reminder` è un `Reminder`; riutilizziamo il filtro per la classe `Reminder`
+
+.Filtri uniti (Joined Filters)
+image::screenshot-dsl-filter-join.webp[]
+
+[source,groovy]
+[[filter-sample-reverse]]
+.Filtro sugli oggetti che puntano agli oggetti filtrati
+----
+UiFilterSpecifier f = new UiFilterSpecifier().sec PlmFreeCadPart, {  <1>
+    PlmFreeCadLink link = new PlmFreeCadLink()
+    filterFieldExpressionReverse link.part_, true,                  <2>
+        new FilterExpression(null as Object, Operator.NE, link.part_)
+}
+----
+
+<1> `sec` crea un filtro senza parte grafica, sempre applicato (ad esempio per motivi di sicurezza)
+<2> Elenca solo le parti che non sono referenziate da un `PlmFreeCadLink` (`true` sta per `NOT IN`). Genera `sc.id NOT IN (select l.part.id from PlmFreeCadLink l where l.part IS NOT NULL)`
+
+=== Gerarchia dei simboli DSL
+
+[graphviz,format="svg",align=center]
+.Diagramma della gerarchia dei simboli per Filter DSL
+----
+digraph mygraph {
+  node [shape=box];
+  "ui"
+  "ui" -> hiddenId [label = "0,1"]
+  "ui" -> "section" [label = "1,N"]
+  "ui" -> "filterAction" [label = "0,1"]
+  "section" -> "section"
+  "section" -> "filterField", "filterFieldInverse" [label = "0,N"]
+  "ui", "section" -> "filterFieldExpressionBool", "filterFieldExpressionReverse", "orOp", "andOp", "innerFilter" [label = "0,N"]
+}
+----
+
+=== Elementi del DSL
+
+=== Radice (Root)
+* `ui`: una versione consente di passare parametri aggiuntivi all'azione di filtro (vedi <<sample2>>)
+* `sec`: filtro senza parte grafica, applicato in aggiunta al filtro visualizzato
+* `join`: aggiunge il filtro di una classe correlata (vedi <<filter-sample-join>>)
+
+=== Input
+* `filterField`: aggiunge il campo dell'oggetto da trasmettere all'azione di filtro
+* `filterFieldInverse`: filtra gli oggetti se un altro oggetto punta ad essi.
+* `filterFieldExpressionBool`: consente di modificare la clausola `where` nell'azione di filtro utilizzando `FilterExpression`, visualizzato come casella di controllo; il secondo parametro è il valore predefinito.
+* `filterFieldExpressionReverse`: `IN` o `NOT IN` su una sottoquery (vedi <<filter-sample-reverse>>)
+* `orOp`, `andOp`: combina espressioni
+* `innerFilter`: riutilizza un altro filtro su un campo
+
+=== Struttura
+* `section`: aggiunge una sezione grafica di filtro, etichettata da una stringa o da una classe, opzionalmente compressa
+* `filterAction`: pulsante di filtro personalizzato
+
+== Tabella (Table)
+
+* [*] Renderizzato in HTML
+* [*] Renderizzato in PDF
+* [*] Renderizzato in CSV
+
+image::screenshot-dsl-table.webp[width=720,align=center]
+
+pass:[<a class="taackMenu" ajaxAction="/dslSample/table" href="/dslSample/table">&#9654; Try it live</a>]
+
+=== Esempio di codice
+
+La parte destra dell'anteprima corrisponde all'esempio di DSL sottostante.
+Il filtro si trova a sinistra dell'immagine; vedere <<filter-sample1>> per il codice corrispondente.
+
+La tabella dispone di *paginazione*, è ordinata per impostazione predefinita sulla colonna *Date Created* e tutte le colonne sono *ordinabili* tranne Picture e Roles.
+Una colonna può contenere più celle.
+Vengono elencati solo gli utenti del team dell'utente corrente, poiché "My Team" è selezionato per impostazione predefinita nel filtro.
+
+
+[source,groovy]
+[[table-sample1]]
+.Esempio di tabella: intestazione, righe e ordinamento predefinito
+----
+new UiTableSpecifier().ui {
+    User u = new User(manager: new User(), enabled: true)
+    header {                                                <1>
+        column {
+            label tr('picture.header.label')                <2>
+        }
+        column {
+            sortableFieldHeader u.username_                 <3>
+            sortableFieldHeader u.dateCreated_
+        }
+        column {
+            sortableFieldHeader u.subsidiary_
+            sortableFieldHeader u.manager_, u.manager.username_
+        }
+        column {
+            sortableFieldHeader u.lastName_
+            sortableFieldHeader u.firstName_
+        }
+        label tr('default.roles.label')                     <4>
+    }
+
+    TaackFilter tf = taackFilterService.getBuilder(User)
+            .setSortOrder(TaackFilter.Order.DESC, u.dateCreated_)
+            .setMaxNumberOfLine(20).addFilter(f).build()
+
+    iterate(tf) { User ru ->                                <5>
+        rowFieldRaw attachmentUiService.preview(ru.mainPicture?.id)
+        rowColumn {
+            rowAction ActionIcon.SHOW * IconStyle.SCALE_DOWN,   <6>
+                CrewController.&showUser as MC, ru.id
+            rowAction ActionIcon.EDIT * IconStyle.SCALE_DOWN,
+                CrewController.&editUser as MC, ru.id
+            rowField ru.username_
+            rowField ru.dateCreated_
+        }
+        rowColumn {
+            rowField ru.subsidiary_
+            rowField ru.manager?.username
+        }
+        rowColumn {
+            rowField ru.lastName_
+            rowField ru.firstName_
+        }
+        rowField ru.authorities*.authority.join(', ')
+    }
+}
+----
+<1> Parte di intestazione delle specifiche della tabella
+<2> Intestazione di campo non ordinabile
+<3> Intestazione di campo ordinabile
+<4> Può essere racchiuso *senza* `column` se c'è un solo campo
+<5> `iterate`, che specifica ordinamento, paginazione e filtraggio
+<6> Icone che chiamano azioni, visualizzate prima dei valori dei campi
+
+[source,groovy]
+[[table-sample-select]]
+.Selezione multipla
+----
+header {
+    columnSelect "selectedUsers", {                         <1>
+        columnSelectButton "Disable", CrewController.&disableUsers as MC
+    }
+    // ...
+}
+iterate(tf) { User ru ->
+    rowSelect ru.id.toString(), true                        <2>
+    // ...
+}
+----
+<1> Colonna di selezione multipla, con i pulsanti che chiamano azioni sulle righe selezionate
+<2> Casella di controllo nella colonna corrispondente al `columnSelect` nell'intestazione
+
+`ActionIcon` può essere modificato da `IconStyle` (ad es. `ActionIcon.EDIT * IconStyle.SCALE_DOWN`).
+
+Lo stile della tabella è specificato da `Style`, un parametro opzionale sugli elementi `row`, `rowColumn` o `rowField`.
+
+[[table-filter-layout]]
+=== Contenuto HTML: rowField e rowFieldRaw
+
+`rowField` con una `String` viene *sanificato*: vengono mantenuti solo i tag di formattazione di base e i link, mentre tutto il resto (`<img>`, `<div>`, script...) viene rimosso. Per inserire codice HTML costruito autonomamente, come l'anteprima di un'immagine, utilizzare `rowFieldRaw`, che scrive il valore così com'è.
+
+[source,groovy]
+----
+iterate(tf) { User ru ->
+    rowFieldRaw attachmentUiService.preview(ru.mainPicture?.id)  <1>
+    rowField ru.authorities*.authority.join(', ')                <2>
+}
+----
+<1> HTML generato dall'applicazione, renderizzato così com'è
+<2> Testo semplice, sanificato
+
+WARNING: Non passare mai dati digitati dagli utenti a `rowFieldRaw`: non vengono sottoposti a escape, quindi consentirebbero l'iniezione di HTML o script.
+
+=== Layout del filtro (Filter Layout)
+
+[source,groovy]
+----
+new UiBlockSpecifier().ui {
+    tableFilter FilterLayout.TOOLBAR, buildFilter(), buildTable(), {  <1>
+        menuIcon ActionIcon.ADD, this.&editUser as MC                 <2>
+    }
+}
+----
+
+<1> `FilterLayout.TOOLBAR` visualizza il filtro come una barra sopra la tabella, `FilterLayout.SIDE` in una colonna accanto alla tabella (predefinito)
+<2> Menu visualizzato nell'intestazione del blocco
+
+[[table-option]]
+=== Opzioni della tabella (Table Options)
+
+[source,groovy]
+----
+TableOption tableOption = TableOption.builder
+        .stickyColumns(2)                           <1>
+        .onDropAction(this.&dropOnTable as MC)      <2>
+        .headerTheme(Style.BLUE)                    <3>
+        .build()
+
+new UiTableSpecifier().ui tableOption, {
+    // ...
+}
+----
+
+<1> Numero di colonne più a sinistra che rimangono visibili mentre la tabella scorre orizzontalmente
+<2> Azione chiamata quando dei file vengono rilasciati sulla tabella (`cellDropAction` fa lo stesso su una cella)
+<3> Colore dell'intestazione
+
+[[table-inline-edit]]
+=== Modifica in linea (Inline Edition)
+
+[source,groovy]
+----
+iterate(tf) { LeadLine ll ->
+    rowQuickEdit(CrmController.&applyLeadLine as MC, ll.id) {   <1>
+        rowColumn {
+            rowFieldEdit ll.salePrice_                          <2>
+            rowFieldEdit ll.qty_
+            rowField ll.total, nf                               <3>
+        }
+    }
+}
+
+@Transactional
+def applyLeadLine() {
+    LeadLine ll = new LeadLine()
+    taackSaveService.saveThenReloadOrRenderErrors(LeadLine,
+            [ll.qty_, ll.salePrice_] as FieldInfo[])            <4>
+}
+----
+
+<1> `rowQuickEdit` dichiara quale azione chiamare quando un valore viene modificato
+<2> `rowFieldEdit` modifica il valore in un campo di input, oppure lo visualizza se l'utente non può chiamare l'azione
+<3> Gli altri campi vengono ricalcolati dopo la modifica
+<4> Campi non modificabili nella tabella (`lockedFields`)
+
+.Modifica in linea con feedback di errore localizzato
+image::screenshot-dsl-inline-edit.webp[]
+
+=== Gerarchia dei simboli DSL
+
+.Diagramma della gerarchia dei simboli per Table DSL
+[graphviz,format="svg",align=center]
+----
+digraph mygraph {
+  node [shape=box];
+  ui
+  ui -> header, iterate [label = "0,1"]
+  ui -> row,rowIndent [label = "0,N"]
+  header -> column, columnSelect [label = "0,N"]
+  columnSelect -> columnSelectButton [label = "1,N"]
+  column, header -> label, sortableFieldHeader [label = "1,N"]
+  row, iterate, rowTree -> rowColumn, innerRow, rowQuickEdit [label = "0,N"]
+  rowQuickEdit -> rowColumn [label = "0,N"]
+  rowColumn, row, rowTree, iterate -> rowAction, rowField, rowFieldEdit, rowFieldRaw, rowSelect, cellDropAction [label = "0,N"]
+  rowIndent -> rowTree [label = "0,N"]
+  rowIndent -> rowIndent [label = "0,N"]
+}
+----

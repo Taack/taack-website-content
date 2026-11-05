@@ -1,0 +1,3 @@
+= GroovyDoc
+:doctype: book
+:taack-category: X|more

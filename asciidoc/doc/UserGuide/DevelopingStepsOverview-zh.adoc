@@ -1,0 +1,159 @@
+= 开发步骤概览
+:taack-category: 1|doc/UserGuide
+:toc:
+:source-highlighter: rouge
+:icons: font
+
+== 启用 Taack 框架支持
+
+为了能够在表单或带筛选器的表格中显示某个对象，该对象所属的类必须添加 `@TaackFieldEnum` 注解。
+
+当在类上指定 `@TaackFieldEnum` 注解时，框架会自动生成额外的符号。这些符号以下划线（`_`）结尾，供各类 DSL 使用。
+
+=== 普通类场景
+
+.启用普通类的代码示例
+[,groovy]
+----
+@GrailsCompileStatic                                    <1>
+@TaackFieldEnum                                         <2>
+final class QueryParameter implements Validateable {    <3>
+    Currency currency = Currency.EUR
+    Short monthStart = 1
+    Short monthStop = 12
+    Set<Subsidiary> subsidiaries
+    String sellerNamePattern
+    String productNameOrCodePattern
+    String customerNameOrCodePattern
+    Value itemValue
+    ItemRange range
+    Integer yearStart
+    Integer yearStop = Calendar.instance.get(Calendar.YEAR)
+
+    static constraints = {                              <4>
+        itemValue nullable: true
+        range nullable: true
+        monthStart min: 1, max: 12
+        monthStop min: 1, max: 12, validator: {         <5>
+            queryParameter, monthStop ->
+            if (monthStop < queryParameter.monthStart)
+                return "monthStop.greater.or.equals.to.monthStart"
+        }
+    }
+}
+
+----
+
+<1> 最佳实践：添加 `GrailsCompileStatic` 注解
+<2> 启用 AST 转换的注解
+<3> 类必须实现 `Validateable` 接口以支持约束校验（领域类无需显式实现）
+<4> 约束（constraints）定义
+<5> 校验器可以是一个返回国际化翻译键的闭包。
+
+此示例代码展示了一个标准类（即未定义在 `domain` 目录下的类）如何启用 Taack 框架支持。
+由于它不是持久化领域类，因此无法进行保存、检索或列表查询。
+
+它必须实现 Grails 的 `Validateable` 特征（trait）。
+
+=== 领域类场景
+
+.启用领域类的代码示例
+[,groovy]
+----
+@GrailsCompileStatic
+@TaackFieldEnum
+class CmsPage {                             <1>
+    Subsidiary subsidiary
+    Date dateCreated
+    Date lastUpdated
+
+    User userCreated
+    User userUpdated
+
+    Boolean published = false
+
+    CmsPageLayout pageLayout = CmsPageLayout.NO_SIDE_COLUMN
+    CmsPageType pageType
+
+    String name
+
+    Map<String, String> urlPart
+    Map<String, String> title
+    Map<String, String> hatContent
+    Map<String, String> bodyContent
+
+    CmsImage mainImage
+    CmsVideoFile mainVideo
+
+    Set<CmsImage> bodyImages
+
+    static hasMany = [
+            bodyImages: CmsImage
+    ]
+
+    static mappedBy = [bodyImages: "none"]
+
+    static constraints = {
+        name nullable: true
+        urlPart nullable: true
+        title nullable: true
+        hatContent nullable: true
+        bodyContent nullable: true, widget: 'textarea'
+        mainImage nullable: true
+        mainVideo nullable: true
+        bodyImages nullable: true
+    }
+
+    static mapping = {
+        autoTimestamp true
+    }
+}
+----
+
+<1> 领域类无需显式实现 `Validateable`
+
+领域类在 Taack 框架中作为一等公民对待，可以直接使用 `TaackSaveService` 提供的各项高级功能。
+
+== 领域类的对象操作
+
+=== 在表格中列出对象
+
+表格 DSL 提供了 `iterate` 符号，用于展示对象列表：
+
+[, groovy]
+----
+TaackFilter tf = taackFilterService.getBuilder(User)        <1>
+        .setSortOrder(TaackFilter.Order.DESC, u.dateCreated_)
+        .setMaxNumberOfLine(20).addFilter(f).build()
+
+iterate(tf) { User ru ->                                    <2>
+    row {                                                   <3>
+    }
+}
+----
+
+<1> 指定筛选条件、对对象列表进行安全控制，并设置显示约束
+<2> 使用 `row` 闭包遍历该 `TaackFilter`
+<3> 绘制行内容……
+
+
+=== 通过表单 DSL 保存对象并显示错误
+
+要保存新对象或修改后的对象（安全相关内容将在后文介绍），只需在表单目标动作（action）中调用以下方法：
+
+[, groovy]
+----
+taackSaveService.saveThenRedirectOrRenderErrors(User, this.&index)
+----
+
+共有 3 种可能的情况：
+
+ * 如果对象通过校验且用户拥有操作该对象的权限，浏览器将重定向到第二个参数指定的动作。
+ * 如果对象包含未通过校验的字段，表单将更新并高亮显示有问题的字段（如下图所示）。
+ * 如果用户没有权限操作该对象，则会显示错误提示。
+
+此处，`index` 是保存成功时跳转的目标动作，`User` 是对象类。
+
+[[form-html-errors-output]]
+.表单校验未通过时向用户展示的反馈。注意所报告的错误均已做本地化翻译。
+image::screenshot-form-validation.webp[]

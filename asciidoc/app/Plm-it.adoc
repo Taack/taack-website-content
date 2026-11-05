@@ -1,0 +1,226 @@
+= FreeCAD PLM
+:doctype: book
+:taack-category: 2|App
+:toc:
+:icons: font
+
+
+
+== Scopo
+
+Gestire la condivisione dei modelli FreeCAD e il versionamento lineare. Questa applicazione mostra le capacità del framework. Pochissime righe di codice descrivono l'interfaccia utente e gestiscono i dati persistenti. Possiamo considerare questa applicazione come un piccolo PLM (Product Lifecycle Management) per FreeCAD.
+
+== Ruoli
+
+* `ROLE_ADMIN`
+* `ROLE_PLM_USER`
+
+Vedere link:Crew-it.adoc#_purpose[configurare i ruoli in Crew] per aggiungere il ruolo nella propria Intranet.
+
+== Installazione del server
+
+
+=== Configurare il server PLM
+
+Se si desidera solo una panoramica, è possibile scaricare il server dimostrativo con la configurazione predefinita, andando direttamente a <<_launch_server_binaries>>.
+
+Ecco i comandi passo dopo passo:
+
+.Clonare il repository Intranet
+[source,bash]
+----
+git clone https://github.com/Taack/intranet.git
+OR
+git clone git@github.com:Taack/intranet.git
+----
+
+.Andare nella cartella `app`
+[source,bash]
+----
+cd intranet/app
+----
+
+.Clonare il repository PLM
+[source,bash]
+----
+git clone https://github.com/Taack/plm.git
+OR
+git clone git@github.com:Taack/plm.git
+----
+
+Da qui è possibile compilare il server o eseguirlo. Spostarsi nella cartella `intranet` e scegliere una delle seguenti opzioni:
+
+.Compilare i binari del server (per l'ambiente di produzione)
+[source,bash]
+----
+./gradlew bootJar
+----
+
+.Avviare il server (per l'ambiente di sviluppo)
+[source,bash]
+----
+./gradlew bootRun
+----
+
+[[_launch_server_binaries]]
+=== Avviare i binari del server
+
+La versione dimostrativa è disponibile qui: https://github.com/Taack/plm/releases[versioni di Taack PLM], scaricare `server-0.6.jar`.
+
+Se si sceglie di compilare i binari del server, eseguire:
+
+[source,bash]
+.Avviare il server
+----
+java -jar server/build/libs/server-0.6.jar
+----
+
+==== Argomenti del server
+
+Vedere `server/grails-app/conf/application.yml` per un elenco delle opzioni disponibili.
+
+Le opzioni possono essere passate al server in questo modo:
+
+[source,bash]
+.Combinare le opzioni
+----
+java -DOption1=Value1 -DOption2=Value2 ... -jar server-0.3.jar
+----
+
+===== Opzioni
+
+* Percorso in cui l'Intranet memorizza i suoi file: `-Dintranet.root=/home/test/someDir`
+* Porta del server: `-Dserver.port=9444`
+* URL del database: `-DdataSource.url='jdbc:h2./prodDb2;LOCK_TIMEOUT=10000;DB_CLOSE_ON_EXIT=FALSE'`
+* Percorso dell'eseguibile `dot`: `-Dexe.dot.path=/somePath...`
+
+
+[[python-protobuf-install]]
+== Installazione del Workbench di FreeCAD
+
+Andare in #Tools# > #Addon Manager#, aggiornare la cache locale e cercare *Taack*.
+
+image::addon-screenshot2.webp[]
+
+Fare clic sul pulsante di installazione.
+
+== Utilizzo
+
+=== Connettersi al PLM
+
+.Connettersi al PLM
+image::fc-connect-plm.webp[]
+
+<1> URL del server (con uno `/` finale)
+<2> Nome utente
+<3> Password
+<4> Directory in cui verranno salvate le parti scaricate (assicurarsi che sia riservata esclusivamente alle parti provenienti dal PLM)
+<5> Fare clic su `Connect` e attendere che compaia `Connected`
+
+=== Caricamento delle parti
+
+Facendo clic sul pulsante `Upload` (o `Ok`) nella scheda `Check-in`, il file verrà caricato nella propria Intranet. L'Intranet creerà un'anteprima; questo processo potrebbe richiedere del tempo.
+
+.Caricamento nel PLM
+image::freecad-plm.webp[]
+
+=== Ricerca delle parti
+
+Successivamente è possibile cercare le parti:
+
+.Ricerca delle parti
+image::fc-search-plm.webp[]
+
+<1> Fare clic sulla scheda `Search Part`
+<2> Cerca parte
+<3> Solo assiemi principali (parti che non appartengono a nessun'altra parte)
+<4> Fare clic per aprire una finestra di dialogo con i dettagli
+<5> Anteprima della parte
+<6> `Checkin`: scarica il modello localmente e blocca il file sul server in modo che nessuno possa caricare una nuova versione finché non si carica la propria
+<7> Scarica il modello localmente, in modalità di sola lettura
+<8> Chiude la finestra
+
+=== Gestione delle parti caricate
+
+.Gestione delle parti caricate
+image::freecad-plm-2.webp[]
+
+<1> Facendo clic su `Checkin` la parte verrà bloccata per la modifica e caricata in FreeCAD. Successivamente, quando si carica la parte, le nuove modifiche verranno aggiunte alla cronologia della parte e la parte verrà sbloccata.
+<2> Facendo clic su `Download Read-Only` la parte verrà scaricata sul computer e aperta in FreeCAD. Non sarà possibile caricare modifiche su questa parte, a meno che non la si duplichi.
+
+=== Scaricamento in sola lettura (Download Read-Only)
+
+Si noti la dicitura `READ_ONLY` nel campo principale dell'ID della parte. Se si tenta di caricarla tramite la scheda `Check-in`, un messaggio di errore ricorderà che la parte è in sola lettura. Sarà necessario duplicare la parte per caricare una nuova versione.
+
+.Scaricamento in sola lettura
+image::fc-download-only-plm.webp[]
+
+<1> Gerarchia del modello
+<2> Si noti la parola chiave `READ_ONLY`
+<3> Il modello 3D
+
+=== Duplicazione delle parti
+
+Per caricare una parte in sola lettura, è necessario duplicarla. È anche possibile duplicare una parte sottoposta a `Checkin` se si desidera creare una diramazione (fork) del modello.
+
+.Duplicazione delle parti
+image::fc-duplicate-plm.webp[]
+
+<1> Scegliere come duplicare il modello e fare clic su `Duplicate History` per duplicarlo
+
+Questo creerà una nuova parte sul server, mantenendo un collegamento tra le due parti:
+
+.Parti duplicate sul server
+image::freecad-taack-plm-server-part-details-duplicated.webp[]
+
+<1> Scheda delle parti duplicate (`Duplicated Parts`)
+<2> La parte clonata
+<3> Visualizzare il grafo gerarchico di questa parte
+
+=== Viste del server
+
+==== Elenco delle parti
+
+.Elenco delle parti
+image::freecad-taack-plm-server-part-list2.webp[]
+
+<1> Guida contestuale
+<2> Filtro per trovare una parte
+<3> Elenco dei risultati
+<4> Fare clic per mostrare il grafo delle dipendenze dell'assieme
+<5> Parti bloccate (parti in `Check-in`)
+
+==== Dettagli della parte
+
+.Vista dettagliata delle parti
+image::freecad-taack-plm-server-part-details.webp[]
+
+<1> Anteprima della versione corrente
+<2> Sottoparti, con anteprima e collegamenti alla versione specifica della sottoparte
+<3> Informazioni sulla versione
+<4> Scaricare il modello e le sue sottoparti in un file ZIP
+<5> Anteprima del modello in un visualizzatore 3D wireframe
+<6> Modificare lo stato della parte o sbloccarla se la si è bloccata o si dispone dei permessi necessari
+<7> Aggiungere tag alla parte per facilitarne la ricerca
+
+==== Cronologia della parte
+
+.Cronologia della parte
+image::freecad-taack-plm-server-part-details-history.webp[]
+
+<1> Versione iniziale
+<2> La parte è sbloccata, qualcuno può effettuarne il `Check-in`
+<3> Stato modificato da `CREATED` a `FREE`
+<4> Nuovo caricamento della parte; è possibile visualizzare il wireframe 3D del vecchio modello per tenere traccia visivamente delle modifiche
+
+WARNING: Se si hanno molti collegamenti, importarli dallo stesso computer. Da altri computer, scaricare il file ZIP dalla propria intranet.
+
+Questo è tutto; registrerò alcuni video per dimostrare le funzionalità di questa applicazione.
+
+video::YNbKiaUQY94[youtube, width=820, height=480]
+
+// # [auo@auo-systemproductname FreeCAD]$ yay -S boost cmake coin curl desktop-file-utils eigen gcc-fortran git glew hicolor-icon-theme jsoncpp libspnav med nlohmann-json opencascade pyside6-tools pyside6 python-matplotlib python-netcdf4 python-packaging python-pivy qt6-svg qt6-tools qt6-webengine shared-mime-info shiboken6 swig utf8cpp xerces-c yaml-cpp
+// git submodule update --init
+// ccmake -DFREECAD_QT_VERSION=6 ..
+// cmake .
+// make -j$(nproc --ignore=2)

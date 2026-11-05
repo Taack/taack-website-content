@@ -1,0 +1,288 @@
+= DSL per Grails
+:taack-category: 1
+:source-highlighter: rouge
+:icons: font
+
+slide::[fn=slideshow-it]
+
+[.home-intro]
+== Crea la tua intranet usando un DSL (senza HTML o JavaScript)
+
+https://github.com/Taack/infra[Taack-UI] è un plugin per https://grails.org/[Grails] che estende Grails descrivendo le interfacce utente tramite un http://docs.groovy-lang.org/docs/latest/html/documentation/core-domain-specific-languages.html[DSL Groovy] (Domain Specific Language) tipizzato staticamente.
+
+[.home-grid.home-start]
+--
+[.home-card]
+====
+icon:rocket[]
+
+*Installa*
+
+Configura Java, Grails e il tuo primo server Taack.
+
+link:usage-it.adoc#_installation_guide[Guida all'installazione →]
+====
+
+[.home-card]
+====
+icon:graduation-cap[]
+
+*Prima applicazione*
+
+Passo dopo passo: una tabella, un modulo, un filtro, un menu.
+
+link:usage-it.adoc#_first_app[Crea la tua prima applicazione →]
+====
+
+[.home-card]
+====
+icon:play-circle[]
+
+*Prova i DSL*
+
+Ogni pagina DSL apre i propri esempi dal vivo, in una finestra modale.
+
+link:doc/DSLs/form-dsl-it.adoc[Esplora i DSL →]
+====
+--
+
+[.home-news]
+****
+*Ultima versione: 0.7.11* (con 0.7.10): nuovi temi selezionabili dal menu delle impostazioni e un salvataggio riprogettato che evita il binding.
+link:news-it.adoc[Tutte le novità →]
+****
+
+== Dal codice allo schermo
+
+Un modulo richiede poche righe di Groovy. I campi sono simboli generati dalla tua classe (`username_`), quindi il compilatore li controlla; i vincoli diventano messaggi di errore localizzati.
+
+[.home-split]
+--
+[source,groovy]
+----
+def form() {
+    DslSampleUser u = new DslSampleUser()
+    taackUiService.show(new UiBlockSpecifier().ui {
+        modal {
+            form createForm(u, {
+                row {
+                    col {
+                        section 'User', {
+                            field u.username_
+                            field u.firstName_
+                            field u.lastName_
+                        }
+                    }
+                    col {
+                        section 'Details', {
+                            field u.age_
+                            field u.birthday_
+                            field u.city_
+                            field u.status_
+                            field u.enabled_
+                        }
+                    }
+                }
+                formAction this.&saveForm as MC
+            })
+        }
+    })
+}
+----
+
+image::home-form-sample.webp[Form with validation errors]
+--
+
+pass:[<a class="taackMenu" ajaxAction="/dslSample/form" href="/dslSample/form">&#9654; Try it live</a>]
+
+== Funzionalità
+
+[.home-grid]
+--
+[.home-card]
+====
+icon:shield[]
+
+*Sicurezza per singolo campo*
+
+Gli oggetti vengono visualizzati e modificati in base ai permessi dell'utente su *ogni campo*. I link e le azioni dei moduli che l'utente non può eseguire vengono nascosti automaticamente.
+
+link:doc/UserGuide/Security-it.adoc[Sicurezza →]
+====
+
+[.home-card]
+====
+icon:file-pdf-o[]
+
+*Un solo DSL, ogni formato di output*
+
+La stessa descrizione genera *HTML*, *PDF*, *email* e *CSV*.
+
+link:doc/DSLs/block-printable-dsl-it.adoc[DSL di stampa →]
+====
+
+[.home-card]
+====
+icon:language[]
+
+*Localizzato e validato*
+
+Le etichette provengono dai file i18n e gli errori di validazione vengono localizzati senza codice aggiuntivo.
+
+link:doc/DSLs/form-dsl-it.adoc#_form_validation[Validazione dei moduli →]
+====
+
+[.home-card]
+====
+icon:table[]
+
+*Filtra, ordina, impagina*
+
+Tabelle e filtri senza scrivere query né mantenere dati in sessione.
+
+link:doc/DSLs/filter-table-dsl-it.adoc[DSL per filtri e tabelle →]
+====
+
+[.home-card]
+====
+icon:search[]
+
+*Ricerca full-text*
+
+Indicizzazione Solr di oggetti di dominio tipizzati staticamente, con faceting e ranking. Le anteprime dei file sono estendibili.
+
+link:more/Search/Search-it.adoc[Ricerca →]
+====
+
+[.home-card]
+====
+icon:database[]
+
+*JDBC sul tuo modello*
+
+Interroga gli oggetti di dominio con TQL (Taack Query Language) da IntelliJ, DBeaver o LibreOffice Base.
+
+link:more/JDBC/taack-jdbc-driver-it.adoc[Driver JDBC Taack →]
+====
+
+[.home-card]
+====
+icon:terminal[]
+
+*SSH e SFTP*
+
+Un'interfaccia shell in esecuzione nel processo del server e un file system virtuale per utente, con verifica delle credenziali (modulo `taack-ui-ssh`).
+
+<<ssh_sftp,Screenshot ↓>>
+====
+
+[.home-card]
+====
+icon:code-fork[]
+
+*Server Git*
+
+L'applicazione Intercom fornisce Git su SSH: la documentazione scritta in AsciiDoc viene inviata tramite push e quindi renderizzata.
+
+link:app/Intercom-it.adoc[Intercom →]
+====
+--
+
+== Perché Taack?
+
+[.home-compare,cols="2,3,3,3",options="header"]
+|===
+|
+|Taack
+|Grails con GSP
+|Front-end JavaScript
+
+|UI scritta in
+|DSL Groovy, tipizzato staticamente
+|Template GSP, HTML, CSS
+|JavaScript o TypeScript, più un'API REST
+
+|Nomi dei campi verificati
+|In fase di compilazione
+|A runtime
+|Dipende dal contratto dell'API
+
+|Permessi per campo e azione
+|Integrati, link nascosti automaticamente
+|Scritti manualmente
+|Scritti manualmente, su entrambi i lati
+
+|PDF, CSV, Email
+|Lo stesso DSL dello schermo
+|Codice separato
+|Codice separato
+
+|Linguaggi da conoscere
+|Groovy
+|Groovy, HTML, CSS, JavaScript
+|Groovy o Java, JavaScript, HTML, CSS
+|===
+
+== Realizzato con Taack
+
+[.home-grid.home-apps]
+--
+[.home-card]
+====
+image::screenshot-dsl-table.webp[Crew]
+
+*Crew*: utenti, ruoli e gerarchia.
+
+link:app/Crew-it.adoc[Crew →]
+====
+
+[.home-card]
+====
+image::plm12-screenshot.webp[FreeCAD PLM]
+
+*FreeCAD PLM*: condivisione di modelli FreeCAD e versionamento lineare.
+
+link:app/Plm-it.adoc[FreeCAD PLM →]
+====
+
+[.home-card]
+====
+image::news-table2.webp[Intercom]
+
+*Intercom*: server SSH e Git, documentazione AsciiDoc pubblicata tramite Git.
+
+link:app/Intercom-it.adoc[Intercom →]
+====
+
+[.home-card]
+====
+image::step-preview1.webp[Viewers]
+
+*Viewers*: conversione e anteprima di file, come i modelli STEP.
+
+link:app/Viewers-it.adoc[Viewers →]
+====
+
+[.home-card]
+====
+image::collabora-editor.webp[Collabora Editor]
+
+*Collabora Editor*: modifica online di allegati da ufficio con Collabora.
+
+link:app/Collabora-Editor-it.adoc[Collabora Editor →]
+====
+--
+
+[[ssh_sftp]]
+== SSH e SFTP
+
+[.home-split]
+--
+[[ssh_screenshot]]
+.Sessione del server SSH
+image::screenshot-ssh.webp[]
+
+[[sftp_screenshot]]
+.File browser SFTP
+image::screenshot-sftp.webp[]
+--

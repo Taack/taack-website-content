@@ -1,0 +1,92 @@
+= Kanban DSL
+:doctype: book
+:taack-category: 6|doc/DSLs
+:toc:
+:source-highlighter: rouge
+:icons: font
+:experimental: true
+
+* [*] Rendu en HTML
+* [ ] Rendu en Mails
+* [ ] Rendu en PDF
+* [ ] Rendu en CSV
+
+image:screenshot-dsl-kanban.webp[]
+
+== Exemple de code
+[source,groovy]
+.Exemple de code Kanban 1
+----
+UiKanbanSpecifier buildTodoKanban() {
+    new UiKanbanSpecifier().ui {                                                                   <1>
+        column 'To Do', Style.ALIGN_CENTER, {                                                      <2>
+            custom "Custom header html code"
+        }, Gantt2Controller.&changeTodoProgression as MethodClosure, [newProgression: 0], {
+            custom "Custom html code"                                                              <3>
+            todos.forEach { Todo todo ->
+                card todo, Gantt2Controller.&showTodo as MethodClosure, todo.id, {                 <4>
+                    cardField todo.what_                                                           <5>
+                    cardFieldRaw "Custom html code"                                                <6>
+                    cardAction ActionIcon.SHOW * IconStyle.SCALE_DOWN, Gantt2Controller.&doSomething as MethodClosure, todo.id   <7>
+                }
+            }
+        }
+    }
+}
+----
+
+[source,groovy]
+.Action de dépôt (Drop)
+----
+@Transactional
+def changeTodoProgression(Integer newProgression) {
+    Todo todo = Todo.get(params.long('cardId'))                                                    <10>
+    todo.progression = newProgression
+    render status: 200
+}
+----
+
+[source,groovy]
+.Enregistrement du menu contextuel dans un service
+----
+@PostConstruct
+void init() {
+    TaackUiService.registerContextualMenuClosure(Todo, new UiMenuSpecifier().ui { Long id ->    <8>
+        menu 'Show Gantt', Gantt2Controller.&showGanttByTodo as MethodClosure, id                 <9>
+    })
+}
+----
+
+<1> Créer le spécificateur de kanban
+<2> Construire une colonne kanban avec son libellé, son style et une closure d'en-tête optionnelle (`custom` uniquement), avec possibilité de passer une action et des paramètres appelés lors d'un kbd:[Drag+Drop] dans la colonne
+<3> Possibilité d'ajouter du code HTML personnalisé dans le corps de la colonne
+<4> Construire des cartes dans la colonne, avec possibilité de passer une action et des paramètres appelés lors d'un kbd:[MouseDoubleClic] sur la carte
+<5> Construire une ligne avec un champ dans la carte, notez le *tiret bas* (`_`) à la fin du nom du champ
+<6> Code HTML personnalisé, rendu tel quel. `cardField` avec une `String` est assaini (seuls le formatage de base et les liens sont conservés) ; utilisez `cardFieldRaw` pour du HTML généré par l'application, jamais pour des données saisies par les utilisateurs
+<7> Possibilité d'ajouter une icône associée à une action au clic
+<8> Enregistrer un menu contextuel déclenché par kbd:[MouseRight] sur la carte
+<9> Ajouter une entrée de menu associée à une action
+<10> L'identifiant de la carte déposée est transmis via le paramètre `cardId`, avec les paramètres de la colonne
+
+Pour afficher le Kanban dans un bloc, utilisez `kanban` ou `kanbanFilter` pour lui associer un filtre :
+
+[source,groovy]
+----
+taackUiService.show(new UiBlockSpecifier().ui {
+    kanbanFilter buildTodoFilter(), buildTodoKanban()
+}, buildMenu())
+----
+
+== Hiérarchie des symboles DSL
+[graphviz,format="svg",align=center]
+.Diagramme de hiérarchie des symboles pour Kanban DSL
+----
+digraph kanbanDslGraph {
+  node [shape=box];
+  ui -> column [label = "0,N"]
+  column -> header [label = "0,1"]
+  header -> custom [label = "0,N"]
+  column -> custom, card [label = "0,N"]
+  card -> cardField, cardFieldRaw, cardAction [label = "0,N"]
+}
+----

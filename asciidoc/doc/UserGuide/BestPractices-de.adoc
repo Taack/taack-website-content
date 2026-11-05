@@ -1,0 +1,111 @@
+= Bewährte Methoden (Best Practices)
+:taack-category: 10|doc/UserGuide
+:toc:
+:source-highlighter: rouge
+:icons: font
+
+== Langsamer Code
+
+Wenn die Datenverarbeitung langsam ist und die Closure verzögert geladen (lazy loaded) wird, ist es wichtig, langsamen Code direkt in die Closure zu platzieren. Auf diese Weise wird er nur ausgeführt, wenn die Closure tatsächlich angezeigt wird.
+
+[source,groovy]
+----
+def showPage() {
+    // [. . .]
+    def b = new UiBlockSpecifier().ui {
+        diagram buildDiagram()                  <1>
+        tableFilter t, f                        <2>
+    }
+
+    taackUiService.show b
+}
+
+private UiDiagramSpecifier buildDiagram() {
+    // Always called                            <3>
+    new UiDisagramSpecifier().ui {
+        // Called only when needed              <4>
+        def data = slowDataRetreiveMethod()
+        // Draw data Stuffs
+    }
+}
+----
+
+<1> `buildDiagram` wird immer aufgerufen, selbst wenn das zu zeichnende Ziel `tableFilter` ist, aber die resultierende Closure wird nicht jedes Mal ausgeführt
+<2> Beim Sortieren oder Filtern wird nur die Tabelle gezeichnet, nicht das Diagramm
+<3> Teil, der immer aufgerufen wird
+<4> Wird nur bei Bedarf aufgerufen; langsamer Code sollte hier stehen.
+
+== Programmierstil-Leitfaden für die Grails-Anwendungsentwicklung
+
+Hier sind einige Richtlinien, die die Wartung von Anwendungen erleichtern:
+
+- Methodenmodifikatoren:
+** Verwenden Sie die Modifikatoren `protected`, `private` und `final` für Methoden in einem Controller, die keine Aktionen sind.
+- Programmierstil:
+** Bevorzugen Sie prägnanten Code bei gleichzeitiger Wahrung der Klarheit.
+** Verwenden Sie durchgehend die Annotationen `@GrailsCompileStatic` oder `@CompileStatic` in der gesamten Codebasis.
+- Zustandslose Aktionen:
+** Entwerfen Sie Aktionen immer zustandslos (stateless) und vermeiden Sie die Verwendung von Sessions.
+- Controller-Traits:
+** Verzichten Sie auf die Verwendung von Services zur Implementierung von Controller-Traits.
+- `@Transactional`-Annotation:
+** Reservieren Sie die `@Transactional`-Annotation ausschließlich für Controller-Aktionen.
+- Allgemeine Regeln:
+** Verwenden Sie nach Möglichkeit den Modifikator `final`.
+** Befolgen Sie das DRY-Prinzip (Don't Repeat Yourself).
+** Halten Sie den Gültigkeitsbereich (Scope) von Symbolen so klein wie möglich, um die Lesbarkeit des Codes zu verbessern.
+** Wählen Sie prägnante und aussagekräftige Namen für lokale Variablen.
+** Geben Sie Parameter öffentlicher Methoden und Attributnamen klar an.
+
+Durch die Einhaltung dieser Richtlinien können Sie eine saubere und ausdrucksstarke Codebasis für Ihre Grails-Anwendung aufrechterhalten.
+
+== i18n
+
+- Zentralisieren Sie `i18n` nicht, sondern verwenden Sie die `i18n`-Ordner des jeweiligen Gradle-Anwendungsmoduls für jede Anwendung.
+
+[,groovy]
+----
+class Book {
+    String title
+}
+----
+- Lokalisierung des Klassennamens: "book.label = Libro"
+- Lokalisierung des Klassenfeldnamens: "book.title.label = Título del libro"
+- Um effizient zu sein:
+** Übersetzen Sie nicht zu früh
+** Beginnen Sie mit der Übersetzung, sobald Sie einen Gesamtüberblick haben
+** Halten Sie die wichtigsten Beschriftungen kurz und verwenden Sie dafür den Namensraum `default`; spezialisierte Beschriftungen können länger sein
+- Verwenden Sie Konventionen für Ihre `i18n`-Dateien:
+** Stellen Sie allem, was wiederverwendet werden könnte, das Präfix "default." voran
+** Stellen Sie übersetzten Klassennamen kein Präfix voran
+** In der Anwendung `crew` verwenden wir aktions- und domänenspezifische Property-Dateien (siehe https://github.com/Taack/intranet/tree/main/app/crew/grails-app/i18n[Crew i18n-Ordner])
+
+Gemeinsame `i18n`-Einträge sollten im Anwendungsmodul `Crew` oder in `Server` lokalisiert werden; Properties sind nicht privat für ein einzelnes Anwendungsmodul.
+
+== Konfiguration
+
+- Verwenden Sie im Code `enum` für die Konfiguration
+** Statische Typisierung ist Trumpf
+** Groovy-Enums sind gut lesbar (besser als XML, JSON, YAML ...)
+
+== Sicherheit
+
+- Sicherheitsrelevanter Code sollte sich nahe an der Stelle befinden, an der er wirkt
+** Wir wollen eine Zentralisierung für alle Belange vermeiden
+*** Erstellen Sie je nach Bedarf eine neue Domänenklasse und vermeiden Sie es, die Klasse `User` zu überladen
+*** Abstrakte Konzepte sollten aus Sicherheitsgründen minimiert werden; statische Prüfungen sind entscheidend
+- Vermeiden Sie komplexe Regeln, die während der Kompilierung nicht statisch überprüft werden können
+- Administrative Regeln dürfen sich nicht auf Berechtigungs-Strings stützen; ein boolescher Wert in einem Objekt ist beim Testen im Code expliziter.
+
+== Domänenklassen
+
+* Vermeiden Sie zyklische Abhängigkeiten im Domänenmodell (`User` => `Cart` UND `Cart` => `User`), wenn Domänenklassen zu verschiedenen Anwendungsmodulen gehören
+* Domänenklassen sollten so minimal wie möglich gehalten werden
+* *Keine Hilfsklassen (Helper)* mit externen Abhängigkeiten in der Domäne
+
+== Wir erkennen, dass wir effizient sind, wenn:
+
+- Kleine Weiterentwicklungen keine vollständige Neuprogrammierung auslösen
+- Das Hinzufügen neuer Funktionen unkompliziert ist
+- Verschiedene Belange isoliert bleiben und sich gegenseitig minimal beeinflussen
+- Die Dinge einfach erscheinen

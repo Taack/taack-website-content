@@ -1,0 +1,127 @@
+= Show DSL
+:doctype: book
+:taack-category: 4|doc/DSLs
+:toc:
+:source-highlighter: rouge
+:icons: font
+
+* [*] Gerendert in HTML
+* [*] Gerendert in PDF
+* [ ] Gerendert in CSV
+
+Diese DSL wird verwendet, um Informationen mit eingeschränkten Bearbeitungsmöglichkeiten anzuzeigen. Felder können gestaltet werden.
+
+== Codebeispiel
+
+[source,groovy]
+----
+UiShowSpecifier buildUserShow(User u) {
+    new UiShowSpecifier().ui {
+        field 'Picture',                                <1>
+            attachmentUiService.previewFull(u.mainPicture?.id)
+        fieldLabeled u.username_                        <2>
+        fieldLabeled u.firstName_
+        fieldLabeled u.lastName_
+        fieldLabeled u.businessUnit_
+        fieldLabeled u.subsidiary_
+        fieldLabeled u.mail_
+        fieldLabeled u.manager_
+    }
+}
+----
+<1> Explizite Beschriftung und Wert (hier HTML-Code)
+<2> Die Beschriftung wird aus dem Feld abgeleitet; beachten Sie den *Unterstrich* am Ende des Feldnamens
+
+.Entsprechende Darstellung in einem modalen Fenster
+image::screenshot-dsl-show.webp[]
+
+pass:[<a class="taackMenu" ajaxAction="/dslSample/show" href="/dslSample/show">&#9654; Try it live</a>]
+
+== Abschnitte, Aktionen und Stile
+
+[source,groovy]
+----
+new UiShowSpecifier().ui {
+    section "Partner", {
+        showAction ActionIcon.SHOW * IconStyle.SCALE_DOWN,  <1>
+            this.&showContact as MC, partner.id
+        fieldLabeled Style.EMPHASIS + Style.BLUE,           <2>
+            partner.name_
+        fieldLabeled partner.branding_
+    }
+}
+----
+<1> Das Icon wird am Ende des nächsten Feldwertes angezeigt; es muss verkleinert werden, damit es neben das Feld passt
+<2> Stile stehen an erster Stelle und können mit `+` kombiniert werden
+
+== Rasterlayout (Grid Layout)
+
+[source,groovy]
+----
+new UiShowSpecifier().ui ShowLayout.GRID, {                      <1>
+    fieldLabeled item.ref_
+    fieldLabeled item.name_
+    fieldLabeled item.itemStatus_
+    fieldLabeled item.gtin_
+    fieldLabeled Style.SPAN_TWO, item.labeling_                  <2>
+    fieldLabeled Style.BOLD + Style.SPAN_FULL, item.description_ <3>
+}
+----
+
+<1> `ShowLayout.GRID` ordnet die Felder in einem sich automatisch anpassenden Raster an, anstatt vertikal in einer Spalte. Der Standardwert ist `ShowLayout.LIST`.
+<2> Jedes Feld nimmt standardmäßig eine Rasterzelle ein. Mit `Style.SPAN_TWO` / `Style.SPAN_THREE` kann sich ein Feld über mehrere Spalten erstrecken.
+<3> `Style.SPAN_FULL` lässt ein Feld über die gesamte Zeile reichen.
+
+Das Raster passt automatisch so viele Spalten an, wie es die Containerbreite zulässt, wobei jede Spalte mindestens `220px` breit ist (das Minimum kann im eigenen CSS über die Klasse `taackShowGrid` überschrieben werden).
+
+image::screenshot-dsl-show-grid.webp[]
+
+== HTML-Inhalt
+
+Einige Elemente geben ihren `String`-Wert unverändert aus, andere *bereinigen* ihn (nur grundlegende Formatierungs-Tags und Links bleiben erhalten, `<img>`, `<div>` oder Skripte werden entfernt):
+
+[cols="2,1",options="header"]
+|===
+|Element |HTML
+|`fieldLabeled field_`, `fieldUnlabeled field_` |Bereinigt
+|`field style, html` (ohne Beschriftung) |Bereinigt
+|`field label, html` |Unverändert ausgegeben
+|`field html` (ein Argument) |Unverändert ausgegeben
+|`inlineHtml html, cssClass` |Unverändert ausgegeben, in einem `div` mit der angegebenen CSS-Klasse
+|===
+
+[source,groovy]
+----
+new UiShowSpecifier().ui {
+    field 'Picture', attachmentUiService.previewFull(u.mainPicture?.id) <1>
+    field Style.BOLD, '<b>Summary</b><img src="...">'                   <2>
+    fieldLabeled u.username_                                            <3>
+}
+----
+<1> Beschriftetes Feld: Das Bild-HTML wird unverändert angezeigt
+<2> Ohne Beschriftung: bereinigt, der fettgedruckte Text bleibt erhalten, das `<img>`-Tag wird entfernt
+<3> Wert eines Domänenfeldes: bereinigt
+
+WARNING: Unverändert ausgegebene Elemente werden nicht maskiert: Übergeben Sie ihnen nur von der Anwendung erzeugtes HTML, niemals von Benutzern eingegebene Daten.
+
+== DSL-Elemente
+
+* `section`: beschriftete Gruppe von Feldern
+* `fieldLabeled`: Feldwert mit einer aus dem Feld abgeleiteten Beschriftung (i18n)
+* `fieldUnlabeled`: Feldwert ohne Beschriftung
+* `field`: Feld mit expliziter Beschriftung (`field 'Print Date', new Date().toString()`) oder HTML-Code (`field Style.ALIGN_CENTER, '<h1>Title</h1>'`)
+* `inlineHtml`: roher HTML-Code mit einer optionalen CSS-Klasse
+* `showAction`: Icon oder Link zum Aufrufen einer Aktion, angezeigt am Ende des nächsten Feldes
+
+== DSL-Symbolhierarchie
+
+[graphviz,format="svg",align=center]
+.Symbolhierarchiediagramm für Show DSL
+----
+digraph mygraph {
+  node [shape=box];
+  ui
+  ui -> section [label = "0,N"]
+  ui, section -> showAction, field, fieldLabeled, fieldUnlabeled, inlineHtml [label = "0,N"]
+}
+----

@@ -1,0 +1,238 @@
+= Controlador JDBC de Taack
+:doctype: book
+:taack-category: 0|more/JDBC
+:toc:
+:source-highlighter: rouge
+:icons: font
+
+== ¿Qué es?
+
+JDBC significa *Java Database Connectivity*. Es un componente de Java antiguo, importante y enormemente utilizado. Simplifica la consulta y edición de datos entre diferentes programas.
+
+Nuestra implementación actual de JDBC solo permite consultar datos desde la Intranet.
+
+Actualizar datos por este medio es un tema complejo. Tenemos que lidiar con los permisos de usuario y la validación de datos que no están descritos a nivel de base de datos, sino directamente dentro del código de la Intranet. Se necesita un nuevo enfoque por nuestra parte para evitar duplicar el código.
+
+.Diagrama de secuencia al ejecutar una consulta sin errores
+[plantuml,format="svg",opts="online"]
+----
+@startuml
+group Querying Object using TQL
+        You -> Program : Type the Query
+        activate Program
+        Program -> Driver : Transmit the Query
+        Driver -> Intranet : Transmit the Query
+        Intranet -> Intranet : Validate TQL Grammar
+        Intranet -> Intranet : Validate Tables and fields
+        Intranet -> Intranet : Translate TQL to HQL
+        Intranet -> Intranet : Translate HQL to SQL
+        note right
+            **SQL** is the Database
+            Native Language
+        end note
+        Intranet -> Database : transmit the SQL
+        activate Database #000055
+        Database -> Intranet : retreive Results
+        deactivate Database
+        Intranet -> Intranet : Pack Results
+        Intranet -> Driver : Transmit the Pack
+        Driver -> Driver : Unpack
+        Driver -> Program : Transmit Results
+        Program -> You : Show Results
+        deactivate Program
+        You -> Program : You scroll on \nthe results
+        note right
+            **Program** will request for
+            more data if needed,
+            using an **offset**
+        end note
+end
+
+box "Your Computer" #LightBlue
+    participant Program
+    participant Driver
+end box
+box "The Intranet Server" #Yellow
+    participant Intranet
+    participant Database
+end box
+
+@enduml
+----
+
+== ¿Dónde consultar datos con este controlador?
+
+Hasta ahora solo se han probado *3 programas de software* con este controlador:
+|===
+|Programa           |¿Introspección?|¿Consultas?|¿Actualización?| ¿Inserción?
+
+|LibreOffice 7.3    |Solo lista de tablas|Sí    |No             | No
+|dBeaver            |Sí             |Sí         |Todavía no     | Todavía no
+|Intellij           |Sí             |Sí         |Todavía no     | Todavía no
+|===
+
+La #introspección# le ayuda al escribir consultas mediante el *autocompletado*. Mientras escribe la consulta, el programa le informará sobre las tablas y los campos disponibles.
+
+Existen 2 patrones de trabajo para analizar datos:
+
+* Escribir y probar la consulta en un software que admita *introspección*;
+* Luego, o bien:
+** Usar la consulta escrita directamente en *LibreOffice*
+** O trabajar con una *extracción CSV* y cargarla en cualquier software (incluido *Office*)
+
+WARNING: Más adelante haré vídeos sobre cómo configurar el controlador con esos programas.
+
+[[_tql_queries]]
+== Consultas TQL
+
+La principal diferencia entre un controlador JDBC convencional y el nuestro es el lenguaje de consulta.
+
+Hemos desarrollado *TQL* (Taack Query Language); estas son algunas de sus ventajas:
+
+* Seguro: verificamos la consulta escrita antes de enviarla a la base de datos real
+* Sintaxis sencilla:
+** Menor necesidad de joins
+** Acceso a campos referenciados (consulte <<easy-syntax>> punto (2))
+* Independiente de la base de datos
+
+=== Estructura de las consultas básicas
+
+[source,sql]
+[[easy-syntax]]
+.Ejemplo básico de TQL
+----
+select                              <1>
+    l.client.firstName,             <2>
+    l.rep.username                  <2>
+from Lead l                         <3>
+where l.dateCreated > '2022-01-01'  <4>
+----
+<1> #Cláusula Select#, que permite seleccionar *columnas*;
+<2> #Campos desreferenciados#: si la columna es en sí misma un objeto, puede acceder de forma recursiva a los campos del objeto. Aquí `rep` es un objeto `User` que contiene campos propios (como `username`);
+<3> #Cláusula From#, que permite elegir *tablas*; aquí usamos un _alias_ `l`
+<4> #Cláusula Where#, que permite filtrar datos.
+
+=== Consultas básicas con fórmulas
+
+Es posible añadir fórmulas aritméticas en la cláusula select.
+
+[source,sql]
+[[basic-query-with-formulas]]
+.Ejemplo básico de TQL con fórmulas
+----
+select
+    ll.lead.name,
+    ll.qty * ll.salePrice as totalWoTaxes   <1>
+from LeadLine ll
+where ll.qty * ll.salePrice > 100           <2>
+----
+<1> #Cláusula Select#, admite tanto `alias de columna` como operaciones aritméticas
+<2> #Cláusula Where#, también admite aritmética
+
+WARNING: El nombre del alias de columna debe comenzar con una letra minúscula y pertenecer únicamente al conjunto de caracteres ASCII7.
+
+.Resultados del ejemplo básico con fórmulas
+|===
+|lead.name |totalWoTaxes
+
+|Balisage pylône SFR site 240087 (Hivory)
+|250.00000000
+
+|Balisage pylône SFR site 240087 (Hivory)
+|340.00000000
+
+|Balisage pylône SFR site 240087 (Hivory)
+|3410.00000000
+
+|EL BJORN low intensity IR AWL system
+|2700.00000000
+|===
+
+=== Consultas con agrupación
+
+La cláusula de agrupación añade la capacidad de agregar datos.
+El <<basic-query-with-formulas>> no tiene una línea por oferta, sino por línea de oferta.
+Es posible utilizar la agrupación para obtener una línea por oferta, como en el siguiente ejemplo:
+
+[source,sql]
+.Ejemplo de TQL con agrupación y fórmulas
+----
+select
+    ll.lead.rep.mainSubsidiary as salesmanSubsidiary,   <1>
+    count(ll.id),                                       <2>
+    sum(ll.qty * ll.salePrice)                          <2>
+from LeadLine ll
+group by ll.lead.rep.mainSubsidiary                     <1>
+----
+<1> Campo estándar, debe incluirse en la #cláusula Group by#;
+<2> Puede utilizar las funciones de agregación #count# o #sum#.
+
+WARNING: Los alias de columna no están soportados en columnas agregadas
+
+|===
+|salesmanSubsidiary|count(ll.id)    |sum(ll.qty * ll.salePrice)
+
+|CITEL_2CP         |118605|212619001943.17760000
+|CITEL_GMBH        |37336 |261342488.98760000
+|CITEL_INC         |25172 |319681146.49190000
+|CITEL_INDIA       |24868 |1122541659.94000000
+|CITEL_OOO         |10382 |3990221200.80740000
+|CITEL_SH          |269   |552810.59000000
+|OBSTA             |46151 |2762758463.12580000
+|===
+
+=== Consultas con Inner Joins
+
+A veces una columna apunta a más de una línea.
+
+Esto se denomina una relación de *muchos a muchos* (many-to-many). No podemos usar campos referenciados directamente; es necesario usar lo que se conoce como *joins* ... (suena a los años 70, pero no es culpa mía).
+
+En el siguiente ejemplo, los *Items* contienen muchos *Values*, y los *Values* pueden ser utilizados por más de un *Item*. Si queremos listar Items y Values en la misma tabla, necesitamos una especie de producto cartesiano entre 2 conjuntos de datos.
+
+WARNING: La cardinalidad del producto cartesiano de 2 conjuntos es #M x N#; debe utilizar la *cláusula Where* para reducir el número de resultados.
+
+[source,sql]
+.Join simple en TQL
+----
+select
+    i.name,
+    i.ref,
+    v.valueString,
+    v.associatedProperty.valueKind as kind,
+    v.associatedProperty.kindOfCharacteristic as typeOfChar,
+    v.associatedProperty.nameAlias as nameAlias
+from Item i, Value v                                    <1>
+where v in elements(i.values) and i.range.name = 'DVM'  <2>
+
+----
+<1> Listamos 2 tablas de forma independiente
+<2> *DEBEMOS* limitar el número de resultados con la expresión `v in elements(i.values)`
+
+.Resultados
+|====
+| name | ref | valueString | kind | typeOfChar | nameAlias
+
+| DVM-230-16A | 3589015 | NULL | dico | BULLET_POINTS | bulletPoints
+| DVM-230-16A | 3589015 | IP20 | string | MECA | NULL
+| DVM-230-16A | 3589015 | -40/+85°C | string | MECA | NULL
+| DVM-230-16A | 3589015 | NULL | dico | NULL | description
+| DVM-230-16A | 3589015 | NULL | dico | NULL | subFamily
+| DVM-230-16A | 3589015 | NULL | dico | MECA | NULL
+| DVM-230-16A | 3589015 | NULL | dico | NORMES | NULL
+| DVM-230-16A | 3589015 | voir schéma | dico | MECA | NULL
+| DVM-230-16A | 3589015 | NULL | dico | MECA | NULL
+| DVM-230-16A | 3589015 | NULL | dico | MECA | NULL
+| DVM-230-16A | 3589015 | NULL | dico | MECA | NULL
+| DVM-230-16A | 3589015 | 16 A | string | ELEC | NULL
+| DVM-230-16A | 3589015 | NULL | dico | ELEC | NULL
+| DVM-230-16A | 3589015 | 0.0305 kg | string | MECA | NULL
+| DVM-230-16A | 3589015 | NULL | dico | NULL | family
+| DVM-230-16A | 3589015 | 230 V monophasé | dico | ELEC | NULL
+| DVM-230-16A | 3589015 | PTFE | string | MECA | NULL
+| DVM-230-16A | 3589015 | NULL | bool | NULL | NULL
+|====
+
+== Limitaciones actuales del controlador
+
+* No podrá *desreferenciar* campos de idioma (`v.valueMap['fr']` fallará, al igual que `v.valueMap`).
+* Solo admitimos Inner join, no outer join. Nuestra implementación actual de join es lenta; podemos mejorarla, pero es más complejo.

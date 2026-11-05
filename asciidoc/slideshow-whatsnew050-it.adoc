@@ -1,0 +1,49 @@
+:taack-height: 640
+include::_settings_reveal.adoc[]
+:source-highlighter: highlightjs
+:highlightjs-languages: groovy, gnuplot
+:title-slide-transition: zoom
+:title-slide-transition-speed: fast
+:icons: font
+:docinfo: shared
+:customcss: custom.css
+
+= Cosa c'è di nuovo?
+Versione 0.5.X
+
+== Basato su Bootstrap
+
+* Supporto per i temi
+** Schema di colori dal tuo desktop
+** Dimensione dei componenti regolabile
+* Più facile da estendere
+
+== Tempo di caricamento migliorato
+
+* Meno risorse (asset)
+* CSS e JS ridotti
+
+== Principali modifiche al codice
+
+=== Nuovo DSL di layout
+
+* Stesso layout per `forms` e `blocks`
+** `col` e `row`
+** `tabs` e `tab`
+
+NOTE: `#With#` solo per `#col#`
+
+=== Menu DSL per i blocchi
+
+* Il DSL di menu sostituisce le azioni
+* Non è più necessario usare icone
+* I menu vengono tradotti automaticamente
+
+=== Codice più semplice
+
+Porta a:
+
+* Manutenzione più semplice
+* Maggiore facilità nel contribuire
+
+// asciidoctor-revealjs -r asciidoctor-diagram -a revealjsdir=https://cdn.jsdelivr.net/npm/reveal.js@3.9.2  -a data-uri slideshow-whatsnew050-fr.adoc.adoc

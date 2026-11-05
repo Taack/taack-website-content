@@ -1,0 +1,28 @@
+= Crew
+:doctype: book
+:taack-category: 1|App
+:toc:
+
+[[_purpose]]
+== Zweck
+
+Benutzer im System verwalten:
+
+* Klicken Sie auf das `Plus`-Zeichen, um einen Benutzer hinzuzufügen.
+* Klicken Sie auf #Roles# und anschließend auf das `Plus`-Zeichen in der Tabelle, um eine Rolle hinzuzufügen.
+
+== Rollen
+
+`ROLE_ADMIN`
+
+=== Reguläre Controller
+* *crew*
+* *attachment*
+
+=== Unterstützende Controller
+* *modelVisitor*: Gibt einen Graphen des Modells aus
+* *progress*: Unterstützender Controller für die Fortschrittsleiste
+
+=== Externe Abhängigkeit
+
+* `convert` aus ImageMagick installieren

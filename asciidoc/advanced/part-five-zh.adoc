@@ -1,0 +1,160 @@
+= PDF 文档
+:doctype: book
+:taack-category: 5|advanced
+:toc:
+:source-highlighter: rouge
+
+== 环境准备
+本任务的完整解答与骨架代码可从以下仓库克隆：
+
+[,shell]
+----
+git clone git@github.com:Taack/myLibrary.git
+----
+
+.要获取本部分的骨架代码，请打开终端并 `cd` 进入项目目录（`myLibrary`），然后复制并执行以下命令。
+[,bash]
+----
+git checkout part-5-skeleton
+----
+
+或者在 IntelliJ 中直接选择所需的分支。点击左上角的 `main/myLibrary/remote` 即可查看所有分支，选择对应分支并执行 checkout。
+
+== 创建 PDF
+
+在本节中，您将学习如何根据项目中的数据生成 PDF 文档。
+
+要创建 PDF，您将使用 `UiPrintableSpecifier()`，它由以下部分组成：
+
+- `printableHeader`：用于定义将在所有页面上重复显示的页眉。
+- `printableBody`：用于定义跨越多页的 PDF 正文内容。
+- `printableFooter`：用于定义将在所有页面上重复显示的页脚（高度不得超过 2cm）。
+
+如果您想查看示例，请参阅 link:doc/DSLs/block-printable-dsl-zh.adoc[可打印块 DSL（Printable Block DSL）]。
+
+=== 可打印页眉（Printable Header）
+
+如果您需要不同于 2cm 的高度，则高度参数是必填的。
+
+有三种选项可用于组织页眉的显示方式：
+
+- `printableHeaderLeft`：从左向右绘制
+- `printableHeader`：需要指定位置（居中、居左、居右）
+- `printableHeaderRight`：从右向左绘制
+
+在页眉内部，您可以使用 `UiSpecifier` 绘制内容。
+
+.示例代码：
+[,groovy]
+----
+printableHeaderRight('7.5cm') { //<1>
+    show new UiShowSpecifier().ui {
+        field'Content'
+    }, BlockSpec.Width.MAX
+}
+----
+<1> 从右侧开始绘制高度为 7.5cm 的页眉。
+
+接下来我们将实现自己的 `printableHeader`，在其中绘制请求生成 PDF 的用户姓名、Taack 徽标以及请求生成 PDF 的日期。
+
+打开 `MyLibraryUiService`。
+
+专业模式：实现 `buildLibraryPdf` 的 `printableHeader` [TODO 1.1]。
+
+.实现 `buildLibraryPdf` 的 `printableHeader`：
+[,groovy]
+----
+printableHeaderLeft('7.5cm') {
+    show new UiShowSpecifier().ui {
+        field Style.BOLD, 'Printed for'
+        field """${currentUser.firstName} ${currentUser.lastName}"""
+    }, BlockSpec.Width.THIRD
+    show new UiShowSpecifier().ui {
+        field """
+            <div style='height: 2cm; text-align: center; width: 75%;'>
+                ${this.taackUiService.dumpAsset('logo-taack-web.svg')}
+            </div>
+        """
+    }, BlockSpec.Width.THIRD
+    show new UiShowSpecifier().ui {
+        field Style.ALIGN_RIGHT, """${new Date()}"""
+    }, BlockSpec.Width.THIRD
+}
+----
+
+=== 可打印正文（Printable Body）
+
+在正文内部，您可以使用与 `printableHeader` 相同的 `UiSpecifier` 来绘制内容。
+
+1. 我们希望显示所有作者的姓名，并在每个作者下方通过表格展示该作者所著的图书。
+2. 我们还希望展示之前实现的图表。
+3. 最后，如果请求生成 PDF 的用户是借阅者，我们希望在表格中显示已归还图书的借阅申请列表。
+
+专业模式：实现 `buildLibraryPdf` 中 `printableBody` 的第一部分 [TODO 1.2.1]。
+
+.实现 `buildLibraryPdf` 中 `printableBody` 的第一部分：
+[,groovy]
+----
+List<MyLibraryAuthor> authors = MyLibraryAuthor.list(sort: 'lastName')
+for (MyLibraryAuthor author : authors) {
+    show new UiShowSpecifier().ui {
+        field """<h2>${author.firstName} ${author.lastName}</h2>"""
+    }, BlockSpec.Width.MAX
+    table this.buildAuthorTablePdf(author), BlockSpec.Width.MAX
+}
+----
+
+专业模式：实现 `buildLibraryPdf` 中 `printableBody` 的第二部分 [TODO 1.2.2]。
+
+.实现 `buildLibraryPdf` 中 `printableBody` 的第二部分：
+[,groovy]
+----
+anonymousBlock BlockSpec.Width.MAX, {
+    diagram buildAuthorPieDiagram(true), BlockSpec.Width.MAX
+    diagram buildBookPopularityPieDiagram(true), BlockSpec.Width.MAX
+    diagram buildBarDiagram(true, 'YEAR'), BlockSpec.Width.MAX
+    diagram buildBorrowDurationWhiskersDiagram(), BlockSpec.Width.MAX
+}
+----
+
+专业模式：实现 `buildLibraryPdf` 中 `printableBody` 的第三部分 [TODO 1.2.3]。
+
+.实现 `buildLibraryPdf` 中 `printableBody` 的第三部分：
+[,groovy]
+----
+if (currentUser?.authorities?.any { it.authority == 'ROLE_BORROWER' }) {
+    table this.buildUserBorrowsTable(false, null, true), BlockSpec.Width.MAX
+}
+----
+
+=== 可打印页脚（Printable Footer）
+
+在页脚内部，您同样可以使用与 `printableHeader` 相同的 `UiSpecifier` 来绘制内容。
+它会自动在右下角显示页码。
+为了避免冗余，我们不在 `printableFooter` 中显示任何额外内容。
+
+== 渲染 PDF
+
+菜单中已添加了一个显示 `export_pdf` 图标的按钮，它会调用 `downloadLibraryPdf`（`downloadBinLibraryPdf`），从而创建并下载 PDF。让我们来实现该方法。
+
+打开 `MyLibraryController`。
+
+专业模式：实现 `downloadBinLibraryPdf` [TODO 2]。
+
+.实现 `downloadBinLibraryPdf`：
+[,groovy]
+----
+def downloadBinLibraryPdf() {
+    UiPrintableSpecifier pdf = myLibraryUiService.buildLibraryPdf()
+    taackUiPdfService.downloadPdf(pdf, 'LibrarySummary', false)
+}
+----
+
+[WARNING]
+====
+任何用于创建 PDF 的方法名称都*必须*以 *downloadBin* 开头
+====
+
+
+以下是通过此代码生成的 PDF 示例：
+link:LibrarySummary.pdf[图书馆摘要（LibrarySummary）]

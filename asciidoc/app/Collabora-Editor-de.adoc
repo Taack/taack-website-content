@@ -1,0 +1,83 @@
+= Collabora Editor
+:doctype: book
+:taack-category: 4|App
+:toc:
+:source-highlighter: rouge
+:experimental: true
+
+== Zweck
+
+Erweitert den Attachment-Controller in der Crew-App.
+
+Ermöglicht das Bearbeiten von Office-Dokumenten mit https://www.collaboraonline.com/[Collabora Online]. Alle Anhänge werden online bearbeitbar.
+
+== Rollen
+
+* `ROLE_TEMPLATE_ADMIN`: Ermöglicht Benutzern das Erstellen neuer Vorlagen zum Anlegen neuer Anhänge.
+
+== Collabora CODE Docker-Image installieren und starten
+
+.Docker starten
+[source,bash]
+----
+sudo systemctl restart docker
+----
+
+.Collabora CODE installieren
+[source,bash]
+----
+sudo docker pull collabora/code:latest
+----
+
+.Collabora CODE ausführen
+[source,bash]
+----
+sudo docker run --privileged --network host -e "username=test" -e "password=test"  -e "extra_params=--o:ssl.enable=false" -p 9980:9980 collabora/code:latest   <1>
+----
+
+<1> Nur zu Testzwecken deaktivieren wir SSL und wählen einen einfachen Benutzernamen / ein einfaches Passwort. Sie benötigen `--network host` nicht, wenn Collabora auf einem anderen Server ausgeführt wird.
+
+.Testen, ob der Dienst gestartet wurde
+[source,bash]
+----
+$ LANG=C wget http://localhost:9980/
+--2025-02-18 22:35:56--  http://localhost:9980/
+Resolving localhost (localhost)... ::1, 127.0.0.1
+Connecting to localhost (localhost)|::1|:9980... connected.
+HTTP request sent, awaiting response... 200 OK
+
+    The file is already fully retrieved; nothing to do.
+----
+
+== Repository `editor-collabora` klonen und einbinden
+
+[source,bash]
+----
+$ git clone https://github.com/Taack/collabora-editor.git
+----
+
+== Intranet-Konfiguration
+
+[source,yaml]
+----
+collabora.url: http://127.0.0.1:9980/     <1>
+----
+
+<1> Ersetzen Sie die IP-Adresse durch den DNS-Namen des Servers.
+
+== Screenshot
+
+.Bearbeiten einer ODP-Datei
+image::collabora-editor.webp[]
+
+Einige grundlegende Befehle:
+
+* Vollbild => menu:Zoom[Fullscreen]
+* Kompaktansicht => menu:Display[Compact View], oder klicken Sie auf image:lc_sidebar.svg[width=25]
+* Seitenleiste schließen => menu:Display[Close Panel]
+* Datei speichern, um eine neue Version im Intranet zu erstellen (klicken Sie auf image:lc_save.svg[width=25] oder drücken Sie btn:[CTRL + S])
+
+
+== Video
+
+video::tB6mL07pzQQ[youtube,480]

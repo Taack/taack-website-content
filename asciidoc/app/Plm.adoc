@@ -105,27 +105,112 @@ Click on installation button.
 
 == Usage
 
-.Select Taack PLM Workbench
-image::plm12-screenshot.webp[]
+=== Connect to the PLM
 
-<1> Taack PLM Workbench
-<2> Main Action
-<3> Enter server URL (with a trailing '/')
-<4> Enter User Credentials
-<5> Enter Password Credentials
-<6> Connect to the server
-<7> Choose Duplicate Mode
-<8> Duplicate History
+.Connect to the PLM
+image::fc-connect-plm.webp[]
 
+<1> Server URL (with a trailing `/`)
+<2> Username
+<3> Password
+<4> Directory where downloaded parts will sit (make sure it is exclusively reserved for parts from the PLM)
+<5> Click Connect, wait for `Connected` to appear
 
-Clicking on OK button will upload the file into your Intranet. The Intranet will create a preview, this process might take time.
+=== Uploading Parts
 
-.Details View of Parts ...
+Clicking on the `Upload` button (or `Ok`) in the `Check-in` tab will upload the file into your Intranet. The Intranet will create a preview, this process might take time.
+
+.Uploading to the PLM
+image::freecad-plm.webp[]
+
+=== Search for Parts
+
+Then you can search for parts:
+
+.Search for Parts
+image::fc-search-plm.webp[]
+
+<1> Click on `Search Part` tab
+<2> Search Part
+<3> Top assemblies only (parts that do not belong to another part)
+<4> Click to open a dialog box with details
+<5> Preview of the part
+<6> Checkin, download the model locally and lock the file on the server so no one can upload a new version until you upload a new version
+<7> Download the model locally, in read-only mode
+<8> Close the window
+
+=== Manage Uploaded Parts
+
+.Manage Uploaded Parts
+image::freecad-plm-2.webp[]
+
+<1> Clicking on `Checkin` will lock the part for you to edit, and load the part into FreeCAD. Then, when you upload the part, your new changes will be added to the part history, and the part will be unlocked.
+<2> Clicking on `Download Read-Only` will download the part to your computer and open it in FreeCAD. You will not be able to upload changes to this part, unless you duplicate it.
+
+=== Download Read-Only
+
+Notice the `READ_ONLY` in the main Part ID field. If you attempt to upload it via the `Check-in` tab, an error message will remind you that the part is read-only. You will have to duplicate the part to upload a new version.
+
+.Download Read-Only
+image::fc-download-only-plm.webp[]
+
+<1> Model hierarchy
+<2> Notice the `READ_ONLY` keyword
+<3> The 3D model
+
+=== Duplicating Parts
+
+To upload a Read-Only part, you must duplicate it. You can also duplicate a part that you checked in if you want to fork the model.
+
+.Duplicating Parts
+image::fc-duplicate-plm.webp[]
+
+<1> Choose how you want to duplicate the model, and click on `Duplicate History` to duplicate the model
+
+This will create a new part on the server, and a link is maintained between the two parts:
+
+.Duplicated Parts on the Server
+image::freecad-taack-plm-server-part-details-duplicated.webp[]
+
+<1> Duplicated Parts tab
+<2> The cloned part
+<3> View the hierarchy graph of this part
+
+=== Server Views
+
+==== Part List
+
+.Part List
+image::freecad-taack-plm-server-part-list2.webp[]
+
+<1> Context help
+<2> Filter to find a Part
+<3> Result list
+<4> Click to show dependency graph of the Assembly
+<5> Locked parts (Checked-in parts)
+
+==== Part Details
+
+.Details View of Parts
 image::freecad-taack-plm-server-part-details.webp[]
 
-<1> File Preview
-<2> Links Hierarchy
-<3> Tags
+<1> Preview of the current Version
+<2> Sub-parts, with Preview, links to the specific version of the sub-part
+<3> Version Info
+<4> Download the model and its sub-parts in a zip file
+<5> Preview of the model in a 3D wireframe viewer
+<6> Change Status of the part or unlock the part if you locked it or have the necessary permissions
+<7> Add tags to the part to ease searching for it
+
+==== Part History
+
+.Part History
+image::freecad-taack-plm-server-part-details-history.webp[]
+
+<1> Initial Version
+<2> Part is unlocked, someone can check it in
+<3> Status changed from CREATED to FREE
+<4> New upload of the part, you can view the 3D wireframe of the old model to visually track changes
 
 WARNING: If you have many links, import them from the same computer. From other computers, download the zip file from your intranet.
 

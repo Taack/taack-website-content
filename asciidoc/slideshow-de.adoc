@@ -1,0 +1,131 @@
+include::_settings_reveal.adoc[]
+:source-highlighter: highlightjs
+:highlightjs-languages: groovy, gnuplot
+:title-slide-transition: zoom
+:title-slide-transition-speed: fast
+:icons: font
+:docinfo: shared
+:customcss: custom.css
+:taack-height: 512
+
+= Taack UI
+
+[.hero,transition=zoom]
+== Erstellen Sie Ihr Intranet in [.accent]#Groovy#
+
+[.lead]
+Typisierte DSLs für Grails: kein HTML, kein JavaScript
+
+[.chips]
+[.chip]#HTML# [.chip]#PDF# [.chip]#CSV# [.chip]#Mail#
+
+[.columns.split,transition=slide]
+== Beschreiben statt Templates schreiben
+
+[.column]
+--
+[source,groovy]
+----
+new UiFormSpecifier().ui user, {
+    section "User", {
+        field user.username_
+        field user.firstName_
+        field user.lastName_
+        ajaxField user.manager_,
+            this.&selectUser
+    }
+    formAction this.&saveUser
+}
+----
+--
+
+[.column]
+--
+image::slideshow-crew-form.webp[]
+--
+
+[.columns.split,transition=slide]
+== Zur Kompilierzeit geprüft
+
+[.column.points]
+--
+* [.accent]#field_#-Symbole werden aus Ihren Klassen generiert
+* Beim Umbenennen eines Feldes findet der Compiler jede Ansicht
+* Validierungsfehler sind ohne Zusatzaufwand lokalisiert
+--
+
+[.column]
+--
+image::slideshow-crew-form-validation.webp[]
+--
+
+[.shot,transition=slide]
+== Tabellen, Filter, Paginierung
+
+image::slideshow-crew-users.webp[]
+
+[.charts,transition=slide]
+== Diagramme in wenigen Zeilen
+
+image:diag-dsl-bar.webp[] image:diag-dsl-line.webp[] image:diag-dsl-pie.webp[] image:diag-dsl-whiskers.webp[]
+
+[.columns.split,transition=slide]
+== Dieselbe DSL, als PDF gedruckt
+
+[.column]
+--
+[source,groovy]
+----
+new UiPrintableSpecifier().ui {
+    printableHeader '2.5cm', {
+        show userHeader, Width.THIRD
+    }
+    printableBody {
+        show userShow, Width.MAX
+        table userTable, Width.MAX
+        diagram barChart, Width.MAX
+    }
+}
+----
+--
+
+[.column]
+--
+image::slideshow-pdf-sample.webp[]
+--
+
+[.cards,transition=slide]
+== Alles inklusive
+
+[.card]
+--
+icon:search[] +
+Volltextsuche
+--
+
+[.card]
+--
+icon:eye[] +
+Dateivorschauen
+--
+
+[.card]
+--
+icon:database[] +
+JDBC auf Ihrem Modell
+--
+
+[.card]
+--
+icon:terminal[] +
+SSH & SFTP
+--
+
+[.hero,transition=zoom]
+== Live ausprobieren
+
+[.lead]
+Jede DSL-Seite der Dokumentation öffnet ihre Beispiele in einem modalen Fenster
+
+[.chips]
+[.chip]#Docs › DSLs# [.chip]#▶ Live ausprobieren#

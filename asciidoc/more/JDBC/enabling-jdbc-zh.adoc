@@ -1,0 +1,41 @@
+= 启用 JDBC
+:doctype: book
+:taack-category: 1|more/JDBC
+:toc:
+:source-highlighter: rouge
+:icons: font
+
+== 创建非惰性（non-lazy）服务
+
+.为 `User` 领域类启用 JDBC
+[,groovy]
+----
+package crew
+
+import grails.compiler.GrailsCompileStatic
+import org.taack.User
+
+import javax.annotation.PostConstruct
+
+import static taack.base.TaackJdbcService.Jdbc
+
+@GrailsCompileStatic
+class CrewJdbcService {
+
+    static lazyInit = false <1>
+
+    @PostConstruct <2>
+    private static void init() {
+        def u = new User()
+        Jdbc.registerClass(User,
+                u.username_, u.mail_,
+                u.subsidiary_, u.firstName_,
+                u.lastName_, u.businessUnit_,
+                u.enabled_) <3>
+    }
+}
+----
+
+<1> 该服务由于无需注入到其他地方，因此不能使用惰性初始化（lazy initialization）
+<2> 列出可通过 TQL 访问的领域类列的方法
+<3> 步骤 3 可以对所有领域类重复执行

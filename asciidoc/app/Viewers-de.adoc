@@ -1,0 +1,23 @@
+= Viewers
+:doctype: book
+:taack-category: 4|App
+:toc:
+:source-highlighter: rouge
+
+
+== Zweck
+
+Dateien konvertieren und in der Vorschau anzeigen.
+
+.STEP-Bildvorschau
+image::step-preview1.webp[]
+
+.Benutzerdefinierte STEP-Vorschau
+image::step-preview2.webp[]
+
+== Quellen
+
+[source,bash]
+----
+$ git clone https://github.com/Taack/viewers.git
+----
